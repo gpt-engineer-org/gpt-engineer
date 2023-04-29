@@ -1,0 +1,75 @@
+Instructions:
+We are writing a feature computation framework.
+
+It will mainly consist of FeatureBuilder classes.
+
+Each Feature Builder will have the methods:
+- get(key, context, cache):  To first check cache, and then go on to call dependencies to compute the feature. Returns value and hash of value.
+- dry_run(key, context):  To check that "type" of key will match input requirements of features
+- input_type(context):  That explains what dimensions key is applying to
+- output_type(context):  That explains what type the output is
+
+It will have the class attr:
+- deps:  list of FeatureBuilder classes
+
+Where it is unclear, please make assumptions and add a commend in the code about it
+
+Here is an example of Builders we want:
+
+ProductEmbeddingString:  takes product_id, queries the product_db and gets the title as a string
+ProductEmbedding: takes string and returns and embedding
+ProductEmbeddingDB: takes just `merchant` name, uses all product_ids and returns the blob that is a database of embeddings
+ProductEmbeddingSearcher: takes a string, constructs embeddingDB feature (note: all features are cached), embeds the string and searches the db
+LLMProductPrompt:  queries the ProductEmbeddingString, and formats a template that says "get recommendations for {title}"
+LLMSuggestions: Takes product_id, looks up prompts and gets list of suggestions of product descriptions
+LLMLogic: Takes the product_id, gets the LLM suggestions, embeds the suggestions, does a search, and returns a list of product_ids
+
+
+The LLMLogic is the logic_builder in a file such as this one:
+```
+def main(merchant, market):
+    cache = get_cache()
+    interaction_data_db = get_interaction_data_db()
+    product_db = get_product_db()
+    merchant_config = get_merchant_config(merchant)[merchant]
+
+    context = Context(
+        interaction_data_db=interaction_data_db,
+        product_db=product_db,
+        merchant_config=merchant_config,
+    )
+    
+    product_ids = cache(ProductIds.get)(
+        key=(merchant, market),
+        context=context,
+        cache=cache,
+    )
+
+    for logic_builder in merchant_config['logic_builders']:
+        for product_id in product_ids:
+            key = (merchant, market, product_id)
+            p2p_recs = cache(logic_builder.get)(key, cache, context)
+            redis.set(key, p2p_recs)
+```
+
+API to product_db:
+```
+    async def get_product_attribute_dimensions(
+        self,
+    ) -> dict[AttributeId, Dimension]:
+        return await self.repository.get_product_attribute_dimensions(self.merchant)
+
+    async def get_products(
+        self,
+        attribute_ids: set[AttributeId],
+        product_ids: set[ProductId] | None = None,
+    ) -> dict[ProductId, dict[AttributeId, dict[IngestionDimensionKey, Any]]]:
+        return await self.repository.get_products_dict(
+            self.merchant, attribute_ids, product_ids
+        )
+```
+
+(note, dimensions are not so important. They related to information that varies by: locale, warehouse, pricelist etc)
+
+
+Remember to read the Instructions carefully.
