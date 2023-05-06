@@ -1,47 +1,45 @@
+import json
 import os
 import pathlib
 from typing import Optional
 import openai
 from chat_to_files import to_files
+from ai import AI
+from steps import STEPS
+from db import DB, DBs
 import typer
 
 
 app = typer.Typer()
+    
 
 
 @app.command()
 def chat(
-    engine: str = "gpt-4",
-    temperature: float = 0.0,
+    model: str = "gpt-4",
+    temperature: float = 0.1,
     max_tokens: int = 4096,
     n: int = 1,
     stream: bool = True,
-    system_prompt: str = typer.Argument("system", help="System prompt file"),
-    user_prompt: str = typer.Argument("user", help="User prompt file"),
-    code_to_file_path: Optional[str] = typer.Option(
+    input_path: str = typer.Argument(
+        None, help="input path"
+    ),
+    memory_path: str = typer.Argument(
+        None, help="memory path"
+    ),
+    workspace_path: Optional[str] = typer.Option(
         None, "--out", "-c", help="Code to file path"
     ),
 ):
 
-    # ensure file path corresponds to file in the same file as this script, using __file__
-    if system_prompt == "system":
-        # get folder of script
-        system_prompt = pathlib.Path(__file__).parent / system_prompt
+    if memory_path is None:
+        memory_path = pathlib.Path(__file__).parent / 'memory'
 
-    if user_prompt == "user":
-        user_prompt = pathlib.Path(__file__).parent / user_prompt
-
+    if input_path is None:
+        input_path = pathlib.Path(__file__).parent / 'input'
     
-    with open(system_prompt, "r") as f:
-        system_prompt = f.read()
-    with open(user_prompt, "r") as f:
-        user_prompt = f.read()
-    response = openai.ChatCompletion.create(
-        model=engine,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
+    ai = AI(
+        model=model,
         temperature=temperature,
         max_tokens=max_tokens,
         n=n,
@@ -49,15 +47,19 @@ def chat(
         stop=None,
     )
 
-    chat = []
-    for chunk in response:
-        delta = chunk['choices'][0]['delta']
-        msg = delta.get('content', '')
-        print(msg, end="")
-        chat.append(msg)
+    dbs = DBs(
+        memory=DB(memory_path),
+        logs=DB(pathlib.Path(memory_path) / 'logs'),
+        input=DB(input_path),
+        workspace=DB(workspace_path),
+        identity=DB(pathlib.Path(__file__).parent / 'identity'),
+    )
 
-    if code_to_file_path is not None:
-        to_files("".join(chat), code_to_file_path)
+    run_prefix= workspace_path.split('/')[-1] + '_' if workspace_path is not None else ''
+
+    for step in STEPS:
+        messages = step(ai, dbs)
+        dbs.logs[run_prefix + step.__name__] = json.dumps(messages)
 
 
 if __name__ == "__main__":

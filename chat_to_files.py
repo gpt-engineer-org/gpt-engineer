@@ -21,13 +21,9 @@ def parse_chat(chat):# -> List[Tuple[str, str]]:
     return files
 
 
-def to_files(chat, path):
-    os.makedirs(path, exist_ok=True)
-
-    with open(os.path.join(path, 'all_output.txt'), "w") as f:
-        f.write(chat)
+def to_files(chat, workspace):
+    workspace['all_output.txt'] = chat
 
     files = parse_chat(chat)
     for file_name, file_content in files:
-        with open(os.path.join(path, file_name), "w") as f:
-            f.write(file_content)
+        workspace[file_name] = file_content
