@@ -1,0 +1,86 @@
+Instructions:
+We are writing a feature computation framework.
+
+It will mainly consist of FeatureBuilder classes.
+
+Each Feature Builder will have the methods:
+- get(key, config, context, cache):  Call feature builder dependencies and then compute the feature. Returns value and hash of value.
+  - key:  tuple of arguments that are used to compute the feature
+  - config:  the configuration for the feature
+  - context:  dataclass that contains dependencies and general configuration (see below)
+  - controller:  object that can be used to get other features (see below)
+  - value:  object that can be pickled
+
+It will have the class attr:
+- deps:  list of FeatureBuilder classes
+- default_config:  function that accepts context and returns a config
+
+The Controller will have the methods:
+- get(feature_builder, key, config):  Check the cache, and decide to call feature builder and then returns the output and timestamp it was computed
+  - feature_builder:  FeatureBuilder class
+  - key:  tuple of arguments that are used to compute the feature
+  - configs:  dict of configs that are used to compute features
+
+and the attributes:
+- context:  dataclass that contains dependencies and general configuration (see below)
+- cache: cache for the features
+
+Where it is unclear, please make assumptions and add a comment in the code about it
+
+Here is an example of Builders we want:
+
+ProductEmbeddingString:  takes product_id, queries the product_db and gets the title as a string
+ProductEmbedding: takes string and returns and embedding
+ProductEmbeddingDB: takes just `merchant` name, uses all product_ids and returns the blob that is a database of embeddings
+ProductEmbeddingSearcher: takes a string, constructs embeddingDB feature (note: all features are cached), embeds the string and searches the db
+LLMProductPrompt:  queries the ProductEmbeddingString, and formats a template that says "get recommendations for {title}"
+LLMSuggestions: Takes product_id, looks up prompts and gets list of suggestions of product descriptions
+LLMLogic: Takes the product_id, gets the LLM suggestions, embeds the suggestions, does a search, and returns a list of product_ids
+
+
+The LLMLogic is the logic_builder in a file such as this one:
+```
+def main(merchant, market):
+    cache = get_feature_cache()
+    interaction_data_db = get_interaction_data_db()
+    product_db = get_product_db()
+    merchant_config = get_merchant_config(merchant)
+
+    context = Context(
+        interaction_data_db=interaction_data_db,
+        product_db=product_db,
+        merchant_config=merchant_config,
+    )
+    
+    product_ids = cache(ProductIds).get(
+        key=(merchant, market),
+        context=context,
+        cache=cache,
+    )
+
+    for logic_builder in merchant_config['logic_builders']:
+        for product_id in product_ids:
+            key = (merchant, market, product_id)
+            p2p_recs = cache(logic_builder).get(key=key, context=context, cache=cache)
+            redis.set(key, p2p_recs)
+```
+
+API to product_db:
+```python
+    async def get_product_attribute_dimensions(
+        self,
+    ) -> dict[AttributeId, Dimension]:
+        pass
+
+    async def get_products(
+        self,
+        attribute_ids: set[AttributeId],
+        product_ids: set[ProductId] | None = None,
+    ) -> dict[ProductId, dict[AttributeId, dict[IngestionDimensionKey, Any]]]:
+        pass
+```
+(note, dimensions are not so important. They related to information that varies by: locale, warehouse, pricelist etc)
+
+---
+You will focus on writing the integration test file test_all.py.
+This file will Mock a lot of the necessary interfaces, run the logic LLMLogic and print the results from it.

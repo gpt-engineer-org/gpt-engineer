@@ -11,33 +11,26 @@ import typer
 
 
 app = typer.Typer()
-    
 
 
 @app.command()
 def chat(
+    project_path: str = typer.Argument(None, help="path"),
+    run_prefix: str = typer.Option("", help="run prefix"),
     model: str = "gpt-4",
     temperature: float = 0.1,
     max_tokens: int = 4096,
     n: int = 1,
     stream: bool = True,
-    input_path: str = typer.Argument(
-        None, help="input path"
-    ),
-    memory_path: str = typer.Argument(
-        None, help="memory path"
-    ),
-    workspace_path: Optional[str] = typer.Option(
-        None, "--out", "-c", help="Code to file path"
-    ),
 ):
 
-    if memory_path is None:
-        memory_path = pathlib.Path(__file__).parent / 'memory'
+    if project_path is None:
+        project_path = str(pathlib.Path(__file__).parent / "example")
 
-    if input_path is None:
-        input_path = pathlib.Path(__file__).parent / 'input'
-    
+    input_path = project_path
+    memory_path = pathlib.Path(project_path) / "memory"
+    workspace_path = pathlib.Path(project_path) / (run_prefix + "workspace")
+
     ai = AI(
         model=model,
         temperature=temperature,
@@ -49,13 +42,12 @@ def chat(
 
     dbs = DBs(
         memory=DB(memory_path),
-        logs=DB(pathlib.Path(memory_path) / 'logs'),
+        logs=DB(pathlib.Path(memory_path) / "logs"),
         input=DB(input_path),
         workspace=DB(workspace_path),
-        identity=DB(pathlib.Path(__file__).parent / 'identity'),
+        identity=DB(pathlib.Path(__file__).parent / "identity"),
     )
 
-    run_prefix= workspace_path.split('/')[-1] + '_' if workspace_path is not None else ''
 
     for step in STEPS:
         messages = step(ai, dbs)
