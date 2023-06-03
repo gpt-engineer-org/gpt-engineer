@@ -1,7 +1,5 @@
 # GPT Engineer
-Specify what you want it to build, the AI asks for clarification, and then builds it.
-
-Even if it is complex.
+Specify what you want it to build, the AI asks for clarification, and then builds it. Even if it is complex.
 
 ## Philosophy
 The philosophy of this project is that it should be be
