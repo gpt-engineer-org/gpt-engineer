@@ -20,12 +20,13 @@ class AI:
     def fuser(self, msg):
         return {"role": "user", "content": msg}
 
-    def next(self, messages, prompt=None):
+    def next(self, messages: list[dict[str, str]], prompt=None):
         if prompt:
             messages = messages + [{"role": "user", "content": prompt}]
 
         response = openai.ChatCompletion.create(
             messages=messages,
+            stream=True,
             **self.kwargs
         )
 
