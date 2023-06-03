@@ -29,10 +29,18 @@ def clarify(ai: AI, dbs: DBs):
 
         print()
         user = input('(answer in text, or "q" to move on)\n')
+        print()
+
         if not user or user == 'q':
             break
 
-        user += '\n\nIs anything else unclear? If yes, only answer in the form: {remaining unclear areas} remaining questions. {Next question}\nIf everything is sufficiently clear, only answer "no".'
+        user += (
+           '\n\n'
+           'Is anything else unclear? If yes, only answer in the form:\n'
+            '{remaining unclear areas} remaining questions.\n'
+            '{Next question}\n'
+            'If everything is sufficiently clear, only answer "no".'
+         )
 
     print()
     return messages
@@ -48,7 +56,7 @@ def run_clarified(ai: AI, dbs: DBs):
         messages[1:]
     )
     messages = ai.next(messages, dbs.identity['use_qa'])
-    to_files(messages[-1]['content'], DB(str(dbs.workspace.path)+'_clarified'))
+    to_files(messages[-1]['content'], dbs.workspace)
     return messages
 
 
