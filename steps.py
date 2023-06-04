@@ -1,12 +1,7 @@
-from ast import List
-from dataclasses import dataclass
-from typing import Callable
 from ai import AI
 from chat_to_files import to_files
-import json
-
 from db import DBs
-from db import DB
+
 
 def setup_sys_prompt(dbs):
     return dbs.identity['setup'] + '\nUseful to know:\n' + dbs.identity['philosophy']
