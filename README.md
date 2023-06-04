@@ -3,7 +3,7 @@
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt. 
 
-![Preview of GPT Engineer in action](https://github.com/AntonOsika/gpt-engineer/raw/main/assets/demo.webm)
+![Preview of GPT Engineer in action](https://github.com/AntonOsika/gpt-engineer/blob/main/assets/demo.webm)
 
 
 
