@@ -3,7 +3,7 @@
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt. 
 
-[Creating a snake game](assets/demo.webm)
+![Creating a snake game](assets/demo.webm)
 
 
 
