@@ -1,6 +1,5 @@
 # GPT Engineer
-**Specify what you want it to build, the AI asks for clarification, and then builds it.
-**
+**Specify what you want it to build, the AI asks for clarification, and then builds it.**
 
 The entire codebase is generated. 
 
