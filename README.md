@@ -1,15 +1,18 @@
 # GPT Engineer
-Specify what you want it to build, the AI asks for clarification, and then builds it. Even if it is complex.
+Specify what you want it to build, the AI asks for clarification, and then builds it.
 
-## Philosophy
-The philosophy of this project is that it should be be
+The entire codebase is generated. 
+
+GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look.
+
+## Project philosophy
 - Simple to get value
-- Flexible and simple to add new own "AI steps" (see `steps.py`)
+- Flexible and easy to add new own "AI steps". See `steps.py`.
 - Incrementally build towards a user experience of:
-  - high level prompting
-  - giving feedback to the AI that it will remember over time
+  1. high level prompting
+  2. giving feedback to the AI that it will remember over time
 - Fast handovers back and forth between AI and human
-- No databases, all computation is "resumable" and persisted to filesystems
+- Simplicity, all computation is "resumable" and persisted to the filesystem
 
 
 ## Usage
