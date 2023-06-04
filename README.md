@@ -13,6 +13,14 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 - Fast handovers back and forth between AI and human
 - Simplicity, all computation is "resumable" and persisted to the filesystem
 
+## Limitations
+The main parts to be addressed next is that – on the first attempt – the generated implementation might not contain all necessary functionality that was specified in the prompt.
+
+Implementing additional chain of thought, or "[Reflexion](https://github.com/noahshinn024/reflexion)", prompting should be able to make it more reliable.
+
+Contributors welcome!
+
+If you are unsure what to try, check out the ideas listed in the Projects part of the github repo.
 
 ## Usage
 
