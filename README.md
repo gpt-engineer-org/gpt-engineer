@@ -40,3 +40,12 @@ You can specify the "identity" of the AI agent by editing the files in the `iden
 Editing the identity, and evolving the main_prompt, is currently how you make the agent remember things between projects.
 
 Each step in steps.py will have its communication history with GPT4 stored in the logs folder, and can be rerun with scripts/rerun_edited_message_logs.py.
+
+
+## Demo
+
+
+
+https://github.com/AntonOsika/gpt-engineer/assets/4467025/6e362e45-4a94-4b0d-973d-393a31d92d9b
+
+
