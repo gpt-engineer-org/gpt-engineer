@@ -3,8 +3,6 @@
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt. 
 
-https://github.com/AntonOsika/gpt-engineer/assets/4467025/15b887b0-7deb-4573-868c-628a8ee30e22
-
 
 ## Project philosophy
 - Simple to get value
