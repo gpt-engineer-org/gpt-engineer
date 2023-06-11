@@ -5,7 +5,7 @@ from typing import Optional
 import openai
 from chat_to_files import to_files
 from ai import AI
-from steps import STEPS
+from gpt_engineer.steps import STEPS
 from db import DB, DBs
 import typer
 
