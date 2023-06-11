@@ -27,7 +27,7 @@ def chat(
     temperature: float = 0.1,
     max_tokens: int = 8192,
 ):
-    app_dir = pathlib.Path(__file__).parent.parent  # typer.get_app_dir(APP_NAME))
+    app_dir = pathlib.Path(__file__).parent.parent
 
     if project_path is None:
         project_path = str(app_dir / "example")
