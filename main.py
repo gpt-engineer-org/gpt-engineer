@@ -19,7 +19,6 @@ def chat(
     run_prefix: str = typer.Option("", help="run prefix, if you want to run multiple variants of the same project and later compare them"),
     model: str = "gpt-4",
     temperature: float = 0.1,
-    max_tokens: int = 8192,
 ):
 
     if project_path is None:
@@ -32,7 +31,6 @@ def chat(
     ai = AI(
         model=model,
         temperature=temperature,
-        max_tokens=max_tokens,
     )
 
     dbs = DBs(
