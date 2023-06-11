@@ -2,12 +2,14 @@ import json
 import os
 import pathlib
 from typing import Optional
+
 import openai
-from chat_to_files import to_files
-from ai import AI
-from gpt_engineer.steps import STEPS
-from db import DB, DBs
 import typer
+
+from gpt_engineer.chat_to_files import to_files
+from gpt_engineer.ai import AI
+from gpt_engineer.steps import STEPS
+from gpt_engineer.db import DB, DBs
 
 
 app = typer.Typer()
@@ -16,7 +18,10 @@ app = typer.Typer()
 @app.command()
 def chat(
     project_path: str = typer.Argument(None, help="path"),
-    run_prefix: str = typer.Option("", help="run prefix, if you want to run multiple variants of the same project and later compare them"),
+    run_prefix: str = typer.Option(
+        "",
+        help="run prefix, if you want to run multiple variants of the same project and later compare them",
+    ),
     model: str = "gpt-4",
     temperature: float = 0.1,
     max_tokens: int = 8192,
@@ -42,7 +47,6 @@ def chat(
         workspace=DB(workspace_path),
         identity=DB(pathlib.Path(__file__).parent / "identity"),
     )
-
 
     for step in STEPS:
         messages = step(ai, dbs)
