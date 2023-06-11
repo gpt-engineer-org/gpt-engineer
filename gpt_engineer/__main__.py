@@ -12,7 +12,6 @@ from gpt_engineer.steps import STEPS
 from gpt_engineer.db import DB, DBs
 
 
-APP_NAME = "gpt-engineer"
 
 app = typer.Typer()
 
