@@ -4,6 +4,8 @@ from pathlib import Path
 
 
 class DB:
+    """A simple key-value store, where keys are filenames and values are file contents."""
+
     def __init__(self, path):
         self.path = Path(path).absolute()
         os.makedirs(self.path, exist_ok=True)
@@ -16,10 +18,14 @@ class DB:
         with open(self.path / key, "w") as f:
             f.write(val)
 
+    def __contains__(self, key):
+        return (self.path / key).exists()
 
-# dataclass for all dbs:
+
 @dataclass
 class DBs:
+    """A dataclass for all dbs"""
+
     memory: DB
     logs: DB
     identity: DB

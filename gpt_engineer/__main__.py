@@ -12,6 +12,8 @@ from gpt_engineer.steps import STEPS
 from gpt_engineer.db import DB, DBs
 
 
+APP_NAME = "gpt-engineer"
+
 app = typer.Typer()
 
 
@@ -26,9 +28,10 @@ def chat(
     temperature: float = 0.1,
     max_tokens: int = 8192,
 ):
+    app_dir = pathlib.Path(__file__).parent.parent  # typer.get_app_dir(APP_NAME))
 
     if project_path is None:
-        project_path = str(pathlib.Path(__file__).parent / "example")
+        project_path = str(app_dir / "example")
 
     input_path = project_path
     memory_path = pathlib.Path(project_path) / (run_prefix + "memory")
@@ -42,10 +45,10 @@ def chat(
 
     dbs = DBs(
         memory=DB(memory_path),
-        logs=DB(pathlib.Path(memory_path) / "logs"),
+        logs=DB(memory_path / "logs"),
         input=DB(input_path),
         workspace=DB(workspace_path),
-        identity=DB(pathlib.Path(__file__).parent / "identity"),
+        identity=DB(app_dir / "identity"),
     )
 
     for step in STEPS:

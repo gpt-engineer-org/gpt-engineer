@@ -1,3 +1,5 @@
+import json
+
 from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.db import DBs
@@ -62,3 +64,5 @@ STEPS = [clarify, run_clarified]
 # add_tests
 # run_tests_and_fix_files,
 # improve_based_on_in_file_feedback_comments
+# pull_out_classes_functions_into_separate_files
+# add_comments_to_files
