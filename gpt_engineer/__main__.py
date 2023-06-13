@@ -25,7 +25,6 @@ def chat(
     ),
     model: str = "gpt-4",
     temperature: float = 0.1,
-    max_tokens: int = 8192,
 ):
     app_dir = pathlib.Path(__file__).parent.parent
 
@@ -39,7 +38,6 @@ def chat(
     ai = AI(
         model=model,
         temperature=temperature,
-        max_tokens=max_tokens,
     )
 
     dbs = DBs(
