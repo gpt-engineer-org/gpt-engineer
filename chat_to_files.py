@@ -1,10 +1,10 @@
 import re
 
-
 def parse_chat(chat):# -> List[Tuple[str, str]]:
-    # Get all ``` blocks
-    regex = r"```(.*?)```"
-
+    # Get all `<``>` blocks
+    #using custom syntax so that common markdown syntax can be used in the code blocks
+    regex = r"<#-(.*?)-#>"
+    
     matches = re.finditer(regex, chat, re.DOTALL)
 
     files = []
@@ -13,6 +13,12 @@ def parse_chat(chat):# -> List[Tuple[str, str]]:
         # Get the code
         code = match.group(1).split("\n")[1:]
         code = "\n".join(code)
+        #remove the first and last line if they have ```
+        if code.startswith("```"):
+            code = "\n".join(code.split("\n")[1:])
+        if code.endswith("```"):
+            code = "\n".join(code.split("\n")[:-1])
+
         # Add the file to the list
         files.append((path, code))
     
