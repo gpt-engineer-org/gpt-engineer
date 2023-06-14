@@ -19,7 +19,19 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 **Install**:
 
 - `pip install -r requirements.txt`
-- `export OPENAI_API_KEY=[your api key]`
+- `cp .env.example .env` 
+- Edit .env file : 
+  ```
+  OPENAI_API_KEY=xxx
+  OPENAI_API_BASE=https://api.openai.com/v1
+
+  gpt_model=gpt-3.5-turbo #gpt-3.5-turbo, gpt-4
+  gpt_temperature=0.1
+  ```
+
+**Test**:
+
+- `python main.py example`
 
 **Run**:
 - Create a new empty folder with a `main_prompt` file (or copy the example folder `cp example -r my-new-project`)

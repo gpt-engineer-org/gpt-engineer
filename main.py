@@ -8,7 +8,40 @@ from ai import AI
 from steps import STEPS
 from db import DB, DBs
 import typer
+from dotenv import load_dotenv
 
+load_dotenv()
+
+api_key = os.getenv("OPENAI_API_KEY") 
+# Check if OPENAI_API_KEY is defined
+if api_key == None:
+    # Raise an error if OPENAI_API_KEY is not defined
+    raise ValueError("OPENAI_API_KEY is not defined")
+else:
+    # Set the OPENAI_API_KEY to the api_key variable
+    openai.api_key = api_key
+
+# Get the OPENAI_API_BASE
+api_base = os.getenv("OPENAI_API_BASE")
+# Check if OPENAI_API_BASE is defined
+if api_base != None:   
+    # Set the OPENAI_API_BASE to the api_base variable
+    openai.api_base = api_base
+
+# Get the list of valid GPT models
+valid_gpt_modles = [
+    "gpt-4",
+    "gpt-3.5-turbo"
+]    
+# Get the GPT model from the environment variable
+gpt_model = os.getenv("gpt_model")
+# Check if the GPT model is valid
+if gpt_model not in valid_gpt_modles:
+    # Raise an error if the GPT model is not valid
+    raise ValueError(f"{gpt_model} is not a valid model. Valid models are: {valid_gpt_modles}")
+
+# Get the GPT temperature from the environment variable
+gpt_temperature = os.getenv("gpt_temperature")
 
 app = typer.Typer()
 
@@ -17,8 +50,8 @@ app = typer.Typer()
 def chat(
     project_path: str = typer.Argument(None, help="path"),
     run_prefix: str = typer.Option("", help="run prefix, if you want to run multiple variants of the same project and later compare them"),
-    model: str = "gpt-4",
-    temperature: float = 0.1,
+    model: str = gpt_model,
+    temperature: float = gpt_temperature,
 ):
 
     if project_path is None:

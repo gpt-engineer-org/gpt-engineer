@@ -1,2 +1,3 @@
 openai
 typer
+python-dotenv
