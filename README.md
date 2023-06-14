@@ -16,10 +16,10 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 
 ## Usage
 
-**Install**:
+**Setup**:
 
 - `pip install -r requirements.txt`
-- `export OPENAI_API_KEY=[your api key]`
+- `export OPENAI_API_KEY=[your api key]` with a key that has GPT4 access
 
 **Run**:
 - Create a new empty folder with a `main_prompt` file (or copy the example folder `cp example -r my-new-project`)
@@ -27,12 +27,12 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 - run `poetry run gpt-engineer my-new-project`
 
 **Results**:
-- Check the generated files in my-new-project/workspace_clarified
+- Check the generated files in my-new-project/workspace
 
 ### Limitations
 Implementing additional chain of thought prompting, e.g. [Reflexion](https://github.com/noahshinn024/reflexion), should be able to make it more reliable and not miss requested functionality in the main prompt.
 
-Contributors welcome! If you are unsure what to add, check out the ideas listed in the Projects part of the github repo.
+Contributors welcome! If you are unsure what to add, check out the ideas listed in the Projects tab in the GitHub repo.
 
 
 ## Features
