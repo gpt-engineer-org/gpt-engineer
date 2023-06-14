@@ -20,7 +20,8 @@ def clarify(ai: AI, dbs: DBs):
     while True:
         messages = ai.next(messages, user)
 
-        if messages[-1]['content'].strip().lower() == 'no':
+        latest_message_content = messages[-1]['content'].strip().lower()
+        if latest_message_content.startswith('no') and len(latest_message_content) < 5:
             break
 
         print()
