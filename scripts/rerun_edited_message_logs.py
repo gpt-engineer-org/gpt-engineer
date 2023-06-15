@@ -17,7 +17,6 @@ def chat(
     temperature: float = 0.1,
     max_tokens: int = 4096,
 ):
-
     ai = AI(
         model=model,
         temperature=temperature,

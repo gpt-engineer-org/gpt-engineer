@@ -1,7 +1,7 @@
 import re
 
 
-def parse_chat(chat):# -> List[Tuple[str, str]]:
+def parse_chat(chat):  # -> List[Tuple[str, str]]:
     # Get all ``` blocks
     regex = r"```(.*?)```"
 
@@ -15,7 +15,7 @@ def parse_chat(chat):# -> List[Tuple[str, str]]:
         code = "\n".join(code)
         # Add the file to the list
         files.append((path, code))
-    
+
     return files
 
 
