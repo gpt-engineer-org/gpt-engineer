@@ -1,16 +1,11 @@
 import json
-import os
 import pathlib
-from typing import Optional
-
-import openai
 import typer
 
 from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.ai import AI
 from gpt_engineer.steps import STEPS
 from gpt_engineer.db import DB, DBs
-
 
 
 app = typer.Typer()
@@ -27,7 +22,6 @@ def chat(
     temperature: float = 0.1,
 ):
     app_dir = pathlib.Path(__file__).parent.parent
-
     if project_path is None:
         project_path = str(app_dir / "example")
 
