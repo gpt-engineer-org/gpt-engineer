@@ -5,6 +5,14 @@ class AI:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
 
+        try:
+            openai.Model.retrieve("gpt-4")
+        except openai.error.InvalidRequestError:
+            print("Model gpt-4 not available for provided api key reverting "
+                  "to gpt-3.5.turbo. Sign up for the gpt-4 wait list here: "
+                  "https://openai.com/waitlist/gpt-4-api")
+            self.kwargs['model'] = "gpt-3.5-turbo"
+
     def start(self, system, user):
         messages = [
             {"role": "system", "content": system},
