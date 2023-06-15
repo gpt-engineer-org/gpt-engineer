@@ -19,7 +19,10 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 **Setup**:
 
 - `pip install -r requirements.txt`
-- `export OPENAI_API_KEY=[your api key]` with a key that has GPT4 access
+- Configure your OpenAI API key:
+    - On Linux: `export OPENAI_API_KEY=[your api key]` in terminal.  
+    - On Windows: edit `main.py` file and add this line - `open.api_key = "your api key"`.  
+   replace `your api key` with a key that has GPT4 access for your account or you can create new api-key [here](https://platform.openai.com/account/api-keys)
 
 **Run**:
 - Create a new empty folder with a `main_prompt` file (or copy the example folder `cp example -r my-new-project`)
