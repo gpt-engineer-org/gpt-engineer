@@ -28,18 +28,8 @@ if api_base != None:
     # Set the OPENAI_API_BASE to the api_base variable
     openai.api_base = api_base
 
-# Get the list of valid GPT models
-valid_gpt_modles = [
-    "gpt-4",
-    "gpt-3.5-turbo"
-]    
 # Get the GPT model from the environment variable
 gpt_model = os.getenv("gpt_model")
-# Check if the GPT model is valid
-if gpt_model not in valid_gpt_modles:
-    # Raise an error if the GPT model is not valid
-    raise ValueError(f"{gpt_model} is not a valid model. Valid models are: {valid_gpt_modles}")
-
 # Get the GPT temperature from the environment variable
 gpt_temperature = os.getenv("gpt_temperature")
 
