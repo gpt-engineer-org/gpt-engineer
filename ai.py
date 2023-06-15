@@ -1,10 +1,28 @@
 
 import openai
 
+openai.api_key = "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"
+
 
 class AI:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
+        self.testWorking()
+
+        
+    def testWorking(self):
+        try: openai.ChatCompletion.create(
+            messages=[{"role": "user", "content": "Testing"}],
+            stream=True,
+            max_tokens=1,
+            **self.kwargs
+        )
+        except Exception as e:
+            print(e)
+            if str(e) != "The model: `gpt-4` does not exist": exit()
+            self.kwargs['model'] = 'gpt-3.5-turbo'
+            print('Switching over to model gpt-3.5-turbo')
+            self.testWorking()
 
     def start(self, system, user):
         messages = [
