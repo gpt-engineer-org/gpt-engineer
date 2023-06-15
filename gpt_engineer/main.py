@@ -47,5 +47,9 @@ def chat(
         dbs.logs[step.__name__] = json.dumps(messages)
 
 
-if __name__ == "__main__":
+def execute():
     app()
+
+
+if __name__ == "__main__":
+    execute()
