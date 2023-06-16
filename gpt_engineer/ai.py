@@ -37,8 +37,8 @@ class AI:
 
         chat = []
         for chunk in response:
-            delta = chunk['choices'][0]['delta']
-            msg = delta.get('content', '')
+            delta = chunk["choices"][0]["delta"]
+            msg = delta.get("content", "")
             print(msg, end="")
             chat.append(msg)
         return messages + [{"role": "assistant", "content": "".join(chat)}]

@@ -20,7 +20,7 @@ def parse_chat(chat):  # -> List[Tuple[str, str]]:
 
 
 def to_files(chat, workspace):
-    workspace['all_output.txt'] = chat
+    workspace["all_output.txt"] = chat
 
     files = parse_chat(chat)
     for file_name, file_content in files:
