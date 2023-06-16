@@ -1,6 +1,6 @@
 # Install Dev Dependencies
 
-- `pip install -r requirements-dev.txt`
+- `pip install ".[dev]"`
 
 ## Using black
 
