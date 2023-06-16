@@ -1,3 +1,4 @@
+import os
 import json
 import pathlib
 import typer
@@ -13,7 +14,7 @@ app = typer.Typer()
 
 @app.command()
 def chat(
-    project_path: str = typer.Argument(None, help="path"),
+    project_path: str = typer.Argument(str(pathlib.Path(os.path.curdir) / "example"), help="path"),
     run_prefix: str = typer.Option(
         "",
         help="run prefix, if you want to run multiple variants of the same project and later compare them",
@@ -21,10 +22,7 @@ def chat(
     model: str = "gpt-4",
     temperature: float = 0.1,
 ):
-    app_dir = pathlib.Path(__file__).parent.parent
-    if project_path is None:
-        project_path = str(app_dir / "example")
-
+    app_dir = pathlib.Path(os.path.curdir)
     input_path = project_path
     memory_path = pathlib.Path(project_path) / (run_prefix + "memory")
     workspace_path = pathlib.Path(project_path) / (run_prefix + "workspace")
