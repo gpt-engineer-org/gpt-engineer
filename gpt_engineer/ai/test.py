@@ -18,7 +18,7 @@ class TestAI(AI):
             (Role.ASSISTANT, Message("hello world"))
         ]
 
-    def next(self, messages: List[Tuple[Role, Message]], prompt: Optional[Message] = None) -> List[Tuple[Role, Message]]:
+    def next(self, messages: List[Tuple[Role, Message]], user_prompt: Optional[Message] = None) -> List[Tuple[Role, Message]]:
         return [
             (Role.ASSISTANT, Message("Unto the next world"))
         ]

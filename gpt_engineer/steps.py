@@ -21,7 +21,7 @@ def clarify(ai: AI, dbs: DBs) -> List[Tuple[Role, Message]]:
     user_msg = dbs.input['main_prompt']
     messages = [(Role.SYSTEM, Message(dbs.identity['qa']))]
     while True:
-        messages = ai.next(messages=messages, prompt=Message(user_msg))
+        messages = ai.next(messages=messages, user_prompt=Message(user_msg))
 
         response_content: str =messages[-1][1].content
         if response_content.strip().lower() == 'no':
