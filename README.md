@@ -2,6 +2,7 @@
 **Specify what you want it to build, the AI asks for clarification, and then builds it.**
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt. 
+![output](https://github.com/AntonOsika/gpt-engineer/assets/4467025/a6938d43-2ac1-4cf1-98d1-93eea1bdfce4)
 
 
 ## Project philosophy
@@ -17,15 +18,13 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 ## Usage
 
 **Setup**:
-- `git clone https://github.com/AntonOsika/gpt-engineer.git`
-- `cd gpt-engineer`
 - `pip install .`
 - `export OPENAI_API_KEY=[your api key]` with a key that has GPT4 access
 
 **Run**:
 - Create a new empty folder with a `main_prompt` file (or copy the example folder `cp -r example/ my-new-project`)
 - Fill in the `main_prompt` in your new folder
-- Run `gpt-engineer my-new-project`
+- Run `python gpt-engineer/main.py my-new-project`
 
 **Results**:
 - Check the generated files in my-new-project/workspace
@@ -47,7 +46,4 @@ Each step in steps.py will have its communication history with GPT4 stored in th
 ## Demo
 
 
-
 https://github.com/AntonOsika/gpt-engineer/assets/4467025/6e362e45-4a94-4b0d-973d-393a31d92d9b
-
-
