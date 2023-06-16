@@ -43,7 +43,7 @@ Editing the identity, and evolving the main_prompt, is currently how you make th
 Each step in steps.py will have its communication history with GPT4 stored in the logs folder, and can be rerun with scripts/rerun_edited_message_logs.py.
 
 ## Development/Contributing
-If you want to contribute, please check out the [issues tab](https://github.com/AntonOsika/gpt-engineer/issues) in the GitHub repo and please read the [contributing document]() regarding some specifics on how to contribute.
+If you want to contribute, please check out the [issues tab](https://github.com/AntonOsika/gpt-engineer/issues) in the GitHub repo and please read the [contributing document](.github/CONTRIBUTING.md) regarding some specifics on how to contribute.
 
 
 ## Demo
