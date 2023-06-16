@@ -14,7 +14,9 @@ class DB:
             return f.read()
 
     def __setitem__(self, key, val):
-        with open(self.path / key, 'w', encoding='utf-8') as f:
+        target = self.path / key
+        os.makedirs(target.parent, exist_ok=True)
+        with open(target, 'w', encoding='utf-8') as f:
             f.write(val)
 
 

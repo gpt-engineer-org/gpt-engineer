@@ -13,6 +13,7 @@ build/
 
 # Virtual environments
 venv/
+.venv/
 ENV/
 
 # IDE-specific files

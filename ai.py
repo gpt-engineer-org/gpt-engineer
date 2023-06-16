@@ -1,21 +1,21 @@
-import openai
-
+from gpt4all import GPT4All
+from typing import List, Dict
 
 class AI:
-    def __init__(self, **kwargs):
+    model: GPT4All = None
+
+    def __init__(self, model, **kwargs):
         self.kwargs = kwargs
 
         try:
-            openai.Model.retrieve("gpt-4")
-        except openai.error.InvalidRequestError:
-            print("Model gpt-4 not available for provided api key reverting "
-                  "to gpt-3.5.turbo. Sign up for the gpt-4 wait list here: "
-                  "https://openai.com/waitlist/gpt-4-api")
-            self.kwargs['model'] = "gpt-3.5-turbo"
+            if not AI.model:
+                AI.model = GPT4All(model)
+        except Exception:
+            print("Unexpected error")
 
     def start(self, system, user):
         messages = [
-            {"role": "system", "content": system},
+            {"role": "system", "content": f"### Instruction: {system}"},
             {"role": "user", "content": user},
         ]
 
@@ -28,17 +28,11 @@ class AI:
         return {"role": "user", "content": msg}
 
     def next(self, messages: list[dict[str, str]], prompt=None):
+        if "### Instruction:" not in messages[0]["content"]:
+            messages[0]["content"] = "### Instruction: " + messages[0]["content"]
         if prompt:
-            messages = messages + [{"role": "user", "content": prompt}]
+            messages = messages + [{"role": "user", "content": f'### Prompt: \n{prompt}'}]
 
-        response = openai.ChatCompletion.create(
-            messages=messages, stream=True, **self.kwargs
-        )
+        response = AI.model.chat_completion(messages=messages, verbose=True, streaming=True, default_prompt_header=False, **self.kwargs)
 
-        chat = []
-        for chunk in response:
-            delta = chunk['choices'][0]['delta']
-            msg = delta.get('content', '')
-            print(msg, end="")
-            chat.append(msg)
-        return messages + [{"role": "assistant", "content": "".join(chat)}]
+        return messages + [response['choices'][0]['message']]

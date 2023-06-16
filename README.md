@@ -1,4 +1,10 @@
 # GPT Engineer
+
+## Fork Information
+This fork serves to replace OpenAI's ChatGPT with GPT4All to allow for offline use with open source model that can generate commercial content (Though make sure the model you choose allows this. Licensing is a tricky thing and it's completely up to you how you deal with it)
+
+So far I still see the best results using OpenAI's ChatGPT-4, however it is imperative that we move away from commercial closed source models as quickly as possible to keep the playing field even. That is the motivation behind this fork
+
 **Specify what you want it to build, the AI asks for clarification, and then builds it.**
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt. 

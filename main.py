@@ -5,7 +5,7 @@ import typer
 
 from ai import AI
 from db import DB, DBs
-from steps import STEPS
+from steps import standard_runner
 
 app = typer.Typer()
 
@@ -17,7 +17,7 @@ def chat(
         "",
         help="run prefix, if you want to run multiple variants of the same project and later compare them",
     ),
-    model: str = "gpt-4",
+    model: str = "ggml-v3-13b-hermes-q5_1.bin",
     temperature: float = 0.1,
 ):
     if project_path is None:
@@ -29,7 +29,7 @@ def chat(
 
     ai = AI(
         model=model,
-        temperature=temperature,
+        temp=temperature,
     )
 
     dbs = DBs(
@@ -40,10 +40,7 @@ def chat(
         identity=DB(pathlib.Path(__file__).parent / "identity"),
     )
 
-    for step in STEPS:
-        messages = step(ai, dbs)
-        dbs.logs[step.__name__] = json.dumps(messages)
-
+    standard_runner(ai, dbs).run()
 
 if __name__ == "__main__":
     app()
