@@ -1,0 +1,38 @@
+# This workflow will create a Python Package
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#publishing-to-package-registries
+
+name: Create Python Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      build-input:
+        description: 'optional_input'     
+        required: false
+        default: 'optional_input' # does nothing now but could be useful later
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build
+    - name: Build package
+      run: python -m build     
+    - name: Upload whl
+      uses: actions/upload-artifact@v3
+      with:
+        name: gptengineer-0.1.0-py2.py3-none-any.whl
+        path: dist/gptengineer-0.1.0-py2.py3-none-any.whl
+    - name: Upload gz
+      uses: actions/upload-artifact@v3
+      with:
+        name: gptengineer-0.1.0.tar.gz
+        path: dist/gptengineer-0.1.0.tar.gz         
