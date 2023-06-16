@@ -32,7 +32,7 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 ### Limitations
 Implementing additional chain of thought prompting, e.g. [Reflexion](https://github.com/noahshinn024/reflexion), should be able to make it more reliable and not miss requested functionality in the main prompt.
 
-Contributors welcome! If you are unsure what to add, check out the ideas listed in the Projects tab in the GitHub repo.
+Contributors welcome! If you are unsure what to add, check out the ideas listed in the Projects tab in the GitHub repo. See [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
 
 
 ## Features

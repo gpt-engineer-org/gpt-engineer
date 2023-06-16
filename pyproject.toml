@@ -9,6 +9,7 @@ exclude = [
     ".bzr",
     ".direnv",
     ".eggs",
+    ".env",
     ".git",
     ".ruff_cache",
     ".svn",
@@ -19,6 +20,7 @@ exclude = [
     "buck-out",
     "build",
     "dist",
+    "env",
     "node_modules",
     "venv",
 ]
@@ -47,12 +49,14 @@ exclude = '''
   /(
       \.direnv
     | \.eggs
+    | \.env
     | \.git
     | \.tox
     | \.venv
     | _build
     | build
     | dist
+    | env
     | venv
   )/
 )
