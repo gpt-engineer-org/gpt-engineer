@@ -1,12 +1,13 @@
 import json
 import pathlib
 import typer
+from typing import Any
 
+from gpt_engineer.ai import GPT, TestAI
 from gpt_engineer.chat_to_files import to_files
-from gpt_engineer.ai import AI
-from gpt_engineer.steps import STEPS
 from gpt_engineer.db import DB, DBs
-
+from gpt_engineer.models import Message, Role, Step
+from gpt_engineer.steps import STEPS
 
 app = typer.Typer()
 
@@ -29,10 +30,11 @@ def chat(
     memory_path = pathlib.Path(project_path) / (run_prefix + "memory")
     workspace_path = pathlib.Path(project_path) / (run_prefix + "workspace")
 
-    ai = AI(
-        model=model,
-        temperature=temperature,
-    )
+    # ai = GPT(
+    #     model=model,
+    #     temperature=temperature,
+    # )
+    ai = TestAI()
 
     dbs = DBs(
         memory=DB(memory_path),
@@ -44,7 +46,11 @@ def chat(
 
     for step in STEPS:
         messages = step(ai, dbs)
-        dbs.logs[step.__name__] = json.dumps(messages)
+        dbs.logs[step.__name__] = json.dumps([output_message_from(r, m) for r, m in messages])
+
+
+def output_message_from(r: Role, m: Message) -> Any:
+    return {"role": str(r), "content": m.content}
 
 
 def execute():

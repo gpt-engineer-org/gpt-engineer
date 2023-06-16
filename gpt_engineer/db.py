@@ -11,6 +11,7 @@ class DB:
         os.makedirs(self.path, exist_ok=True)
 
     def __getitem__(self, key):
+        print((self.path / key))
         with open(self.path / key, encoding='utf-8') as f:
             return f.read()
 
