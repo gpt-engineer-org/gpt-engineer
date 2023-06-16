@@ -28,11 +28,11 @@ def chat(
     memory_path = pathlib.Path(project_path) / (run_prefix + "memory")
     workspace_path = pathlib.Path(project_path) / (run_prefix + "workspace")
 
-    # ai = GPT(
-    #     model=model,
-    #     temperature=temperature,
-    # )
-    ai = TestAI()
+    ai = GPT(
+        model=model,
+        temperature=temperature,
+    )
+    # ai = TestAI()
 
     dbs = DBs(
         memory=DB(memory_path),
@@ -48,7 +48,7 @@ def chat(
 
 
 def output_message_from(r: Role, m: Message) -> Any:
-    return {"role": str(r), "content": m.content}
+    return {"role": r.value, "content": m.content}
 
 
 def execute():

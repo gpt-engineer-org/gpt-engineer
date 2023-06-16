@@ -38,12 +38,12 @@ class TestAI(AI):
 
     def start(self, initial_conversation: List[Tuple[Role, Message]]) -> List[Tuple[Role, Message]]:
         return [
-            (Role.ASSISTANT, "hello world")
+            (Role.ASSISTANT, Message("hello world"))
         ]
 
     def next(self, messages: List[Tuple[Role, Message]], prompt: Optional[Message] = None) -> List[Tuple[Role, Message]]:
         return [
-            (Role.ASSISTANT, "Unto the next world")
+            (Role.ASSISTANT, Message("Unto the next world"))
         ]
 
 
@@ -83,7 +83,7 @@ class GPT(AI):
             List[Dict[str, str]]: Returns the chat completion response along with previous messages.
         """
         if prompt:
-            messages.append(self._format_message(Role.USER, prompt))
+            messages.append((Role.USER, prompt))
 
 
         response = openai.ChatCompletion.create(
@@ -113,7 +113,7 @@ class GPT(AI):
         Returns:
             Dict[str, str]: A dictionary containing the role and content.
         """
-        return {"role": str(role), "content": msg.content}
+        return {"role": role.value, "content": msg.content}
 
     def _model_check_and_fallback(self) -> None:
         """

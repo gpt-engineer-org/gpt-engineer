@@ -23,10 +23,11 @@ def clarify(ai: AI, dbs: DBs) -> List[Tuple[Role, Message]]:
     while True:
         messages = ai.next(messages=messages, prompt=Message(user_msg))
 
-        if messages[-1].content.strip().lower() == 'no':
+        response_content: str =messages[-1][1].content
+        if response_content.strip().lower() == 'no':
             break
 
-        print()
+        print(f"Help clarify: {response_content}")
         user_msg = input('(answer in text, or "q" to move on)\n')
         print()
 
@@ -53,11 +54,11 @@ def run_clarified(ai: AI, dbs: DBs) -> List[Tuple[Role, Message]]:
     messages = json.loads(dbs.logs[Step.CLARIFY.value])
 
     messages = [
-        (Role.System, Message(setup_sys_prompt(dbs))),
+        (Role.SYSTEM, Message(setup_sys_prompt(dbs))),
     ] + [parse_message_json(m) for m in  messages[1:]]
 
     messages = ai.next(messages, dbs.identity['use_qa'])
-    to_files(messages[-1].content, dbs.workspace)
+    to_files(messages[-1][1].content, dbs.workspace)
     return messages
 
 
