@@ -8,7 +8,7 @@ import pytest
 
 from dotenv import load_dotenv
 
-from ai import AI
+from gpt_engineer.ai import AI
 
 FAKE_API_KEY = "my_api_key"
 DOTENV_VAR_NAME = "DOTENV_API_KEY"
