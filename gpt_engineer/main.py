@@ -4,14 +4,20 @@ import pathlib
 
 import typer
 
-from dotenv import load_dotenv
-
 from gpt_engineer.ai import AI
 from gpt_engineer.db import DB, DBs
 from gpt_engineer.steps import STEPS
 
-# Load OPENAI_API_KEY variable from .env file
-load_dotenv()
+# Load OPENAI_API_KEY variable from .env file if dotenv installed.
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    print(
+        "python-dotenv not installed. Skipping loading environment variables from "
+        ".env file."
+    )
 
 app = typer.Typer()
 
