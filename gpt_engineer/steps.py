@@ -2,7 +2,7 @@ from enum import Enum
 import json
 from typing import Any, Callable, Dict, List, Tuple
 
-from gpt_engineer.ai import AI
+from gpt_engineer.ai.ai import AI
 from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.db import DBs
 from gpt_engineer.models import Message, Role, Step

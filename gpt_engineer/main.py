@@ -4,7 +4,7 @@ import pathlib
 import typer
 from typing import Any
 
-from gpt_engineer.ai import GPT, TestAI
+from gpt_engineer.ai.models import models, default_model_name, ModelName
 from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.db import DB, DBs
 from gpt_engineer.models import Message, Role, Step
@@ -20,7 +20,7 @@ def chat(
         "",
         help="run prefix, if you want to run multiple variants of the same project and later compare them",
     ),
-    model: str = "gpt-4",
+    model: ModelName = default_model_name,
     temperature: float = 0.1,
 ):
     app_dir = pathlib.Path(os.path.curdir)
@@ -28,12 +28,12 @@ def chat(
     memory_path = pathlib.Path(project_path) / (run_prefix + "memory")
     workspace_path = pathlib.Path(project_path) / (run_prefix + "workspace")
 
-    ai = GPT(
-        model=model,
-        temperature=temperature,
-    )
-    # ai = TestAI()
-
+    kwargs = {
+        "model": model,
+        "temperature": temperature 
+    }
+    ai = models[model](**kwargs)
+    
     dbs = DBs(
         memory=DB(memory_path),
         logs=DB(memory_path / "logs"),

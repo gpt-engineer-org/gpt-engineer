@@ -1,50 +1,12 @@
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from enum import Enum
 import logging
-from typing import Any, Dict, List, Tuple, Union, Optional
+from typing import Any, Dict, List, Tuple, Optional
 
 import openai
 
 from gpt_engineer.models import Message, Role
-
+from gpt_engineer.ai.ai import AI
 
 logging.basicConfig(level=logging.INFO)
-
-
-class AI(ABC):
-    """Abstract class for AI models. Any LLM model for use in gpt-engineer must satisfy the 
-    following interface.
-    """
-
-    @abstractmethod
-    def __init__(self, **kwargs: Dict[str, Any]) -> None:
-        pass
-
-    @abstractmethod
-    def start(self, initial_conversation: List[Tuple[Role, Message]]) -> List[Tuple[Role, Message]]:
-        pass
-
-    @abstractmethod
-    def next(self, messages: List[Tuple[Role, Message]], prompt: Optional[Message] = None) -> List[Tuple[Role, Message]]:
-        pass
-
-class TestAI(AI):
-    """A simple AI that tests the code's functionality.
-    """
-
-    def __init__(self, **kwargs: Dict[str, Any]) -> None:
-        pass
-
-    def start(self, initial_conversation: List[Tuple[Role, Message]]) -> List[Tuple[Role, Message]]:
-        return [
-            (Role.ASSISTANT, Message("hello world"))
-        ]
-
-    def next(self, messages: List[Tuple[Role, Message]], prompt: Optional[Message] = None) -> List[Tuple[Role, Message]]:
-        return [
-            (Role.ASSISTANT, Message("Unto the next world"))
-        ]
 
 
 class GPT(AI):
