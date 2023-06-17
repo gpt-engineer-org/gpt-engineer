@@ -95,6 +95,29 @@ def run_clarified(ai: AI, dbs: DBs):
 
 
 def execute_workspace(ai: AI, dbs: DBs):
+    messages = gen_entrypoint(ai, dbs)
+    execute_entrypoint(ai, dbs)
+    return messages
+
+
+def execute_entrypoint(ai, dbs):
+    command = dbs.workspace['run.sh']
+
+    print('Do you want to execute this code?')
+    print()
+    print(command)
+    print()
+    print('If yes, press enter. If no, type "no"')
+    print()
+    if input() == 'no':
+        print('Ok, not executing the code.')
+    print('Executing the code...')
+    print()
+    subprocess.run('bash run.sh', shell=True, cwd=dbs.workspace.path)
+    return []
+
+
+def gen_entrypoint(ai, dbs):
     messages = ai.start(
         system=(
             f"You will get information about a codebase that is currently on disk in the current folder.\n"
@@ -106,34 +129,20 @@ def execute_workspace(ai: AI, dbs: DBs):
         ),
         user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
     )
-
+    print()
     [[lang, command]] = parse_chat(messages[-1]['content'])
     assert lang in ['', 'bash', 'sh']
-
     dbs.workspace['run.sh'] = command
-
-    print('Do you want to execute this code?')
-    print(command)
-    print()
-    print('If yes, press enter. If no, type "no"')
-    print()
-    if input() == 'no':
-        print('Ok, not executing the code.')
-        return messages
-    print('Executing the code...')
-    print()
-
-    # Run the subprocess in dbs.workspace.path
-    subprocess.run('bash run.sh', shell=True, cwd=dbs.workspace.path)
     return messages
 
 
 # Different configs of what steps to run
 STEPS = {
     'default': [gen_spec, pre_unit_tests, run_clarified, execute_workspace],
+    'benchmark': [gen_spec, pre_unit_tests, run_clarified, gen_entrypoint],
     'simple': [run, execute_workspace],
-    'clarify': [clarify, run_clarified],
-    'execute_only': [execute_workspace],
+    'clarify': [clarify, run_clarified, gen_entrypoint],
+    'execute_only': [execute_entrypoint],
 }
 
 # Future steps that can be added:
