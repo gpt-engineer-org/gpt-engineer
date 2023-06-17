@@ -83,9 +83,9 @@ def run_clarified(ai: AI, dbs: DBs):
 
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
-        ai.fsystem(f"Main prompt: {dbs.input['main_prompt']}"),
-        ai.fsystem(f"Specification:\n\n{dbs.memory['specification']}"),
-        ai.fsystem(f"Unit tests:\n\n{dbs.memory['unit_tests']}"),
+        ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
+        ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
+        ai.fuser(f"Unit tests:\n\n{dbs.memory['unit_tests']}"),
     ]
     messages = ai.next(messages, dbs.identity['use_qa'])
     to_files(messages[-1]['content'], dbs.workspace)
