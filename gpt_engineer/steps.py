@@ -73,6 +73,7 @@ def pre_unit_tests(ai: AI, dbs: DBs):
     messages = ai.next(messages, dbs.identity['unit_tests'])
 
     dbs.memory['unit_tests'] = messages[-1]['content']
+    to_files(dbs.memory['unit_tests'], dbs.workspace)
 
     return messages
 
