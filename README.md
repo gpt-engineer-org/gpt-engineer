@@ -1,7 +1,7 @@
 # GPT Engineer
 **Specify what you want it to build, the AI asks for clarification, and then builds it.**
 
-GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt. [Demo](https://twitter.com/antonosika/status/1667641038104674306).
+GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt: [demo](https://twitter.com/antonosika/status/1667641038104674306) 👶🤖
 
 ## Project philosophy
 - Simple to get value
