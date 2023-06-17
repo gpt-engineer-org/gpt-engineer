@@ -56,7 +56,7 @@ def gen_spec(ai: AI, dbs: DBs):
     '''
     Generate a spec from the main prompt + clarifications and save the results to the workspace
     '''
-    messages = [ai.fsystem(setup_sys_prompt(dbs)), ai.fsystem(f"Main prompt: {dbs.input['main_prompt']}")]
+    messages = [ai.fsystem(setup_sys_prompt(dbs)), ai.fsystem(f"Instructions: {dbs.input['main_prompt']}")]
 
     messages = ai.next(messages, dbs.identity['spec'])
     messages = ai.next(messages, dbs.identity['respec'])
@@ -97,10 +97,11 @@ def run_clarified(ai: AI, dbs: DBs):
 def execute_workspace(ai: AI, dbs: DBs):
     messages = ai.start(
         system=(
-            f"You will get infomation about a codebase that is currently on disk in the folder {dbs.workspace.path}.\n"
+            f"You will get information about a codebase that is currently on disk in the current folder.\n"
             "From this you will answer with one code block that includes all the necessary macos terminal commands to "
             "a) install dependencies "
-            "b) run the necessary parts of the codebase to try it.\n"
+            "b) run all necessary parts of the codebase (in parallell if necessary).\n"
+            "Do not install globally. Do not use sudo.\n"
             "Do not explain the code, just give the commands.\n"
         ),
         user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
@@ -108,6 +109,8 @@ def execute_workspace(ai: AI, dbs: DBs):
 
     [[lang, command]] = parse_chat(messages[-1]['content'])
     assert lang in ['', 'bash', 'sh']
+
+    dbs.workspace['run.sh'] = command
 
     print('Do you want to execute this code?')
     print(command)
@@ -119,7 +122,9 @@ def execute_workspace(ai: AI, dbs: DBs):
         return messages
     print('Executing the code...')
     print()
-    subprocess.run(command, shell=True)
+
+    # Run the subprocess in dbs.workspace.path
+    subprocess.run('bash run.sh', shell=True, cwd=dbs.workspace.path)
     return messages
 
 
@@ -128,6 +133,7 @@ STEPS = {
     'default': [gen_spec, pre_unit_tests, run_clarified],
     'simple': [run, execute_workspace],
     'clarify': [clarify, run_clarified],
+    'execute_only': [execute_workspace],
 }
 
 # Future steps that can be added:
