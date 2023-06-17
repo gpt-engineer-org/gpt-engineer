@@ -16,7 +16,7 @@ def chat(
     out_path: str | None = None,
     model: str = "gpt-4",
     temperature: float = 0.1,
-    max_tokens: int = 8192,
+    max_tokens: int = 4096,
 ):
     # Check if the selected model is available and update if necessary
     try:
