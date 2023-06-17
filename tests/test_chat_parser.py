@@ -79,22 +79,23 @@ const a: number = 1;
 import pygame
 ```
 
-(13)
+(14)
 **file2.py**
 ```python
 import pygame
 ```
 
-(14)
+(15)
 #### `gm.py`
 ```python
 import pygame
+```
 '''
 
 class TestChatParsing(unittest.TestCase):
     
     def setUp(self):
-        self.expected_files = [
+        self._expected_filenames = (
             'main.py',
             'entry.py',
             'rickroll.py',
@@ -110,22 +111,18 @@ class TestChatParsing(unittest.TestCase):
             'file1.py',
             'file2.py',
             'gm.py',
-        ]
+        )
         self.chat = CODE_FORMATS
 
     def test_parsing(self):
-        files_and_content = parse_chat(self.chat)
+        codefiles = parse_chat(self.chat)
 
-        # Check that the number of extracted files matches the expected number
-        self.assertEqual(len(files_and_content), len(self.expected_files))
-
-        # Iterate over the expected files and check if they match the parsed files
-        for i, expected_file in enumerate(self.expected_files):
-            self.assertEqual(files_and_content[i][0], expected_file)
-
-        # Check that the content of each file is not empty
-        for file in files_and_content:
-            self.assertNotEqual(file[1], '')
+        self.assertEqual(len(codefiles), len(self._expected_filenames))
+        for i, cf in enumerate(codefiles):
+            filename, content = cf
+            
+            self.assertEqual(filename, self._expected_filenames[i])
+            self.assertNotEqual(content, '')
 
 if __name__ == '__main__':
     unittest.main()
