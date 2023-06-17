@@ -68,7 +68,7 @@ def pre_unit_tests(ai: AI, dbs: DBs):
     '''
     Generate unit tests based on the specification, that should work.
     '''
-    messages = [ai.fsystem(setup_sys_prompt(dbs)), ai.fsystem(f"Main prompt: {dbs.input['main_prompt']}"), ai.fsystem(f"Specification:\n\n{dbs.memory['specification']}")]
+    messages = [ai.fsystem(setup_sys_prompt(dbs)), ai.fuser(f"Instructions: {dbs.input['main_prompt']}"), ai.fuser(f"Specification:\n\n{dbs.memory['specification']}")]
 
     messages = ai.next(messages, dbs.identity['unit_tests'])
 
