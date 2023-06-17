@@ -97,7 +97,7 @@ def run_clarified(ai: AI, dbs: DBs):
 def execute_workspace(ai: AI, dbs: DBs):
     messages = ai.start(
         system=(
-            f"You will get infomation about a codebase that is currently on disk in the folder {dbs.workspace.path}.\n"
+            f"You will get information about a codebase that is currently on disk in the folder {dbs.workspace.path}.\n"
             "From this you will answer with one code block that includes all the necessary macos terminal commands to "
             "a) install dependencies "
             "b) run the necessary parts of the codebase to try it.\n"
