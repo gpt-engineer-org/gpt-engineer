@@ -11,14 +11,17 @@ class DB:
         os.makedirs(self.path, exist_ok=True)
 
     def __getitem__(self, key):
-        with open(self.path / key, encoding='utf-8') as f:
-            return f.read()
+        try:
+            with open(self.path / key, encoding='utf-8') as f:
+                return f.read()
+        except FileNotFoundError:
+            raise KeyError(key)
 
     def __setitem__(self, key, val):
         Path(self.path / key).absolute().parent.mkdir(parents=True, exist_ok=True)
 
         with open(self.path / key, 'w', encoding='utf-8') as f:
-            f.write(val)
+            f.write(str(val))
 
     def __contains__(self, key):
         return (self.path / key).exists()
