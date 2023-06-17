@@ -11,7 +11,7 @@ def setup_sys_prompt(dbs):
     return dbs.identity["generate"] + "\nUseful to know:\n" + dbs.identity["philosophy"]
 
 
-def run(ai: AI, dbs: DBs):
+def simple_gen(ai: AI, dbs: DBs):
     """Run the AI on the main prompt and save the results"""
     messages = ai.start(
         setup_sys_prompt(dbs),
@@ -62,15 +62,30 @@ def gen_spec(ai: AI, dbs: DBs):
     ]
 
     messages = ai.next(messages, dbs.identity["spec"])
-    messages = ai.next(messages, dbs.identity["respec"])
-    messages = ai.next(messages, dbs.identity["spec"])
 
     dbs.memory["specification"] = messages[-1]["content"]
 
     return messages
 
+def respec(ai: AI, dbs: DBs):
+    messages = dbs.logs[gen_spec.__name__]
+    messages += [ai.fsystem(dbs.identity["respec"])]
 
-def pre_unit_tests(ai: AI, dbs: DBs):
+    messages = ai.next(messages)
+    messages = ai.next(
+        messages,
+        (
+            'Based on the conversation so far, please reiterate the specification for the program. '
+            'If there are things that can be improved, please incorporate the improvements. '
+            "If you are satisfied with the specification, just write out the specification word by word again."
+        )
+    )
+
+    dbs.memory["specification"] = messages[-1]["content"]
+    return messages
+
+
+def gen_unit_tests(ai: AI, dbs: DBs):
     """
     Generate unit tests based on the specification, that should work.
     """
@@ -88,7 +103,20 @@ def pre_unit_tests(ai: AI, dbs: DBs):
     return messages
 
 
-def run_clarified(ai: AI, dbs: DBs):
+def gen_clarified_code(ai: AI, dbs: DBs):
+    # get the messages from previous step
+
+    messages = json.loads(dbs.logs[clarify.__name__])
+
+    messages = [
+        ai.fsystem(setup_sys_prompt(dbs)),
+    ] + messages[1:]
+    messages = ai.next(messages, dbs.identity["use_qa"])
+
+    to_files(messages[-1]["content"], dbs.workspace)
+    return messages
+
+def gen_code(ai: AI, dbs: DBs):
     # get the messages from previous step
 
     messages = [
@@ -146,10 +174,11 @@ def gen_entrypoint(ai, dbs):
 
 # Different configs of what steps to run
 STEPS = {
-    "default": [gen_spec, pre_unit_tests, run_clarified, execute_workspace],
-    "benchmark": [gen_spec, pre_unit_tests, run_clarified, gen_entrypoint],
-    "simple": [run, execute_workspace],
-    "clarify": [clarify, run_clarified, gen_entrypoint],
+    "default": [gen_spec, gen_unit_tests, gen_code, execute_workspace],
+    "benchmark": [gen_spec, gen_unit_tests, gen_code, gen_entrypoint],
+    "simple": [simple_gen, execute_workspace],
+    "clarify": [clarify, gen_clarified_code, execute_workspace],
+    "respec": [gen_spec, respec, gen_unit_tests, gen_code, execute_workspace],
     "execute_only": [execute_entrypoint],
 }
 
