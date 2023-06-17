@@ -117,9 +117,12 @@ def execute_workspace(ai: AI, dbs: DBs):
     if input() == 'no':
         print('Ok, not executing the code.')
         return messages
+
     print('Executing the code...')
     print()
-    subprocess.run(command, shell=True)
+    # Here we prepend the command with a cd command to navigate to the right directory
+    complete_command = f'cd {dbs.workspace.path} && {command}'
+    subprocess.run(complete_command, shell=True)
     return messages
 
 
