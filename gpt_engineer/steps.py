@@ -30,7 +30,7 @@ def clarify(ai: AI, dbs: DBs):
     while True:
         messages = ai.next(messages, user)
 
-        if messages[-1]['content'].strip().lower().startswith("no"):
+        if messages[-1]["content"].strip().lower().startswith("no"):
             break
 
         print()
@@ -53,29 +53,37 @@ def clarify(ai: AI, dbs: DBs):
 
 
 def gen_spec(ai: AI, dbs: DBs):
-    '''
+    """
     Generate a spec from the main prompt + clarifications and save the results to the workspace
-    '''
-    messages = [ai.fsystem(setup_sys_prompt(dbs)), ai.fsystem(f"Instructions: {dbs.input['main_prompt']}")]
+    """
+    messages = [
+        ai.fsystem(setup_sys_prompt(dbs)),
+        ai.fsystem(f"Instructions: {dbs.input['main_prompt']}"),
+    ]
 
-    messages = ai.next(messages, dbs.identity['spec'])
-    messages = ai.next(messages, dbs.identity['respec'])
-    messages = ai.next(messages, dbs.identity['spec'])
+    messages = ai.next(messages, dbs.identity["spec"])
+    messages = ai.next(messages, dbs.identity["respec"])
+    messages = ai.next(messages, dbs.identity["spec"])
 
-    dbs.memory['specification'] = messages[-1]['content']
+    dbs.memory["specification"] = messages[-1]["content"]
 
     return messages
 
+
 def pre_unit_tests(ai: AI, dbs: DBs):
-    '''
+    """
     Generate unit tests based on the specification, that should work.
-    '''
-    messages = [ai.fsystem(setup_sys_prompt(dbs)), ai.fuser(f"Instructions: {dbs.input['main_prompt']}"), ai.fuser(f"Specification:\n\n{dbs.memory['specification']}")]
+    """
+    messages = [
+        ai.fsystem(setup_sys_prompt(dbs)),
+        ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
+        ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
+    ]
 
-    messages = ai.next(messages, dbs.identity['unit_tests'])
+    messages = ai.next(messages, dbs.identity["unit_tests"])
 
-    dbs.memory['unit_tests'] = messages[-1]['content']
-    to_files(dbs.memory['unit_tests'], dbs.workspace)
+    dbs.memory["unit_tests"] = messages[-1]["content"]
+    to_files(dbs.memory["unit_tests"], dbs.workspace)
 
     return messages
 
@@ -101,19 +109,19 @@ def execute_workspace(ai: AI, dbs: DBs):
 
 
 def execute_entrypoint(ai, dbs):
-    command = dbs.workspace['run.sh']
+    command = dbs.workspace["run.sh"]
 
-    print('Do you want to execute this code?')
+    print("Do you want to execute this code?")
     print()
     print(command)
     print()
     print('If yes, press enter. If no, type "no"')
     print()
-    if input() == 'no':
-        print('Ok, not executing the code.')
-    print('Executing the code...')
+    if input() == "no":
+        print("Ok, not executing the code.")
+    print("Executing the code...")
     print()
-    subprocess.run('bash run.sh', shell=True, cwd=dbs.workspace.path)
+    subprocess.run("bash run.sh", shell=True, cwd=dbs.workspace.path)
     return []
 
 
@@ -130,19 +138,19 @@ def gen_entrypoint(ai, dbs):
         user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
     )
     print()
-    [[lang, command]] = parse_chat(messages[-1]['content'])
-    assert lang in ['', 'bash', 'sh']
-    dbs.workspace['run.sh'] = command
+    [[lang, command]] = parse_chat(messages[-1]["content"])
+    assert lang in ["", "bash", "sh"]
+    dbs.workspace["run.sh"] = command
     return messages
 
 
 # Different configs of what steps to run
 STEPS = {
-    'default': [gen_spec, pre_unit_tests, run_clarified, execute_workspace],
-    'benchmark': [gen_spec, pre_unit_tests, run_clarified, gen_entrypoint],
-    'simple': [run, execute_workspace],
-    'clarify': [clarify, run_clarified, gen_entrypoint],
-    'execute_only': [execute_entrypoint],
+    "default": [gen_spec, pre_unit_tests, run_clarified, execute_workspace],
+    "benchmark": [gen_spec, pre_unit_tests, run_clarified, gen_entrypoint],
+    "simple": [run, execute_workspace],
+    "clarify": [clarify, run_clarified, gen_entrypoint],
+    "execute_only": [execute_entrypoint],
 }
 
 # Future steps that can be added:
