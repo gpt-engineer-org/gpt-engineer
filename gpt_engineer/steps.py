@@ -107,7 +107,7 @@ def execute_workspace(ai: AI, dbs: DBs):
     )
 
     [[lang, command]] = parse_chat(messages[-1]['content'])
-    assert lang in ['', 'bash']
+    assert lang in ['', 'bash', 'sh']
 
     print('Do you want to execute this code?')
     print(command)
