@@ -1,8 +1,10 @@
 import json
+import subprocess
 
 from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.db import DBs
+from gpt_engineer.chat_to_files import parse_chat
 
 
 def setup_sys_prompt(dbs):
@@ -98,11 +100,15 @@ def execute_workspace(ai: AI, dbs: DBs):
             f"You will get infomation about a codebase that is currently on disk in the folder {dbs.workspace.path}.\n"
             "From this you will answer with one code block that includes all the necessary macos terminal commands to "
             "a) install dependencies "
-            "b) run the necessary parts of the codebase to try it."
+            "b) run the necessary parts of the codebase to try it.\n"
+            "Do not explain the code, just give the commands.\n"
         ),
         user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
     )
-    command = messages[-1]['content'].strip('```')
+
+    [[lang, command]] = parse_chat(messages[-1]['content'])
+    assert lang in ['', 'bash']
+
     print('Do you want to execute this code?')
     print(command)
     print()
@@ -125,7 +131,7 @@ STEPS = {
 }
 
 # Future steps that can be added:
-# improve_files,
+# self_reflect_and_improve_files,
 # add_tests
 # run_tests_and_fix_files,
 # improve_based_on_in_file_feedback_comments
