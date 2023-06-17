@@ -62,7 +62,11 @@ def run_clarified(ai: AI, dbs: DBs):
     return messages
 
 
-STEPS = [clarify, run_clarified]
+# Different configs of what steps to run
+STEPS = {
+    'default': [run],
+    'clarify': [clarify, run_clarified],
+}
 
 # Future steps that can be added:
 # improve_files,

@@ -21,6 +21,7 @@ def chat(
     ),
     model: str = "gpt-4",
     temperature: float = 0.1,
+    steps_config: str = "default",
 ):
     app_dir = pathlib.Path(os.path.curdir)
     input_path = project_path
@@ -40,7 +41,7 @@ def chat(
         identity=DB(app_dir / "identity"),
     )
 
-    for step in STEPS:
+    for step in STEPS[steps_config]:
         messages = step(ai, dbs)
         dbs.logs[step.__name__] = json.dumps(messages)
 
