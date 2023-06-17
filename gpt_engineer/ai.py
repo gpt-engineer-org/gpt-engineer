@@ -1,3 +1,4 @@
+from typing import List, Dict
 import openai
 
 
@@ -27,7 +28,7 @@ class AI:
     def fuser(self, msg):
         return {"role": "user", "content": msg}
 
-    def next(self, messages: list[dict[str, str]], prompt=None):
+    def next(self, messages: List[Dict[str, str]], prompt=None):
         if prompt:
             messages = messages + [{"role": "user", "content": prompt}]
 
