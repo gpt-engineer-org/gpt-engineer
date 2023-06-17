@@ -31,3 +31,6 @@ Thumbs.db
 
 # this application's specific files
 archive
+
+# any log file
+*log.txt
