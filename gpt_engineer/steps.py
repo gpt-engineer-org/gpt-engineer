@@ -30,7 +30,7 @@ def clarify(ai: AI, dbs: DBs):
     while True:
         messages = ai.next(messages, user)
 
-        if messages[-1]["content"].strip().lower() == "no":
+        if messages[-1]['content'].strip().lower().startswith("no"):
             break
 
         print()
