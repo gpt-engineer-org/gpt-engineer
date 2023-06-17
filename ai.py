@@ -33,6 +33,6 @@ class AI:
         if prompt:
             messages = messages + [{"role": "user", "content": f'### Prompt: \n{prompt}'}]
 
-        response = AI.model.chat_completion(messages=messages, verbose=True, streaming=True, default_prompt_header=False, **self.kwargs)
+        response = AI.model.chat_completion(messages=messages, verbose=True, streaming=True, default_prompt_header=False, n_ctx=2048, n_predict=2048, **self.kwargs)
 
         return messages + [response['choices'][0]['message']]
