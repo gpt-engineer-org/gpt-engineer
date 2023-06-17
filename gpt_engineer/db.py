@@ -15,7 +15,7 @@ class DB:
             return f.read()
 
     def __setitem__(self, key, val):
-        os.makedirs(self.path, exist_ok=True)
+        Path(self.path / key).absolute().parent.mkdir(parents=True, exist_ok=True)
 
         with open(self.path / key, 'w', encoding='utf-8') as f:
             f.write(val)
