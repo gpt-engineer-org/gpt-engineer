@@ -12,6 +12,7 @@ build/
 *.egg
 
 # Virtual environments
+.env
 venv/
 ENV/
 
@@ -31,3 +32,6 @@ Thumbs.db
 
 # this application's specific files
 archive
+
+# any log file
+*log.txt
