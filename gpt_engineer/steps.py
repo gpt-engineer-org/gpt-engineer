@@ -8,7 +8,7 @@ from gpt_engineer.chat_to_files import parse_chat
 
 
 def setup_sys_prompt(dbs):
-    return dbs.identity["setup"] + "\nUseful to know:\n" + dbs.identity["philosophy"]
+    return dbs.identity["generate"] + "\nUseful to know:\n" + dbs.identity["philosophy"]
 
 
 def run(ai: AI, dbs: DBs):
