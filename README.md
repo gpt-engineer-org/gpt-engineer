@@ -13,10 +13,6 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 - Simplicity, all computation is "resumable" and persisted to the filesystem
 
 
-
-![output](https://github.com/AntonOsika/gpt-engineer/assets/4467025/a6938d43-2ac1-4cf1-98d1-93eea1bdfce4)
-
-
 ## Usage
 
 **Setup**:
