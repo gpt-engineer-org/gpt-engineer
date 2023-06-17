@@ -84,6 +84,20 @@ class RunLatest(Step):
         to_files(messages[-1]['content'], dbs.workspace)
         return messages
 
+class Planning(Step):
+    def __init__(self):
+        Step.__init__(self, "Planning")
+    
+    def run(self, ai: AI, dbs:DBs):
+        # get the messages from previous step
+        messages = self.prev.messages
+
+        messages = [
+            ai.fsystem("You provide additional creative information about the project."),
+        ] + messages[1:]
+        messages = ai.next(messages, dbs.identity['planning'])
+        return messages
+
 class RunMain(Step):
     def __init__(self):
         Step.__init__(self, "Run Main")
@@ -102,19 +116,10 @@ def setup_sys_prompt(dbs):
     return dbs.identity['setup'] + '\nUseful to know:\n' + dbs.identity['philosophy']
 
 
-def run(ai: AI, dbs: DBs):
-    '''Run the AI on the main prompt and save the results'''
-    messages = ai.start(
-        setup_sys_prompt(dbs),
-        dbs.input['main_prompt'],
-    )
-    to_files(messages[-1]['content'], dbs.workspace)
-    return messages
-
-
 def standard_runner(ai: AI, dbs: DBs):
     return StepRunner(ai, dbs, [
         ClarificationStep(),
+        Planning(),
         RunLatest()
     ])
 
