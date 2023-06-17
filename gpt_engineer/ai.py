@@ -1,3 +1,13 @@
+#Before importing the openai module, load your API key from an environment variable or file:
+from dotenv import load_dotenv
+load_dotenv()
+import os
+openai_api_key = os.getenv("OPENAI_API_KEY")
+if openai_api_key is None:
+    raise Exception("Please set your environment variable OPENAI_API_KEY.")
+
+os.environ["OPENAI_API_KEY"] = openai_api_key
+#End of loading API key
 import openai
 
 
