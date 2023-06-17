@@ -1,7 +1,7 @@
 # GPT Engineer
 **Specify what you want it to build, the AI asks for clarification, and then builds it.**
 
-GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt. 
+GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
 
 ## Project philosophy
 - Simple to get value
@@ -43,6 +43,9 @@ You can specify the "identity" of the AI agent by editing the files in the `iden
 Editing the identity, and evolving the main_prompt, is currently how you make the agent remember things between projects.
 
 Each step in steps.py will have its communication history with GPT4 stored in the logs folder, and can be rerun with scripts/rerun_edited_message_logs.py.
+
+## Development/Contributing
+If you want to contribute, please check out the [issues tab](https://github.com/AntonOsika/gpt-engineer/issues) in the GitHub repo and please read the [contributing document](.github/CONTRIBUTING.md) regarding some specifics on how to contribute.
 
 
 ## High resolution example
