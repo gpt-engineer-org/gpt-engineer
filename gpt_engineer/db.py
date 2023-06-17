@@ -1,10 +1,11 @@
-import os
-
 from dataclasses import dataclass
+import os
 from pathlib import Path
 
 
 class DB:
+    """A simple key-value store, where keys are filenames and values are file contents."""
+
     def __init__(self, path):
         self.path = Path(path).absolute()
         os.makedirs(self.path, exist_ok=True)
@@ -14,15 +15,19 @@ class DB:
             return f.read()
 
     def __setitem__(self, key, val):
-        target = self.path / key
-        os.makedirs(target.parent, exist_ok=True)
-        with open(target, 'w', encoding='utf-8') as f:
+        Path(self.path / key).absolute().parent.mkdir(parents=True, exist_ok=True)
+
+        with open(self.path / key, 'w', encoding='utf-8') as f:
             f.write(val)
 
+    def __contains__(self, key):
+        return (self.path / key).exists()
 
-# dataclass for all dbs:
+
 @dataclass
 class DBs:
+    """A dataclass for all dbs"""
+
     memory: DB
     logs: DB
     identity: DB

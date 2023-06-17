@@ -1,3 +1,24 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[project]
+name = "gpt-engineer"
+version = "0.0.1"
+description = "Specify what you want it to build, the AI asks for clarification, and then builds it."
+readme = "README.md"
+requires-python = ">=3"
+dependencies = [
+  'black == 23.3.0',
+  'ruff == 0.0.272',
+  'typer == 0.9.0'
+]
+
+[project.scripts]
+gpt-engineer = 'gpt_engineer.main:app'
+
+[tool.setuptools]
+packages = ["gpt_engineer"]
+
 # https://beta.ruff.rs/docs/configuration/#using-rufftoml
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
@@ -22,6 +43,11 @@ exclude = [
     "node_modules",
     "venv",
 ]
+
+[project.urls]
+"Homepage" = "https://github.com/AntonOsika/gpt-engineer"
+"Bug Tracker" = "https://github.com/AntonOsika/gpt-engineer/issues"
+
 
 [tool.ruff.isort]
 known-first-party = []

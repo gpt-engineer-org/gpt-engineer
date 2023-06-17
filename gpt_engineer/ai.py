@@ -28,11 +28,11 @@ class AI:
         return {"role": "user", "content": msg}
 
     def next(self, messages: list[dict[str, str]], prompt=None):
-        if "### Instruction:" not in messages[0]["content"]:
-            messages[0]["content"] = "### Instruction: " + messages[0]["content"]
+        if "### System:" not in messages[0]["content"]:
+            messages[0]["content"] = "### System: " + messages[0]["content"]
         if prompt:
             messages = messages + [{"role": "user", "content": f'### Prompt: \n{prompt}'}]
 
-        response = AI.model.chat_completion(messages=messages, verbose=True, streaming=True, default_prompt_header=False, n_ctx=2048, n_predict=2048, **self.kwargs)
+        response = AI.model.chat_completion(messages=messages, verbose=True, streaming=True, default_prompt_header=False, n_ctx=4096, n_predict=2048, **self.kwargs)
 
         return messages + [response['choices'][0]['message']]

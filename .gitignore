@@ -12,12 +12,14 @@ build/
 *.egg
 
 # Virtual environments
+.env
 venv/
 .venv/
 ENV/
 
 # IDE-specific files
 .vscode/
+.idea/
 
 # Compiled Python modules
 *.pyc
@@ -32,3 +34,7 @@ Thumbs.db
 
 # this application's specific files
 archive
+
+# any log file
+*log.txt
+todo

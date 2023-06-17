@@ -1,7 +1,9 @@
 import re
+from typing import List, Tuple
+from gpt_engineer.db import DB
 
 
-def parse_chat(chat):  # -> List[Tuple[str, str]]:
+def parse_chat(chat) -> List[Tuple[str, str]]:
     # Get all ``` blocks
     regex = r"```(.*?)```"
 
@@ -19,8 +21,8 @@ def parse_chat(chat):  # -> List[Tuple[str, str]]:
     return files
 
 
-def to_files(chat, workspace):
-    workspace['all_output.txt'] = chat
+def to_files(chat: str, workspace: DB):
+    workspace["all_output.txt"] = chat
 
     files = parse_chat(chat)
     for file_name, file_content in files:
