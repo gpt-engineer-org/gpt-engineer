@@ -40,9 +40,9 @@ Contributors welcome! If you are unsure what to add, check out the ideas listed 
 ## Features
 You can specify the "identity" of the AI agent by editing the files in the `identity` folder.
 
-Editing the identity, and evolving the main_prompt, is currently how you make the agent remember things between projects.
+Editing the identity, and evolving the `main_prompt`, is currently how you make the agent remember things between projects.
 
-Each step in steps.py will have its communication history with GPT4 stored in the logs folder, and can be rerun with scripts/rerun_edited_message_logs.py.
+Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
 
 ## Contributing
 If you want to contribute, please check out the [projects](https://github.com/AntonOsika/gpt-engineer/projects?query=is%3Aopen) or [issues tab](https://github.com/AntonOsika/gpt-engineer/issues) in the GitHub repo and please read the [contributing document](.github/CONTRIBUTING.md) on how to contribute.
