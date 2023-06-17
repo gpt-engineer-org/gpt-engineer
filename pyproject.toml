@@ -1,6 +1,19 @@
 [build-system]
 requires = ["setuptools", "wheel"]
 
+[tool.poetry]
+name = "gpt-engineer"
+version = "0.0.1"
+description = "Specify what you want it to build, the AI asks for clarification, and then builds it."
+authors = ["Anton Osika <anton.osika@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+black = "23.3.0"
+openai = "0.27.8"
+ruff = "0.0.272"
+typer = "0.9.0"
+
 [project]
 name = "gpt-engineer"
 version = "0.0.1"
