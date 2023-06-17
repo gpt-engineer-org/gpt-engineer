@@ -11,6 +11,9 @@ from gpt_engineer.db import DB, DBs
 
 app = typer.Typer()
 
+# setting path
+sys.path.append('../gpt-engineer')
+from model_select import model_select_method
 
 @app.command()
 def chat(
@@ -19,7 +22,7 @@ def chat(
         "",
         help="run prefix, if you want to run multiple variants of the same project and later compare them",
     ),
-    model: str = "gpt-4",
+    model: str = model_select_method(),
     temperature: float = 0.1,
     steps_config: str = "default",
 ):
