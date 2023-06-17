@@ -20,13 +20,16 @@ help:
 	@echo "  dev-install    	Will install the dev dependencies too."
 	@echo "  run <folder_name>  Runs GPT Engineer on the folder with the given name."
 
-dev-install: create-venv install-dependencies install-pre-commit farewell
+dev-install: create-venv upgrade-pip install-dependencies install-pre-commit farewell
 
-install: create-venv install-dependencies farewell
+install: create-venv upgrade-pip install-dependencies farewell
 
 create-venv:
 	@echo -e "$(COLOR_CYAN)Creating virtual environment...$(COLOR_RESET)" && \
-	python -m venv venv && \
+	python -m venv venv
+
+upgrade-pip:
+	@echo -e "$(COLOR_CYAN)Upgrading pip...$(COLOR_RESET)" && \
 	source venv/bin/activate && \
 	pip install --upgrade pip >> /dev/null
 
@@ -47,3 +50,4 @@ run:
 	@echo -e "$(COLOR_CYAN)Running GPT Engineer on $(COLOR_GREEN)$(name)$(COLOR_CYAN) folder...$(COLOR_RESET)" && \
 	source venv/bin/activate && \
 	python -m gpt_engineer.main $(name)
+
