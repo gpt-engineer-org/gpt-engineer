@@ -125,7 +125,7 @@ def execute_workspace(ai: AI, dbs: DBs):
 
 # Different configs of what steps to run
 STEPS = {
-    'default': [gen_spec, pre_unit_tests, run_clarified, execute_workspace],
+    'default': [gen_spec, pre_unit_tests, run_clarified],
     'simple': [run, execute_workspace],
     'clarify': [clarify, run_clarified],
 }
