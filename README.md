@@ -1,7 +1,7 @@
 # GPT Engineer
 **Specify what you want it to build, the AI asks for clarification, and then builds it.**
 
-GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt. 
+GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
 
 ## Project philosophy
 - Simple to get value
@@ -20,13 +20,13 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 ## Usage
 
 **Setup**:
-- `pip install .`
+- `pip install -r requirements.txt`
 - `export OPENAI_API_KEY=[your api key]` with a key that has GPT4 access
 
 **Run**:
 - Create a new empty folder with a `main_prompt` file (or copy the example folder `cp -r example/ my-new-project`)
 - Fill in the `main_prompt` in your new folder
-- Run `python gpt_engineer/main.py my-new-project`
+- Run `python -m gpt_engineer.main my-new-project`
 
 **Results**:
 - Check the generated files in my-new-project/workspace
@@ -43,6 +43,9 @@ You can specify the "identity" of the AI agent by editing the files in the `iden
 Editing the identity, and evolving the `main_prompt`, is currently how you make the agent remember things between projects.
 
 Each step in steps.py will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
+
+## Contributing
+If you want to contribute, please check out the [projects](https://github.com/AntonOsika/gpt-engineer/projects?query=is%3Aopen) or [issues tab](https://github.com/AntonOsika/gpt-engineer/issues) in the GitHub repo and please read the [contributing document](.github/CONTRIBUTING.md) on how to contribute.
 
 
 ## High resolution example
