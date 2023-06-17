@@ -1,5 +1,6 @@
 import re
 from typing import List, Tuple
+from gpt_engineer.db import DB
 
 # Amount of lines within the code block to consider for filename discovery
 N_CODELINES_FOR_FILENAME_TA = 5
@@ -81,8 +82,7 @@ def parse_chat(chat: str, verbose: bool = False) -> List[Tuple[str, str]]:
     return files
 
 
-
-def to_files(chat, workspace):
+def to_files(chat: str, workspace: DB):
     workspace["all_output.txt"] = chat
 
     files = parse_chat(chat)

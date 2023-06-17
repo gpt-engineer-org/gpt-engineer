@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
-gpt-engineer = 'gpt_engineer.main:execute'
+gpt-engineer = 'gpt_engineer.main:app'
 
 [tool.setuptools]
 packages = ["gpt_engineer"]
