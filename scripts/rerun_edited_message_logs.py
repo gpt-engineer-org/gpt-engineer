@@ -2,7 +2,6 @@ import json
 import pathlib
 
 import typer
-import openai
 
 from ..ai import AI
 from ..chat_to_files import to_files
@@ -18,17 +17,7 @@ def chat(
     temperature: float = 0.1,
     max_tokens: int = 4096,
 ):
-    # Check if the selected model is available and update if necessary
-    try:
-        openai.Model.retrieve(model)
-    except openai.error.InvalidRequestError:
-        print(
-            "Model gpt-4 not available for provided api key reverting "
-            "to gpt-3.5-turbo-16k-0613. Sign up for the gpt-4 wait list here: "
-            "https://openai.com/waitlist/gpt-4-api"
-        )
-        model = "gpt-3.5-turbo-16k-0613"
-
+    
     ai = AI(
         model=model,
         temperature=temperature,
