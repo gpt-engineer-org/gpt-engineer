@@ -194,12 +194,12 @@ def use_feedback(ai: AI, dbs: DBs):
 
 
 def fix_code(ai: AI, dbs: DBs):
-    codemem = json.loads(dbs.logs[gen_code.__name__])[-1]["content"]
+    code_ouput = json.loads(dbs.logs[gen_code.__name__])[-1]["content"]
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
-        ai.fuser(codemem),
-        ai.fsystem(dbs.identity["fixer"]),
+        ai.fuser(code_ouput),
+        ai.fsystem(dbs.identity["fix_code"]),
     ]
     messages = ai.next(messages, "Please fix any errors in the code above.")
     to_files(messages[-1]["content"], dbs.workspace)
