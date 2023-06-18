@@ -26,6 +26,11 @@ ENV/
 *.pyo
 *.pyd
 
+# Python testing
+.pytest_cache/
+.ruff_cache/
+.coverage
+
 # macOS specific files
 .DS_Store
 
