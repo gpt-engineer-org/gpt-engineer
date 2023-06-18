@@ -12,6 +12,7 @@ app = typer.Typer()
 sys.path.append("../gpt-engineer")
 from model_select import model_select_method
 
+
 @app.command()
 def chat(
     messages_path: str,
