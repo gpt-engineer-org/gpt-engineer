@@ -9,14 +9,14 @@ from ..chat_to_files import to_files
 app = typer.Typer()
 
 # setting path
-sys.path.append('../gpt-engineer')
+sys.path.append("../gpt-engineer")
 from model_select import model_select_method
 
 @app.command()
 def chat(
     messages_path: str,
     out_path: str | None = None,
-    model: str =  model_select_method(),
+    model: str = model_select_method(),
     temperature: float = 0.1,
     max_tokens: int = 4096,
 ):
