@@ -1,5 +1,6 @@
-from dataclasses import dataclass
 import os
+
+from dataclasses import dataclass
 from pathlib import Path
 
 
@@ -11,13 +12,13 @@ class DB:
         os.makedirs(self.path, exist_ok=True)
 
     def __getitem__(self, key):
-        with open(self.path / key, encoding='utf-8') as f:
+        with open(self.path / key, encoding="utf-8") as f:
             return f.read()
 
     def __setitem__(self, key, val):
         Path(self.path / key).absolute().parent.mkdir(parents=True, exist_ok=True)
 
-        with open(self.path / key, 'w', encoding='utf-8') as f:
+        with open(self.path / key, "w", encoding="utf-8") as f:
             f.write(val)
 
     def __contains__(self, key):

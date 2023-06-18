@@ -2,9 +2,8 @@ import json
 import subprocess
 
 from gpt_engineer.ai import AI
-from gpt_engineer.chat_to_files import to_files
+from gpt_engineer.chat_to_files import parse_chat, to_files
 from gpt_engineer.db import DBs
-from gpt_engineer.chat_to_files import parse_chat
 
 
 def setup_sys_prompt(dbs):
@@ -67,6 +66,7 @@ def gen_spec(ai: AI, dbs: DBs):
 
     return messages
 
+
 def respec(ai: AI, dbs: DBs):
     messages = dbs.logs[gen_spec.__name__]
     messages += [ai.fsystem(dbs.identity["respec"])]
@@ -75,10 +75,10 @@ def respec(ai: AI, dbs: DBs):
     messages = ai.next(
         messages,
         (
-            'Based on the conversation so far, please reiterate the specification for the program. '
-            'If there are things that can be improved, please incorporate the improvements. '
+            "Based on the conversation so far, please reiterate the specification for the program. "
+            "If there are things that can be improved, please incorporate the improvements. "
             "If you are satisfied with the specification, just write out the specification word by word again."
-        )
+        ),
     )
 
     dbs.memory["specification"] = messages[-1]["content"]
@@ -115,6 +115,7 @@ def gen_clarified_code(ai: AI, dbs: DBs):
 
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
+
 
 def gen_code(ai: AI, dbs: DBs):
     # get the messages from previous step
@@ -156,7 +157,7 @@ def execute_entrypoint(ai, dbs):
 def gen_entrypoint(ai, dbs):
     messages = ai.start(
         system=(
-            f"You will get information about a codebase that is currently on disk in the current folder.\n"
+            "You will get information about a codebase that is currently on disk in the current folder.\n"
             "From this you will answer with one code block that includes all the necessary macos terminal commands to "
             "a) install dependencies "
             "b) run all necessary parts of the codebase (in parallell if necessary).\n"
@@ -169,10 +170,15 @@ def gen_entrypoint(ai, dbs):
 
     blocks = parse_chat(messages[-1]["content"])
     for lang, _ in blocks:
-        assert lang in ["", "bash", "sh"], "Generated entrypoint command that was not bash"
+        assert lang in [
+            "",
+            "bash",
+            "sh",
+        ], "Generated entrypoint command that was not bash"
 
     dbs.workspace["run.sh"] = "\n".join(block for lang, block in blocks)
     return messages
+
 
 def use_feedback(ai: AI, dbs: DBs):
     messages = [
@@ -181,7 +187,7 @@ def use_feedback(ai: AI, dbs: DBs):
         ai.fassistant(dbs.workspace["all_output.txt"]),
         ai.fsystem(dbs.identity["use_feedback"]),
     ]
-    messages = ai.next(messages, dbs.memory['feedback'])
+    messages = ai.next(messages, dbs.memory["feedback"])
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
