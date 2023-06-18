@@ -166,9 +166,23 @@ def gen_entrypoint(ai, dbs):
         user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
     )
     print()
-    [[lang, command]] = parse_chat(messages[-1]["content"])
-    assert lang in ["", "bash", "sh"]
-    dbs.workspace["run.sh"] = command
+
+    blocks = parse_chat(messages[-1]["content"])
+    for lang, _ in blocks:
+        assert lang in ["", "bash", "sh"], "Generated entrypoint command that was not bash"
+
+    dbs.workspace["run.sh"] = "\n".join(block for lang, block in blocks)
+    return messages
+
+def use_feedback(ai: AI, dbs: DBs):
+    messages = [
+        ai.fsystem(setup_sys_prompt(dbs)),
+        ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
+        ai.fassistant(dbs.workspace["all_output.txt"]),
+        ai.fsystem(dbs.identity["use_feedback"]),
+    ]
+    messages = ai.next(messages, dbs.memory['feedback'])
+    to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
 
@@ -180,6 +194,7 @@ STEPS = {
     "clarify": [clarify, gen_clarified_code, execute_workspace],
     "respec": [gen_spec, respec, gen_unit_tests, gen_code, execute_workspace],
     "execute_only": [execute_entrypoint],
+    "use_feedback": [use_feedback],
 }
 
 # Future steps that can be added:

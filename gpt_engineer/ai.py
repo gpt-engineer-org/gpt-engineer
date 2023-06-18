@@ -18,6 +18,9 @@ class AI:
 
     def fuser(self, msg):
         return {"role": "user", "content": msg}
+    def fassistant(self, msg):
+        return {"role": "assistant", "content": msg}
+
 
     def next(self, messages: list[dict[str, str]], prompt=None):
         if prompt:
