@@ -3,6 +3,8 @@
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
 
+[Demo](https://twitter.com/antonosika/status/1667641038104674306) 👶🤖
+
 ## Project philosophy
 - Simple to get value
 - Flexible and easy to add new own "AI steps". See `steps.py`.
@@ -11,10 +13,6 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
   2. giving feedback to the AI that it will remember over time
 - Fast handovers back and forth between AI and human
 - Simplicity, all computation is "resumable" and persisted to the filesystem
-
-
-
-![output](https://github.com/AntonOsika/gpt-engineer/assets/4467025/a6938d43-2ac1-4cf1-98d1-93eea1bdfce4)
 
 
 ## Usage
