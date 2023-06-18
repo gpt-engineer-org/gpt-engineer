@@ -25,7 +25,10 @@ class AI:
         return {"role": "system", "content": msg}
 
     def fuser(self, msg):
-        return {"role": "user", "content": msg}
+        return {"role": "user", "content": msg
+    
+    def fassistant(self, msg):
+        return {"role": "assistant", "content": msg}
 
     def next(self, messages: list[dict[str, str]], prompt=None):
         if "### System:" not in messages[0]["content"]:
