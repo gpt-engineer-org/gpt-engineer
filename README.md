@@ -69,7 +69,7 @@ cp -r projects/example/ projects/my-new-project
   - Optionally pass in `true` to delete the working files before running
 
 **Results**:
-- Check the generated files in projects/my-new-project/workspace
+- Check the generated files in `projects/my-new-project/workspace`
 
 ### Limitations
 Implementing additional chain of thought prompting, e.g. [Reflexion](https://github.com/noahshinn024/reflexion), should be able to make it more reliable and not miss requested functionality in the main prompt.
