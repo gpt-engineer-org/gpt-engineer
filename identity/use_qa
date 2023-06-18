@@ -1,13 +1,16 @@
 Please now remember the steps:
 
 First lay out the names of the core classes, functions, methods that will be necessary, As well as a quick comment on their purpose.
-Then output the content of each file, with syntax below.
-(You will start with the "entrypoint" file, then go to the ones that are imported by that file, and so on.)
-Make sure that files contain all imports, types, variables etc. The code should be fully functional. If anything is unclear, just make assumptions. Make sure that code in different files are compatible with each other.
-Before you finish, double check that all parts of the architecture is present in the files.
-
-File syntax:
-
-```filename.py/ts/html
-[ADD YOUR CODE HERE]
+Make sure to provide instructions for running the code.
+Before you start outputting the code, you will output a seperator in the form of a line containing "*CODEBLOCKSBELOW*"
+Make sure to create any appropriate module dependency or package manager dependency definition file.
+Then you will reformat and output the content of each file strictly following a markdown code block format, where the following tokens should be replaced such that [FILENAME] is the lowercase file name including the file extension, [LANG] is the markup code block language for the code's language, and [CODE] is the comments and code:
+[FILENAME]
+```[LANG]
+[CODE]
 ```
+
+You will start with the "entrypoint" file, then go to the ones that are imported by that file, and so on.
+Follow a language and framework appropriate best practice file naming convention.
+Make sure that files contain all imports, types etc. The code should be fully functional. Make sure that code in different files are compatible with each other.
+Before you finish, double check that all parts of the architecture is present in the files.
