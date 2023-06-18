@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+
 # This class represents a simple database that stores its data as files in a directory.
 # It supports both text and binary files, and can handle directory structures.
 class DB:
@@ -18,7 +19,7 @@ class DB:
         # Check if the file exists before trying to open it.
         if full_path.is_file():
             # Open the file in text mode and return its content.
-            with full_path.open('r') as f:
+            with full_path.open("r") as f:
                 return f.read()
         else:
             # If the file doesn't exist, raise an error.

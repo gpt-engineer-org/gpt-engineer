@@ -1,14 +1,13 @@
-import os
 import json
+import os
 import pathlib
-import typer
 import shutil
 
+import typer
 
 from gpt_engineer.ai import AI
-from gpt_engineer.steps import STEPS
 from gpt_engineer.db import DB, DBs
-
+from gpt_engineer.steps import STEPS
 
 app = typer.Typer()
 
@@ -30,7 +29,7 @@ def chat(
     memory_path = input_path / (run_prefix + "memory")
     workspace_path = input_path / (run_prefix + "workspace")
 
-    if delete_existing == 'true':
+    if delete_existing == "true":
         # Delete files and subdirectories in paths
         shutil.rmtree(memory_path, ignore_errors=True)
         shutil.rmtree(workspace_path, ignore_errors=True)
@@ -51,6 +50,7 @@ def chat(
     for step in STEPS[steps_config]:
         messages = step(ai, dbs)
         dbs.logs[step.__name__] = json.dumps(messages)
+
 
 if __name__ == "__main__":
     app()
