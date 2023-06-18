@@ -157,8 +157,8 @@ def execute_entrypoint(ai, dbs):
 def gen_entrypoint(ai, dbs):
     messages = ai.start(
         system=(
-            f"You will get information about a codebase that is currently on disk in the current folder.\n"
-            "From this you will answer with one code block that includes all the necessary macos terminal commands to "
+            f"You will get information about a codebase that is currently on disk in the folder {dbs.workspace.path}.\n"
+            "From this you will answer with code blocks that includes all the necessary Windows, MacOS, and Linux terminal commands to "
             "a) install dependencies "
             "b) run all necessary parts of the codebase (in parallell if necessary).\n"
             "Do not install globally. Do not use sudo.\n"
