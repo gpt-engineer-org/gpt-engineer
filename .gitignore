@@ -12,16 +12,24 @@ build/
 *.egg
 
 # Virtual environments
+.env
+.env.sh
 venv/
 ENV/
 
 # IDE-specific files
 .vscode/
+.idea/
 
 # Compiled Python modules
 *.pyc
 *.pyo
 *.pyd
+
+# Python testing
+.pytest_cache/
+.ruff_cache/
+.coverage
 
 # macOS specific files
 .DS_Store
@@ -31,3 +39,11 @@ Thumbs.db
 
 # this application's specific files
 archive
+
+# any log file
+*log.txt
+todo
+
+# Ignore GPT Engineer files
+projects
+!projects/example
