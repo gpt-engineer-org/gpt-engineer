@@ -36,3 +36,6 @@ archive
 
 # any log file
 *log.txt
+
+# ignore all project files
+projects
