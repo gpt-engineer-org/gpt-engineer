@@ -26,15 +26,17 @@ To enforce this we use [`pre-commit`](https://pre-commit.com/) to run [`black`](
 
 ```bash
 $ pip install -r requirements.txt
-```
 
-And then install the `pre-commit` hooks with:
-```bash
+# And then install the `pre-commit` hooks with:
+
 $ pre-commit install
 
+# output:
 pre-commit installed at .git/hooks/pre-commit
-
 ```
+
+Or you could just run `make dev-install` to install the dependencies and the hooks!
+
 
 If you are not familiar with the concept of [git hooks](https://git-scm.com/docs/githooks) and/or [`pre-commit`](https://pre-commit.com/) please read the documentation to understand how they work.
 
