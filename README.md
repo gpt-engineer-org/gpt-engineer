@@ -14,59 +14,34 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 - Fast handovers back and forth between AI and human
 - Simplicity, all computation is "resumable" and persisted to the filesystem
 
-
-## Installation
-
-**Users**:
-
-We recommend installing from PyPi:
-```bash
-pip install gpt-engineer
-```
-This will make sure you are running the latest stable version.
-
-
-**Contributors/Developers**:
-
-If you plan on becoming a [contributor](.github/CONTRIBUTING.md) or if you just want to test/develop something on top of things,
-you can install from GitHub the bleeding version, aka the `main` branch:
-
-_(be aware this is a very active project and might be unstable at times)_
-
-```bash
-# use make (run make --help to see all commands available)
-make install
-
-# or
-
-make dev-install  # if you plan to contribute
-```
-
-If you know your way around Python project you can also install manually (make sure you are in a virtual environment):
-```
-pip install -r requirements.txt
-```
-
-
 ## Usage
 
-**Setup**:
+Choose either **stable** or **development**.
 
-- setup your OpenAI API Key (with a key that has GPT4 access)
-```
-export OPENAI_API_KEY=[your api key]
-```
+For **stable** release:
+
+- `pip install gpt-engineer`
+
+For **development**:
+- `git clone git@github.com:AntonOsika/gpt-engineer.git`
+- `cd gpt-engineer`
+- `make install`
+- `source venv/bin/activate`
+
+**Setup**
+
+With an api key that has GPT4 access run:
+
+- `export OPENAI_API_KEY=[your api key]`
+
 
 **Run**:
-- Create a new empty folder with a `main_prompt` file in the `projects` folder or copy the example folder:
-```
-cp -r projects/example/ projects/my-new-project
-```
+- Create an empty folder. If inside the repo, you can run:
+  - `cp -r projects/example/ projects/my-new-project`
+- Fill in the `main_prompt` file in your new folder
+- Run: `gpt-engineer projects/my-new-project`
 
-- Fill in the `main_prompt` in your new folder
-- Run `python -m gpt_engineer.main projects/my-new-project`
-
-**Results**:
+**Results**
 - Check the generated files in `projects/my-new-project/workspace`
 
 ### Limitations

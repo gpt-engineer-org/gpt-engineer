@@ -20,9 +20,9 @@ help:
 	@echo "  dev-install    	Will install the dev dependencies too."
 	@echo "  run <folder_name>  Runs GPT Engineer on the folder with the given name."
 
-dev-install: create-venv upgrade-pip install-dependencies install-pre-commit farewell
+dev-install: install
 
-install: create-venv upgrade-pip install-dependencies farewell
+install: create-venv upgrade-pip install-dependencies install-pre-commit farewell
 
 create-venv:
 	@echo -e "$(COLOR_CYAN)Creating virtual environment...$(COLOR_RESET)" && \
@@ -36,7 +36,7 @@ upgrade-pip:
 install-dependencies:
 	@echo -e "$(COLOR_CYAN)Installing dependencies...$(COLOR_RESET)" && \
 	source venv/bin/activate && \
-	pip install -r requirements.txt >> /dev/null
+	pip install -e . >> /dev/null
 
 install-pre-commit:
 	@echo -e "$(COLOR_CYAN)Installing pre-commit hooks...$(COLOR_RESET)" && \
