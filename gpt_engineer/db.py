@@ -21,7 +21,7 @@ class DB:
         Path(self.path / key).absolute().parent.mkdir(parents=True, exist_ok=True)
 
         with open(self.path / key, 'w', encoding='utf-8') as f:
-            f.write(str(val))
+            f.write(val)
 
     def __contains__(self, key):
         return (self.path / key).exists()
