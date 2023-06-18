@@ -24,8 +24,7 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 **Run**:
 - Create a new empty folder with a `main_prompt` file in the `projects` folder (or copy the example folder `cp -r projects/example/ projects/my-new-project`)
 - Fill in the `main_prompt` in your new folder
-- Run `python -m gpt_engineer.main my-new-project`
-  - Optionally pass in `true` to delete the working files before running
+- Run `python -m gpt_engineer.main projects/my-new-project`
 
 **Results**:
 - Check the generated files in projects/my-new-project/workspace
