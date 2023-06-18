@@ -200,12 +200,12 @@ STEPS = {
     "simple": [simple_gen, gen_entrypoint, execute_entrypoint],
     "clarify": [clarify, gen_clarified_code, gen_entrypoint, execute_entrypoint],
     "respec": [
-        gen_spec, 
-        respec, 
-        gen_unit_tests, 
-        gen_code, 
-        gen_entrypoint, 
-        execute_entrypoint
+        gen_spec,
+        respec,
+        gen_unit_tests,
+        gen_code,
+        gen_entrypoint,
+        execute_entrypoint,
     ],
     "execute_only": [execute_entrypoint],
     "use_feedback": [use_feedback],

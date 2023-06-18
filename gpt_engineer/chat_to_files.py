@@ -1,5 +1,6 @@
 import re
 
+
 def parse_chat(chat):  # -> List[Tuple[str, str]]:
     # Split the chat into sections by the "*CODEBLOCKSBELOW*" token
     split_chat = chat.split("*CODEBLOCKSBELOW*")
