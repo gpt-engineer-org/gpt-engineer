@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-# This class represents a simple database that stores its data as files in a directory.
+# This class represents a simple database that stores its data as files in a directory.!
 # It supports both text and binary files, and can handle directory structures.
 class DB:
     def __init__(self, path):
