@@ -20,7 +20,7 @@ def chat(
         "",
         help=(
             "run prefix, if you want to run multiple variants of the same project and "
-            "later compare them",
+            "later compare them"
         ),
     ),
     model: str = "gpt-4",
