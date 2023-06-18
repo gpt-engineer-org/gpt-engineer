@@ -142,9 +142,9 @@ def execute_entrypoint(ai, dbs):
     print()
     print(command)
     print()
-    print('If yes, type "yes". If no, press enter.')
+    print('If yes, press enter. Otherwise, type "no"')
     print()
-    if input().lower() != "yes":
+    if input() != "":
         print("Ok, not executing the code.")
         return []
     print("Executing the code...")
