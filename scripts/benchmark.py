@@ -2,16 +2,13 @@
 # for each folder, run the benchmark
 
 import os
-import sys
 import subprocess
-import time
-import datetime
-import shutil
-import argparse
-import json
-from pathlib import Path
-from typer import run
+
 from itertools import islice
+from pathlib import Path
+
+from typer import run
+
 
 def main(
     n_benchmarks: int | None = None,

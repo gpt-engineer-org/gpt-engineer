@@ -38,3 +38,7 @@ archive
 # any log file
 *log.txt
 todo
+
+# Ignore GPT Engineer files
+projects
+my-new-project/
