@@ -19,6 +19,7 @@ ENV/
 
 # IDE-specific files
 .vscode/
+.idea/
 
 # Compiled Python modules
 *.pyc
@@ -36,3 +37,4 @@ archive
 
 # any log file
 *log.txt
+todo

@@ -8,10 +8,10 @@ from gpt_engineer.chat_to_files import parse_chat
 
 
 def setup_sys_prompt(dbs):
-    return dbs.identity["setup"] + "\nUseful to know:\n" + dbs.identity["philosophy"]
+    return dbs.identity["generate"] + "\nUseful to know:\n" + dbs.identity["philosophy"]
 
 
-def run(ai: AI, dbs: DBs):
+def simple_gen(ai: AI, dbs: DBs):
     """Run the AI on the main prompt and save the results"""
     messages = ai.start(
         setup_sys_prompt(dbs),
@@ -30,7 +30,7 @@ def clarify(ai: AI, dbs: DBs):
     while True:
         messages = ai.next(messages, user)
 
-        if messages[-1]['content'].strip().lower().startswith("no"):
+        if messages[-1]["content"].strip().lower().startswith("no"):
             break
 
         print()
@@ -53,34 +53,70 @@ def clarify(ai: AI, dbs: DBs):
 
 
 def gen_spec(ai: AI, dbs: DBs):
-    '''
+    """
     Generate a spec from the main prompt + clarifications and save the results to the workspace
-    '''
-    messages = [ai.fsystem(setup_sys_prompt(dbs)), ai.fsystem(f"Main prompt: {dbs.input['main_prompt']}")]
+    """
+    messages = [
+        ai.fsystem(setup_sys_prompt(dbs)),
+        ai.fsystem(f"Instructions: {dbs.input['main_prompt']}"),
+    ]
 
-    messages = ai.next(messages, dbs.identity['spec'])
-    messages = ai.next(messages, dbs.identity['respec'])
-    messages = ai.next(messages, dbs.identity['spec'])
+    messages = ai.next(messages, dbs.identity["spec"])
 
-    dbs.memory['specification'] = messages[-1]['content']
+    dbs.memory["specification"] = messages[-1]["content"]
 
     return messages
 
-def pre_unit_tests(ai: AI, dbs: DBs):
-    '''
+def respec(ai: AI, dbs: DBs):
+    messages = dbs.logs[gen_spec.__name__]
+    messages += [ai.fsystem(dbs.identity["respec"])]
+
+    messages = ai.next(messages)
+    messages = ai.next(
+        messages,
+        (
+            'Based on the conversation so far, please reiterate the specification for the program. '
+            'If there are things that can be improved, please incorporate the improvements. '
+            "If you are satisfied with the specification, just write out the specification word by word again."
+        )
+    )
+
+    dbs.memory["specification"] = messages[-1]["content"]
+    return messages
+
+
+def gen_unit_tests(ai: AI, dbs: DBs):
+    """
     Generate unit tests based on the specification, that should work.
-    '''
-    messages = [ai.fsystem(setup_sys_prompt(dbs)), ai.fuser(f"Instructions: {dbs.input['main_prompt']}"), ai.fuser(f"Specification:\n\n{dbs.memory['specification']}")]
+    """
+    messages = [
+        ai.fsystem(setup_sys_prompt(dbs)),
+        ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
+        ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
+    ]
 
-    messages = ai.next(messages, dbs.identity['unit_tests'])
+    messages = ai.next(messages, dbs.identity["unit_tests"])
 
-    dbs.memory['unit_tests'] = messages[-1]['content']
-    to_files(dbs.memory['unit_tests'], dbs.workspace)
+    dbs.memory["unit_tests"] = messages[-1]["content"]
+    to_files(dbs.memory["unit_tests"], dbs.workspace)
 
     return messages
 
 
-def run_clarified(ai: AI, dbs: DBs):
+def gen_clarified_code(ai: AI, dbs: DBs):
+    # get the messages from previous step
+
+    messages = json.loads(dbs.logs[clarify.__name__])
+
+    messages = [
+        ai.fsystem(setup_sys_prompt(dbs)),
+    ] + messages[1:]
+    messages = ai.next(messages, dbs.identity["use_qa"])
+
+    to_files(messages[-1]["content"], dbs.workspace)
+    return messages
+
+def gen_code(ai: AI, dbs: DBs):
     # get the messages from previous step
 
     messages = [
@@ -95,39 +131,55 @@ def run_clarified(ai: AI, dbs: DBs):
 
 
 def execute_workspace(ai: AI, dbs: DBs):
-    messages = ai.start(
-        system=(
-            f"You will get infomation about a codebase that is currently on disk in the folder {dbs.workspace.path}.\n"
-            "From this you will answer with one code block that includes all the necessary macos terminal commands to "
-            "a) install dependencies "
-            "b) run the necessary parts of the codebase to try it.\n"
-            "Do not explain the code, just give the commands.\n"
-        ),
-        user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
-    )
+    messages = gen_entrypoint(ai, dbs)
+    execute_entrypoint(ai, dbs)
+    return messages
 
-    [[lang, command]] = parse_chat(messages[-1]['content'])
-    assert lang in ['', 'bash', 'sh']
 
-    print('Do you want to execute this code?')
+def execute_entrypoint(ai, dbs):
+    command = dbs.workspace["run.sh"]
+
+    print("Do you want to execute this code?")
+    print()
     print(command)
     print()
     print('If yes, press enter. If no, type "no"')
     print()
-    if input() == 'no':
-        print('Ok, not executing the code.')
-        return messages
-    print('Executing the code...')
+    if input() == "no":
+        print("Ok, not executing the code.")
+    print("Executing the code...")
     print()
-    subprocess.run(command, shell=True)
+    subprocess.run("bash run.sh", shell=True, cwd=dbs.workspace.path)
+    return []
+
+
+def gen_entrypoint(ai, dbs):
+    messages = ai.start(
+        system=(
+            f"You will get information about a codebase that is currently on disk in the current folder.\n"
+            "From this you will answer with one code block that includes all the necessary macos terminal commands to "
+            "a) install dependencies "
+            "b) run all necessary parts of the codebase (in parallell if necessary).\n"
+            "Do not install globally. Do not use sudo.\n"
+            "Do not explain the code, just give the commands.\n"
+        ),
+        user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
+    )
+    print()
+    [[lang, command]] = parse_chat(messages[-1]["content"])
+    assert lang in ["", "bash", "sh"]
+    dbs.workspace["run.sh"] = command
     return messages
 
 
 # Different configs of what steps to run
 STEPS = {
-    'default': [gen_spec, pre_unit_tests, run_clarified, execute_workspace],
-    'simple': [run, execute_workspace],
-    'clarify': [clarify, run_clarified],
+    "default": [gen_spec, gen_unit_tests, gen_code, execute_workspace],
+    "benchmark": [gen_spec, gen_unit_tests, gen_code, gen_entrypoint],
+    "simple": [simple_gen, execute_workspace],
+    "clarify": [clarify, gen_clarified_code, execute_workspace],
+    "respec": [gen_spec, respec, gen_unit_tests, gen_code, execute_workspace],
+    "execute_only": [execute_entrypoint],
 }
 
 # Future steps that can be added:
