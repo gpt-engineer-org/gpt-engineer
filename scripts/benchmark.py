@@ -6,13 +6,12 @@ import subprocess
 
 from itertools import islice
 from pathlib import Path
-from typing import Optional
 
 from typer import run
 
 
 def main(
-    n_benchmarks: Optional[int] = None,
+    n_benchmarks: int | None = None,
 ):
     path = Path("benchmark")
 
