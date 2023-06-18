@@ -18,7 +18,10 @@ def chat(
     delete_existing: str = typer.Argument(None, help="delete existing files"),
     run_prefix: str = typer.Option(
         "",
-        help="run prefix, if you want to run multiple variants of the same project and later compare them",
+        help=(
+            "run prefix, if you want to run multiple variants of the same project and "
+            "later compare them"
+        ),
     ),
     model: str = "gpt-4",
     temperature: float = 0.1,

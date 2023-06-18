@@ -30,7 +30,7 @@ def main(
             process = subprocess.Popen(
                 [
                     "python",
-                    "-u", # Unbuffered output
+                    "-u",  # Unbuffered output
                     "-m",
                     "gpt_engineer.main",
                     bench_folder,
@@ -50,7 +50,7 @@ def main(
         file.close()
 
         print("process", bench_folder.name, "finished with code", process.returncode)
-        print('Running it. Original benchmark prompt:')
+        print("Running it. Original benchmark prompt:")
         print()
         with open(bench_folder / "main_prompt") as f:
             print(f.read())
@@ -58,10 +58,18 @@ def main(
 
         try:
             subprocess.run(
-                ['python', "-m", "gpt_engineer.main", bench_folder, "--steps-config", "execute_only"],
+                [
+                    "python",
+                    "-m",
+                    "gpt_engineer.main",
+                    bench_folder,
+                    "--steps-config",
+                    "execute_only",
+                ],
             )
         except KeyboardInterrupt:
             pass
+
 
 if __name__ == "__main__":
     run(main)
