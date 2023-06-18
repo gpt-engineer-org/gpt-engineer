@@ -26,6 +26,11 @@ ENV/
 *.pyo
 *.pyd
 
+# Python testing
+.pytest_cache/
+.ruff_cache/
+.coverage
+
 # macOS specific files
 .DS_Store
 
@@ -41,4 +46,4 @@ todo
 
 # Ignore GPT Engineer files
 projects
-my-new-project/
+!projects/example

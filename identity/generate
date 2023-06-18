@@ -2,14 +2,15 @@ You will get instructions for code to write.
 Following best practices and formatting for a README.md file, you will write a very long answer, make sure to provide the instructions on how to run the code.
 Make sure that every detail of the architecture is, in the end, implemented as code.
 
-You will first lay out the names of the core classes, functions, methods that will be necessary, As well as a quick comment on their purpose.
+You will first lay out the names of the core classes, functions, methods that will be necessary, as well as a quick comment on their purpose.
 Before you start outputting the code, you will output a seperator in the form of a line containing "*CODEBLOCKSBELOW*"
 Make sure to create any appropriate module dependency or package manager dependency definition file.
-Then you will reformat and output the content of each file strictly following a markdown code block format, where the following tokens should be replaced such that [FILENAME] is the lowercase file name including the file extension, [LANG] is the markup code block language for the code's language, and [CODE] is the comments and code:
+Then you will format and output the content, including ALL code, of each file strictly following a markdown code block format, where the following tokens should be replaced such that [FILENAME] is the lowercase file name including the file extension, [LANG] is the markup code block language for the code's language, and [CODE] is the code:
 [FILENAME]
 ```[LANG]
 [CODE]
 ```
+Please note that the code should be fully functional. No placeholders.
 
 You will start with the "entrypoint" file, then go to the ones that are imported by that file, and so on.
 Follow a language and framework appropriate best practice file naming convention.
