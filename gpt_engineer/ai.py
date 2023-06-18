@@ -6,18 +6,19 @@ logger = logging.getLogger(__name__)
 
 
 class AI:
-    def __init__(self, **kwargs):
-        self.kwargs = kwargs
+    def __init__(self, model="gpt-4", temperature=0.1):
+        self.temperature = temperature
 
         try:
-            openai.Model.retrieve("gpt-4")
-        except openai.error.InvalidRequestError:
+            openai.Model.retrieve(model)
+            self.model = model
+        except openai.InvalidRequestError:
             print(
-                "Model gpt-4 not available for provided api key reverting "
-                "to gpt-3.5.turbo. Sign up for the gpt-4 wait list here: "
+                f"Model {model} not available for provided API key. Reverting "
+                "to gpt-3.5-turbo. Sign up for the GPT-4 wait list here: "
                 "https://openai.com/waitlist/gpt-4-api"
             )
-            self.kwargs["model"] = "gpt-3.5-turbo"
+            self.model = "gpt-3.5-turbo"
 
     def start(self, system, user):
         messages = [
@@ -42,7 +43,10 @@ class AI:
 
         logger.debug(f"Creating a new chat completion: {messages}")
         response = openai.ChatCompletion.create(
-            messages=messages, stream=True, **self.kwargs
+            messages=messages,
+            stream=True,
+            model=self.model,
+            temperature=self.temperature,
         )
 
         chat = []
