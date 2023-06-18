@@ -135,12 +135,6 @@ def gen_code(ai: AI, dbs: DBs):
     return messages
 
 
-def execute_workspace(ai: AI, dbs: DBs):
-    messages = gen_entrypoint(ai, dbs)
-    execute_entrypoint(ai, dbs)
-    return messages
-
-
 def execute_entrypoint(ai, dbs):
     command = dbs.workspace["run.sh"]
 
@@ -201,11 +195,11 @@ def use_feedback(ai: AI, dbs: DBs):
 
 # Different configs of what steps to run
 STEPS = {
-    "default": [gen_spec, gen_unit_tests, gen_code, execute_workspace],
+    "default": [gen_spec, gen_unit_tests, gen_code, gen_entrypoint, execute_entrypoint],
     "benchmark": [gen_spec, gen_unit_tests, gen_code, gen_entrypoint],
-    "simple": [simple_gen, execute_workspace],
-    "clarify": [clarify, gen_clarified_code, execute_workspace],
-    "respec": [gen_spec, respec, gen_unit_tests, gen_code, execute_workspace],
+    "simple": [simple_gen, gen_entrypoint, execute_entrypoint],
+    "clarify": [clarify, gen_clarified_code, gen_entrypoint, execute_entrypoint],
+    "respec": [gen_spec, respec, gen_unit_tests, gen_code, gen_entrypoint, execute_entrypoint],
     "execute_only": [execute_entrypoint],
     "use_feedback": [use_feedback],
 }
