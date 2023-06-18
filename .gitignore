@@ -38,3 +38,6 @@ archive
 # any log file
 *log.txt
 todo
+
+# ignore all project files
+projects
