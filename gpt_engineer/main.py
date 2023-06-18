@@ -2,6 +2,8 @@ import os
 import json
 import pathlib
 import typer
+from dotenv import load_dotenv
+load_dotenv()
 
 from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.ai import AI
