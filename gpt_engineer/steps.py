@@ -143,10 +143,11 @@ def execute_entrypoint(ai, dbs):
     print()
     print(command)
     print()
-    print('If yes, press enter. If no, type "no"')
+    print('If yes, type "yes". If no, press enter.')
     print()
-    if input() == "no":
+    if input().lower() != "yes":
         print("Ok, not executing the code.")
+        return []
     print("Executing the code...")
     print()
     subprocess.run("bash run.sh", shell=True, cwd=dbs.workspace.path)
