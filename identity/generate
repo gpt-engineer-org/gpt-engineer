@@ -4,7 +4,7 @@ Make sure that every detail of the architecture is, in the end, implemented as c
 
 You will first lay out the names of the core classes, functions, methods that will be necessary, as well as a quick comment on their purpose.
 Before you start outputting the code, you will output a seperator in the form of a line containing "*CODEBLOCKSBELOW*"
-Make sure to create any appropriate module dependency or package manager dependency definition file. 
+Make sure to create any appropriate module dependency or package manager dependency definition file.
 Then you will format and output the content, including ALL code, of each file strictly following a markdown code block format, where the following tokens should be replaced such that [FILENAME] is the lowercase file name including the file extension, [LANG] is the markup code block language for the code's language, and [CODE] is the code:
 [FILENAME]
 ```[LANG]
