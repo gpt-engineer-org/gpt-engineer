@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import pathlib
 import shutil
@@ -26,7 +27,10 @@ def chat(
     model: str = "gpt-4",
     temperature: float = 0.1,
     steps_config: str = "default",
+    verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
+    logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
+
     app_dir = pathlib.Path(os.path.curdir)
     input_path = pathlib.Path(app_dir / "projects" / project_path)
     memory_path = input_path / (run_prefix + "memory")
