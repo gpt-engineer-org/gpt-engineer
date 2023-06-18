@@ -1,14 +1,18 @@
 Please now remember the steps:
 
+Think step by step and reason yourself to the right decisions to make sure we get it right.
 First lay out the names of the core classes, functions, methods that will be necessary, As well as a quick comment on their purpose.
-Make sure to provide instructions for running the code.
-Before you start outputting the code, you will output a seperator in the form of a line containing "*CODEBLOCKSBELOW*"
-Make sure to create any appropriate module dependency or package manager dependency definition file.
-Then you will reformat and output the content of each file strictly following a markdown code block format, where the following tokens should be replaced such that [FILENAME] is the lowercase file name including the file extension, [LANG] is the markup code block language for the code's language, and [CODE] is the code:
+
+Then you will output the content of each file, with syntax below, including ALL code.
+
+Syntax:
 [FILENAME]
 ```[LANG]
 [CODE]
 ```
+Where [FILENAME] is the lowercase file name including the file extension,
+[LANG] is the language for the code's language, and [CODE] is the code:
+
 Please note that the code should be fully functional. No placeholders.
 
 You will start with the "entrypoint" file, then go to the ones that are imported by that file, and so on.
