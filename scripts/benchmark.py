@@ -59,12 +59,12 @@ def main(
         try:
             subprocess.run(
                 [
-                    "python", 
-                    "-m", 
-                    "gpt_engineer.main", 
-                    bench_folder, 
-                    "--steps-config", 
-                    "execute_only"
+                     "python",
+                     "-m",
+                     "gpt_engineer.main",
+                     bench_folder,
+                     "--steps-config",
+                     "execute_only",
                 ],
             )
         except KeyboardInterrupt:
