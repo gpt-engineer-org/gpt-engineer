@@ -38,3 +38,6 @@ archive
 # any log file
 *log.txt
 todo
+
+# GPT Engineer specific files
+my-new-project/
