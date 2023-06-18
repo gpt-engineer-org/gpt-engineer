@@ -1,16 +1,16 @@
 import json
 import pathlib
+import sys
 
 import typer
 
 from ..ai import AI
 from ..chat_to_files import to_files
-
-app = typer.Typer()
-
 # setting path
 sys.path.append("../gpt-engineer")
 from model_select import model_select_method
+
+app = typer.Typer()
 
 
 @app.command()
