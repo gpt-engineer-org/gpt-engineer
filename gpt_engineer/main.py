@@ -10,7 +10,7 @@ from gpt_engineer.db import DB, DBs
 from gpt_engineer.steps import STEPS
 
 # setting path
-sys.path.append('../gpt-engineer')
+sys.path.append("../gpt-engineer")
 from model_select import model_select_method
 
 app = typer.Typer()
