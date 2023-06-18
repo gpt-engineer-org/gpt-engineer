@@ -1,22 +1,19 @@
-import unittest
+import pytest
 from gpt_engineer.chat_to_files import parse_chat
 
+def test_parse_chat_with_valid_messages():
+    chat = "```path1.py\nline1\nline2```" \
+           "```path2.css\nline3\nline4```"
+    expected_output = [('path1.py', 'line1\nline2'), ('path2.css', 'line3\nline4')]
 
-class TestParseChat(unittest.TestCase):
+    output = parse_chat(chat)
 
-    def test_parse_chat_with_valid_messages(self):
-        chat = "```path1.py\nline1\nline2```" \
-               "```path2.css\nline3\nline4```"
-        expected_output = [('path1.py', 'line1\nline2'), ('path2.css', 'line3\nline4')]
+    assert expected_output == output
 
-        output = parse_chat(chat)
+def test_parse_chat_with_no_messages():
+    chat = "This is a test string without any valid messages."
+    expected_output = []
 
-        self.assertEqual(expected_output, output)
+    output = parse_chat(chat)
 
-    def test_parse_chat_with_no_messages(self):
-        chat = "This is a test string without any valid messages."
-        expected_output = []
-
-        output = parse_chat(chat)
-
-        self.assertEqual(output, expected_output)
+    assert expected_output == output
