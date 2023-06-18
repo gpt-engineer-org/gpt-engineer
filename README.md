@@ -64,9 +64,7 @@ cp -r projects/example/ projects/my-new-project
 ```
 
 - Fill in the `main_prompt` in your new folder
-
-- Run `make run my-new-project` or `python -m gpt_engineer.main my-new-project`
-  - Optionally pass in `true` to delete the working files before running
+- Run `python -m gpt_engineer.main projects/my-new-project`
 
 **Results**:
 - Check the generated files in `projects/my-new-project/workspace`

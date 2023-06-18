@@ -55,6 +55,7 @@ class AI:
             msg = delta.get("content", "")
             print(msg, end="")
             chat.append(msg)
+        print()
         messages = messages + [{"role": "assistant", "content": "".join(chat)}]
         logger.debug(f"Chat completion finished: {messages}")
         return messages

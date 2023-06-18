@@ -1,8 +1,9 @@
 import json
+import re
 import subprocess
 
 from gpt_engineer.ai import AI
-from gpt_engineer.chat_to_files import parse_chat, to_files
+from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.db import DBs
 
 
@@ -169,15 +170,9 @@ def gen_entrypoint(ai, dbs):
     )
     print()
 
-    blocks = parse_chat(messages[-1]["content"])
-    for lang, _ in blocks:
-        assert lang in [
-            "",
-            "bash",
-            "sh",
-        ], "Generated entrypoint command that was not bash"
-
-    dbs.workspace["run.sh"] = "\n".join(block for lang, block in blocks)
+    regex = r"```\S*\n(.+?)```"
+    matches = re.finditer(regex, messages[-1]["content"], re.DOTALL)
+    dbs.workspace["run.sh"] = "\n".join(match.group(1) for match in matches)
     return messages
 
 

@@ -1,8 +1,9 @@
 import json
 import logging
 import os
-import pathlib
 import shutil
+
+from pathlib import Path
 
 import typer
 
@@ -14,9 +15,13 @@ app = typer.Typer()
 
 
 @app.command()
-def chat(
+def main(
     project_path: str = typer.Argument("example", help="path"),
-    delete_existing: str = typer.Argument(None, help="delete existing files"),
+    delete_existing: bool = typer.Argument(False, help="delete existing files"),
+    model: str = "gpt-4",
+    temperature: float = 0.1,
+    steps_config: str = "default",
+    verbose: bool = typer.Option(False, "--verbose", "-v"),
     run_prefix: str = typer.Option(
         "",
         help=(
@@ -24,19 +29,14 @@ def chat(
             "later compare them"
         ),
     ),
-    model: str = "gpt-4",
-    temperature: float = 0.1,
-    steps_config: str = "default",
-    verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
-    app_dir = pathlib.Path(os.path.curdir)
-    input_path = pathlib.Path(app_dir / "projects" / project_path)
+    input_path = Path(project_path).absolute()
     memory_path = input_path / (run_prefix + "memory")
     workspace_path = input_path / (run_prefix + "workspace")
 
-    if delete_existing == "true":
+    if delete_existing:
         # Delete files and subdirectories in paths
         shutil.rmtree(memory_path, ignore_errors=True)
         shutil.rmtree(workspace_path, ignore_errors=True)
@@ -51,7 +51,7 @@ def chat(
         logs=DB(memory_path / "logs"),
         input=DB(input_path),
         workspace=DB(workspace_path),
-        identity=DB(app_dir / "identity"),
+        identity=DB(Path(os.path.curdir) / "identity"),
     )
 
     for step in STEPS[steps_config]:

@@ -43,7 +43,9 @@ def main(
             )
             benchmarks.append((bench_folder, process, log_file))
 
-            print("You can stream the log file by running: tail -f {}".format(log_path))
+            print("You can stream the log file by running:")
+            print("tail -f {}".format(log_path))
+            print()
 
     for bench_folder, process, file in benchmarks:
         process.wait()
