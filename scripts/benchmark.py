@@ -59,7 +59,7 @@ def main(
         try:
             subprocess.run(
                 [
-                    'python', 
+                    "python", 
                     "-m", 
                     "gpt_engineer.main", 
                     bench_folder, 
