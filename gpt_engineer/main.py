@@ -1,17 +1,14 @@
-import os
-import logging
 import json
-from pathlib import Path
+import logging
+import os
 import shutil
 
+from pathlib import Path
+
 import typer
-from typing import Any
 
-from gpt_engineer.ai.models import models, default_model_name, ModelName
-from gpt_engineer.chat_to_files import to_files
+from gpt_engineer.ai.models import models
 from gpt_engineer.db import DB, DBs
-from gpt_engineer.models import Message, Role, Step
-
 from gpt_engineer.steps import STEPS
 
 app = typer.Typer()
@@ -44,10 +41,7 @@ def main(
         shutil.rmtree(memory_path, ignore_errors=True)
         shutil.rmtree(workspace_path, ignore_errors=True)
 
-    kwargs = {
-            "model": model,
-            "temperature": temperature 
-        }
+    kwargs = {"model": model, "temperature": temperature}
     ai = models[model](**kwargs)
 
     dbs = DBs(

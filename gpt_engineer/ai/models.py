@@ -1,9 +1,10 @@
 from enum import Enum
 from typing import Any, Callable, Dict
 
+from .ai import AI
 from .gpt import GPT
 from .test import TestAI
-from .ai import AI
+
 
 class ModelName(str, Enum):
     GPT4 = "gpt-4"
@@ -11,9 +12,13 @@ class ModelName(str, Enum):
     TEST = "test"
 
 
-models: Dict[ModelName, Callable[[Any,], AI]] = {
-    ModelName.GPT4: GPT,
-    ModelName.GPT35_TURBO: GPT,
-    ModelName.TEST: TestAI
-}
+models: Dict[
+    ModelName,
+    Callable[
+        [
+            Any,
+        ],
+        AI,
+    ],
+] = {ModelName.GPT4: GPT, ModelName.GPT35_TURBO: GPT, ModelName.TEST: TestAI}
 default_model_name: ModelName = ModelName.GPT4

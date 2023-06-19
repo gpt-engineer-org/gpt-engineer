@@ -1,7 +1,7 @@
-from enum import Enum
 import json
 import re
 import subprocess
+
 from typing import Any, Callable, Dict, List, Tuple
 
 from gpt_engineer.ai.ai import AI
@@ -14,34 +14,35 @@ def setup_sys_prompt(dbs: DBs) -> str:
     """Constructs the system setup prompt."""
     return dbs.identity["generate"] + "\nUseful to know:\n" + dbs.identity["philosophy"]
 
+
 def parse_message_json(x: Dict[str, Any]) -> Tuple[Role, Message]:
     return Role(x["role"]), Message(x["content"])
 
 
-
 ### Steps
+
 
 def clarify(ai: AI, dbs: DBs) -> List[Tuple[Role, Message]]:
     """
     Ask the user if they want to clarify anything and save the results to the workspace.
     """
-    user_msg = dbs.input['main_prompt']
-    messages = [(Role.SYSTEM, Message(dbs.identity['qa']))]
+    user_msg = dbs.input["main_prompt"]
+    messages = [(Role.SYSTEM, Message(dbs.identity["qa"]))]
     while True:
         messages = ai.next(messages=messages, user_prompt=Message(user_msg))
 
-        response_content: str =messages[-1][1].content
-        if response_content.strip().lower() == 'no':
+        response_content: str = messages[-1][1].content
+        if response_content.strip().lower() == "no":
             break
 
         print(f"Help clarify: {response_content}")
         user_msg = input('(answer in text, or "q" to move on)\n')
         print()
 
-        if not user_msg or user_msg == 'q':
+        if not user_msg or user_msg == "q":
             break
 
-        user += (
+        user_msg += (
             "\n\n"
             "Is anything else unclear? If yes, only answer in the form:\n"
             "{remaining unclear areas} remaining questions.\n"
@@ -49,15 +50,17 @@ def clarify(ai: AI, dbs: DBs) -> List[Tuple[Role, Message]]:
             'If everything is sufficiently clear, only answer "no".'
         )
     print()
-    return messages 
+    return messages
 
 
 def simple_gen(ai: AI, dbs: DBs) -> List[Tuple[Role, Message]]:
     """Run the AI on the main prompt and save the results"""
-    messages = ai.start([
-        (Role.SYSTEM, Message(setup_sys_prompt(dbs))),
-        (Role.USER, dbs.input["main_prompt"])
-    ])
+    messages = ai.start(
+        [
+            (Role.SYSTEM, Message(setup_sys_prompt(dbs))),
+            (Role.USER, Message(dbs.input["main_prompt"])),
+        ]
+    )
     to_files(messages[-1][1].content, dbs.workspace)
     return messages
 
@@ -68,15 +71,11 @@ def run_clarified(ai: AI, dbs: DBs) -> List[Tuple[Role, Message]]:
     """
     # get the messages from previous step
     messages = json.loads(dbs.logs[Step.CLARIFY.value])
-
-    # TODO
-    print(messages)
-
     messages = [
         (Role.SYSTEM, Message(setup_sys_prompt(dbs))),
-    ] + [parse_message_json(m) for m in  messages[1:]]
+    ] + [parse_message_json(m) for m in messages[1:]]
 
-    messages = ai.next(messages, user_prompt=dbs.identity['use_qa'])
+    messages = ai.next(messages, user_prompt=dbs.identity["use_qa"])
     to_files(messages[-1][1].content, dbs.workspace)
     return messages
 
@@ -88,7 +87,7 @@ def gen_spec(ai: AI, dbs: DBs) -> List[Tuple[Role, Message]]:
     """
     messages = [
         (Role.SYSTEM, Message(setup_sys_prompt(dbs))),
-        (Role.SYSTEM, f"Instructions: {dbs.input['main_prompt']}")
+        (Role.SYSTEM, Message(f"Instructions: {dbs.input['main_prompt']}")),
     ]
 
     messages = ai.next(messages, user_prompt=dbs.identity["spec"])
@@ -106,10 +105,11 @@ def respec(ai: AI, dbs: DBs) -> List[Tuple[Role, Message]]:
     messages = ai.next(
         messages,
         user_prompt=(
-            "Based on the conversation so far, please reiterate the specification for the program. "
-            "If there are things that can be improved, please incorporate the improvements. If you "
-            "are satisfied with the specification, just write out the specification word by word again."
-        )
+            "Based on the conversation so far, please reiterate the specification for "
+            "the program. If there are things that can be improved, please incorporate "
+            "the improvements. If you are satisfied with the specification, just write "
+            "out the specification word by word again."
+        ),
     )
 
     dbs.memory["specification"] = messages[-1][1].content
@@ -137,12 +137,11 @@ def gen_unit_tests(ai: AI, dbs: DBs) -> List[Tuple[Role, Message]]:
 def gen_clarified_code(ai: AI, dbs: DBs) -> List[Tuple[Role, Message]]:
     # get the messages from previous step
 
-    # TODO: 
     messages = json.loads(dbs.logs[clarify.__name__])
 
     messages = [
         (Role.SYSTEM, Message(setup_sys_prompt(dbs))),
-    ] + [parse_message_json(m) for m in  messages[1:]]
+    ] + [parse_message_json(m) for m in messages[1:]]
     messages = ai.next(messages, dbs.identity["use_qa"])
 
     to_files(messages[-1][1].content, dbs.workspace)
@@ -183,17 +182,27 @@ def execute_entrypoint(ai, dbs) -> List[Tuple[Role, Message]]:
 
 def gen_entrypoint(ai, dbs) -> List[Tuple[Role, Message]]:
     messages = ai.start(
-        [(Role.SYSTEM, Message(
-            "You will get information about a codebase that is currently on disk in "
-            "the current folder.\n"
-            "From this you will answer with code blocks that includes all the necessary "
-            "unix terminal commands to "
-            "a) install dependencies "
-            "b) run all necessary parts of the codebase (in parallell if necessary).\n"
-            "Do not install globally. Do not use sudo.\n"
-            "Do not explain the code, just give the commands.\n"
-        )),
-        (Role.USER, Message("Information about the codebase:\n\n" + dbs.workspace["all_output.txt"]))
+        [
+            (
+                Role.SYSTEM,
+                Message(
+                    "You will get information about a codebase that is currently on disk"
+                    " in the current folder.\n"
+                    "From this you will answer with code blocks that includes all the"
+                    " necessary unix terminal commands to a) install dependencies "
+                    "b) run all necessary parts of the codebase "
+                    "(in parallell if necessary).\n"
+                    "Do not install globally. Do not use sudo.\n"
+                    "Do not explain the code, just give the commands.\n"
+                ),
+            ),
+            (
+                Role.USER,
+                Message(
+                    "Information about the codebase:\n\n"
+                    + dbs.workspace["all_output.txt"]
+                ),
+            ),
         ]
     )
     print()
