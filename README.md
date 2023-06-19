@@ -3,6 +3,8 @@
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
 
+[Demo](https://twitter.com/antonosika/status/1667641038104674306) 👶🤖
+
 ## Project philosophy
 - Simple to get value
 - Flexible and easy to add new own "AI steps". See `steps.py`.
@@ -12,21 +14,35 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 - Fast handovers back and forth between AI and human
 - Simplicity, all computation is "resumable" and persisted to the filesystem
 
-[Demo](https://twitter.com/antonosika/status/1667641038104674306) 👶🤖
-
 ## Usage
 
-**Setup**:
-- `pip install -r requirements.txt`
-- `export OPENAI_API_KEY=[your api key]` with a key that has GPT4 access
+Choose either **stable** or **development**.
+
+For **stable** release:
+
+- `pip install gpt-engineer`
+
+For **development**:
+- `git clone git@github.com:AntonOsika/gpt-engineer.git`
+- `cd gpt-engineer`
+- `make install`
+- `source venv/bin/activate`
+
+**Setup**
+
+With an api key that has GPT4 access run:
+
+- `export OPENAI_API_KEY=[your api key]`
+
 
 **Run**:
-- Create a new empty folder with a `main_prompt` file (or copy the example folder `cp -r example/ my-new-project`)
-- Fill in the `main_prompt` in your new folder
-- Run `python -m gpt_engineer.main my-new-project`
+- Create an empty folder. If inside the repo, you can run:
+  - `cp -r projects/example/ projects/my-new-project`
+- Fill in the `main_prompt` file in your new folder
+- Run: `gpt-engineer projects/my-new-project`
 
-**Results**:
-- Check the generated files in my-new-project/workspace
+**Results**
+- Check the generated files in `projects/my-new-project/workspace`
 
 ### Limitations
 Implementing additional chain of thought prompting, e.g. [Reflexion](https://github.com/noahshinn024/reflexion), should be able to make it more reliable and not miss requested functionality in the main prompt.

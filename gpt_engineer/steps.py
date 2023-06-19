@@ -1,10 +1,10 @@
 import json
+import re
 import subprocess
 
 from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.db import DBs
-from gpt_engineer.chat_to_files import parse_chat
 
 
 def setup_sys_prompt(dbs):
@@ -54,7 +54,8 @@ def clarify(ai: AI, dbs: DBs):
 
 def gen_spec(ai: AI, dbs: DBs):
     """
-    Generate a spec from the main prompt + clarifications and save the results to the workspace
+    Generate a spec from the main prompt + clarifications and save the results to
+    the workspace
     """
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
@@ -67,6 +68,7 @@ def gen_spec(ai: AI, dbs: DBs):
 
     return messages
 
+
 def respec(ai: AI, dbs: DBs):
     messages = dbs.logs[gen_spec.__name__]
     messages += [ai.fsystem(dbs.identity["respec"])]
@@ -75,10 +77,13 @@ def respec(ai: AI, dbs: DBs):
     messages = ai.next(
         messages,
         (
-            'Based on the conversation so far, please reiterate the specification for the program. '
-            'If there are things that can be improved, please incorporate the improvements. '
-            "If you are satisfied with the specification, just write out the specification word by word again."
-        )
+            "Based on the conversation so far, please reiterate the specification for "
+            "the program. "
+            "If there are things that can be improved, please incorporate the "
+            "improvements. "
+            "If you are satisfied with the specification, just write out the "
+            "specification word by word again."
+        ),
     )
 
     dbs.memory["specification"] = messages[-1]["content"]
@@ -116,6 +121,7 @@ def gen_clarified_code(ai: AI, dbs: DBs):
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
+
 def gen_code(ai: AI, dbs: DBs):
     # get the messages from previous step
 
@@ -130,12 +136,6 @@ def gen_code(ai: AI, dbs: DBs):
     return messages
 
 
-def execute_workspace(ai: AI, dbs: DBs):
-    messages = gen_entrypoint(ai, dbs)
-    execute_entrypoint(ai, dbs)
-    return messages
-
-
 def execute_entrypoint(ai, dbs):
     command = dbs.workspace["run.sh"]
 
@@ -143,10 +143,11 @@ def execute_entrypoint(ai, dbs):
     print()
     print(command)
     print()
-    print('If yes, press enter. If no, type "no"')
+    print('If yes, press enter. Otherwise, type "no"')
     print()
-    if input() == "no":
+    if input() != "":
         print("Ok, not executing the code.")
+        return []
     print("Executing the code...")
     print()
     subprocess.run("bash run.sh", shell=True, cwd=dbs.workspace.path)
@@ -156,8 +157,10 @@ def execute_entrypoint(ai, dbs):
 def gen_entrypoint(ai, dbs):
     messages = ai.start(
         system=(
-            f"You will get information about a codebase that is currently on disk in the current folder.\n"
-            "From this you will answer with one code block that includes all the necessary macos terminal commands to "
+            "You will get information about a codebase that is currently on disk in "
+            "the current folder.\n"
+            "From this you will answer with code blocks that includes all the necessary "
+            "unix terminal commands to "
             "a) install dependencies "
             "b) run all necessary parts of the codebase (in parallell if necessary).\n"
             "Do not install globally. Do not use sudo.\n"
@@ -166,20 +169,54 @@ def gen_entrypoint(ai, dbs):
         user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
     )
     print()
-    [[lang, command]] = parse_chat(messages[-1]["content"])
-    assert lang in ["", "bash", "sh"]
-    dbs.workspace["run.sh"] = command
+
+    regex = r"```\S*\n(.+?)```"
+    matches = re.finditer(regex, messages[-1]["content"], re.DOTALL)
+    dbs.workspace["run.sh"] = "\n".join(match.group(1) for match in matches)
+    return messages
+
+
+def use_feedback(ai: AI, dbs: DBs):
+    messages = [
+        ai.fsystem(setup_sys_prompt(dbs)),
+        ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
+        ai.fassistant(dbs.workspace["all_output.txt"]),
+        ai.fsystem(dbs.identity["use_feedback"]),
+    ]
+    messages = ai.next(messages, dbs.memory["feedback"])
+    to_files(messages[-1]["content"], dbs.workspace)
+    return messages
+
+
+def fix_code(ai: AI, dbs: DBs):
+    code_ouput = json.loads(dbs.logs[gen_code.__name__])[-1]["content"]
+    messages = [
+        ai.fsystem(setup_sys_prompt(dbs)),
+        ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
+        ai.fuser(code_ouput),
+        ai.fsystem(dbs.identity["fix_code"]),
+    ]
+    messages = ai.next(messages, "Please fix any errors in the code above.")
+    to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
 
 # Different configs of what steps to run
 STEPS = {
-    "default": [gen_spec, gen_unit_tests, gen_code, execute_workspace],
-    "benchmark": [gen_spec, gen_unit_tests, gen_code, gen_entrypoint],
-    "simple": [simple_gen, execute_workspace],
-    "clarify": [clarify, gen_clarified_code, execute_workspace],
-    "respec": [gen_spec, respec, gen_unit_tests, gen_code, execute_workspace],
+    "default": [gen_spec, gen_unit_tests, gen_code, gen_entrypoint, execute_entrypoint],
+    "benchmark": [gen_spec, gen_unit_tests, gen_code, fix_code, gen_entrypoint],
+    "simple": [simple_gen, gen_entrypoint, execute_entrypoint],
+    "clarify": [clarify, gen_clarified_code, gen_entrypoint, execute_entrypoint],
+    "respec": [
+        gen_spec,
+        respec,
+        gen_unit_tests,
+        gen_code,
+        gen_entrypoint,
+        execute_entrypoint,
+    ],
     "execute_only": [execute_entrypoint],
+    "use_feedback": [use_feedback],
 }
 
 # Future steps that can be added:

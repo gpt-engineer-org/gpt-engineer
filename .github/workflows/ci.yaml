@@ -1,0 +1,31 @@
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - "3.10"
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install package
+        run: pip install -e .
+
+      - name: Install test runner
+        run: pip install pytest pytest-cov
+
+      - name: Run unit tests
+        run: pytest --cov=gpt_engineer
