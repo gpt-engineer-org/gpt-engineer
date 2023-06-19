@@ -3,7 +3,6 @@ import logging
 import os
 import pathlib
 import shutil
-from pathlib import Path
 
 import typer
 
