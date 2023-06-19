@@ -1,0 +1,6 @@
+- id: pytest
+  name: Run pytest
+  entry: pytest
+  language: system
+  types: [python]
+  pass_filenames: false

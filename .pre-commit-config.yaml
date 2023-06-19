@@ -25,3 +25,12 @@ repos:
        id: detect-private-key
        id: end-of-file-fixer
        id: trailing-whitespace
+
+- repo: local
+  hooks:
+    - id: pytest
+      name: Run pytest
+      entry: pytest
+      language: system
+      types: [python]
+      exclude: .+/migrations((/.+)|(\.py))
