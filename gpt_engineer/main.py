@@ -3,6 +3,7 @@ import logging
 import os
 import pathlib
 import shutil
+from pathlib import Path
 
 import typer
 
@@ -31,10 +32,10 @@ def chat(
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
-    app_dir = pathlib.Path(os.path.curdir)
-    input_path = pathlib.Path(app_dir / "projects" / project_path)
-    memory_path = input_path / (run_prefix + "memory")
-    workspace_path = input_path / (run_prefix + "workspace")
+    app_dir: Path = pathlib.Path(os.path.curdir)
+    input_path: Path = pathlib.Path(app_dir / "projects" / project_path)
+    memory_path: Path = input_path / (run_prefix + "memory")
+    workspace_path: Path = input_path / (run_prefix + "workspace")
 
     if delete_existing == "true":
         # Delete files and subdirectories in paths
