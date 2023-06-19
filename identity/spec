@@ -6,6 +6,5 @@ and give details about anything that might be unclear. **Don't leave anything un
 
 Second, lay out the names of the core classes, functions, methods that will be necessary,
 as well as a quick comment on their purpose.
-Finally list all non-standard dependencies you'll have to use.
 
 This specification will be used later as the basis for the implementation.
