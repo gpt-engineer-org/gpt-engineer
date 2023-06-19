@@ -48,5 +48,3 @@ todo
 # Ignore GPT Engineer files
 projects
 !projects/example
-
-# MyPy
