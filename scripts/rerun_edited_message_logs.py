@@ -4,8 +4,8 @@ import sys
 
 import typer
 
-from ..ai import AI
-from ..chat_to_files import to_files
+from gpt_engineer.ai import AI
+from gpt_engineer.chat_to_files import to_files
 
 # setting path
 sys.path.append("../gpt-engineer")
@@ -15,17 +15,15 @@ app = typer.Typer()
 
 
 @app.command()
-def chat(
+def main(
     messages_path: str,
     out_path: str | None = None,
     model: str = model_select_method(),
     temperature: float = 0.1,
-    max_tokens: int = 4096,
 ):
     ai = AI(
         model=model,
         temperature=temperature,
-        max_tokens=max_tokens,
     )
 
     with open(messages_path) as f:

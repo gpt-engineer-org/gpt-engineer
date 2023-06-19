@@ -1,8 +1,9 @@
 import json
+import re
 import subprocess
 
 from gpt_engineer.ai import AI
-from gpt_engineer.chat_to_files import parse_chat, to_files
+from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.db import DBs
 
 
@@ -157,9 +158,9 @@ def gen_entrypoint(ai, dbs):
     messages = ai.start(
         system=(
             "You will get information about a codebase that is currently on disk in "
-            f"the folder {dbs.workspace.path}.\n"
+            "the current folder.\n"
             "From this you will answer with code blocks that includes all the necessary "
-            "Windows, MacOS, and Linux terminal commands to "
+            "unix terminal commands to "
             "a) install dependencies "
             "b) run all necessary parts of the codebase (in parallell if necessary).\n"
             "Do not install globally. Do not use sudo.\n"
@@ -169,15 +170,9 @@ def gen_entrypoint(ai, dbs):
     )
     print()
 
-    blocks = parse_chat(messages[-1]["content"])
-    for lang, _ in blocks:
-        assert lang in [
-            "",
-            "bash",
-            "sh",
-        ], "Generated entrypoint command that was not bash"
-
-    dbs.workspace["run.sh"] = "\n".join(block for lang, block in blocks)
+    regex = r"```\S*\n(.+?)```"
+    matches = re.finditer(regex, messages[-1]["content"], re.DOTALL)
+    dbs.workspace["run.sh"] = "\n".join(match.group(1) for match in matches)
     return messages
 
 
@@ -193,10 +188,23 @@ def use_feedback(ai: AI, dbs: DBs):
     return messages
 
 
+def fix_code(ai: AI, dbs: DBs):
+    code_ouput = json.loads(dbs.logs[gen_code.__name__])[-1]["content"]
+    messages = [
+        ai.fsystem(setup_sys_prompt(dbs)),
+        ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
+        ai.fuser(code_ouput),
+        ai.fsystem(dbs.identity["fix_code"]),
+    ]
+    messages = ai.next(messages, "Please fix any errors in the code above.")
+    to_files(messages[-1]["content"], dbs.workspace)
+    return messages
+
+
 # Different configs of what steps to run
 STEPS = {
     "default": [gen_spec, gen_unit_tests, gen_code, gen_entrypoint, execute_entrypoint],
-    "benchmark": [gen_spec, gen_unit_tests, gen_code, gen_entrypoint],
+    "benchmark": [gen_spec, gen_unit_tests, gen_code, fix_code, gen_entrypoint],
     "simple": [simple_gen, gen_entrypoint, execute_entrypoint],
     "clarify": [clarify, gen_clarified_code, gen_entrypoint, execute_entrypoint],
     "respec": [

@@ -1,10 +1,14 @@
+import logging
+
 import openai
+
+logger = logging.getLogger(__name__)
 
 
 class AI:
-    def __init__(self, **kwargs):
-        self.kwargs = kwargs
-
+    def __init__(self, model="gpt-4", temperature=0.1):
+        self.temperature = temperature
+        
     def start(self, system, user):
         messages = [
             {"role": "system", "content": system},
@@ -26,8 +30,12 @@ class AI:
         if prompt:
             messages = messages + [{"role": "user", "content": prompt}]
 
+        logger.debug(f"Creating a new chat completion: {messages}")
         response = openai.ChatCompletion.create(
-            messages=messages, stream=True, **self.kwargs
+            messages=messages,
+            stream=True,
+            model=self.model,
+            temperature=self.temperature,
         )
 
         chat = []
@@ -36,4 +44,7 @@ class AI:
             msg = delta.get("content", "")
             print(msg, end="")
             chat.append(msg)
-        return messages + [{"role": "assistant", "content": "".join(chat)}]
+        print()
+        messages = messages + [{"role": "assistant", "content": "".join(chat)}]
+        logger.debug(f"Chat completion finished: {messages}")
+        return messages
