@@ -18,7 +18,8 @@ dependencies = [
 gpt-engineer = 'gpt_engineer.main:app'
 
 [tool.setuptools]
-packages = ["gpt_engineer"]
+packages = ["gpt_engineer", "gpt_engineer.ai"]
+
 
 # https://beta.ruff.rs/docs/configuration/#using-rufftoml
 [tool.ruff]

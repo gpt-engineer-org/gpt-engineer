@@ -1,5 +1,7 @@
 import re
 
+from gpt_engineer.db import DB
+
 
 def parse_chat(chat):  # -> List[Tuple[str, str]]:
     # Get all ``` blocks and preceding filenames
@@ -25,7 +27,7 @@ def parse_chat(chat):  # -> List[Tuple[str, str]]:
     return files
 
 
-def to_files(chat, workspace):
+def to_files(chat, workspace: DB):
     workspace["all_output.txt"] = chat
 
     files = parse_chat(chat)
