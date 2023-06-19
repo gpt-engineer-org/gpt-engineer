@@ -238,10 +238,20 @@ def fix_code(ai: AI, dbs: DBs) -> List[Tuple[Role, Message]]:
 
 # Different configs of what steps to run
 StepFunction = Callable[[AI, DBs], List[Tuple[Role, Message]]]
+
 STEPS: Dict[str, List[StepFunction]] = {
     "default": [gen_spec, gen_unit_tests, gen_code, gen_entrypoint, execute_entrypoint],
     "benchmark": [gen_spec, gen_unit_tests, gen_code, fix_code, gen_entrypoint],
     "simple": [simple_gen, gen_entrypoint, execute_entrypoint],
+    "tdd": [gen_spec, gen_unit_tests, gen_code, gen_entrypoint, execute_entrypoint],
+    "tdd+": [
+        gen_spec,
+        gen_unit_tests,
+        gen_code,
+        fix_code,
+        gen_entrypoint,
+        execute_entrypoint,
+    ],
     "clarify": [clarify, gen_clarified_code, gen_entrypoint, execute_entrypoint],
     "respec": [
         gen_spec,
