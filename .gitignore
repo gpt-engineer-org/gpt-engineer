@@ -30,6 +30,7 @@ ENV/
 .pytest_cache/
 .ruff_cache/
 .coverage
+.mypy_cache/
 
 # macOS specific files
 .DS_Store
@@ -47,3 +48,5 @@ todo
 # Ignore GPT Engineer files
 projects
 !projects/example
+
+# MyPy
