@@ -70,7 +70,7 @@ def gen_spec(ai: AI, dbs: DBs):
 
 
 def respec(ai: AI, dbs: DBs):
-    messages = dbs.logs[gen_spec.__name__]
+    messages = json.loads(dbs.logs[gen_spec.__name__])
     messages += [ai.fsystem(dbs.identity["respec"])]
 
     messages = ai.next(messages)
