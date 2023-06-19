@@ -14,6 +14,12 @@ def parse_chat(chat):  # -> List[Tuple[str, str]]:
         # Remove leading and trailing brackets
         path = re.sub(r"^\[(.*)\]$", r"\1", path)
 
+        # Remove leading and trailing backticks
+        path = re.sub(r"^`(.*)`$", r"\1", path)
+
+        # Remove trailing ]
+        path = re.sub(r"\]$", "", path)
+
         # Get the code
         code = match.group(2)
 
