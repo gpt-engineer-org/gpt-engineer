@@ -10,7 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
-    - name: Install dependencies
-        run: pip install -r requirements.txt
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: pip
+
+    - name: Install test runner
+      run: pip install pytest pytest-cov
+
     - uses: pre-commit/action@v3.0.0
