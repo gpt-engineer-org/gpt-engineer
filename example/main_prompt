@@ -1,1 +1,363 @@
-We are writing snake in python. MVC components split in separate files. Keyboard control.
+Rewrite this research paper as required in the correction.
+
+
+RESEARCH PAPER;
+
+LOCKED OUT:EXPLORING THE UNIQUE CHALLENGES OF RESPONDING TO RANSOM
+WARE ATTACKS ON CRACKS ON CRITICAL INFRASTRUCTURE IN AFRICA
+
+Introduction
+Ransomware is a type of malicious software that encrypts the data or systems of a victim and
+demands a ransom for their decryption or restoration. Ransomware attacks have become a major threat to the
+security and stability of critical infrastructure, which refers to the physical and cyber assets that are essential
+for the functioning of a society and economy, such as energy, water, transportation, health, communication,
+and finance.
+Critical infrastructure is increasingly dependent on information and communication technologies
+(ICTs) for its operation and management, which makes it more vulnerable to cyberattacks. Ransomware
+attacks can disrupt or damage critical infrastructure, causing significant economic losses, social unrest, public
+health crises, environmental disasters, or even loss of life.
+The aim of this paper is to explore the unique challenges of responding to ransomware attacks on
+critical infrastructure in Africa. Africa is a continent with diverse and complex political, economic, social, and
+cultural realities that shape its cyber security landscape. Africa faces multiple and interrelated challenges that
+make it more susceptible and less resilient to ransomware attacks on critical infrastructure, such as lack of
+resources, skills, awareness, regulation, or coordination.
+Moreover, Africa is exposed to various actors and motivations that drive ransomware attacks on
+critical infrastructure, such as criminal groups, state-sponsored hackers, terrorists, or activists. These actors
+exploit the vulnerabilities and weaknesses of African critical infrastructure to achieve their goals, such as
+financial gain, political pressure, ideological agenda, or sabotage.
+The paper will address the following research question: What are the unique challenges of
+responding to ransomware attacks on critical infrastructure in Africa? The paper will use a qualitative
+approach to answer this question, based on web searches, reports, news articles, interviews, and case studies.
+The paper will use three case studies to illustrate and support the main arguments: the Cyber_HorusGroup attack on Ethiopia in 2020 over the GERD issue; the Johannesburg municipality attack in South Africa
+in 2019 that demanded 4 bitcoins as ransom; and the Colonial Pipeline attack in the US in 2021 that caused
+fuel shortages and price hikes. The paper will compare and contrast these cases to show how the situation in
+Africa differs from other regions or countries that have faced similar challenges.
+The paper will contribute to the existing literature and policy debates on ransomware attacks and
+critical infrastructure by providing a comprehensive and nuanced analysis of the African context. The paper
+will identify and explain the factors that make Africa more vulnerable or less prepared to deal with
+ransomware attacks on critical infrastructure and how they affect the impact and response of these attacks. The
+paper will also discuss the implications and recommendations of the findings for policy makers, practitioners,
+researchers, and other stakeholders who are concerned with cyber security and critical infrastructure in Africa.
+The paper is organized as follows: Section 2 reviews the existing literature on ransomware attacks and
+critical infrastructure; Section 3 explains the research design and methods used for data collection and
+analysis; Section 4 presents and discusses the main findings of the data analysis; Section 5 summarizes the
+main arguments and findings of the paper and discusses their implications and recommendations; Section 6
+acknowledges the limitations and suggests directions for future research.Literature Review
+This section reviews the existing literature on ransomware attacks and critical infrastructure. It covers
+the following topics:
+- The definition and classification of ransomware
+- The evolution and trends of ransomware attacks
+- The impact and challenges of ransomware attacks on critical infrastructure
+- The detection and prevention methods of ransomware attacks
+- The gaps and limitations of the current literature
+Definition and Classification of Ransomware
+Ransomware is a type of malicious software that encrypts the data or systems of a victim and demands
+a ransom for their decryption or restoration¹. Ransomware can be classified into two main types: locker
+ransomware and crypto ransomware. Locker ransomware locks the access to the device or system, while
+crypto ransomware encrypts the files or data. Ransomware can also be categorized based on the distribution
+method, such as phishing emails, drive-by downloads, exploit kits, or network propagation.
+Evolution and Trends of Ransomware Attacks
+Ransomware attacks have evolved over time in terms of sophistication, scale, and target selection. The
+first known ransomware attack was in 1989, when a biologist distributed floppy disks containing a program
+that encrypted the files after a certain number of uses and asked for $189 to unlock them. Since then,
+ransomware attacks have become more advanced and diverse, using various encryption algorithms,
+obfuscation techniques, payment methods, and communication channels.
+Some of the notable ransomware families that emerged in the past decade are CryptoLocker,
+CryptoWall, CryptoDefense, WannaCry, NotPetya, Ryuk, Maze, REvil, and DarkSide. These ransomwarefamilies have different features and capabilities, such as spreading through network vulnerabilities, deleting
+backup files, exfiltrating data before encryption, threatening to leak data if not paid, or forming cartels with
+other ransomware groups.
+Ransomware attacks have also increased in frequency and magnitude in recent years. According to a
+report by Chainalysis, the total amount paid by ransomware victims increased by 311% in 2020 to reach
+nearly $350 million worth of cryptocurrency. Another report by SonicWall estimates that there were 304.7
+million ransomware attempts in 2020, a 62% increase from 2019. Ransomware attacks have also targeted
+more diverse and critical sectors, such as healthcare, education, government, energy, transportation, and
+finance.
+Impact and Challenges of Ransomware Attacks on Critical Infrastructure
+Ransomware attacks can have severe consequences for critical infrastructure, which refers to the
+physical and cyber assets that are essential for the functioning of a society and economy. Ransomware attacks
+can disrupt or damage critical infrastructure, causing significant economic losses, social unrest, public health
+crises, environmental disasters, or even loss of life.
+For example, in 2020, a ransomware attack on a German hospital resulted in the death of a patient who
+had to be diverted to another facility due to the unavailability of emergency services³. In 2021, a ransomware
+attack on Colonial Pipeline, which supplies about 45% of the fuel consumed on the US East Coast,
+caused fuel shortages and price hikes in several states. In 2019,a ransomware attack on Johannesburg
+municipality in South Africa paralyzed several public services and demanded 4 bitcoins as ransom.Ransomware attacks pose unique challenges for critical infrastructure operators and defenders. Some of these
+challenges are:
+- The lack of resources, skills, awareness,regulation, or coordination among critical infrastructure stakeholders
+to prevent, detect, and respond to ransomware attacks.
+- The complexity and interdependency of critical infrastructure systems, which increase the attack surface and
+the potential cascading effects of ransomware attacks.
+- The diversity and dynamism of ransomware actors and motivations, which range from criminal groups,
+state-sponsored hackers, terrorists, or activists, and vary from financial gain, political pressure, ideological
+agenda, or sabotage.
+- The difficulty and dilemma of paying or not paying the ransom, which involves legal and ethical issues.
+Detection and Prevention Methods of Ransomware Attacks
+Ransomware attacks can be detected and prevented by using various methods and tools, such as
+antivirus software, firewall, backup, encryption, awareness training, threat intelligence, and incident response.
+These methods and tools aim to protect the confidentiality, integrity, and availability of critical data and
+systems from ransomware attacks.
+Some of the best practices for detecting and preventing ransomware attacks are:
+- Keeping antivirus and anti-malware software and signatures up to date and using a centrally managed
+antivirus solution.
+- Configuring firewall rules to block unauthorized access and malicious traffic to critical systems and
+networks.
+- Performing regular backup of important files and data and storing them offline or on a separate network.- Encrypting sensitive data and using strong passwords and multi-factor authentication for accessing critical
+systems and networks.
+- Providing awareness training to employees and users on how to recognize and avoid phishing emails,
+malicious attachments, or suspicious links that may deliver ransomware.
+- Monitoring and sharing threat intelligence on ransomware actors, campaigns, indicators, and vulnerabilities.
+- Establishing and testing an incident response plan that includes roles, responsibilities, procedures, and
+communication channels for responding to ransomware incidents.
+Gaps and Limitations of the Current Literature
+The current literature on ransomware attacks and critical infrastructure has some gaps and limitations
+that need to be addressed by future research. Some of these gaps and limitations are:
+- The lack of empirical data and evidence on the actual impact and cost of ransomware attacks on critical
+infrastructure, especially in developing regions such as Africa.
+- The lack of comprehensive and comparative analysis of the legal and ethical issues involved in paying or not
+paying the ransom, as well as the sanctions risks and implications for funding DPRK malicious cyber
+activities.
+- The lack of systematic and collaborative evaluation of the effectiveness and limitations of existing detection
+and prevention methods and tools for ransomware attacks.
+- The lack of innovative and adaptive solutions that can address the emerging and evolving ransomware
+threats and techniques, such as double extortion, data leakage, or cartel formation.Methodology
+This section explains the research design and methods used for data collection and analysis. The
+research adopts a qualitative approach to answer the research question: What are the unique challenges of
+responding to ransomware attacks on critical infrastructure in Africa? The qualitative approach is suitable for
+exploring the complex and contextual nature of the phenomenon under study, as well as capturing the
+perspectives and experiences of the relevant stakeholders.
+Data Collection
+The data collection methods consist of web searches, reports, news articles, interviews, and case
+studies. These methods are chosen to provide a comprehensive and diverse source of data that can address the
+different aspects and dimensions of the research question.
+- Web searches: The web searches are conducted using various search engines and keywords to find relevant
+and reliable information on ransomware attacks and critical infrastructure in Africa and other regions or
+countries. The web searches are used to supplement and validate the data from other sources, as well as to
+identify potential reports, news articles, interviews, and case studies to be included in the data collection.
+- Reports: The reports are obtained from various organizations and institutions that are involved or interested
+in cybersecurity and critical infrastructure in Africa and other regions or countries. The reports provide
+authoritative and in-depth data and analysis on the trends, impacts, challenges, and responses of ransomware
+attacks and critical infrastructure. Some examples of the reports are:
+- Ransomware Guide by CISA and MS-ISAC
+- Systematic literature review and metadata analysis of ransomware attacks and detection mechanisms by
+Maigida et al.
+- #StopRansomware: Ransomware Attacks on Critical Infrastructure Fund DPRK Malicious Cyber Activities
+by NSA, FBI, CISA, HHS, NIS, and DSA
+- Cybersecurity Threats to Critical Infrastructure in Africa by African Union Commission- Ransomware: A Growing Threat to Critical Infrastructure by World Economic Forum
+- News articles: The news articles are collected from various online media outlets that cover cybersecurity and
+critical infrastructure issues in Africa and other regions or countries. The news articles provide timely and
+updated data on the incidents, events, actors, and outcomes of ransomware attacks and critical infrastructure.
+Some examples of the news articles are:
+- Korean nuclear fusion reactor achieves 100 million°C for 30 seconds by New Scientist
+- Inside ‘holy grail’ fusion experiments to create a mini Sun after breakthrough race for unlimited energy by
+The Sun
+- Nuclear fusion breakthrough as reactor runs seven times hotter than the Sun by Yahoo News
+- German hospital hacked, patient taken to another city dies by Associated Press
+- Colonial Pipeline paid $4.4 million ransom after cyberattack by CNN
+- Johannesburg municipality hit by ransomware attack by BBC
+- Interviews: The interviews are conducted with various experts and practitioners who have knowledge or
+experience on ransomware attacks and critical infrastructure in Africa and other regions or countries. The
+interviews provide insights and opinions on the causes, effects, challenges, and solutions of ransomware
+attacks and critical infrastructure. The interviews are conducted using online platforms such as Zoom or
+Skype, with prior consent.
+Sure, I can write more about the data analysis method. Here is a possible continuation of the previous section:Data Analysis
+The data analysis method consists of thematic analysis and comparative analysis. These methods are
+chosen to identify and compare the common and unique themes and patterns that emerge from the data.
+- Thematic analysis: The thematic analysis is used to code and categorize the data into meaningful themes and
+subthemes that answer the research question. The thematic analysis follows a six-step process: familiarization
+with the data, generating initial codes, searching for themes, reviewing themes, defining and naming themes,
+and producing the report.
+The thematic analysis is guided by a deductive approach, which means that the themes are derived
+from the existing literature and theory on ransomware attacks and critical infrastructure, as well as an
+inductive approach, which means that the themes are also generated from the data itself.
+- Comparative analysis: The comparative analysis is used to compare and contrast the data across different
+sources, regions, countries, and cases. The comparative analysis aims to highlight the similarities and
+differences in the trends, impacts, challenges, and responses of ransomware attacks and critical infrastructure
+in Africa and other regions or countries.
+The comparative analysis also aims to explain the reasons and factors behind these similarities and
+differences. The comparative analysis is based on a framework that considers the following dimensions:
+political, economic, social, technological, legal, and environmental.
+Sure, I can write these sections for you. Here are some possible sections:
+Ethical Considerations
+This research follows the ethical guidelines and standards of the University of Jomo Kenyatta
+University of Agriculture and Technology (JKUAT) and the African Union Commission. The research respectsthe rights and dignity of the participants and the stakeholders involved in the data collection and analysis. The
+research also ensures the following ethical principles:
+- Informed consent: The research obtains informed consent from the participants before conducting the
+interviews. The research explains the purpose, objectives, methods, benefits, and risks of the research to the
+participants and obtains their voluntary and written agreement to participate. The research also informs the
+participants of their right to withdraw from the research at any time without any negative consequences.
+- Confidentiality: The research protects the confidentiality of the participants and the data collected from
+them. The research does not disclose the identity or personal information of the participants to anyone without
+their permission. The research also uses pseudonyms or codes to anonymize the participants and their data in
+the report and other publications.
+- Anonymity: The research protects the anonymity of the sources and the data collected from them. The
+research does not reveal the name or location of the sources or the data in the report and other publications.
+The research also uses generic terms or categories to describe the sources and the data.
+- Data protection: The research protects the data collected from unauthorized access, use, modification, or
+disclosure. The research stores the data in a secure and encrypted device or platform that requires a password
+or a biometric authentication to access. The research also deletes or destroys the data after completing the
+analysis or when it is no longer needed.
+- Risk assessment: The research assesses and minimizes the potential risks and harms to the participants, the
+sources, and the researcher. The research identifies and avoids any physical, psychological, social, legal, or
+financial risks or harms that may arise from participating in or conducting the research. The research also
+prepares contingency plans and mitigation strategies in case of any unforeseen risks or harms.Trustworthiness and Validity
+This research ensures the trustworthiness and validity of the findings and conclusions by using various
+methods and techniques, such as:
+- Credibility: The research establishes credibility by using multiple and triangulated sources of data, such as
+web searches, reports, news articles, interviews, and case studies. The research also uses member checking to
+verify and validate the findings and interpretations with the participants or other experts. The research also
+uses peer debriefing to discuss and review the research process and outcomes with other researchers or
+colleagues.
+- Transferability: The research enhances transferability by providing rich and detailed descriptions of the
+context, setting, participants, sources, data, methods, and findings of the research. The research also uses
+purposive sampling to select relevant and representative participants and sources that can provide diverse and
+comprehensive perspectives on the research question. The research also uses thick description to illustrate and
+explain the findings and conclusions with examples and quotes from the data.
+- Dependability: The research ensures dependability by maintaining consistency and transparency in the
+research process and outcomes. The research also uses audit trail to document and record the steps, decisions,
+changes, and challenges involved in the data collection and analysis. The research also uses reflexivity to
+acknowledge and address the researcher's role, position, bias, and influence on the research.
+- Confirmability: The research demonstrates confirmability by using objective and neutral data, methods, and
+findings. The research also uses triangulation to cross-check and corroborate the data, methods, and findings
+from different sources or perspectives. The research also uses external audit to seek feedback and evaluation
+from an independent and qualified reviewer or examiner on the quality and validity of the research.Findings and Discussion
+This section presents and discusses the main findings of the data analysis. The findings are organized
+according to the themes and subthemes that emerged from the thematic analysis. The findings are also
+compared and contrasted across different sources, regions, countries, and cases using the comparative analysis
+framework. The findings and discussions aim to answer the research question: What are the unique challenges
+of responding to ransomware attacks on critical infrastructure in Africa?
+Theme 1: Impact of Ransomware Attacks on Critical Infrastructure
+The first theme that emerged from the data analysis is the impact of ransomware attacks on critical
+infrastructure. The data shows that ransomware attacks can have severe and diverse consequences for critical
+infrastructure, such as:
+- Economic losses: Ransomware attacks can cause direct and indirect economic losses for critical
+infrastructure operators and users. Direct losses include the cost of paying or not paying the ransom, restoring
+or replacing the affected systems or data, and compensating for any legal liabilities or penalties. Indirect losses
+include the loss of revenue, productivity, reputation, or market share due to the disruption or damage of
+critical services or operations.
+For example, according to a report by CISA and MS-ISAC, ransomware attacks on critical
+infrastructure in 2020 resulted in an estimated $350 million worth of cryptocurrency payments by victims.
+Another report by World Economic Forum² estimates that ransomware attacks on critical infrastructure can
+cost up to $193 billion globally in a worst-case scenario.
+- Social unrest: Ransomware attacks can cause social unrest among the public due to the unavailability or
+degradation of critical services or operations that affect their daily lives, such as water, electricity,
+transportation, or health care. Social unrest can manifest as protests, riots, violence, or vandalism against
+critical infrastructure operators or authorities. For example, according to a news article by BBC, a ransomwareattack on Johannesburg municipality in South Africa in 2019 paralyzed several public services and sparked
+public anger and frustration. Another news article by ISS Africa reports that a cyberattack on South Africa's
+ports in 2021 disrupted the supply chain and triggered social instability amid the COVID-19 pandemic.
+- Public health crises: Ransomware attacks can cause public health crises by affecting the delivery or quality
+of health care services or operations that are vital for preventing or treating diseases, injuries, or emergencies.
+Public health crises can result in increased morbidity or mortality rates, reduced access or affordability of
+health care, or spread of infections or epidemics.
+For example, according to a news article by Associated Press, a ransomware attack on a German
+hospital in 2020 resulted in the death of a patient who had to be diverted to another facility due to the
+unavailability of emergency services. Another news article by CNN reports that a ransomware attack on
+Colonial Pipeline in the US in 2021 caused fuel shortages and price hikes that affected ambulance services
+and hospitals.
+- Environmental disasters: Ransomware attacks can cause environmental disasters by compromising the safety
+or quality of environmental resources or services that are essential for sustaining life, health, or biodiversity.
+Environmental disasters can result in pollution, contamination, degradation, or depletion of natural resources
+such as water, air, soil, or wildlife. For example, according to a news article by CISA, a ransomware attack on
+a water treatment plant in Florida in 2021 attempted to increase the amount of sodium hydroxide in the water
+supply, which could have caused serious health problems for the residents. Another news article by The White
+House reports that a ransomware attack on JBS, the world's largest meat processing company, in 2021
+disrupted the food supply chain and increased greenhouse gas emissions due to the waste of animal products.Theme 2: Challenges of Responding to Ransomware Attacks on Critical Infrastructure
+The second theme that emerged from the data analysis is the challenges of responding to ransomware
+attacks on critical infrastructure. The data shows that critical infrastructure operators and defenders face
+multiple and interrelated challenges that make it difficult or impossible to prevent, detect, or recover from
+ransomware attacks. Some of these challenges are:
+- Lack of resources: Critical infrastructure operators and defenders lack adequate resources, such as funding,
+equipment, personnel, or training, to implement effective cybersecurity measures and practices. Lack of
+resources also limits their ability to conduct regular backup, update, or patching of their systems and data. For
+example, according to a report by African Union Commission, most African countries have low levels of
+investment and expenditure on cybersecurity, which affects their capacity and readiness to deal with cyber
+threats. Another report by World Economic Forum estimates that the global cybersecurity skills gap is around
+3.5 million professionals.
+- Lack of skills: Critical infrastructure operators and defenders lack sufficient skills, knowledge, or expertise
+to understand and manage the cyber risks and threats they face. Lack of skills also hinders their ability to use
+or deploy the available tools and technologies for cybersecurity. For example, according to a report by
+Maigida et al., most African countries have low levels of cybersecurity awareness and education among their
+population and workforce, which affects their ability to prevent or respond to cyberattacks.
+Another report by CISA and MS-ISAC states that ransomware attackers often exploit human errors or
+weaknesses, such as clicking on malicious links or attachments, using weak passwords, or falling for phishing
+scams.
+- Lack of awareness: Critical infrastructure operators and defenders lack adequate awareness of the nature and
+magnitude of the ransomware threat and its potential impact on their operations and services. Lack of
+awareness also reduces their motivation or willingness to take proactive or preventive actions against
+ransomware attacks.For example, according to a news article by ISS Africa, most African countries have low levels of
+cyber threat intelligence and reporting, which affects their ability to identify and anticipate cyberattacks.
+Another news article by The White House states that ransomware attackers often target organizations that are
+less likely to have robust cybersecurity defenses or backups, such as small businesses, local governments, or
+schools.
+1. - Lack of regulation: Critical infrastructure operators and defenders lack clear and consistent regulation
+or guidance on the minimum standards or best practices for cybersecurity. Lack of regulation also
+creates uncertainty or ambiguity on the roles and responsibilities of different stakeholders, such as
+government agencies, private sector entities, or international organizations.
+For example, according to a report by African Union Commission, most African countries have
+inadequate or outdated legal frameworks and policies for cybersecurity, which affect their ability to prevent or
+prosecute cybercrime. Another report by World Economic Forum states that there is no global consensus or
+coordination on how to deal with ransomware attacks, such as whether to pay or not pay the ransom, how to
+share information or intelligence, or how to impose sanctions or consequences.
+- Lack of coordination: Critical infrastructure operators and defenders lack effective and timely coordination
+and collaboration among themselves and with other stakeholders, such as government agencies, private sector
+entities, or international organizations. Lack of coordination also hampers their ability to share information or
+intelligence, provide mutual assistance or support, or leverage collective resources or capabilities.
+For example, according to a news article by ISS Africa, most African countries have low levels of
+regional and continental cooperation and integration on cybersecurity, which affect their ability to respond to
+cross-border cyberattacks. Another news article by CISA states that ransomware attackers often exploit the
+gaps and weaknesses in the coordination and communication between different sectors or jurisdictions.Conclusion
+This section has presented and discussed the main findings of the data analysis, which aimed to answer
+the research question: What are the unique challenges of responding to ransomware attacks on critical
+infrastructure in Africa? The data analysis revealed two major themes: the impact of ransomware attacks on
+critical infrastructure and the challenges of responding to ransomware attacks on critical infrastructure.
+The data analysis also showed that ransomware attacks can have severe and diverse consequences for
+critical infrastructure, such as economic losses, social unrest, public health crises, and environmental disasters.
+The data analysis also indicated that critical infrastructure operators and defenders face multiple and
+interrelated challenges that make it difficult or impossible to prevent, detect, or recover from ransomware
+attacks.
+Some of these challenges are lack of resources, skills, awareness, regulation, and coordination. The
+data analysis also compared and contrasted the data across different sources, regions, countries, and cases
+using a comparative analysis framework. The data analysis highlighted the similarities and differences in the
+trends, impacts, challenges, and responses of ransomware attacks and critical infrastructure in Africa and other
+regions or countries.
+The data analysis also explained the reasons and factors behind these similarities and differences. The
+findings and discussions have implications for theory, practice, and policy on ransomware attacks and critical
+infrastructure in Africa and beyond.References
+African Union Commission. (2021). Cybersecurity Threats to Critical Infrastructure in Africa.
+https://au.int/sites/default/files/documents/42648-doc
+cybersecurity_threats_to_critical_infrastructure_in_africa.pdf
+World Economic Forum. (2021). Ransomware: A Growing Threat to Critical Infrastructure.
+https://www.weforum.org/whitepapers/ransomware-a-growing-threat-to-critical-infrastructure
+Maigida, J. F., Oluwadare, S. A., & Adeyemo, A. B. (2021). Systematic literature review and metadata
+analysis of ransomware attacks and detection mechanisms. Computers & Security, 107, 102307.
+https://doi.org/10.1016/j.cose.2021.102307
+CISA and MS-ISAC. (2020). Ransomware Guide.
+https://www.cisa.gov/sites/default/files/publications/CISA_MS-ISAC_Ransomware
+%20Guide_S508C.pdf
+NSA, FBI, CISA, HHS, NIS, and DSA. (2022). #StopRansomware: Ransomware Attacks on Critical
+Infrastructure Fund DPRK Malicious Cyber Activities.
+https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-040a
+New Scientist. (2022). Korean nuclear fusion reactor achieves 100 million°C for 30 seconds.
+https://www.newscientist.com/article/2336385-korean-nuclear-fusion-reactor-achieves-100-millionc-
+for-30-seconds/
+The Sun. (2022). Inside ‘holy grail’ fusion experiments to create a mini Sun after breakthrough race for
+unlimited energy. https://www.thesun.co.uk/news/17143468/holy-grail-fusion-experiments-
+breakthrough-race-unlimited-energy/
+Yahoo News. (2021). Nuclear fusion breakthrough as reactor runs seven times hotter than the Sun.
+https://news.yahoo.com/nuclear-fusion-breakthrough-reactor-runs-130157687.html
+Associated Press. (2020). German hospital hacked, patient taken to another city dies.https://apnews.com/article/international-news-europe-germany-dda4a3e8c8b6f9dce8d3f6f8d0dbbdfb
+CNN. (2021). Colonial Pipeline paid $4.4 million ransom after cyberattack.
+https://edition.cnn.com/2021/05/19/business/colonial-pipeline-ransom/index.html
+BBC. (2019). Johannesburg municipality hit by ransomware attack.
+
+
+CORRECTIONS;
+Ok I finally managed to read your essay. A few points:
+
+This still doesn’t do a case study. You have a lot of information about methodology, but that is mostly irrelevant. Right now what you do is provide commentary with some hand-picked examples. That’s fine, and I think ok to do as well. But if your aspiration is to do comparative case studies, you have a lot more work to do. What factors are you comparing? What are your hypotheses? How are you testing them? Have a look at this book for pointers: https://mitpress.mit.edu/9780262572224/case-studies-and-theory-development-in-the-social-sciences/
+Focus on what is important, and develop your own argument. The first 12 pages of your article can be, and should be compressed into one or two. The important points are that
+“Africa faces multiple and interrelated challenges that make it more susceptible and less resilient to ransomware attacks on critical infrastructure, such as lack of resources, skills, awareness, regulation, or coordination.” – This is your thesis statement. Now you need to start the analysis. Which of these factors are more important, which are less important, and why? What are the consequences, i.e. what would you expect to happen in ransomware attacks in Africa compared to attacks in the US? Based on that analysis, you develop hypotheses, such as “ransomware attacks against critical infrastructure in Africa are more likely to disrupt physical infrastructure”, or “ransomware attacks in Africa are likely to last longer than in the US”. Etc. This is where you need to spend some time thinking.
+Once that is clear, think about the metrics that you could use to compare these factors between Africa and other countries? What are the metrics to assess the impact of ransomware attacks, and of the effectiveness of mitigation efforts? How can you measure them? Then collect data on these metrics, for your case studies.
+Finally, then build the case studies. You need to provide data for each of the variables you have chosen, and this data needs to be of the same kind as for the others in order to allow comparability.
+With these changes, what are currently your first 12 pages should be no more than 3-5. Meanwhile, the case studies section needs much more detail, and can be 7-10 pages long.
+
+So have a think what direction you want to go in, but most importantly, decide what your own argument will be here. What is you own perspective, and how does it differ from what you have seen out there? What do the perspectives of existing researchers and commenters miss? Do they not see the full picture? Or have they underestimated some specific factors? Something like this.
