@@ -24,7 +24,7 @@ class GPT(AI):
         self, messages: List[Tuple[Role, Message]], user_prompt: Optional[Message] = None
     ) -> List[Tuple[Role, Message]]:
         if user_prompt:
-            messages.append((Role.USER, user_prompt))
+            messages.append((Role.USER, Message(user_prompt)))
 
         response = openai.ChatCompletion.create(
             messages=[self._format_message(r, m) for r, m in messages],
@@ -36,7 +36,7 @@ class GPT(AI):
         for chunk in response:
             delta = chunk["choices"][0]["delta"]
             msg = delta.get("content", "")
-            logging.info(msg)
+            print(msg, end="")
             chat.append(msg)
 
         messages.append((Role.ASSISTANT, Message(content="".join(chat))))

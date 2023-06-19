@@ -18,7 +18,6 @@ def setup_sys_prompt(dbs: DBs) -> str:
 def parse_message_json(x: Dict[str, Any]) -> Tuple[Role, Message]:
     return Role(x["role"]), Message(x["content"])
 
-
 ### Steps
 
 
@@ -89,7 +88,6 @@ def gen_spec(ai: AI, dbs: DBs) -> List[Tuple[Role, Message]]:
         (Role.SYSTEM, Message(setup_sys_prompt(dbs))),
         (Role.SYSTEM, Message(f"Instructions: {dbs.input['main_prompt']}")),
     ]
-
     messages = ai.next(messages, user_prompt=dbs.identity["spec"])
 
     dbs.memory["specification"] = messages[-1][1].content

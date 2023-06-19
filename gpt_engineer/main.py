@@ -54,7 +54,15 @@ def main(
 
     for step in STEPS[steps_config]:
         messages = step(ai, dbs)
-        dbs.logs[step.__name__] = json.dumps(messages)
+        dbs.logs[step.__name__] = json.dumps([to_message_json(r, m) for r, m in messages])
+
+
+from gpt_engineer.models import Message, Role, Step
+from typing import Dict
+def to_message_json(r: Role, m: Message) -> Dict[str, str]:
+    return {
+        "role": r.value, "content": m.content
+    }
 
 
 if __name__ == "__main__":
