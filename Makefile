@@ -15,15 +15,15 @@ name := $(word 2,$(MAKECMDGOALS))
 
 help::
 	@echo "Please use 'make <target>' like in the following:"
-	@echo "  make help           	Return this message with usage instructions."
-	@echo "  make install        	Will install the dependencies and create a virtual environment."
-	@echo "  make dev-install    	Will install the dev dependencies too."
-	@echo "  make run <folder_name>  Runs GPT Engineer on the folder with the given name."
+	@echo "  make help           	## Return this message with usage instructions."
+	@echo "  make install        	## Will install the dependencies and create a virtual environment."
+	@echo "  make dev-install    	## Will install the dev dependencies too."
+	@echo "  make run <folder_name>  ## Runs GPT Engineer on the folder with the given name."
 
 # List "  run ${project_name}" for files in projects/
 define define_job
 help::
-	@echo "  make run $(1)  Runs GPT Engineer on projects/${1}."
+	@echo "  make run $(1)  ## Runs GPT Engineer on projects/${1}."
 endef
 $(foreach f,$(wildcard projects/*),$(eval $(call define_job,$(notdir $(f)))))
 
