@@ -4,6 +4,7 @@ SHELL := /bin/bash
 COLOR_RESET=\033[0m
 COLOR_CYAN=\033[1;36m
 COLOR_GREEN=\033[1;32m
+PYTHON := $(shell command -v python3 2> /dev/null || echo "python")
 
 .PHONY: help install dev-install run
 
@@ -26,17 +27,17 @@ install: create-venv upgrade-pip install-dependencies install-pre-commit farewel
 
 create-venv:
 	@echo -e "$(COLOR_CYAN)Creating virtual environment...$(COLOR_RESET)" && \
-	python -m venv venv
+	${PYTHON} -m venv venv
 
 upgrade-pip:
 	@echo -e "$(COLOR_CYAN)Upgrading pip...$(COLOR_RESET)" && \
 	source venv/bin/activate && \
-	pip install --upgrade pip >> /dev/null
+	python3 -m pip install --upgrade pip >> /dev/null
 
 install-dependencies:
 	@echo -e "$(COLOR_CYAN)Installing dependencies...$(COLOR_RESET)" && \
 	source venv/bin/activate && \
-	pip install -e . >> /dev/null
+	python3 -m pip install -e . >> /dev/null
 
 install-pre-commit:
 	@echo -e "$(COLOR_CYAN)Installing pre-commit hooks...$(COLOR_RESET)" && \
@@ -50,4 +51,3 @@ run:
 	@echo -e "$(COLOR_CYAN)Running GPT Engineer on $(COLOR_GREEN)$(name)$(COLOR_CYAN) folder...$(COLOR_RESET)" && \
 	source venv/bin/activate && \
 	gpt-engineer projects/$(name)
-
