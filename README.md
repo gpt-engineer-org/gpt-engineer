@@ -64,3 +64,5 @@ If you want to contribute, please check out the [projects](https://github.com/An
 ## High resolution example
 
 https://github.com/AntonOsika/gpt-engineer/assets/4467025/6e362e45-4a94-4b0d-973d-393a31d92d9b
+
+-----
