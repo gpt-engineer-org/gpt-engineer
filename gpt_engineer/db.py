@@ -14,11 +14,10 @@ class DB:
     def __getitem__(self, key):
         full_path = self.path / key
 
-        if full_path.is_file():
-            with full_path.open("r", encoding="utf-8") as f:
-                return f.read()
-        else:
+        if not full_path.is_file():
             raise KeyError(key)
+        with full_path.open("r", encoding="utf-8") as f:
+            return f.read()
 
     def __setitem__(self, key, val):
         full_path = self.path / key
