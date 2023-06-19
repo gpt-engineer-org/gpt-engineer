@@ -39,7 +39,7 @@ class AI:
 
     def next(self, messages: list[dict[str, str]], prompt=None):
         if prompt:
-            messages += [{"role": "user", "content": prompt}]
+            messages = messages + [{"role": "user", "content": prompt}]
 
         logger.debug(f"Creating a new chat completion: {messages}")
         response = openai.ChatCompletion.create(
