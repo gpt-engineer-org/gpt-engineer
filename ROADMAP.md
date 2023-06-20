@@ -20,12 +20,11 @@ task, by giving it few shot example of what are usually "the right-sized steps" 
 out for other projects
 
 
-# Experiments to try out
-- [ ] Microsoft guidance, and benchmark if this helps improve it
-
 
 # How you can help out
 You can:
 - Sign up to help [measure the progress of gpt-engineer towards AGI](https://forms.gle/TMX68mScyxQUsE6Y9)
 - Submit PRs to address one of the above items
 
+### Experiments we can try
+- [ ] Microsoft guidance, and benchmark if this helps improve it
