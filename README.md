@@ -27,6 +27,8 @@ For **development**:
 - `cd gpt-engineer`
 - `make install`
 - `source venv/bin/activate`
+### For fish shell, run
+- `source venv/bin/activate.fish`
 
 **Setup**
 
