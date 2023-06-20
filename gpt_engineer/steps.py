@@ -151,6 +151,12 @@ def execute_entrypoint(ai, dbs):
         print("Ok, not executing the code.")
         return []
     print("Executing the code...")
+    print(
+        "\033[92m"  # green color
+        + "Note: If it does not work as expected, please consider running the code'"
+        + " in another way than above."
+        + "\033[0m"
+    )
     print()
     subprocess.run("bash run.sh", shell=True, cwd=dbs.workspace.path)
     return []
@@ -167,6 +173,8 @@ def gen_entrypoint(ai, dbs):
             "b) run all necessary parts of the codebase (in parallell if necessary).\n"
             "Do not install globally. Do not use sudo.\n"
             "Do not explain the code, just give the commands.\n"
+            "Do not use placeholders, use example values (like . for a folder argument) "
+            "if necessary.\n"
         ),
         user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
     )
@@ -260,3 +268,4 @@ STEPS = {
 
 # Future steps that can be added:
 # run_tests_and_fix_files
+# execute_entrypoint_and_fix_files_if_needed
