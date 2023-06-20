@@ -9,6 +9,7 @@ readme = "README.md"
 requires-python = ">=3"
 dependencies = [
   'black == 23.3.0',
+  'dataclasses-json == 0.5.8',
   'openai == 0.27.8',
   'ruff == 0.0.272',
   'pre-commit == 3.3.3',
@@ -19,7 +20,7 @@ dependencies = [
 gpt-engineer = 'gpt_engineer.main:app'
 
 [tool.setuptools]
-packages = ["gpt_engineer", "gpt_engineer.ai"]
+packages = ["gpt_engineer"]
 
 
 # https://beta.ruff.rs/docs/configuration/#using-rufftoml

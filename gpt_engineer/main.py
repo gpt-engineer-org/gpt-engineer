@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import shutil
@@ -7,7 +6,7 @@ from pathlib import Path
 
 import typer
 
-from gpt_engineer.ai.models import models
+from gpt_engineer.ai import GPT
 from gpt_engineer.db import DB, DBs
 from gpt_engineer.steps import STEPS
 
@@ -41,8 +40,7 @@ def main(
         shutil.rmtree(memory_path, ignore_errors=True)
         shutil.rmtree(workspace_path, ignore_errors=True)
 
-    kwargs = {"model": model, "temperature": temperature}
-    ai = models[model](**kwargs)
+    ai = GPT(model=model, temperature=temperature)
 
     dbs = DBs(
         memory=DB(memory_path),
@@ -54,15 +52,7 @@ def main(
 
     for step in STEPS[steps_config]:
         messages = step(ai, dbs)
-        dbs.logs[step.__name__] = json.dumps([to_message_json(r, m) for r, m in messages])
-
-
-from gpt_engineer.models import Message, Role, Step
-from typing import Dict
-def to_message_json(r: Role, m: Message) -> Dict[str, str]:
-    return {
-        "role": r.value, "content": m.content
-    }
+        dbs.logs[step.__name__] = messages.to_json()
 
 
 if __name__ == "__main__":
