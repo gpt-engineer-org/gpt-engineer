@@ -29,5 +29,5 @@ You can:
 ### Repository ergonomics
 - [ ] Set up automatic AI/LLM based PR review
 
-### Ad hoc experiments we can try
+### Ad hoc experiments
 - [ ] Microsoft guidance, and benchmark if this helps improve it
