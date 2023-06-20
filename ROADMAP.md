@@ -5,20 +5,23 @@
   - [ ] Document the best performing configs, and feed this into our roadmap
 - [ ] Self healing code
   - [ ] Feed the results of failing tests back into GPT4 and ask it to fix the code
-- [ ] Ask human for what is not working as expected in a loop, and feed it into
-GPT4 to fix the code, until the human is happy or give up
-- [ ] Break down the code generation in much smaller parts. Then generate test for
-each subpart, and do the loop of running the tests for each part, feeding
+- [ ] Let human give feedback
+  - [ ] Ask human for what is not working as expected in a loop, and feed it into
+GPT4 to fix the code, until the human is happy or gives up
+- [ ] Break down the code generation into much smaller parts
+  - [ ] For each small part, generate tests for each subpart, and do the loop of running the tests for each part, feeding
 results into GPT4, and let it edit the code until they pass
-- [ ] Run very small tests with GPT3.5 in CI, to make sure we don't worsen
+- [ ] LLM tests in CI
+  - [ ] Run very small tests with GPT3.5 in CI, to make sure we don't worsen
 performance over time
-- [ ] Let gpt-engineer plan which "steps" to carry out itself, depending on the
-task, by giving it few shot example of what are usually "the right sized steps" to carry
+- [ ] Dynamic planning
+  - [ ] Let gpt-engineer plan which "steps" to carry out itself, depending on the
+task, by giving it few shot example of what are usually "the right-sized steps" to carry
 out for other projects
 
 
 # Experiments to try out
-- [ ] Microsoft guidance, and benchmark if this helsp improve it
+- [ ] Microsoft guidance, and benchmark if this helps improve it
 
 
 # How you can help out
