@@ -2,6 +2,8 @@ import json
 import re
 import subprocess
 
+from enum import Enum
+
 from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.db import DBs
@@ -34,10 +36,10 @@ def clarify(ai: AI, dbs: DBs):
             break
 
         print()
-        user = input('(answer in text, or "q" to move on)\n')
+        user = input('(answer in text, or "c" to move on)\n')
         print()
 
-        if not user or user == "q":
+        if not user or user == "c":
             break
 
         user += (
@@ -145,7 +147,7 @@ def execute_entrypoint(ai, dbs):
     print()
     print('If yes, press enter. Otherwise, type "no"')
     print()
-    if input() != "":
+    if input() not in ["", "y", "yes"]:
         print("Ok, not executing the code.")
         return []
     print("Executing the code...")
@@ -183,7 +185,7 @@ def use_feedback(ai: AI, dbs: DBs):
         ai.fassistant(dbs.workspace["all_output.txt"]),
         ai.fsystem(dbs.identity["use_feedback"]),
     ]
-    messages = ai.next(messages, dbs.memory["feedback"])
+    messages = ai.next(messages, dbs.input["feedback"])
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
@@ -201,13 +203,36 @@ def fix_code(ai: AI, dbs: DBs):
     return messages
 
 
+class Config(str, Enum):
+    DEFAULT = "default"
+    BENCHMARK = "benchmark"
+    SIMPLE = "simple"
+    TDD = "tdd"
+    TDD_PLUS = "tdd+"
+    CLARIFY = "clarify"
+    RESPEC = "respec"
+    EXECUTE_ONLY = "execute_only"
+    USE_FEEDBACK = "use_feedback"
+
+
 # Different configs of what steps to run
 STEPS = {
-    "default": [simple_gen, gen_entrypoint, execute_entrypoint],
-    "benchmark": [simple_gen, gen_entrypoint],
-    "simple": [simple_gen, gen_entrypoint, execute_entrypoint],
-    "tdd": [gen_spec, gen_unit_tests, gen_code, gen_entrypoint, execute_entrypoint],
-    "tdd+": [
+    Config.DEFAULT: [
+        clarify,
+        gen_clarified_code,
+        gen_entrypoint,
+        execute_entrypoint,
+    ],
+    Config.BENCHMARK: [simple_gen, gen_entrypoint],
+    Config.SIMPLE: [simple_gen, gen_entrypoint, execute_entrypoint],
+    Config.TDD: [
+        gen_spec,
+        gen_unit_tests,
+        gen_code,
+        gen_entrypoint,
+        execute_entrypoint,
+    ],
+    Config.TDD_PLUS: [
         gen_spec,
         gen_unit_tests,
         gen_code,
@@ -215,8 +240,13 @@ STEPS = {
         gen_entrypoint,
         execute_entrypoint,
     ],
-    "clarify": [clarify, gen_clarified_code, gen_entrypoint, execute_entrypoint],
-    "respec": [
+    Config.CLARIFY: [
+        clarify,
+        gen_clarified_code,
+        gen_entrypoint,
+        execute_entrypoint,
+    ],
+    Config.RESPEC: [
         gen_spec,
         respec,
         gen_unit_tests,
@@ -224,12 +254,9 @@ STEPS = {
         gen_entrypoint,
         execute_entrypoint,
     ],
-    "execute_only": [execute_entrypoint],
-    "use_feedback": [use_feedback],
+    Config.USE_FEEDBACK: [use_feedback, gen_entrypoint, execute_entrypoint],
+    Config.EXECUTE_ONLY: [gen_entrypoint, execute_entrypoint],
 }
 
 # Future steps that can be added:
-# self_reflect_and_improve_files,
-# add_tests
-# run_tests_and_fix_files,
-# improve_based_on_in_file_feedback_comments
+# run_tests_and_fix_files

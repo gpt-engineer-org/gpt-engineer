@@ -35,7 +35,7 @@ def main(
                     "-m",
                     "gpt_engineer.main",
                     bench_folder,
-                    "--steps-config",
+                    "--steps",
                     "benchmark",
                 ],
                 stdout=log_file,
@@ -66,7 +66,7 @@ def main(
                     "-m",
                     "gpt_engineer.main",
                     bench_folder,
-                    "--steps-config",
+                    "--steps",
                     "execute_only",
                 ],
             )
