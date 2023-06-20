@@ -49,11 +49,6 @@ With an api key that has GPT4 access run:
 **Results**
 - Check the generated files in `projects/my-new-project/workspace`
 
-### Limitations
-Implementing additional chain of thought prompting, e.g. [Reflexion](https://github.com/noahshinn024/reflexion), should be able to make it more reliable and not miss requested functionality in the main prompt.
-
-Contributors welcome! If you are unsure what to add, check out the ideas listed in the Projects tab in the GitHub repo.
-
 
 ## Features
 You can specify the "identity" of the AI agent by editing the files in the `identity` folder.
@@ -63,7 +58,11 @@ Editing the identity, and evolving the `main_prompt`, is currently how you make 
 Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
 
 ## Contributing
-If you want to contribute, please check out the [projects](https://github.com/AntonOsika/gpt-engineer/projects?query=is%3Aopen) or [issues tab](https://github.com/AntonOsika/gpt-engineer/issues) in the GitHub repo and please read the [contributing document](.github/CONTRIBUTING.md) on how to contribute. Here is our [Discord 💬](https://discord.gg/4t5vXHhu)
+We are building the open platform for devs to tinker with and build their personal code-generation toolbox.
+
+If you want to contribute, please check out the [roadmap](https://github.com/AntonOsika/gpt-engineer/blob/main/ROADMAP.md), [projects](https://github.com/AntonOsika/gpt-engineer/projects?query=is%3Aopen) or [issues tab](https://github.com/AntonOsika/gpt-engineer/issues) in the GitHub repo. You are welcome to read the [contributing document](.github/CONTRIBUTING.md) and join our [Discord 💬](https://discord.gg/4t5vXHhu).
+
+We are currently looking for more maintainers and community organisers. Email anton.osika@gmail.com if you are interested in an official role.
 
 
 ## Example
