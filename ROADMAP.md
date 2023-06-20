@@ -30,4 +30,5 @@ You can:
 - [ ] Set up automatic AI/LLM based PR review
 
 ### Ad hoc experiments
-- [ ] Microsoft guidance, and benchmark if this helps improve it
+- [ ] Microsoft guidance, and benchmark if this helps improve performance
+
