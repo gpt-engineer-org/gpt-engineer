@@ -11,7 +11,7 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 
 [Demo](https://twitter.com/antonosika/status/1667641038104674306) 👶🤖
 
-[Discord 💬](https://discord.gg/autogpt)
+[Discord 💬](https://discord.gg/4t5vXHhu)
 
 ## Project philosophy
 - Simple to get value
