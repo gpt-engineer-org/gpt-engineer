@@ -3,7 +3,7 @@ import pathlib
 
 import typer
 
-from gpt_engineer.ai.ai import AI
+from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import to_files
 
 app = typer.Typer()

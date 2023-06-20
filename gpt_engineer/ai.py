@@ -69,10 +69,10 @@ class GPT(AI):
 
     def next(self, messages: Messages, user_prompt: Optional[str] = None) -> Messages:
         if user_prompt:
-            messages.append(Message(user_prompt, Role.USER))
+            messages.messages.append(Message(user_prompt, Role.USER))
 
         response = openai.ChatCompletion.create(
-            messages=[self._format_message(m) for m in messages],
+            messages=[self._format_message(m) for m in messages.messages],
             stream=True,
             **self.kwargs,
         )
@@ -84,7 +84,7 @@ class GPT(AI):
             print(msg, end="")
             chat.append(msg)
 
-        messages.append(Message("".join(chat), Role.ASSISTANT))
+        messages.messages.append(Message("".join(chat), Role.ASSISTANT))
         return messages
 
     def _format_message(self, msg: Message) -> Dict[str, str]:

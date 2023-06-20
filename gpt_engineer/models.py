@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import List
 
 from dataclasses_json import dataclass_json
 
@@ -21,7 +22,7 @@ class Message:
 @dataclass_json
 @dataclass
 class Messages:
-    messages: list[Message]
+    messages: List[Message]
 
     def last_message_content(self) -> str:
-        return self.messages[-1][1].content
+        return self.messages[-1].content

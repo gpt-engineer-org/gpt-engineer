@@ -1,4 +1,3 @@
-import json
 import re
 import subprocess
 
@@ -51,7 +50,7 @@ def clarify(ai: AI, dbs: DBs) -> Messages:
 def simple_gen(ai: AI, dbs: DBs) -> Messages:
     """Run the AI on the main prompt and save the results"""
     messages = ai.start(
-        Message(
+        Messages(
             [
                 Message(role=Role.SYSTEM, content=setup_sys_prompt(dbs)),
                 Message(role=Role.USER, content=dbs.input["main_prompt"]),
@@ -68,9 +67,9 @@ def run_clarified(ai: AI, dbs: DBs) -> Messages:
     """
     # get the messages from previous step
     messages = ai.next(
-        Message(
+        Messages(
             [Message(role=Role.SYSTEM, content=setup_sys_prompt(dbs))]
-            + [Message(m) for m in json.loads(dbs.logs[clarify.__name__])[1:]]
+            + Messages.from_json(dbs.logs[clarify.__name__]).messages[1:]
         ),
         user_prompt=dbs.identity["use_qa"],
     )
@@ -93,14 +92,14 @@ def gen_spec(ai: AI, dbs: DBs) -> Messages:
     )
     messages = ai.next(messages, user_prompt=dbs.identity["spec"])
 
-    dbs.memory["specification"] = messages[-1][1].content
+    dbs.memory["specification"] = messages.last_message_content()
 
     return messages
 
 
 def respec(ai: AI, dbs: DBs) -> Messages:
     messages = Messages(
-        [Message(role=Role.SYSTEM, content=log) for log in dbs.logs[gen_spec.__name__]]
+        Messages.from_json(dbs.logs[gen_spec.__name__]).messages
         + [Message(role=Role.SYSTEM, content=dbs.identity["respec"])]
     )
 
@@ -115,7 +114,7 @@ def respec(ai: AI, dbs: DBs) -> Messages:
         ),
     )
 
-    dbs.memory["specification"] = messages[-1][1].content
+    dbs.memory["specification"] = messages.last_message_content()
     return messages
 
 
@@ -135,7 +134,7 @@ def gen_unit_tests(ai: AI, dbs: DBs) -> Messages:
 
     messages = ai.next(messages, user_prompt=dbs.identity["unit_tests"])
 
-    dbs.memory["unit_tests"] = messages[-1][1].content
+    dbs.memory["unit_tests"] = messages.last_message_content()
     to_files(dbs.memory["unit_tests"], dbs.workspace)
 
     return messages
@@ -147,7 +146,7 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> Messages:
     messages = ai.next(
         Messages(
             [Message(role=Role.SYSTEM, content=setup_sys_prompt(dbs))]
-            + [Message.from_dict(m) for m in json.loads(dbs.logs[clarify.__name__])[1:]]
+            + Messages.from_json(dbs.logs[clarify.__name__]).messages[1:]
         ),
         user_prompt=dbs.identity["use_qa"],
     )
@@ -192,11 +191,11 @@ def execute_entrypoint(ai, dbs) -> Messages:
     print()
     if input() != "":
         print("Ok, not executing the code.")
-        return []
+        return Messages(messages=[])
     print("Executing the code...")
     print()
     subprocess.run("bash run.sh", shell=True, cwd=dbs.workspace.path)
-    return []
+    return Messages(messages=[])
 
 
 def gen_entrypoint(ai, dbs) -> Messages:
@@ -228,7 +227,7 @@ def gen_entrypoint(ai, dbs) -> Messages:
     )
     print()
     regex = r"```\S*\n(.+?)```"
-    matches = re.finditer(regex, messages[-1][1].content, re.DOTALL)
+    matches = re.finditer(regex, messages.last_message_content(), re.DOTALL)
     dbs.workspace["run.sh"] = "\n".join(match.group(1) for match in matches)
     return messages
 
@@ -248,7 +247,7 @@ def use_feedback(ai: AI, dbs: DBs) -> Messages:
 
 
 def fix_code(ai: AI, dbs: DBs) -> Messages:
-    code_output = json.loads(dbs.logs[gen_code.__name__])[-1]["content"]
+    code_output = Messages.from_json(dbs.logs[gen_code.__name__]).last_message_content()
     messages = Messages(
         [
             Message(role=Role.SYSTEM, content=setup_sys_prompt(dbs)),
