@@ -144,3 +144,57 @@ def test_files_with_back_tick():
 
     for file_name, file_content in expected_files.items():
         assert workspace[file_name] == file_content
+
+
+def test_files_with_newline_between():
+    chat = textwrap.dedent(
+        """
+    This is a sample program.
+
+    file1.py
+
+    ```python
+    print("Hello, World!")
+    ```
+    """
+    )
+
+    workspace = {}
+    to_files(chat, workspace)
+
+    assert workspace["all_output.txt"] == chat
+
+    expected_files = {
+        "file1.py": 'print("Hello, World!")\n',
+        "README.md": "\nThis is a sample program.\n\nfile1.py\n\n",
+    }
+
+    for file_name, file_content in expected_files.items():
+        assert workspace[file_name] == file_content
+
+
+def test_files_with_newline_between_header():
+    chat = textwrap.dedent(
+        """
+    This is a sample program.
+
+    ## file1.py
+
+    ```python
+    print("Hello, World!")
+    ```
+    """
+    )
+
+    workspace = {}
+    to_files(chat, workspace)
+
+    assert workspace["all_output.txt"] == chat
+
+    expected_files = {
+        "file1.py": 'print("Hello, World!")\n',
+        "README.md": "\nThis is a sample program.\n\n## file1.py\n\n",
+    }
+
+    for file_name, file_content in expected_files.items():
+        assert workspace[file_name] == file_content
