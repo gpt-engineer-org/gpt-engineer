@@ -1,9 +1,17 @@
 # GPT Engineer
+# Auto-GPT: An Autonomous GPT-4 Experiment
+[![Discord Follow](https://dcbadge.vercel.app/api/server/4t5vXHhu?style=flat)](https://discord.gg/4t5vXHhu)
+[![GitHub Repo stars](https://img.shields.io/github/stars/AntonOsika/gpt-engineer?style=social)](https://github.com/AntonOsika/gpt-engineer)
+[![Twitter Follow](https://img.shields.io/twitter/follow/antonosika?style=social)](https://twitter.com/AntonOsika)
+
+
 **Specify what you want it to build, the AI asks for clarification, and then builds it.**
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
 
 [Demo](https://twitter.com/antonosika/status/1667641038104674306) 👶🤖
+
+[Discord 💬](https://discord.gg/autogpt)
 
 ## Project philosophy
 - Simple to get value
