@@ -70,7 +70,7 @@ def gen_spec(ai: AI, dbs: DBs):
 
 
 def respec(ai: AI, dbs: DBs):
-    messages = dbs.logs[gen_spec.__name__]
+    messages = json.loads(dbs.logs[gen_spec.__name__])
     messages += [ai.fsystem(dbs.identity["respec"])]
 
     messages = ai.next(messages)
@@ -203,9 +203,18 @@ def fix_code(ai: AI, dbs: DBs):
 
 # Different configs of what steps to run
 STEPS = {
-    "default": [gen_spec, gen_unit_tests, gen_code, gen_entrypoint, execute_entrypoint],
-    "benchmark": [gen_spec, gen_unit_tests, gen_code, fix_code, gen_entrypoint],
+    "default": [simple_gen, gen_entrypoint, execute_entrypoint],
+    "benchmark": [simple_gen, gen_entrypoint],
     "simple": [simple_gen, gen_entrypoint, execute_entrypoint],
+    "tdd": [gen_spec, gen_unit_tests, gen_code, gen_entrypoint, execute_entrypoint],
+    "tdd+": [
+        gen_spec,
+        gen_unit_tests,
+        gen_code,
+        fix_code,
+        gen_entrypoint,
+        execute_entrypoint,
+    ],
     "clarify": [clarify, gen_clarified_code, gen_entrypoint, execute_entrypoint],
     "respec": [
         gen_spec,
