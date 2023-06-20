@@ -44,6 +44,7 @@ archive
 # any log file
 *log.txt
 todo
+scratchpad
 
 # Ignore GPT Engineer files
 projects
