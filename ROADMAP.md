@@ -8,7 +8,7 @@
 - [ ] Let human give feedback
   - [ ] Ask human for what is not working as expected in a loop, and feed it into
 GPT4 to fix the code, until the human is happy or gives up
-- [ ] Break down the code generation into much smaller parts
+- [ ] Break down the code generation into small parts
   - [ ] For each small part, generate tests for each subpart, and do the loop of running the tests for each part, feeding
 results into GPT4, and let it edit the code until they pass
 - [ ] LLM tests in CI
