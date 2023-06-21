@@ -8,7 +8,7 @@ import typer
 
 from gpt_engineer.ai import GPT
 from gpt_engineer.db import DB, DBs
-from gpt_engineer.steps import STEPS
+from gpt_engineer.steps import STEPS, Config
 
 app = typer.Typer()
 
@@ -19,7 +19,9 @@ def main(
     delete_existing: bool = typer.Argument(False, help="delete existing files"),
     model: str = "gpt-4",
     temperature: float = 0.1,
-    steps_config: str = "default",
+    steps_config: Config = typer.Option(
+        Config.DEFAULT, "--steps", "-s", help="decide which steps to run"
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
     run_prefix: str = typer.Option(
         "",

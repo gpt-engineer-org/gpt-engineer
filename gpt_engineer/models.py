@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List
 
-from dataclasses_json import dataclass_json
+from dataclasses_json import DataClassJsonMixin, dataclass_json
 
 
 class Role(str, Enum):
@@ -14,14 +14,14 @@ class Role(str, Enum):
 
 @dataclass_json
 @dataclass
-class Message:
+class Message(DataClassJsonMixin):
     content: str
     role: Role
 
 
 @dataclass_json
 @dataclass
-class Messages:
+class Messages(DataClassJsonMixin):
     messages: List[Message]
 
     def last_message_content(self) -> str:

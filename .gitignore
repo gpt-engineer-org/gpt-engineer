@@ -31,6 +31,7 @@ ENV/
 .pytest_cache/
 .ruff_cache/
 .coverage
+.mypy_cache/
 
 # macOS specific files
 .DS_Store
@@ -44,6 +45,7 @@ archive
 # any log file
 *log.txt
 todo
+scratchpad
 
 # Ignore GPT Engineer files
 projects

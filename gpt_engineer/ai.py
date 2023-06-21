@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 
 from abc import ABC, abstractmethod
@@ -14,7 +16,7 @@ class AI(ABC):
     """
 
     @abstractmethod
-    def __init__(self, **kwargs: Dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         """
         Initialization for the AI model.
 
@@ -41,7 +43,7 @@ class AI(ABC):
         pass
 
     @abstractmethod
-    def next(self, messages: Messages, user_prompt: Optional[Message] = None) -> Messages:
+    def next(self, messages: Messages, user_prompt: Optional[str] = None) -> Messages:
         """
         Asks the AI model to respond to the user prompt after ingesting some initial
             messages.
@@ -60,7 +62,7 @@ class AI(ABC):
 
 
 class GPT(AI):
-    def __init__(self, **kwargs: Dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         self.kwargs = kwargs
         self._model_check_and_fallback()
 

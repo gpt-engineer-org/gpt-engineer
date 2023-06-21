@@ -2,14 +2,20 @@
 # See https://pre-commit.com/hooks.html for more hooks
 fail_fast: true
 
+
 repos:
+
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.3.0
+  hooks:
+    - id: mypy
+
 - repo: https://github.com/psf/black
   rev: 23.3.0
   hooks:
     - id: black
       args: [--config, pyproject.toml]
       types: [python]
-      exclude: .+/migrations((/.+)|(\.py))
 
 - repo: https://github.com/charliermarsh/ruff-pre-commit
   rev: "v0.0.272"
@@ -25,3 +31,4 @@ repos:
        id: detect-private-key
        id: end-of-file-fixer
        id: trailing-whitespace
+

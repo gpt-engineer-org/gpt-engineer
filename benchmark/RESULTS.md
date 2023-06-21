@@ -4,6 +4,36 @@
 $ python scripts/benchmark.py
 ```
 
+# 2023-06-21
+
+| Benchmark          | Ran | Works | Perfect |
+|--------------------|-----|-------|---------|
+| currency_converter | ✅  | ❌    | ❌      |
+| image_resizer      | ✅  | ✅    | ✅      |
+| pomodoro_timer     | ✅  | ✅    | ✅      |
+| url_shortener      | ✅  | ✅    | ✅      |
+| file_explorer      | ✅  | ✅    | ✅      |
+| markdown_editor    | ✅  | ✅    | ❌      |
+| timer_app          | ✅  | ❌    | ❌      |
+| weather_app        | ✅  | ✅    | ✅      |
+| file_organizer     | ✅  | ✅    | ✅      |
+| password_generator | ✅  | ✅    | ✅      |
+| todo_list          | ✅  | ✅    | ✅      |
+
+
+# Notes on the errors
+Most errors come from that the "generate entrypoint" are incorrect. Ignoring
+those, we get 8/11 fully correct.
+
+All errors are very easy to fix.
+
+One error was trying to modify a constant.
+One error was that the html template was not fully filled in.
+One error is that a dependency was used incorrectly and easy to fix
+
+
+# 2023-06-19
+
 | Benchmark          | Ran | Works | Perfect |
 |--------------------|-----|-------|---------|
 | currency_converter | ❌  | ❌    | ❌      |
