@@ -4,10 +4,13 @@ import subprocess
 
 from enum import Enum
 
-from gpt_engineer.ai import AI
-from gpt_engineer.chat_to_files import to_files
-from gpt_engineer.db import DBs
+#from gpt_engineer.ai import AI
+#from gpt_engineer.chat_to_files import to_files
+#from gpt_engineer.db import DBs
 
+from ai import AI
+from chat_to_files import to_files
+from db import DBs
 
 def setup_sys_prompt(dbs):
     return dbs.identity["generate"] + "\nUseful to know:\n" + dbs.identity["philosophy"]

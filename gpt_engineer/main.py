@@ -7,10 +7,15 @@ from pathlib import Path
 
 import typer
 
-from gpt_engineer import steps
-from gpt_engineer.ai import AI
-from gpt_engineer.db import DB, DBs
-from gpt_engineer.steps import STEPS
+#from gpt_engineer import steps
+#from gpt_engineer.ai import AI
+#from gpt_engineer.db import DB, DBs
+#from gpt_engineer.steps import STEPS
+
+import steps
+from ai import AI
+from db import DB, DBs
+from steps import STEPS
 
 app = typer.Typer()
 
@@ -20,7 +25,7 @@ def main(
     project_path: str = typer.Argument("example", help="path"),
     delete_existing: bool = typer.Argument(False, help="delete existing files"),
     model: str = "gpt-4",
-    temperature: float = 0.1,
+    temperature: float = typer.Option(0.0, "--temperature", "-t", help="use 0.1 to add some variability"),
     steps_config: steps.Config = typer.Option(
         steps.Config.DEFAULT, "--steps", "-s", help="decide which steps to run"
     ),
