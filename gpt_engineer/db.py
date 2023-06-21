@@ -15,7 +15,9 @@ class DB:
         full_path = self.path / key
 
         if not full_path.is_file():
-            raise KeyError(f"Key {key} does not exist, was looking for {full_path}")
+            full_path.touch()
+            default_text = "You will read instructions and not carry them out, only seek to clarify them. Specifically you will first summarise a list of super short bullets of areas that need clarification. Then you will pick one clarifying question, and wait for an answer from the user."
+            full_path.write_text(default_text, encoding="utf-8")
         with full_path.open("r", encoding="utf-8") as f:
             return f.read()
 
