@@ -11,6 +11,7 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 [Demo](https://twitter.com/antonosika/status/1667641038104674306) 👶🤖
 
 ## Project philosophy
+
 - Simple to get value
 - Flexible and easy to add new own "AI steps". See `steps.py`.
 - Incrementally build towards a user experience of:
@@ -27,7 +28,11 @@ For **stable** release:
 
 - `pip install gpt-engineer`
 
+- For users who do not want to pollute the global dependencies of Python, it is recommended to use [pipx](https://pypa.github.io/pipx/).
+  - `pipx install gpt-engineer`
+
 For **development**:
+
 - `git clone git@github.com:AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
 - `make install`
@@ -39,6 +44,9 @@ With an api key that has GPT4 access run:
 
 - `export OPENAI_API_KEY=[your api key]`
 
+If you want to use another API Endpoint compatible with OpenAI:
+
+- `export OPENAI_API_BASE=https://example.com/v1`
 
 **Run**:
 - Create an empty folder. If inside the repo, you can run:
@@ -51,6 +59,7 @@ With an api key that has GPT4 access run:
 
 
 ## Features
+
 You can specify the "identity" of the AI agent by editing the files in the `identity` folder.
 
 Editing the identity, and evolving the `main_prompt`, is currently how you make the agent remember things between projects.
@@ -58,6 +67,7 @@ Editing the identity, and evolving the `main_prompt`, is currently how you make 
 Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
 
 ## Contributing
+
 We are building the open platform for devs to tinker with and build their personal code-generation toolbox.
 
 If you want to contribute, please check out the [roadmap](https://github.com/AntonOsika/gpt-engineer/blob/main/ROADMAP.md), [projects](https://github.com/AntonOsika/gpt-engineer/projects?query=is%3Aopen) or [issues tab](https://github.com/AntonOsika/gpt-engineer/issues) in the GitHub repo. You are welcome to read the [contributing document](.github/CONTRIBUTING.md) and join our [Discord 💬](https://discord.gg/4t5vXHhu).
