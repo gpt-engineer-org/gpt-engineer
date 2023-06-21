@@ -3,10 +3,10 @@
 We are building AGI by first creating the code generation tooling of the future.
 
 There are three main milestones we think can improve gpt-engineer's capability 2x:
+
 - Continuous evaluation of our progress
 - Make code generation become small, verifiable steps
 - Run tests and fix errors with GPT4
-
 
 ## Steps to achieve our roadmap
 
@@ -32,16 +32,17 @@ performance over time
 task, by giving it few shot example of what are usually "the right-sized steps" to carry
 out for other projects
 
-
-
 # How you can help out
+
 You can:
+
 - Sign up to help [measure the progress of gpt-engineer towards "bootstrapping"](https://forms.gle/TMX68mScyxQUsE6Y9)
 - Submit PRs to address one of the items in the roadmap
 
 ### Repository ergonomics
+
 - [ ] Set up automatic AI/LLM based PR review
 
 ### Ad hoc experiments
-- [ ] Microsoft guidance, and benchmark if this helps improve performance
 
+- [ ] Microsoft guidance, and benchmark if this helps improve performance
