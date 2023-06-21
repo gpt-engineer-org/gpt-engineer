@@ -15,7 +15,7 @@ class DB:
         full_path = self.path / key
 
         if not full_path.is_file():
-            raise KeyError(key)
+            raise KeyError(f"Key {key} does not exist, was looking for {full_path}")
         with full_path.open("r", encoding="utf-8") as f:
             return f.read()
 
