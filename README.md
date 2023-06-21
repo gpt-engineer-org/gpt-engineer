@@ -24,12 +24,13 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 **Setup**
 - `git clone git@github.com:AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
-- `make install`
+- `make install` or `pip install .`
 - `source venv/bin/activate`
 
 With an api key that has GPT4 access run:
 
-- `export OPENAI_API_KEY=[your api key]`
+- `export OPENAI_API_KEY=[your api key]` or
+- `setx OPENAI_API_KEY "[your api key]` in Windows
 
 
 **Run**:
