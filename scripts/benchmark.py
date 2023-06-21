@@ -1,6 +1,7 @@
 # list all folders in benchmark folder
 # for each folder, run the benchmark
 
+import contextlib
 import os
 import subprocess
 
@@ -59,7 +60,7 @@ def main(
             print(f.read())
         print()
 
-        try:
+        with contextlib.suppress(KeyboardInterrupt):
             subprocess.run(
                 [
                     "python",
@@ -70,8 +71,6 @@ def main(
                     "execute_only",
                 ],
             )
-        except KeyboardInterrupt:
-            pass
 
 
 if __name__ == "__main__":
