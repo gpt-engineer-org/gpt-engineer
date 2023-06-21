@@ -3,6 +3,7 @@
   - [ ] Create a step that asks “did it run/work/perfect” in the end [#240](https://github.com/AntonOsika/gpt-engineer/issues/240)
   - [ ] Run the benchmark repeatedly and document the results for the different "step configs" (`STEPS` in `steps.py`) [#239](https://github.com/AntonOsika/gpt-engineer/issues/239)
   - [ ] Document the best performing configs, and feed this into our roadmap
+  - [ ] Collect a dataset for gpt engineer to learn from, by storing code generation runs, and if they fail/succeed on an opt out basis
 - [ ] Self healing code
   - [ ] Feed the results of failing tests back into GPT4 and ask it to fix the code
 - [ ] Let human give feedback
