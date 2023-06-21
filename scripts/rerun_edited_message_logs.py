@@ -1,10 +1,11 @@
 import json
 import pathlib
 
+from typing import Optional
+
 import typer
 
-from gpt_engineer.ai import AI
-from gpt_engineer.chat_to_files import to_files
+from gpt_engineer.ai import GPT
 
 app = typer.Typer()
 
@@ -12,11 +13,11 @@ app = typer.Typer()
 @app.command()
 def main(
     messages_path: str,
-    out_path: str | None = None,
+    out_path: Optional[str] = None,
     model: str = "gpt-4",
     temperature: float = 0.1,
 ):
-    ai = AI(
+    ai = GPT(
         model=model,
         temperature=temperature,
     )
@@ -27,9 +28,8 @@ def main(
     messages = ai.next(messages)
 
     if out_path:
-        to_files(messages[-1]["content"], out_path)
         with open(pathlib.Path(out_path) / "all_output.txt", "w") as f:
-            json.dump(messages[-1]["content"], f)
+            json.dump(messages.last_message_content(), f)
 
 
 if __name__ == "__main__":
