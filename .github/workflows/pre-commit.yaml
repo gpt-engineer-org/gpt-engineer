@@ -8,7 +8,22 @@ on:
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-    - uses: pre-commit/action@v3.0.0
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+
+      - uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: --all-files
+
+      - name: Commit and push changes
+        if: always()
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "auto-generated: 🤖 fix pre-commit"
+          file_pattern: "*"
