@@ -21,19 +21,11 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 
 ## Usage
 
-Choose either **stable** or **development**.
-
-For **stable** release:
-
-- `pip install gpt-engineer`
-
-For **development**:
+**Setup**
 - `git clone git@github.com:AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
 - `make install`
 - `source venv/bin/activate`
-
-**Setup**
 
 With an api key that has GPT4 access run:
 
