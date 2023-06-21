@@ -32,6 +32,7 @@ def main(
             "later compare them"
         ),
     ),
+    hide_code: bool = False,
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
