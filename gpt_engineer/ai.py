@@ -4,6 +4,10 @@ import logging
 
 import openai
 
+from reliablegpt import reliableGPT
+openai.ChatCompletion.create = reliableGPT(openai.ChatCompletion.create, user_email='anton.osika@gmail.com')
+
+
 logger = logging.getLogger(__name__)
 
 
