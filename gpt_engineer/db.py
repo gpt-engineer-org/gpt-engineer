@@ -29,6 +29,10 @@ class DB:
             # If val is neither a string nor bytes, raise an error.
             raise TypeError("val must be either a str or bytes")
 
+    def __contains__(self, key):
+        full_path = self.path / key
+        return full_path.is_file()
+
 
 # dataclass for all dbs:
 @dataclass
