@@ -4,7 +4,7 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/antonosika?style=social)](https://twitter.com/AntonOsika)
 
 
-**Specify what you want it to build, the AI asks for clarification, and then builds it.**
+**Specify what you want it to build, the AI asks for clarification and then builds it.**
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
 
@@ -12,9 +12,9 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 
 ## Project philosophy
 - Simple to get value
-- Flexible and easy to add new own "AI steps". See `steps.py`.
+- Flexible and easy to add new own "AI steps". See `steps.py`
 - Incrementally build towards a user experience of:
-  1. high level prompting
+  1. high-level prompting
   2. giving feedback to the AI that it will remember over time
 - Fast handovers back and forth between AI and human
 - Simplicity, all computation is "resumable" and persisted to the filesystem
@@ -35,9 +35,9 @@ For **development**:
 
 **Setup**
 
-With an api key that has GPT4 access run:
+With an API key that has GPT4 access run:
 
-- `export OPENAI_API_KEY=[your api key]`
+- `export OPENAI_API_KEY=[your API key]`
 
 
 **Run**:
@@ -58,7 +58,7 @@ Editing the identity, and evolving the `main_prompt`, is currently how you make 
 Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
 
 ## Contributing
-We are building the open platform for devs to tinker with and build their personal code-generation toolbox.
+We are building an open platform for devs to tinker with and build their personal code-generation toolbox.
 
 If you want to contribute, please check out the [roadmap](https://github.com/AntonOsika/gpt-engineer/blob/main/ROADMAP.md), [projects](https://github.com/AntonOsika/gpt-engineer/projects?query=is%3Aopen) or [issues tab](https://github.com/AntonOsika/gpt-engineer/issues) in the GitHub repo. You are welcome to read the [contributing document](.github/CONTRIBUTING.md) and join our [Discord 💬](https://discord.gg/4t5vXHhu).
 
