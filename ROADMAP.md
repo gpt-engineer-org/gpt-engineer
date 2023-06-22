@@ -44,8 +44,8 @@ You can:
 Volunteer work in any of these gets acknowledged.
 
 ### Repository ergonomics
-- [ ] Set up automatic AI/LLM based PR review
+- [ ] Set up automatic PR review for all PRs (based on AI)
 
 ### Ad hoc experiments
-- [ ] Microsoft guidance, and benchmark if this helps improve performance
+- [ ] Try Microsoft guidance, and benchmark if this helps improve performance
 
