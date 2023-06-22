@@ -14,13 +14,31 @@ class DB:
     def __contains__(self, key):
         return (self.path / key).is_file()
 
+    # def __getitem__(self, key):
+    #     full_path = self.path / key
+    #
+    #     if not full_path.is_file():
+    #         raise KeyError(key)
+    #     with full_path.open("r", encoding="utf-8") as f:
+    #         return f.read()
+
     def __getitem__(self, key):
         full_path = self.path / key
 
+        result = []
         if not full_path.is_file():
             raise KeyError(key)
         with full_path.open("r", encoding="utf-8") as f:
-            return f.read()
+            lines = f.readlines()
+            for line in lines:
+                ll = line[:2]
+                if ll == '++':  # check for include statement
+                    fn = line[2:].strip()
+                    sub_db = self.__getitem__(fn)
+                    result.append(sub_db)
+                else:
+                    result.append(line)
+            return "".join(result)
 
     def __setitem__(self, key, val):
         full_path = self.path / key
