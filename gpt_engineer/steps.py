@@ -39,6 +39,7 @@ def clarify(ai: AI, dbs: DBs):
         messages = ai.next(messages, user)
 
         if messages[-1]["content"].strip().lower().startswith("no"):
+            print(" Nothing more to clarify.")
             break
 
         print()
@@ -157,13 +158,17 @@ def execute_entrypoint(ai, dbs):
         print("Ok, not executing the code.")
         return []
     print("Executing the code...")
+    print()
     print(
         "\033[92m"  # green color
-        + "Note: If it does not work as expected, please consider running the code'"
+        + "Note: If it does not work as expected, consider running the code"
         + " in another way than above."
         + "\033[0m"
     )
     print()
+    print("You can press ctrl+c *once* to stop the execution.")
+    print()
+
     subprocess.run("bash run.sh", shell=True, cwd=dbs.workspace.path)
     return []
 
@@ -270,7 +275,7 @@ STEPS = {
         execute_entrypoint,
     ],
     Config.USE_FEEDBACK: [use_feedback, gen_entrypoint, execute_entrypoint],
-    Config.EXECUTE_ONLY: [gen_entrypoint, execute_entrypoint],
+    Config.EXECUTE_ONLY: [execute_entrypoint],
 }
 
 # Future steps that can be added:
