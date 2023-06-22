@@ -22,6 +22,17 @@ def simple_gen(ai: AI, dbs: DBs):
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
+def multi_line_input(prompt=""):
+    print(prompt)
+    print("Enter/Paste your content. Ctrl-D or Ctrl-Z ( windows ) to save it.")
+    contents = []
+    while True:
+        try:
+            line = input()
+        except EOFError:
+            break
+        contents.append(line)
+    return ".".join(contents)
 
 def clarify(ai: AI, dbs: DBs):
     """
@@ -36,7 +47,7 @@ def clarify(ai: AI, dbs: DBs):
             break
 
         print()
-        user = input('(answer in text, or "c" to move on)\n')
+        user = multi_line_input('(answer in text, or "c" to move on)\n')
         print()
 
         if not user or user == "c":
@@ -142,9 +153,11 @@ def execute_entrypoint(ai, dbs):
     command = dbs.workspace["run.sh"]
 
     print("Do you want to execute this code?")
-    print()
+    print("\033[92m"  # green color
+          + "--- BEGIN CODE ---")
     print(command)
-    print()
+    print("--- END CODE   ---"
+          + "\033[0m")
     print('If yes, press enter. Otherwise, type "no"')
     print()
     if input() not in ["", "y", "yes"]:
