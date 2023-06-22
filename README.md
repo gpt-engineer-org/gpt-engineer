@@ -20,7 +20,7 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 - Simplicity, all computation is "resumable" and persisted to the filesystem
 
 ## Setup
-- `git clone git@github.com:AntonOsika/gpt-engineer.git`
+- `git clone https://github.com/AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
 - `pip install -e .`
   - (or: `make install && source venv/bin/activate` for a venv)
