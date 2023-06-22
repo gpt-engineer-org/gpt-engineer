@@ -34,6 +34,7 @@ With an api key that has GPT4 access run:
 **Run**:
 - Create an empty folder. If inside the repo, you can run:
   - `cp -r projects/example/ projects/my-new-project`
+    - (or `xcopy /E projects\example projects\my-new-project` on Windows)
 - Fill in the `main_prompt` file in your new folder
 - Run: `gpt-engineer projects/my-new-project`
 
