@@ -1,6 +1,6 @@
 # Roadmap
 
-We are building AGI by first creating the code generation tooling of the future.
+We are building AGI. The first step is creating the code generation tooling of the future.
 
 There are three main milestones we think can improve gpt-engineer's capability 2x:
 - Continuous evaluation of our progress
