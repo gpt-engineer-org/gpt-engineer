@@ -2,7 +2,7 @@
 
 We are building AGI. The first step is creating the code generation tooling of the future.
 
-There are three main milestones we think can improve gpt-engineer's capability 2x:
+There are three main milestones we believe will improve gpt-engineer's capability 2x:
 - Continuous evaluation of our progress
 - Make code generation become small, verifiable steps
 - Run tests and fix errors with GPT4
