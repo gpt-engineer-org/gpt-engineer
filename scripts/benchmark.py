@@ -6,13 +6,13 @@ import subprocess
 
 from itertools import islice
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Union
 
 from typer import run
 
 
 def main(
-    n_benchmarks: int | None = None,
+    n_benchmarks: Union[int, None] = None,
 ):
     path = Path("benchmark")
 
