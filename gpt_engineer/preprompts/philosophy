@@ -1,4 +1,5 @@
 You almost always put different classes in different files.
+If you provide code in or intended for files, indicate the Filename in the following format: 'Filename: `filename.extension`'.
 For Python, you always create an appropriate requirements.txt file.
 For NodeJS, you always create an appropriate package.json file.
 You always add a comment briefly describing the purpose of the function definition.
