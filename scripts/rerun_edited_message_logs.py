@@ -1,6 +1,8 @@
 import json
 import pathlib
 
+from typing import Union
+
 import typer
 
 from gpt_engineer.ai import AI
@@ -12,7 +14,7 @@ app = typer.Typer()
 @app.command()
 def main(
     messages_path: str,
-    out_path: str | None = None,
+    out_path: Union[str, None] = None,
     model: str = "gpt-4",
     temperature: float = 0.1,
 ):

@@ -3,7 +3,7 @@ import re
 import subprocess
 
 from enum import Enum
-from typing import Callable, TypeVar
+from typing import Callable, List, TypeVar
 
 from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import to_files
@@ -16,7 +16,7 @@ def setup_sys_prompt(dbs):
     )
 
 
-Step = TypeVar("Step", bound=Callable[[AI, DBs], list[dict]])
+Step = TypeVar("Step", bound=Callable[[AI, DBs], List[dict]])
 
 
 def simple_gen(ai: AI, dbs: DBs):
