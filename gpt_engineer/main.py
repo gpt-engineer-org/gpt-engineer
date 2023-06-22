@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 import shutil
 
 from pathlib import Path
@@ -54,7 +53,7 @@ def main(
         logs=DB(memory_path / "logs"),
         input=DB(input_path),
         workspace=DB(workspace_path),
-        identity=DB(Path(os.path.curdir) / "identity"),
+        preprompts=DB(Path(__file__).parent / "preprompts"),
     )
 
     for step in STEPS[steps_config]:
