@@ -11,6 +11,9 @@ class DB:
 
         self.path.mkdir(parents=True, exist_ok=True)
 
+    def __contains__(self, key):
+        return (self.path / key).is_file()
+
     def __getitem__(self, key):
         full_path = self.path / key
 
@@ -35,6 +38,6 @@ class DB:
 class DBs:
     memory: DB
     logs: DB
-    identity: DB
+    preprompts: DB
     input: DB
     workspace: DB
