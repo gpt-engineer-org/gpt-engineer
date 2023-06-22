@@ -3,6 +3,7 @@ import re
 import subprocess
 
 from enum import Enum
+from typing import Callable, TypeVar
 
 from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import to_files
@@ -10,7 +11,12 @@ from gpt_engineer.db import DBs
 
 
 def setup_sys_prompt(dbs):
-    return dbs.identity["generate"] + "\nUseful to know:\n" + dbs.identity["philosophy"]
+    return (
+        dbs.preprompts["generate"] + "\nUseful to know:\n" + dbs.preprompts["philosophy"]
+    )
+
+
+Step = TypeVar("Step", bound=Callable[[AI, DBs], list[dict]])
 
 
 def simple_gen(ai: AI, dbs: DBs):
@@ -27,7 +33,7 @@ def clarify(ai: AI, dbs: DBs):
     """
     Ask the user if they want to clarify anything and save the results to the workspace
     """
-    messages = [ai.fsystem(dbs.identity["qa"])]
+    messages = [ai.fsystem(dbs.preprompts["qa"])]
     user = dbs.input["main_prompt"]
     while True:
         messages = ai.next(messages, user)
@@ -64,7 +70,7 @@ def gen_spec(ai: AI, dbs: DBs):
         ai.fsystem(f"Instructions: {dbs.input['main_prompt']}"),
     ]
 
-    messages = ai.next(messages, dbs.identity["spec"])
+    messages = ai.next(messages, dbs.preprompts["spec"])
 
     dbs.memory["specification"] = messages[-1]["content"]
 
@@ -73,7 +79,7 @@ def gen_spec(ai: AI, dbs: DBs):
 
 def respec(ai: AI, dbs: DBs):
     messages = json.loads(dbs.logs[gen_spec.__name__])
-    messages += [ai.fsystem(dbs.identity["respec"])]
+    messages += [ai.fsystem(dbs.preprompts["respec"])]
 
     messages = ai.next(messages)
     messages = ai.next(
@@ -102,7 +108,7 @@ def gen_unit_tests(ai: AI, dbs: DBs):
         ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
     ]
 
-    messages = ai.next(messages, dbs.identity["unit_tests"])
+    messages = ai.next(messages, dbs.preprompts["unit_tests"])
 
     dbs.memory["unit_tests"] = messages[-1]["content"]
     to_files(dbs.memory["unit_tests"], dbs.workspace)
@@ -118,7 +124,7 @@ def gen_clarified_code(ai: AI, dbs: DBs):
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
     ] + messages[1:]
-    messages = ai.next(messages, dbs.identity["use_qa"])
+    messages = ai.next(messages, dbs.preprompts["use_qa"])
 
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
@@ -133,7 +139,7 @@ def gen_code(ai: AI, dbs: DBs):
         ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
         ai.fuser(f"Unit tests:\n\n{dbs.memory['unit_tests']}"),
     ]
-    messages = ai.next(messages, dbs.identity["use_qa"])
+    messages = ai.next(messages, dbs.preprompts["use_qa"])
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
@@ -170,7 +176,7 @@ def gen_entrypoint(ai, dbs):
             "From this you will answer with code blocks that includes all the necessary "
             "unix terminal commands to "
             "a) install dependencies "
-            "b) run all necessary parts of the codebase (in parallel if necessary).\n"
+            "b) run all necessary parts of the codebase (in parallell if necessary).\n"
             "Do not install globally. Do not use sudo.\n"
             "Do not explain the code, just give the commands.\n"
             "Do not use placeholders, use example values (like . for a folder argument) "
@@ -191,7 +197,7 @@ def use_feedback(ai: AI, dbs: DBs):
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
         ai.fassistant(dbs.workspace["all_output.txt"]),
-        ai.fsystem(dbs.identity["use_feedback"]),
+        ai.fsystem(dbs.preprompts["use_feedback"]),
     ]
     messages = ai.next(messages, dbs.input["feedback"])
     to_files(messages[-1]["content"], dbs.workspace)
@@ -204,7 +210,7 @@ def fix_code(ai: AI, dbs: DBs):
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
         ai.fuser(code_output),
-        ai.fsystem(dbs.identity["fix_code"]),
+        ai.fsystem(dbs.preprompts["fix_code"]),
     ]
     messages = ai.next(messages, "Please fix any errors in the code above.")
     to_files(messages[-1]["content"], dbs.workspace)

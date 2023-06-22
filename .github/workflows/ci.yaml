@@ -1,5 +1,4 @@
-name: CI
-
+name: Pytest Execution
 on:
   pull_request:
     branches: [main]
