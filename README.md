@@ -30,8 +30,8 @@ For **stable** release:
 For **development**:
 - `git clone git@github.com:AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
-- `make install`
-- `source venv/bin/activate`
+- `pip install -e .`
+  - (or: `make install && source venv/bin/activate` for a venv)
 
 **Setup**
 
