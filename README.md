@@ -28,6 +28,7 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 With an api key that has GPT4 access run:
 
 - `export OPENAI_API_KEY=[your api key]`
+  - (or `set OPENAI_API_KEY=[your api key]` on Windows)
 
 
 **Run**:
