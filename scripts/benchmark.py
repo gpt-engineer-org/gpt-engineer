@@ -60,7 +60,6 @@ def main(
             print(f.read())
         print()
 
-        # surrpess exception
         with contextlib.suppress(KeyboardInterrupt):
             subprocess.run(
                 [
