@@ -66,7 +66,7 @@ Uncaught ReferenceError: module is not defined
 
 - failure mode: placeholder text
 
-url_shortner starts but gets the error:
+url_shortener starts but gets the error:
   SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 8636125824 and this is thread id 13021003776.
 
 markdown_editor:
