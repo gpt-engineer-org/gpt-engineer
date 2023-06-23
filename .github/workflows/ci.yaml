@@ -1,25 +1,23 @@
 name: Pytest Execution
 on:
   pull_request:
-    branches:
-      - main
+    branches: [main]
+    paths:
+      - "**.py"
   push:
-    branches:
-      - main
+    branches: [main]
+    paths:
+      - "**.py"
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version:
-          - "3.10"
     steps:
       - uses: actions/checkout@v3
 
       - uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.10"
           cache: pip
 
       - name: Install package
