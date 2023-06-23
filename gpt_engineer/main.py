@@ -1,12 +1,12 @@
 import json
 import logging
-import os
 import shutil
 
 from pathlib import Path
 
 import typer
 
+from gpt_engineer import steps
 from gpt_engineer.ai import AI
 from gpt_engineer.db import DB, DBs
 from gpt_engineer.steps import STEPS
@@ -20,7 +20,9 @@ def main(
     delete_existing: bool = typer.Argument(False, help="delete existing files"),
     model: str = "gpt-4",
     temperature: float = 0.1,
-    steps_config: str = "default",
+    steps_config: steps.Config = typer.Option(
+        steps.Config.DEFAULT, "--steps", "-s", help="decide which steps to run"
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
     run_prefix: str = typer.Option(
         "",
@@ -51,7 +53,7 @@ def main(
         logs=DB(memory_path / "logs"),
         input=DB(input_path),
         workspace=DB(workspace_path),
-        identity=DB(Path(os.path.curdir) / "identity"),
+        preprompts=DB(Path(__file__).parent / "preprompts"),
     )
 
     for step in STEPS[steps_config]:
