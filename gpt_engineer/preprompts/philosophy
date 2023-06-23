@@ -10,3 +10,7 @@ package/project.
 Python toolbelt preferences:
 - pytest
 - dataclasses
+
+NodeJS toolbelt preferences:
+- jest
+- supertest
