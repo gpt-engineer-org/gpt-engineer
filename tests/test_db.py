@@ -1,5 +1,5 @@
-import os
 import pytest
+
 from gpt_engineer.db import DB, DBs
 
 
@@ -8,26 +8,26 @@ def test_DB_operations(tmp_path):
     db = DB(tmp_path)
 
     # Test __setitem__
-    db['test_key'] = 'test_value'
+    db["test_key"] = "test_value"
 
-    assert (tmp_path / 'test_key').is_file()
+    assert (tmp_path / "test_key").is_file()
 
     # Test __getitem__
-    val = db['test_key']
+    val = db["test_key"]
 
-    assert val == 'test_value'
+    assert val == "test_value"
 
     # Test error on getting non-existent key
     with pytest.raises(KeyError):
-        db['non_existent']
+        db["non_existent"]
 
     # Test error on setting non-str or non-bytes value
     with pytest.raises(TypeError):
-        db['key'] = ['Invalid', 'value']
+        db["key"] = ["Invalid", "value"]
 
 
 def test_DBs_initialization(tmp_path):
-    dir_names = ['memory', 'logs', 'identity', 'input', 'workspace']
+    dir_names = ["memory", "logs", "preprompts", "input", "workspace"]
     directories = [tmp_path / name for name in dir_names]
 
     # Create DB objects
@@ -38,7 +38,7 @@ def test_DBs_initialization(tmp_path):
 
     assert isinstance(dbs_instance.memory, DB)
     assert isinstance(dbs_instance.logs, DB)
-    assert isinstance(dbs_instance.identity, DB)
+    assert isinstance(dbs_instance.preprompts, DB)
     assert isinstance(dbs_instance.input, DB)
     assert isinstance(dbs_instance.workspace, DB)
 
@@ -46,18 +46,18 @@ def test_DBs_initialization(tmp_path):
 def test_invalid_path():
     with pytest.raises(PermissionError):
         # Test with a path that will raise a permission error
-        DB('/root/test')
+        DB("/root/test")
 
 
 def test_large_files(tmp_path):
     db = DB(tmp_path)
-    large_content = 'a' * (10 ** 6)  # 1MB of data
+    large_content = "a" * (10**6)  # 1MB of data
 
     # Test write large files
-    db['large_file'] = large_content
+    db["large_file"] = large_content
 
     # Test read large files
-    assert db['large_file'] == large_content
+    assert db["large_file"] == large_content
 
 
 def test_concurrent_access(tmp_path):
@@ -70,7 +70,7 @@ def test_concurrent_access(tmp_path):
 
     def write_to_db(thread_id):
         for i in range(num_writes):
-            key = f'thread{thread_id}_write{i}'
+            key = f"thread{thread_id}_write{i}"
             db[key] = str(i)
 
     threads = []
@@ -85,7 +85,7 @@ def test_concurrent_access(tmp_path):
     # Verify that all expected data was written
     for thread_id in range(num_threads):
         for i in range(num_writes):
-            key = f'thread{thread_id}_write{i}'
+            key = f"thread{thread_id}_write{i}"
             assert key in db  # using __contains__ now
             assert db[key] == str(i)
 
@@ -94,9 +94,9 @@ def test_error_messages(tmp_path):
     db = DB(tmp_path)
 
     with pytest.raises(TypeError) as e:
-        db['key'] = ['Invalid', 'value']
+        db["key"] = ["Invalid", "value"]
 
-    assert str(e.value) == 'val must be either a str or bytes'
+    assert str(e.value) == "val must be either a str or bytes"
 
 
 def test_DBs_instantiation_with_wrong_number_of_arguments(tmp_path):
@@ -110,7 +110,7 @@ def test_DBs_instantiation_with_wrong_number_of_arguments(tmp_path):
 
 
 def test_DBs_dataclass_attributes(tmp_path):
-    dir_names = ['memory', 'logs', 'identity', 'input', 'workspace']
+    dir_names = ["memory", "logs", "preprompts", "input", "workspace"]
     directories = [tmp_path / name for name in dir_names]
 
     # Create DB objects
@@ -121,6 +121,6 @@ def test_DBs_dataclass_attributes(tmp_path):
 
     assert dbs_instance.memory == dbs[0]
     assert dbs_instance.logs == dbs[1]
-    assert dbs_instance.identity == dbs[2]
+    assert dbs_instance.preprompts == dbs[2]
     assert dbs_instance.input == dbs[3]
     assert dbs_instance.workspace == dbs[4]
