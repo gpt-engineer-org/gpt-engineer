@@ -20,10 +20,3 @@ jobs:
       - uses: pre-commit/action@v3.0.0
         with:
           extra_args: --all-files
-
-      - name: Commit and push changes
-        if: always()
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "auto-generated: 🤖 fix pre-commit"
-          file_pattern: "*"
