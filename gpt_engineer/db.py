@@ -40,6 +40,12 @@ class DB:
                     result.append(line)
             return "".join(result)
 
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
     def __setitem__(self, key, val):
         full_path = self.path / key
         full_path.parent.mkdir(parents=True, exist_ok=True)
