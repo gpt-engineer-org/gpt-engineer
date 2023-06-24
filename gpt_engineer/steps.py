@@ -48,22 +48,31 @@ def clarify(ai: AI, dbs: DBs):
     Ask the user if they want to clarify anything and save the results to the workspace
     """
     messages = [ai.fsystem(dbs.preprompts["qa"])]
-    user = dbs.input["prompt"]
+    user_input = get_prompt(dbs)
     while True:
-        messages = ai.next(messages, user)
+        messages = ai.next(messages, user_input)
 
         if messages[-1]["content"].strip().lower().startswith("no"):
-            print(" Nothing more to clarify.")
+            print("Nothing more to clarify.")
             break
 
         print()
-        user = input('(answer in text, or "c" to move on)\n')
+        user_input = input('(answer in text, or "c" to move on)\n')
         print()
 
-        if not user or user == "c":
-            break
+        if not user_input or user_input == "c":
+            print("(letting gpt-engineer make its own assumptions)")
+            print()
+            messages = ai.next(
+                messages,
+                ai.fuser(
+                    "Make your own assumptions and state them explicitly before starting"
+                ),
+            )
+            print()
+            return messages
 
-        user += (
+        user_input += (
             "\n\n"
             "Is anything else unclear? If yes, only answer in the form:\n"
             "{remaining unclear areas} remaining questions.\n"
