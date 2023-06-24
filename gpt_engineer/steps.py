@@ -145,29 +145,22 @@ def gen_code(ai: AI, dbs: DBs):
     return messages
 
 
+import subprocess
+
 def execute_entrypoint(ai, dbs):
     command = dbs.workspace["run.sh"]
 
-    print("Do you want to execute this code?")
-    print()
+    print("Do you want to execute this code?\n")
     print(command)
-    print()
-    print('If yes, press enter. Otherwise, type "no"')
-    print()
+    print("\nIf yes, press enter. Otherwise, type 'no'\n")
+    
     if input() not in ["", "y", "yes"]:
         print("Ok, not executing the code.")
         return []
-    print("Executing the code...")
-    print()
-    print(
-        "\033[92m"  # green color
-        + "Note: If it does not work as expected, consider running the code"
-        + " in another way than above."
-        + "\033[0m"
-    )
-    print()
-    print("You can press ctrl+c *once* to stop the execution.")
-    print()
+    
+    print("Executing the code...\n")
+    print("\033[92mNote: If it does not work as expected, consider running the code in another way than above.\033[0m\n")
+    print("You can press ctrl+c *once* to stop the execution.\n")
 
     subprocess.run("bash run.sh", shell=True, cwd=dbs.workspace.path)
     return []
