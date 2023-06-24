@@ -7,6 +7,7 @@ import subprocess
 
 from itertools import islice
 from pathlib import Path
+import sys
 from typing import Iterable, Union
 
 from typer import run
@@ -60,7 +61,7 @@ def main(
             print(f.read())
         print()
 
-        with contextlib.suppress(KeyboardInterrupt):
+        try:
             subprocess.run(
                 [
                     "python",
@@ -71,6 +72,8 @@ def main(
                     "execute_only",
                 ],
             )
+        except KeyboardInterrupt:
+            sys.exit(1)
 
 
 if __name__ == "__main__":
