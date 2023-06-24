@@ -1,7 +1,6 @@
 import os
 
 from unittest.mock import MagicMock
-
 import pytest
 import rudderstack.analytics as rudder_analytics
 
