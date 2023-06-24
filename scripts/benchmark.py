@@ -1,13 +1,12 @@
 # list all folders in benchmark folder
 # for each folder, run the benchmark
 
-import contextlib
 import os
 import subprocess
+import sys
 
 from itertools import islice
 from pathlib import Path
-import sys
 from typing import Iterable, Union
 
 from typer import run
