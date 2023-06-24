@@ -5,6 +5,8 @@ import subprocess
 from enum import Enum
 from typing import Callable, List, TypeVar
 
+from termcolor import colored
+
 from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.db import DBs
@@ -19,12 +21,24 @@ def setup_sys_prompt(dbs):
 Step = TypeVar("Step", bound=Callable[[AI, DBs], List[dict]])
 
 
+def get_prompt(dbs):
+    """While we migrate we have this fallback getter"""
+    assert (
+        "prompt" in dbs.input or "main_prompt" in dbs.input
+    ), "Please put your prompt in the file `prompt` in the project directory"
+
+    if "prompt" not in dbs.input:
+        print(
+            colored("Please put the prompt in the file `prompt`, not `main_prompt", "red")
+        )
+        print()
+
+    return dbs.input.get("prompt", dbs.input["main_prompt"])
+
+
 def simple_gen(ai: AI, dbs: DBs):
     """Run the AI on the main prompt and save the results"""
-    messages = ai.start(
-        setup_sys_prompt(dbs),
-        dbs.input["main_prompt"],
-    )
+    messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs))
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
@@ -34,7 +48,7 @@ def clarify(ai: AI, dbs: DBs):
     Ask the user if they want to clarify anything and save the results to the workspace
     """
     messages = [ai.fsystem(dbs.preprompts["qa"])]
-    user = dbs.input["main_prompt"]
+    user = dbs.input["prompt"]
     while True:
         messages = ai.next(messages, user)
 
@@ -68,7 +82,7 @@ def gen_spec(ai: AI, dbs: DBs):
     """
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
-        ai.fsystem(f"Instructions: {dbs.input['main_prompt']}"),
+        ai.fsystem(f"Instructions: {dbs.input['prompt']}"),
     ]
 
     messages = ai.next(messages, dbs.preprompts["spec"])
@@ -105,7 +119,7 @@ def gen_unit_tests(ai: AI, dbs: DBs):
     """
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
-        ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
+        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
         ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
     ]
 
@@ -136,7 +150,7 @@ def gen_code(ai: AI, dbs: DBs):
 
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
-        ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
+        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
         ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
         ai.fuser(f"Unit tests:\n\n{dbs.memory['unit_tests']}"),
     ]
@@ -200,7 +214,7 @@ def gen_entrypoint(ai, dbs):
 def use_feedback(ai: AI, dbs: DBs):
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
-        ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
+        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
         ai.fassistant(dbs.workspace["all_output.txt"]),
         ai.fsystem(dbs.preprompts["use_feedback"]),
     ]
@@ -213,7 +227,7 @@ def fix_code(ai: AI, dbs: DBs):
     code_output = json.loads(dbs.logs[gen_code.__name__])[-1]["content"]
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
-        ai.fuser(f"Instructions: {dbs.input['main_prompt']}"),
+        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
         ai.fuser(code_output),
         ai.fsystem(dbs.preprompts["fix_code"]),
     ]

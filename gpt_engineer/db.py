@@ -22,6 +22,12 @@ class DB:
         with full_path.open("r", encoding="utf-8") as f:
             return f.read()
 
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
     def __setitem__(self, key, val):
         full_path = self.path / key
         full_path.parent.mkdir(parents=True, exist_ok=True)
