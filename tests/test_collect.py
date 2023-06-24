@@ -1,5 +1,7 @@
 import os
 
+from unittest.mock import MagicMock
+
 import pytest
 import rudderstack.analytics as rudder_analytics
 
@@ -10,7 +12,7 @@ from gpt_engineer.steps import gen_code
 
 def test_collect_learnings(monkeypatch):
     monkeypatch.setattr(os, "environ", {"COLLECT_LEARNINGS_OPT_OUT": "false"})
-    # monkeypatch.setattr(rudder_analytics, "track", MagicMock())
+    monkeypatch.setattr(rudder_analytics, "track", MagicMock())
 
     model = "test_model"
     temperature = 0.5
