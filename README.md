@@ -52,6 +52,15 @@ With an api key that has GPT4 access run:
 
 - Check the generated files in `projects/my-new-project/workspace`
 
+**Alternate Method (Using Dev Containers)**
+
+- Clone the repo 
+  - `git clone git@github.com:AntonOsika/gpt-engineer.git`
+- Rename `.env.sample` to `.env` & put OpenAI API Key
+- Open the cloned foler in Dev Container 
+  - VS Code -> Command Palette (`ctrl + shift + p`) -> `Open Folder in Container` (Requires [this](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension installed)
+- Follow the run steps above
+
 ## Features
 
 You can specify the "identity" of the AI agent by editing the files in the `identity` folder.
