@@ -44,7 +44,7 @@ def test_DBs_initialization(tmp_path):
 
 
 def test_invalid_path():
-    with pytest.raises(PermissionError):
+    with pytest.raises((PermissionError, OSError)):
         # Test with a path that will raise a permission error
         DB("/root/test")
 

@@ -16,7 +16,7 @@ def main():
         if benchmark.is_dir():
             print(f"Cleaning {benchmark}")
             for path in benchmark.iterdir():
-                if path.name == "main_prompt":
+                if path.name in ["prompt", "main_prompt"]:
                     continue
 
                 # Get filename of Path object
