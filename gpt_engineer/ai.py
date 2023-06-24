@@ -8,6 +8,10 @@ logger = logging.getLogger(__name__)
 
 
 class AI:
+    # Fallback model to be used if API key doesn't have GPT-4 access. 
+    # Change to "gpt-3.5-turbo" for small projects to save 50% on API cost.
+    FALLBACK_MODEL = "gpt-3.5-turbo-16k"
+
     def __init__(self, model="gpt-4", temperature=0.1):
         self.temperature = temperature
 
@@ -17,10 +21,10 @@ class AI:
         except openai.InvalidRequestError:
             print(
                 f"Model {model} not available for provided API key. Reverting "
-                "to gpt-3.5-turbo. Sign up for the GPT-4 wait list here: "
+                "to {AI.FALLBACK_MODEL}. Sign up for the GPT-4 wait list here: "
                 "https://openai.com/waitlist/gpt-4-api"
             )
-            self.model = "gpt-3.5-turbo"
+            self.model = AI.FALLBACK_MODEL
 
     def start(self, system, user):
         messages = [
