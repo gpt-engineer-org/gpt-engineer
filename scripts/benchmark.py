@@ -56,7 +56,7 @@ def main(
         print("process", bench_folder.name, "finished with code", process.returncode)
         print("Running it. Original benchmark prompt:")
         print()
-        with open(bench_folder / "main_prompt") as f:
+        with open(bench_folder / "prompt") as f:
             print(f.read())
         print()
 
