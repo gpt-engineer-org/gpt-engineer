@@ -1,6 +1,3 @@
-# list all folders in benchmark folder
-# for each folder, run the benchmark
-
 import contextlib
 import os
 import subprocess
@@ -24,7 +21,7 @@ def main(
 
     benchmarks = []
     for bench_folder in folders:
-        if os.path.isdir(bench_folder):
+        if bench_folder.is_dir():
             print(f"Running benchmark for {bench_folder}")
 
             log_path = bench_folder / "log.txt"
@@ -35,7 +32,7 @@ def main(
                     "-u",  # Unbuffered output
                     "-m",
                     "gpt_engineer.main",
-                    bench_folder,
+                    str(bench_folder),
                     "--steps",
                     "benchmark",
                 ],
@@ -48,7 +45,6 @@ def main(
             print("You can stream the log file by running:")
             print(f"tail -f {log_path}")
             print()
-
     for bench_folder, process, file in benchmarks:
         process.wait()
         file.close()
@@ -60,16 +56,17 @@ def main(
             print(f.read())
         print()
 
+        port = 8000 + benchmarks.index((bench_folder, process, file))  # Assign unique port for each instance
+
         with contextlib.suppress(KeyboardInterrupt):
             subprocess.run(
                 [
-                    "python",
-                    "-m",
-                    "gpt_engineer.main",
-                    bench_folder,
-                    "--steps",
-                    "execute_only",
+                    "npx",
+                    "http-server",
+                    "-p",
+                    str(port),  # Use unique port for each instance
                 ],
+                cwd=str(bench_folder),  # Change working directory to project's directory
             )
 
 
