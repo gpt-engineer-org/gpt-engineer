@@ -1,6 +1,3 @@
-# list all folders in benchmark folder
-# for each folder, run the benchmark
-
 import contextlib
 import os
 import subprocess
@@ -11,12 +8,11 @@ from typing import Iterable, Union
 
 from typer import run
 
+from gpt_engineer.main import main as gpt_main
 
-def main(
-    n_benchmarks: Union[int, None] = None,
-):
+
+def main(n_benchmarks: Union[int, None] = None):
     path = Path("benchmark")
-
     folders: Iterable[Path] = path.iterdir()
 
     if n_benchmarks:
@@ -29,31 +25,17 @@ def main(
 
             log_path = bench_folder / "log.txt"
             log_file = open(log_path, "w")
-            process = subprocess.Popen(
-                [
-                    "python",
-                    "-u",  # Unbuffered output
-                    "-m",
-                    "gpt_engineer.main",
-                    bench_folder,
-                    "--steps",
-                    "benchmark",
-                ],
-                stdout=log_file,
-                stderr=log_file,
-                bufsize=0,
-            )
-            benchmarks.append((bench_folder, process, log_file))
+            gpt_main(bench_folder, "--steps", "benchmark")
+            benchmarks.append((bench_folder, log_file))
 
             print("You can stream the log file by running:")
             print(f"tail -f {log_path}")
             print()
 
-    for bench_folder, process, file in benchmarks:
-        process.wait()
+    for bench_folder, file in benchmarks:
         file.close()
 
-        print("process", bench_folder.name, "finished with code", process.returncode)
+        print("process", bench_folder.name, "finished")
         print("Running it. Original benchmark prompt:")
         print()
         with open(bench_folder / "prompt") as f:
@@ -61,16 +43,7 @@ def main(
         print()
 
         with contextlib.suppress(KeyboardInterrupt):
-            subprocess.run(
-                [
-                    "python",
-                    "-m",
-                    "gpt_engineer.main",
-                    bench_folder,
-                    "--steps",
-                    "execute_only",
-                ],
-            )
+            gpt_main(bench_folder, "--steps", "execute_only")
 
 
 if __name__ == "__main__":
