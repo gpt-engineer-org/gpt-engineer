@@ -1,76 +1,44 @@
-# list all folders in benchmark folder
-# for each folder, run the benchmark
-
-import contextlib
+import logging
 import os
-import subprocess
-
-from itertools import islice
 from pathlib import Path
-from typing import Iterable, Union
 
+from gpt_engineer.main import main as gpt_main
 from typer import run
 
+logging.basicConfig(filename='benchmark.log', level=logging.INFO)
 
-def main(
-    n_benchmarks: Union[int, None] = None,
-):
+
+def run_benchmark(bench_folder, steps):
+    try:
+        gpt_main(bench_folder, steps)
+    except Exception as e:
+        logging.error(f"Error running benchmark for {bench_folder}: {e}")
+
+
+def main(n_benchmarks: int = None):
     path = Path("benchmark")
-
-    folders: Iterable[Path] = path.iterdir()
+    folders = path.iterdir()
 
     if n_benchmarks:
-        folders = islice(folders, n_benchmarks)
+        folders = list(folders)[:n_benchmarks]
 
-    benchmarks = []
     for bench_folder in folders:
-        if os.path.isdir(bench_folder):
-            print(f"Running benchmark for {bench_folder}")
+        if bench_folder.is_dir():
+            logging.info(f"Running benchmark for {bench_folder}")
+            run_benchmark(bench_folder, "benchmark")
 
-            log_path = bench_folder / "log.txt"
-            log_file = open(log_path, "w")
-            process = subprocess.Popen(
-                [
-                    "python",
-                    "-u",  # Unbuffered output
-                    "-m",
-                    "gpt_engineer.main",
-                    bench_folder,
-                    "--steps",
-                    "benchmark",
-                ],
-                stdout=log_file,
-                stderr=log_file,
-                bufsize=0,
-            )
-            benchmarks.append((bench_folder, process, log_file))
+            logging.info("You can stream the log file by running:")
+            logging.info(f"tail -f benchmark.log")
+            logging.info()
 
-            print("You can stream the log file by running:")
-            print(f"tail -f {log_path}")
-            print()
+            logging.info("process", bench_folder.name, "finished with code")
+            logging.info("Running it. Original benchmark prompt:")
+            logging.info()
+            with open(bench_folder / "prompt") as f:
+                logging.info(f.read())
+            logging.info()
 
-    for bench_folder, process, file in benchmarks:
-        process.wait()
-        file.close()
-
-        print("process", bench_folder.name, "finished with code", process.returncode)
-        print("Running it. Original benchmark prompt:")
-        print()
-        with open(bench_folder / "prompt") as f:
-            print(f.read())
-        print()
-
-        with contextlib.suppress(KeyboardInterrupt):
-            subprocess.run(
-                [
-                    "python",
-                    "-m",
-                    "gpt_engineer.main",
-                    bench_folder,
-                    "--steps",
-                    "execute_only",
-                ],
-            )
+            run_benchmark(bench_folder, "execute_only")
 
 
 if __name__ == "__main__":
