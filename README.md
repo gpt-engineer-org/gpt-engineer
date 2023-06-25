@@ -1,6 +1,6 @@
 # GPT Engineer
 
-[![Discord Follow](https://dcbadge.vercel.app/api/server/4t5vXHhu?style=flat)](https://discord.gg/4t5vXHhu)
+[![Discord Follow](https://dcbadge.vercel.app/api/server/4t5vXHhu?style=flat)](https://discord.gg/8tcDQ89Ej2)
 [![GitHub Repo stars](https://img.shields.io/github/stars/AntonOsika/gpt-engineer?style=social)](https://github.com/AntonOsika/gpt-engineer)
 [![Twitter Follow](https://img.shields.io/twitter/follow/antonosika?style=social)](https://twitter.com/AntonOsika)
 
@@ -9,7 +9,7 @@
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
 
-[Demo](https://twitter.com/antonosika/status/1667641038104674306) 👶🤖
+[Demo](https://twitter.com/antonosika/status/1667641038104674306)
 
 ## Project philosophy
 
