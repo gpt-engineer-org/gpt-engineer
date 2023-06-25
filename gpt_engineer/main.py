@@ -7,7 +7,7 @@ from pathlib import Path
 import typer
 
 from gpt_engineer import steps
-from gpt_engineer.ai import AI
+from gpt_engineer.ai import AI, fallback_model
 from gpt_engineer.collect import collect_learnings
 from gpt_engineer.db import DB, DBs
 from gpt_engineer.steps import STEPS
@@ -43,6 +43,8 @@ def main(
         # Delete files and subdirectories in paths
         shutil.rmtree(memory_path, ignore_errors=True)
         shutil.rmtree(workspace_path, ignore_errors=True)
+
+    model = fallback_model(model)
 
     ai = AI(
         model=model,

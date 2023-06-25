@@ -32,8 +32,9 @@ def get_prompt(dbs):
             colored("Please put the prompt in the file `prompt`, not `main_prompt", "red")
         )
         print()
+        return dbs.input["main_prompt"]
 
-    return dbs.input.get("prompt", dbs.input["main_prompt"])
+    return dbs.input["prompt"]
 
 
 def simple_gen(ai: AI, dbs: DBs):
@@ -65,9 +66,7 @@ def clarify(ai: AI, dbs: DBs):
             print()
             messages = ai.next(
                 messages,
-                ai.fuser(
-                    "Make your own assumptions and state them explicitly before starting"
-                ),
+                "Make your own assumptions and state them explicitly before starting",
             )
             print()
             return messages
@@ -192,7 +191,16 @@ def execute_entrypoint(ai, dbs):
     print("You can press ctrl+c *once* to stop the execution.")
     print()
 
-    subprocess.run("bash run.sh", shell=True, cwd=dbs.workspace.path)
+    p = subprocess.Popen("bash run.sh", shell=True, cwd=dbs.workspace.path)
+    try:
+        p.wait()
+    except KeyboardInterrupt:
+        print("Stopping execution...")
+        print()
+        p.kill()
+        print()
+        print("Execution stopped.")
+
     return []
 
 

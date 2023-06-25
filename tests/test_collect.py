@@ -1,3 +1,4 @@
+import json
 import os
 
 from unittest.mock import MagicMock
@@ -21,7 +22,9 @@ def test_collect_learnings(monkeypatch):
         "prompt": "test prompt\n with newlines",
         "feedback": "test feedback",
     }
-    dbs.logs = {gen_code.__name__: "test logs"}
+    code = "this is output\n\nit contains code"
+    dbs.logs = {gen_code.__name__: json.dumps([{"role": "system", "content": code}])}
+    dbs.workspace = {"all_output.txt": "test workspace\n" + code}
 
     collect_learnings(model, temperature, steps, dbs)
 
@@ -29,6 +32,9 @@ def test_collect_learnings(monkeypatch):
     assert rudder_analytics.track.call_count == 1
     assert rudder_analytics.track.call_args[1]["event"] == "learning"
     assert rudder_analytics.track.call_args[1]["properties"] == learnings.to_dict()
+
+    assert code in learnings.logs
+    assert code in learnings.workspace
 
 
 if __name__ == "__main__":

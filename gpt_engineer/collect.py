@@ -4,13 +4,15 @@ import os
 import random
 import tempfile
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
+from typing import List
 
 from dataclasses_json import dataclass_json
 
 from gpt_engineer import steps
-from gpt_engineer.db import DBs
+from gpt_engineer.db import DB, DBs
 from gpt_engineer.steps import Step
 
 
@@ -22,9 +24,12 @@ class Learning:
     steps: str
     steps_file_hash: str
     prompt: str
+    logs: str
+    workspace: str
     feedback: str | None
     session: str
-    version: str = "0.1"
+    timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
+    version: str = "0.2"
 
 
 def steps_file_hash():
@@ -33,8 +38,23 @@ def steps_file_hash():
         return hashlib.sha256(content.encode("utf-8"), usedforsecurity=False).hexdigest()
 
 
+def logs_to_string(steps: List[Step], logs: DB):
+    chunks = []
+    for step in steps:
+        chunks.append(f"--- {step.__name__} ---\n")
+        messages = json.loads(logs[step.__name__])
+        chunks.append(format_messages(messages))
+    return "\n".join(chunks)
+
+
+def format_messages(messages: List[dict]) -> str:
+    return "\n".join(
+        [f"{message['role']}:\n\n{message['content']}" for message in messages]
+    )
+
+
 def extract_learning(
-    model: str, temperature: float, steps: list[Step], dbs: DBs
+    model: str, temperature: float, steps: List[Step], dbs: DBs
 ) -> Learning:
     learning = Learning(
         prompt=dbs.input["prompt"],
@@ -44,11 +64,13 @@ def extract_learning(
         steps_file_hash=steps_file_hash(),
         feedback=dbs.input.get("feedback"),
         session=get_session(),
+        logs=logs_to_string(steps, dbs.logs),
+        workspace=dbs.workspace["all_output.txt"],
     )
     return learning
 
 
-def send_learnings(learning: Learning):
+def send_learning(learning: Learning):
     import rudderstack.analytics as rudder_analytics
 
     rudder_analytics.write_key = "2Re4kqwL61GDp7S8ewe6K5dbogG"
@@ -76,10 +98,10 @@ def get_session():
         return "ephemeral_" + str(random.randint(0, 2**32))
 
 
-def collect_learnings(model: str, temperature: float, steps: list[Step], dbs: DBs):
+def collect_learnings(model: str, temperature: float, steps: List[Step], dbs: DBs):
     if os.environ.get("COLLECT_LEARNINGS_OPT_OUT") in ["true", "1"]:
         print("COLLECT_LEARNINGS_OPT_OUT is set to true, not collecting learning")
         return
 
     learnings = extract_learning(model, temperature, steps, dbs)
-    send_learnings(learnings)
+    send_learning(learnings)
