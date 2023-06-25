@@ -69,7 +69,7 @@ The gpt-engineer community is building the **open platform for devs to tinker wi
 
 If you are interested in contributing to this, we would be interested in having you!
 
-You can check for good first issues [here](https://github.com/AntonOsika/gpt-engineer/issues).
+You can check for good first issues [here](https://github.com/AntonOsika/gpt-engineer/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
 Contributing document [here](.github/CONTRIBUTING.md).
 
 We are currently looking for more maintainers and community organisers. Email anton.osika@gmail.com if you are interested in an official role.
