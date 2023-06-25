@@ -1,18 +1,18 @@
 # list all folders in benchmark folder
 # for each folder, run the benchmark
-
+import contextlib
 import os
 import subprocess
 
 from itertools import islice
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Union
 
 from typer import run
 
 
 def main(
-    n_benchmarks: int | None = None,
+    n_benchmarks: Union[int, None] = None,
 ):
     path = Path("benchmark")
 
@@ -55,11 +55,11 @@ def main(
         print("process", bench_folder.name, "finished with code", process.returncode)
         print("Running it. Original benchmark prompt:")
         print()
-        with open(bench_folder / "main_prompt") as f:
+        with open(bench_folder / "prompt") as f:
             print(f.read())
         print()
 
-        try:
+        with contextlib.suppress(KeyboardInterrupt):
             subprocess.run(
                 [
                     "python",
@@ -67,11 +67,9 @@ def main(
                     "gpt_engineer.main",
                     bench_folder,
                     "--steps",
-                    "execute_only",
+                    "evaluate",
                 ],
             )
-        except KeyboardInterrupt:
-            pass
 
 
 if __name__ == "__main__":

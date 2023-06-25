@@ -4,12 +4,11 @@ about: All templates should use this format unless there is a reason not to
 title: ''
 labels: ''
 assignees: ''
-
 ---
 
 **YOU MAY DELETE THE ENTIRE TEMPLATE BELOW.**
 
-# Issue Template
+## Issue Template
 
 ## Expected Behavior
 

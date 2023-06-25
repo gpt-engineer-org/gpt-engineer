@@ -1,0 +1,1 @@
+Create a password generator CLI tool in Python that generates strong, random passwords based on user-specified criteria, such as length and character types (letters, numbers, symbols).
