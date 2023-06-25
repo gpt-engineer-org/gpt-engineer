@@ -2,11 +2,13 @@ import json
 import os
 
 from unittest.mock import MagicMock
+
 import pytest
 import rudderstack.analytics as rudder_analytics
 
-from gpt_engineer.collect import collect_learnings, extract_learning
+from gpt_engineer.collect import collect_learnings, steps_file_hash
 from gpt_engineer.db import DB, DBs
+from gpt_engineer.learning import extract_learning
 from gpt_engineer.steps import gen_code
 
 
@@ -28,10 +30,18 @@ def test_collect_learnings(monkeypatch):
 
     collect_learnings(model, temperature, steps, dbs)
 
-    learnings = extract_learning(model, temperature, steps, dbs)
+    learnings = extract_learning(
+        model, temperature, steps, dbs, steps_file_hash=steps_file_hash()
+    )
     assert rudder_analytics.track.call_count == 1
     assert rudder_analytics.track.call_args[1]["event"] == "learning"
-    assert rudder_analytics.track.call_args[1]["properties"] == learnings.to_dict()
+    a = {
+        k: v
+        for k, v in rudder_analytics.track.call_args[1]["properties"].items()
+        if k != "timestamp"
+    }
+    b = {k: v for k, v in learnings.to_dict().items() if k != "timestamp"}
+    assert a == b
 
     assert code in learnings.logs
     assert code in learnings.workspace

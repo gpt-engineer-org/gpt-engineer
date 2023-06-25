@@ -3,13 +3,14 @@ import re
 import subprocess
 
 from enum import Enum
-from typing import Callable, List, TypeVar
+from typing import List
 
 from termcolor import colored
 
 from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.db import DBs
+from gpt_engineer.learning import human_input
 
 
 def setup_sys_prompt(dbs: DBs) -> str:
@@ -34,8 +35,7 @@ def get_prompt(dbs: DBs) -> str:
     return dbs.input["prompt"]
 
 
-# All steps below have this signature
-Step = TypeVar("Step", bound=Callable[[AI, DBs], List[dict]])
+# All steps below have the signature Step
 
 
 def simple_gen(ai: AI, dbs: DBs) -> List[dict]:
@@ -53,6 +53,9 @@ def clarify(ai: AI, dbs: DBs) -> List[dict]:
     user_input = get_prompt(dbs)
     while True:
         messages = ai.next(messages, user_input)
+
+        if messages[-1]["content"].strip() == "Nothing more to clarify.":
+            break
 
         if messages[-1]["content"].strip().lower().startswith("no"):
             print("Nothing more to clarify.")
@@ -77,7 +80,7 @@ def clarify(ai: AI, dbs: DBs) -> List[dict]:
             "Is anything else unclear? If yes, only answer in the form:\n"
             "{remaining unclear areas} remaining questions.\n"
             "{Next question}\n"
-            'If everything is sufficiently clear, only answer "no".'
+            'If everything is sufficiently clear, only answer "Nothing more to clarify.".'
         )
 
     print()
@@ -183,10 +186,11 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     print("Executing the code...")
     print()
     print(
-        "\033[92m"  # green color
-        + "Note: If it does not work as expected, consider running the code"
-        + " in another way than above."
-        + "\033[0m"
+        colored(
+            "Note: If it does not work as expected, consider running the code"
+            + " in another way than above.",
+            "green",
+        )
     )
     print()
     print("You can press ctrl+c *once* to stop the execution.")
@@ -196,16 +200,16 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     try:
         p.wait()
     except KeyboardInterrupt:
-        print("Stopping execution...")
         print()
+        print("Stopping execution.")
+        print("Execution stopped.")
         p.kill()
         print()
-        print("Execution stopped.")
 
     return []
 
 
-def gen_entrypoint(ai, dbs):
+def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     messages = ai.start(
         system=(
             "You will get information about a codebase that is currently on disk in "
@@ -254,6 +258,12 @@ def fix_code(ai: AI, dbs: DBs):
     return messages
 
 
+def human_review(ai: AI, dbs: DBs):
+    review = human_input()
+    dbs.memory["review"] = review.to_json()  # type: ignore
+    return []
+
+
 class Config(str, Enum):
     DEFAULT = "default"
     BENCHMARK = "benchmark"
@@ -273,6 +283,7 @@ STEPS = {
         gen_clarified_code,
         gen_entrypoint,
         execute_entrypoint,
+        human_review,
     ],
     Config.BENCHMARK: [simple_gen, gen_entrypoint],
     Config.SIMPLE: [simple_gen, gen_entrypoint, execute_entrypoint],
@@ -282,6 +293,7 @@ STEPS = {
         gen_code,
         gen_entrypoint,
         execute_entrypoint,
+        human_review,
     ],
     Config.TDD_PLUS: [
         gen_spec,
@@ -290,12 +302,14 @@ STEPS = {
         fix_code,
         gen_entrypoint,
         execute_entrypoint,
+        human_review,
     ],
     Config.CLARIFY: [
         clarify,
         gen_clarified_code,
         gen_entrypoint,
         execute_entrypoint,
+        human_review,
     ],
     Config.RESPEC: [
         gen_spec,
@@ -305,11 +319,12 @@ STEPS = {
         fix_code,
         gen_entrypoint,
         execute_entrypoint,
+        human_review,
     ],
-    Config.USE_FEEDBACK: [use_feedback, gen_entrypoint, execute_entrypoint],
+    Config.USE_FEEDBACK: [use_feedback, gen_entrypoint, execute_entrypoint, human_review],
     Config.EXECUTE_ONLY: [execute_entrypoint],
 }
 
 # Future steps that can be added:
 # run_tests_and_fix_files
-# execute_entrypoint_and_fix_files_if_needed
+# execute_entrypoint_and_fix_files_if_it_results_in_error
