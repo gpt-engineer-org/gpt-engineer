@@ -41,8 +41,14 @@ def main(
 
     if delete_existing:
         # Delete files and subdirectories in paths
-        shutil.rmtree(memory_path, ignore_errors=True)
-        shutil.rmtree(workspace_path, ignore_errors=True)
+        try:
+            shutil.rmtree(memory_path, ignore_errors=True)
+            shutil.rmtree(workspace_path, ignore_errors=True)
+        except Exception as e:
+            # Handle the exception
+            logging.error("An error occurred while deleting files: %s", str(e))
+
+
 
     model = fallback_model(model)
 
