@@ -59,7 +59,7 @@ def human_input() -> Review:
     print()
 
     ran = input("Did the generated code run at all? " + TERM_CHOICES)
-    while ran not in ("y", "n", "u", ""):
+    while ran not in ("y", "n", "u"):
         ran = input("Invalid input. Please enter y, n, or u: ")
 
     perfect = ""
@@ -69,12 +69,12 @@ def human_input() -> Review:
         perfect = input(
             "Did the generated code do everything you wanted? " + TERM_CHOICES
         )
-        while perfect not in ("y", "n", "u", ""):
+        while perfect not in ("y", "n", "u"):
             perfect = input("Invalid input. Please enter y, n, or u: ")
 
         if perfect != "y":
             useful = input("Did the generated code do anything useful? " + TERM_CHOICES)
-            while useful not in ("y", "n", "u", ""):
+            while useful not in ("y", "n", "u"):
                 useful = input("Invalid input. Please enter y, n, or u: ")
 
     comments = ""

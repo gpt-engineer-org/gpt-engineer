@@ -273,6 +273,7 @@ class Config(str, Enum):
     CLARIFY = "clarify"
     RESPEC = "respec"
     EXECUTE_ONLY = "execute_only"
+    EVALUATE = "evaluate"
     USE_FEEDBACK = "use_feedback"
 
 
@@ -323,6 +324,7 @@ STEPS = {
     ],
     Config.USE_FEEDBACK: [use_feedback, gen_entrypoint, execute_entrypoint, human_review],
     Config.EXECUTE_ONLY: [execute_entrypoint],
+    Config.EVALUATE: [execute_entrypoint, human_review],
 }
 
 # Future steps that can be added:
