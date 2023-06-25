@@ -37,7 +37,7 @@ class Learning:
     feedback: Optional[str]
     session: str
     review: Optional[Review]
-    timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
+    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
     version: str = "0.3"
 
 
