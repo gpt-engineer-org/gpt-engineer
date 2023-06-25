@@ -1,9 +1,9 @@
 # list all folders in benchmark folder
 # for each folder, run the benchmark
 
-import contextlib
 import os
 import subprocess
+import sys
 
 from itertools import islice
 from pathlib import Path
@@ -60,7 +60,7 @@ def main(
             print(f.read())
         print()
 
-        with contextlib.suppress(KeyboardInterrupt):
+        try:
             subprocess.run(
                 [
                     "python",
@@ -71,6 +71,8 @@ def main(
                     "evaluate",
                 ],
             )
+        except KeyboardInterrupt:
+            sys.exit(1)
 
 
 if __name__ == "__main__":

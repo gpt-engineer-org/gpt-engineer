@@ -6,7 +6,7 @@ name = "gpt-engineer"
 version = "0.0.7"
 description = "Specify what you want it to build, the AI asks for clarification, and then builds it."
 readme = "README.md"
-requires-python = ">=3"
+requires-python = ">=3.8"
 dependencies = [
   'black == 23.3.0',
   'click >= 8.0.0',
@@ -19,6 +19,16 @@ dependencies = [
   'typer >= 0.3.2',
   'rudder-sdk-python == 2.0.2',
   'dataclasses-json == 0.5.7',
+]
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
 [project.scripts]
