@@ -68,7 +68,7 @@ def main(
                     "gpt_engineer.main",
                     bench_folder,
                     "--steps",
-                    "execute_only",
+                    "evaluate",
                 ],
             )
 
