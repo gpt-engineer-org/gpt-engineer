@@ -9,4 +9,4 @@ Please beware that natural text input, such as the files `prompt` and `feedback`
 
 More information about OpenAI's terms of use [here](https://openai.com/policies/terms-of-use).
 
-You can disable storing data for each by the creators of gpt-engineer, but not OpenAI, by setting the environment variable COLLECT_LEARNINGS_OPT_OUT=true.
+You can disable storing usage data by gpt-engineer, **but not OpenAI**, by setting the environment variable COLLECT_LEARNINGS_OPT_OUT=true.
