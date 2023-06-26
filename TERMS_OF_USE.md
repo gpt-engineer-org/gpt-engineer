@@ -1,6 +1,6 @@
 # Terms of Use
 
-By using gpt-engineer you are aware of and agree to the below Terms of Use, as well as the attached [disclaimer](https://github.com/AntonOsika/gpt-engineer/blob/main/DISCLAIMER.md) of any warranty.
+By using gpt-engineer you are aware of and agree to the below Terms of Use, as well as the attached [disclaimer of warranty](https://github.com/AntonOsika/gpt-engineer/blob/main/DISCLAIMER.md).
 
 Both OpenAI, L.L.C. and the creators of gpt-engineer centrally store data
 about how gpt-engineer is used with the sole intent of improving the capability of the product.
