@@ -13,7 +13,7 @@ from gpt_engineer.steps import gen_code
 
 
 def test_collect_learnings(monkeypatch):
-    monkeypatch.setattr(os, "environ", {"COLLECT_LEARNINGS_OPT_OUT": "false"})
+    monkeypatch.setattr(os, "environ", {"COLLECT_LEARNINGS_OPT_IN": "true"})
     monkeypatch.setattr(rudder_analytics, "track", MagicMock())
 
     model = "test_model"
