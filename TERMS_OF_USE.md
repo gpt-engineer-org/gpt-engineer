@@ -2,8 +2,8 @@
 
 By using gpt-engineer you are aware of and agree to the below Terms of Use, as well as the attached [disclaimer of warranty](https://github.com/AntonOsika/gpt-engineer/blob/main/DISCLAIMER.md).
 
-Both OpenAI, L.L.C. and the creators of gpt-engineer centrally store data
-about how gpt-engineer is used with the sole intent of improving the capability of the product. Care is taken to not store any information that can be tied to a person.
+Both OpenAI, L.L.C. and the creators of gpt-engineer **store data
+about how gpt-engineer is used** with the sole intent of improving the capability of the product. Care is taken to not store any information that can be tied to a person.
 
 More information about OpenAI's terms of use [here](https://openai.com/policies/terms-of-use).
 
