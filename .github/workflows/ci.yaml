@@ -1,4 +1,4 @@
-name: Pytest Execution
+name: Pip install and pytest
 on:
   pull_request:
     branches: [main]
