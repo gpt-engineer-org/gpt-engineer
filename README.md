@@ -75,7 +75,7 @@ Contributing document [here](.github/CONTRIBUTING.md).
 We are currently looking for more maintainers and community organisers. Email anton.osika@gmail.com if you are interested in an official role.
 
 If you want to see our broader ambitions, check out the [roadmap](https://github.com/AntonOsika/gpt-engineer/blob/main/ROADMAP.md), and join
-[discord ](https://discord.gg/4t5vXHhu)
+[discord](https://discord.gg/8tcDQ89Ej2)
 to get input on how you can contribute to it.
 
 ## Example
