@@ -50,7 +50,7 @@ With an api key that has GPT4 access run:
 - `gpt-engineer projects/my-new-project`
   - (Note, `gpt-engineer --help` lets you see all available options. For example `--steps use_feedback` lets you improve/fix code in a project)
 
-By running gpt-engineer you agree to our [ToS](https://github.com/AntonOsika/gpt-engineer/TERMS_OF_USE.md).
+By running gpt-engineer you agree to our [ToS](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
 **Results**
 - Check the generated files in `projects/my-new-project/workspace`
