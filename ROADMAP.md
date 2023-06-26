@@ -35,7 +35,7 @@ You can:
 
 - Submit your first PR to address an [issue](https://github.com/AntonOsika/gpt-engineer/issues)
 - Submit PRs to address one of the items in the roadmap
-- Review your first PR/issue and propose next steps (further review, merge, close)
+- Do your first review of someone else's PR/issue and propose next steps (further review, merge, close)
 - Sign up to help [measure the progress of gpt-engineer towards recursively coding itself](https://forms.gle/TMX68mScyxQUsE6Y9)
 
 Volunteer work in any of these gets acknowledged.
