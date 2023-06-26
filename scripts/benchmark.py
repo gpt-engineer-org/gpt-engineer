@@ -5,12 +5,11 @@ from itertools import islice
 from pathlib import Path
 from typing import Iterable, Union
 from typer import run
-def main(
-    n_benchmarks: Union[int, None] = None,
-):
+def main(n_benchmarks: Union[int, None] = None):
     path = Path("benchmark")
     folders: Iterable[Path] = path.iterdir()
     if n_benchmarks:
+        port = 8000
         benchmarks = []
         for bench_folder in folders:
             if os.path.isdir(bench_folder):
@@ -26,6 +25,8 @@ def main(
                         bench_folder,
                         "--steps",
                         "benchmark",
+                        "-p",
+                        str(port),
                     ],
                     stdout=log_file,
                     stderr=log_file,
@@ -35,6 +36,8 @@ def main(
                 print("You can stream the log file by running:")
                 print(f"tail -f {log_path}")
                 print()
+                port += 1
+        print()
         for bench_folder, process, file in benchmarks:
             process.wait()
             file.close()
