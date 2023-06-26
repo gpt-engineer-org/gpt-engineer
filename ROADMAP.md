@@ -1,7 +1,5 @@
 # Roadmap
 
-We are building AGI. The first step is creating the code generation tooling of the future.
-
 There are three main milestones we believe will 2x gpt-engineer's reliability and capability:
 - Continuous evaluation of our progress
 - Make code generation become small, verifiable steps
