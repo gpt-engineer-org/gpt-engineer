@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class AI:
+    # uncomment and put your api key here if you want to save it in code
+    # openai.api_key = "sk-"
     def __init__(self, model="gpt-4", temperature=0.1):
         self.temperature = temperature
         self.model = model
