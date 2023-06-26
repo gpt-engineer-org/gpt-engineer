@@ -1,5 +1,3 @@
-# list all folders in benchmark folder
-# for each folder, run the benchmark
 import contextlib
 import os
 import subprocess
@@ -20,7 +18,7 @@ def main(
 
     if n_benchmarks:
         folders = islice(folders, n_benchmarks)
-
+    port = 8000
     benchmarks = []
     for bench_folder in folders:
         if os.path.isdir(bench_folder):
@@ -30,18 +28,17 @@ def main(
             log_file = open(log_path, "w")
             process = subprocess.Popen(
                 [
-                    "python",
-                    "-u",  # Unbuffered output
-                    "-m",
-                    "gpt_engineer.main",
-                    bench_folder,
-                    "--steps",
-                    "benchmark",
+                    "npx",
+                    "http-server",
+                    "-p",
+                    str(port),
+                    bench_folder
                 ],
                 stdout=log_file,
                 stderr=log_file,
                 bufsize=0,
             )
+            port += 1
             benchmarks.append((bench_folder, process, log_file))
 
             print("You can stream the log file by running:")
