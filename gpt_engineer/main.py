@@ -31,8 +31,14 @@ def main(
             "run prefix, if you want to run multiple variants of the same project and "
             "later compare them"
         ),
-    ),
+    ),    
+    is_azure: bool = typer.Option(False, "--azure", help="use Azure OpenAI"),
+    engine: str = typer.Option(None, help="model name as defined in "
+                               "azure opanai studio"),
 ):
+    if is_azure and not engine:
+        raise typer.Exit("When using --azure, you must provide an --engine argument.")
+
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
     input_path = Path(project_path).absolute()
@@ -44,11 +50,15 @@ def main(
         shutil.rmtree(memory_path, ignore_errors=True)
         shutil.rmtree(workspace_path, ignore_errors=True)
 
-    model = fallback_model(model)
+    if is_azure:
+        model = engine
+    else: 
+        model = fallback_model(model)
 
     ai = AI(
         model=model,
         temperature=temperature,
+        is_azure=is_azure
     )
 
     dbs = DBs(

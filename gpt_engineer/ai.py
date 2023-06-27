@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 
 import openai
 
@@ -8,9 +9,25 @@ logger = logging.getLogger(__name__)
 
 
 class AI:
-    def __init__(self, model="gpt-4", temperature=0.1):
+    def __init__(self, model="gpt-4", temperature=0.1, is_azure=False):
         self.temperature = temperature
         self.model = model
+        self.is_azure = is_azure
+
+        if self.is_azure:
+            # set up azure openai
+            if not os.getenv("AZURE_OPENAI_ENDPOINT"):
+                raise ValueError("To use Azure OpenAI models please set a "
+                                "AZURE_OPENAI_ENDPOINT enviroment variable.") 
+            if not os.getenv("AZURE_OPENAI_KEY"):
+                raise ValueError("To use Azure OpenAI models please set a "
+                                "AZURE_OPENAI_KEY enviroment variable.") 
+    
+            openai.api_type = "azure"
+            openai.api_base = os.getenv("AZURE_OPENAI_ENDPOINT") 
+            openai.api_version = "2023-05-15"
+            openai.api_key = os.getenv("AZURE_OPENAI_KEY")
+
 
     def start(self, system, user):
         messages = [
@@ -34,12 +51,18 @@ class AI:
             messages += [{"role": "user", "content": prompt}]
 
         logger.debug(f"Creating a new chat completion: {messages}")
-        response = openai.ChatCompletion.create(
-            messages=messages,
-            stream=True,
-            model=self.model,
-            temperature=self.temperature,
-        )
+
+        shared_params = {
+            "messages": messages,
+            "stream": True,
+            "temperature": self.temperature,
+        }
+        if not self.is_azure:
+            # use OpenAI's models directly
+            response = openai.ChatCompletion.create(model=self.model, **shared_params)
+        else:
+            # use Azure OpenAI
+            response = openai.ChatCompletion.create(engine=self.model, **shared_params)
 
         chat = []
         for chunk in response:
