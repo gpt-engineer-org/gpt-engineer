@@ -4,80 +4,72 @@
 [![GitHub Repo stars](https://img.shields.io/github/stars/AntonOsika/gpt-engineer?style=social)](https://github.com/AntonOsika/gpt-engineer)
 [![Twitter Follow](https://img.shields.io/twitter/follow/antonosika?style=social)](https://twitter.com/AntonOsika)
 
-
-**Specify what you want it to build, the AI asks for clarification, and then builds it.**
-
-GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
+GPT Engineer is an AI-powered tool designed to simplify code generation and help you build your codebase based on a prompt.
 
 [Demo](https://twitter.com/antonosika/status/1667641038104674306)
 
-## Project philosophy
+## Project Philosophy
 
-- Simple to get value
-- Flexible and easy to add new own "AI steps". See `steps.py`.
-- Incrementally build towards a user experience of:
-  1. high level prompting
-  2. giving feedback to the AI that it will remember over time
-- Fast handovers back and forth between AI and human
-- Simplicity, all computation is "resumable" and persisted to the filesystem
+- Easy to use and get value from
+- Flexible and extensible, allowing you to customize and teach the AI how you want your code to look
+- Iterative improvement towards a user experience that includes high-level prompting and the ability to provide feedback to the AI for better learning
+- Smooth collaboration between AI and human developers
+- Simplicity with all computation being resumable and persisted to the filesystem
 
 ## Usage
 
-Choose either **stable** or **development**.
+Choose between the **stable** or **development** release.
 
-For **stable** release:
+For the **stable** release:
 
 - `pip install gpt-engineer`
 
-For **development**:
+For the **development** release:
 - `git clone https://github.com/AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
 - `pip install -e .`
-  - (or: `make install && source venv/bin/activate` for a venv)
+  - (Alternatively, use `make install && source venv/bin/activate` for a virtual environment)
 
 **Setup**
 
-With an api key that has GPT4 access run:
+Before running GPT Engineer, ensure you have an API key with GPT4 access:
 
 - `export OPENAI_API_KEY=[your api key]`
 
+**Running GPT Engineer**:
 
-**Run**:
-
-- Create an empty folder. If inside the repo, you can run:
+- Create an empty folder. If you're inside the repository, you can run:
   - `cp -r projects/example/ projects/my-new-project`
 - Fill in the `prompt` file in your new folder
-- `gpt-engineer projects/my-new-project`
-  - (Note, `gpt-engineer --help` lets you see all available options. For example `--steps use_feedback` lets you improve/fix code in a project)
+- Run `gpt-engineer projects/my-new-project`
+  - (Note: Use `gpt-engineer --help` to see all available options. For example, `--steps use_feedback` allows you to improve or fix code in a project)
 
-By running gpt-engineer you agree to our [ToS](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
+By running GPT Engineer, you agree to our [Terms of Service](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
 **Results**
 - Check the generated files in `projects/my-new-project/workspace`
-
 
 ## Features
 
 You can specify the "identity" of the AI agent by editing the files in the `preprompts` folder.
 
-Editing the `preprompts`, and evolving how you write the project prompt, is currently how you make the agent remember things between projects.
+Editing the `preprompts` and evolving how you write the project prompt is currently the way to make the agent remember things between projects.
 
-Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
+Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder and can be rerun with `scripts/rerun_edited_message_logs.py`.
 
 ## Contributing
-The gpt-engineer community is building the **open platform for devs to tinker with and build their personal code-generation toolbox**.
+The GPT Engineer community is building an open platform for developers to experiment and build their personal code-generation toolbox.
 
-If you are interested in contributing to this, we would be interested in having you!
+If you're interested in contributing, we would love to have you on board!
 
-You can check for good first issues [here](https://github.com/AntonOsika/gpt-engineer/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
-Contributing document [here](.github/CONTRIBUTING.md).
+You can find good first issues [here](https://github.com/AntonOsika/gpt-engineer/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
+Check out the contributing guidelines [here](.github/CONTRIBUTING.md).
 
-We are currently looking for more maintainers and community organisers. Email anton.osika@gmail.com if you are interested in an official role.
+We are currently looking for more maintainers and community organizers. If you're interested in an official role, please email anton.osika@gmail.com.
 
-If you want to see our broader ambitions, check out the [roadmap](https://github.com/AntonOsika/gpt-engineer/blob/main/ROADMAP.md), and join
-[discord](https://discord.gg/8tcDQ89Ej2)
-to get input on how you can contribute to it.
+To learn more about our broader ambitions, take a look at the [roadmap](https://github.com/AntonOsika/gpt-engineer/blob/main/ROADMAP.md), and join our [Discord](https://discord.gg/8tcDQ89Ej2) community to get involved and contribute.
 
 ## Example
 
 https://github.com/AntonOsika/gpt-engineer/assets/4467025/6e362e45-4a94-4b0d-973d-393a31d92d9b
+
