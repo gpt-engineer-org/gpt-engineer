@@ -98,3 +98,8 @@ exclude = '''
   )/
 )
 '''
+
+[tool.codespell]
+skip = '.git,*.pdf,*.svg'
+#
+# ignore-words-list = ''
