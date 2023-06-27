@@ -23,8 +23,8 @@ def send_learning(learning: Learning):
 
 
 def collect_learnings(model: str, temperature: float, steps: List[Step], dbs: DBs):
-    if os.environ.get("COLLECT_LEARNINGS_OPT_OUT") in ["true", "1"]:
-        print("COLLECT_LEARNINGS_OPT_OUT is set to true, not collecting learning")
+    if os.environ.get("COLLECT_LEARNINGS_OPT_IN") in ["false", "1"]:
+        print("COLLECT_LEARNINGS_OPT_IN is set to false, not collecting learning")
         return
 
     learnings = extract_learning(
