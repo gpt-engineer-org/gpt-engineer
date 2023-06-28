@@ -52,6 +52,12 @@ With an api key that has GPT4 access run:
 
 By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
+
+- Run with other models:
+  - Azure OpenAI
+    - use `gpt-engineer projects/my-new-project --azure --engine your_model_name`
+    - this requires these environment variables: `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_KEY` and optionally `AZURE_API_VERSION`
+
 **Results**
 - Check the generated files in `projects/my-new-project/workspace`
 
