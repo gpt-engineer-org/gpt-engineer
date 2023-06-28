@@ -40,7 +40,8 @@ def get_prompt(dbs: DBs) -> str:
 
 def simple_gen(ai: AI, dbs: DBs) -> List[dict]:
     """Run the AI on the main prompt and save the results"""
-    messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs))
+    step_name = "simple_gen"
+    messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs),step_name=step_name)
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
@@ -49,10 +50,11 @@ def clarify(ai: AI, dbs: DBs) -> List[dict]:
     """
     Ask the user if they want to clarify anything and save the results to the workspace
     """
+    step_name = "clarify"
     messages = [ai.fsystem(dbs.preprompts["qa"])]
     user_input = get_prompt(dbs)
     while True:
-        messages = ai.next(messages, user_input)
+        messages = ai.next(messages, user_input, step_name=step_name)
 
         if messages[-1]["content"].strip() == "Nothing more to clarify.":
             break
@@ -71,6 +73,7 @@ def clarify(ai: AI, dbs: DBs) -> List[dict]:
             messages = ai.next(
                 messages,
                 "Make your own assumptions and state them explicitly before starting",
+                step_name=step_name
             )
             print()
             return messages
@@ -92,12 +95,13 @@ def gen_spec(ai: AI, dbs: DBs) -> List[dict]:
     Generate a spec from the main prompt + clarifications and save the results to
     the workspace
     """
+    step_name = "gen_spec"
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fsystem(f"Instructions: {dbs.input['prompt']}"),
     ]
 
-    messages = ai.next(messages, dbs.preprompts["spec"])
+    messages = ai.next(messages, dbs.preprompts["spec"], step_name=step_name)
 
     dbs.memory["specification"] = messages[-1]["content"]
 
@@ -105,10 +109,12 @@ def gen_spec(ai: AI, dbs: DBs) -> List[dict]:
 
 
 def respec(ai: AI, dbs: DBs) -> List[dict]:
+    step_name = "respec"
+
     messages = json.loads(dbs.logs[gen_spec.__name__])
     messages += [ai.fsystem(dbs.preprompts["respec"])]
 
-    messages = ai.next(messages)
+    messages = ai.next(messages, step_name=step_name)
     messages = ai.next(
         messages,
         (
@@ -119,6 +125,7 @@ def respec(ai: AI, dbs: DBs) -> List[dict]:
             "If you are satisfied with the specification, just write out the "
             "specification word by word again."
         ),
+        step_name=step_name
     )
 
     dbs.memory["specification"] = messages[-1]["content"]
@@ -129,13 +136,15 @@ def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
     """
     Generate unit tests based on the specification, that should work.
     """
+    step_name = "gen_unit_tests"
+
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
         ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
     ]
 
-    messages = ai.next(messages, dbs.preprompts["unit_tests"])
+    messages = ai.next(messages, dbs.preprompts["unit_tests"], step_name=step_name)
 
     dbs.memory["unit_tests"] = messages[-1]["content"]
     to_files(dbs.memory["unit_tests"], dbs.workspace)
@@ -145,13 +154,14 @@ def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
 
 def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     """Takes clarification and generates code"""
+    step_name = "gen_clarified_code"
 
     messages = json.loads(dbs.logs[clarify.__name__])
 
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
     ] + messages[1:]
-    messages = ai.next(messages, dbs.preprompts["use_qa"])
+    messages = ai.next(messages, dbs.preprompts["use_qa"], step_name=step_name)
 
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
@@ -159,6 +169,7 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
 
 def gen_code(ai: AI, dbs: DBs) -> List[dict]:
     # get the messages from previous step
+    step_name = "gen_code"
 
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
@@ -166,7 +177,7 @@ def gen_code(ai: AI, dbs: DBs) -> List[dict]:
         ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
         ai.fuser(f"Unit tests:\n\n{dbs.memory['unit_tests']}"),
     ]
-    messages = ai.next(messages, dbs.preprompts["use_qa"])
+    messages = ai.next(messages, dbs.preprompts["use_qa"], step_name=step_name)
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
@@ -210,6 +221,8 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
 
 
 def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
+    step_name = "gen_entrypoint"
+
     messages = ai.start(
         system=(
             "You will get information about a codebase that is currently on disk in "
@@ -224,6 +237,7 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
             "if necessary.\n"
         ),
         user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
+        step_name=step_name
     )
     print()
 
@@ -234,18 +248,20 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
 
 
 def use_feedback(ai: AI, dbs: DBs):
+    step_name = "use_feedback"
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
         ai.fassistant(dbs.workspace["all_output.txt"]),
         ai.fsystem(dbs.preprompts["use_feedback"]),
     ]
-    messages = ai.next(messages, dbs.input["feedback"])
+    messages = ai.next(messages, dbs.input["feedback"], step_name=step_name)
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
 
 def fix_code(ai: AI, dbs: DBs):
+    step_name = "fix_code"
     code_output = json.loads(dbs.logs[gen_code.__name__])[-1]["content"]
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
@@ -253,7 +269,8 @@ def fix_code(ai: AI, dbs: DBs):
         ai.fuser(code_output),
         ai.fsystem(dbs.preprompts["fix_code"]),
     ]
-    messages = ai.next(messages, "Please fix any errors in the code above.")
+    messages = ai.next(messages, "Please fix any errors in the code above.",
+                       step_name=step_name)
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
