@@ -15,7 +15,6 @@ To get started with contributing, please follow these steps:
 7. Push to the branch: `git push origin my-branch-name`.
 8. Submit a pull request to the `main` branch of the original repository.
 
-
 ## Code Style
 
 Please make sure to follow the established code style guidelines for this project. Consistent code style helps maintain readability and makes it easier for others to contribute to the project.
@@ -25,7 +24,7 @@ To enforce this we use [`pre-commit`](https://pre-commit.com/) to run [`black`](
 `pre-commit` is part of our `requirements.txt` file so you should already have it installed. If you don't, you can install the library via pip with:
 
 ```bash
-$ pip install -r requirements.txt
+$ pip install -e .
 
 # And then install the `pre-commit` hooks with:
 
@@ -35,8 +34,7 @@ $ pre-commit install
 pre-commit installed at .git/hooks/pre-commit
 ```
 
-Or you could just run `make dev-install` to install the dependencies and the hooks!
-
+Or you could just run `make dev-install` to install the dependencies and the hooks.
 
 If you are not familiar with the concept of [git hooks](https://git-scm.com/docs/githooks) and/or [`pre-commit`](https://pre-commit.com/) please read the documentation to understand how they work.
 
@@ -44,6 +42,7 @@ As an introduction of the actual workflow, here is an example of the process you
 
 Let's add a file we have modified with some errors, see how the pre-commit hooks run `black` and fails.
 `black` is set to automatically fix the issues it finds:
+
 ```bash
 $ git add chat_to_files.py
 $ git commit -m "commit message"
@@ -58,6 +57,7 @@ All done! ✨ 🍰 ✨
 ```
 
 You can see that `chat_to_files.py` is both staged and not staged for commit. This is because `black` has formatted it and now it is different from the version you have in your working directory. To fix this you can simply run `git add chat_to_files.py` again and now you can commit your changes.
+
 ```bash
 $ git status
 On branch pre-commit-setup
@@ -71,8 +71,8 @@ Changes not staged for commit:
     modified:   chat_to_files.py
 ```
 
-
 Now let's add the file again to include the latest commits and see how `ruff` fails.
+
 ```bash
 $ git add chat_to_files.py
 $ git commit -m "commit message"
@@ -86,6 +86,7 @@ Found 2 errors (2 fixed, 0 remaining).
 ```
 
 Same as before, you can see that `chat_to_files.py` is both staged and not staged for commit. This is because `ruff` has formatted it and now it is different from the version you have in your working directory. To fix this you can simply run `git add chat_to_files.py` again and now you can commit your changes.
+
 ```bash
 $ git add chat_to_files.py
 $ git commit -m "commit message"
@@ -100,12 +101,9 @@ Now your file has been committed and you can push your changes.
 
 At the beginning this might seem like a tedious process (having to add the file again after `black` and `ruff` have modified it) but it is actually very useful. It allows you to see what changes `black` and `ruff` have made to your files and make sure that they are correct before you commit them.
 
-
-
 ## Issue Tracker
 
 If you encounter any bugs, issues, or have feature requests, please [create a new issue](https://github.com/AntonOsika/gpt-engineer/issues/new) on the project's GitHub repository. Provide a clear and descriptive title along with relevant details to help us address the problem or understand your request.
-
 
 ## Licensing
 
