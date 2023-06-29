@@ -24,7 +24,7 @@ To enforce this we use [`pre-commit`](https://pre-commit.com/) to run [`black`](
 `pre-commit` is part of our `requirements.txt` file so you should already have it installed. If you don't, you can install the library via pip with:
 
 ```bash
-$ pip install -r requirements.txt
+$ pip install -e .
 
 # And then install the `pre-commit` hooks with:
 
@@ -34,7 +34,7 @@ $ pre-commit install
 pre-commit installed at .git/hooks/pre-commit
 ```
 
-Or you could just run `make dev-install` to install the dependencies and the hooks!
+Or you could just run `make dev-install` to install the dependencies and the hooks.
 
 If you are not familiar with the concept of [git hooks](https://git-scm.com/docs/githooks) and/or [`pre-commit`](https://pre-commit.com/) please read the documentation to understand how they work.
 
