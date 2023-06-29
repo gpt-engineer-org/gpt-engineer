@@ -4,13 +4,34 @@ import logging
 
 import openai
 
+import os
+
 logger = logging.getLogger(__name__)
 
+def fallback_model(model: str) -> str:
+    try:
+        openai.Model.retrieve(model)
+        return model
+    except openai.InvalidRequestError:
+        print(
+            f"Model {model} not available for provided API key. Reverting "
+            "to gpt-3.5-turbo. Sign up for the GPT-4 wait list here: "
+            "https://openai.com/waitlist/gpt-4-api\n"
+        )
+        return "gpt-3.5-turbo"
 
 class AI:
-    def __init__(self, model="gpt-4", temperature=0.1):
+    def __init__(
+            self,
+            model="gpt-4",
+            temperature=0.1,
+            openai_api_base=os.getenv("OPENAI_API_BASE", default=openai.api_base),
+        ):
         self.temperature = temperature
-        self.model = model
+
+        # model name is often irrelevant when querying locally deployed LLMs
+        self.model = fallback_model(model) if "api.openai.com/" in openai_api_base else model
+        openai.api_base = openai_api_base
 
     def start(self, system, user):
         messages = [
@@ -53,14 +74,3 @@ class AI:
         return messages
 
 
-def fallback_model(model: str) -> str:
-    try:
-        openai.Model.retrieve(model)
-        return model
-    except openai.InvalidRequestError:
-        print(
-            f"Model {model} not available for provided API key. Reverting "
-            "to gpt-3.5-turbo. Sign up for the GPT-4 wait list here: "
-            "https://openai.com/waitlist/gpt-4-api\n"
-        )
-        return "gpt-3.5-turbo"
