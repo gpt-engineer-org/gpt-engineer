@@ -4,8 +4,14 @@ import logging
 
 import openai
 
+import toml
+
 logger = logging.getLogger(__name__)
 
+secrets = toml.load(".secrets\secrets.toml")
+openaikey = secrets["OPENAI"]["openai"]
+
+openai.api_key = openaikey
 
 class AI:
     def __init__(self, model="gpt-4", temperature=0.1):
