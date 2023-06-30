@@ -49,3 +49,4 @@ scratchpad
 # Ignore GPT Engineer files
 projects
 !projects/example
+.secrets/secrets.toml
