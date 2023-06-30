@@ -152,3 +152,6 @@ def fallback_model(model: str) -> str:
             "https://openai.com/waitlist/gpt-4-api\n"
         )
         return "gpt-3.5-turbo"
+
+
+serializeMessages = AI.serializeMessages

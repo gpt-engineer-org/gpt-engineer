@@ -7,7 +7,6 @@ import typer
 
 from gpt_engineer import steps
 from gpt_engineer.ai import AI, fallback_model
-from gpt_engineer.collect import collect_learnings
 from gpt_engineer.db import DB, DBs
 from gpt_engineer.steps import STEPS
 
@@ -69,7 +68,7 @@ def main(
         dbs.logs[step.__name__] = AI.serializeMessages(messages)
         # dbs.logs[step.__name__] = json.dumps(messages)
 
-    collect_learnings(model, temperature, steps, dbs)
+    # collect_learnings(model, temperature, steps, dbs)
 
 
 if __name__ == "__main__":
