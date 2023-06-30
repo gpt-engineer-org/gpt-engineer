@@ -3,7 +3,7 @@
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt. 
 ######
-This Repository's main goal is to bring the great help that AntonOsika/gpt-engineer gave to the web.
+This Repository's main goal is to bring the great help that the AntonOsika/gpt-engineer project gave to people, but make it easier to use by adding it to the web.
 
 ## Project philosophy
 - Simple to get value
@@ -18,18 +18,6 @@ This Repository's main goal is to bring the great help that AntonOsika/gpt-engin
 
 ## Usage
 
-**Install**:
-
-- `pip install -r requirements.txt`
-- `export OPENAI_API_KEY=[your api key]`
-
-**Run**:
-- Create a new empty folder with a `main_prompt` file (or copy the example folder `cp example -r my-new-project`)
-- Fill in the `main_prompt` in your new folder
-- run `python main.py my-new-project`
-
-**Results**:
-- Check the generated files in my-new-project/workspace_clarified
 
 ### Limitations
 Implementing additional chain of thought prompting, e.g. [Reflexion](https://github.com/noahshinn024/reflexion), should be able to make it more reliable and not miss requested functionality in the main prompt.
@@ -38,17 +26,7 @@ Contributors welcome! If you are unsure what to add, check out the ideas listed 
 
 
 ## Features
-You can specify the "identity" of the AI agent by editing the files in the `identity` folder.
-
-Editing the identity, and evolving the main_prompt, is currently how you make the agent remember things between projects.
-
-Each step in steps.py will have its communication history with GPT4 stored in the logs folder, and can be rerun with scripts/rerun_edited_message_logs.py.
-
+The Features header is still under progress and is not ready. Thank you!
 
 ## Demo
-
-
-
-https://github.com/AntonOsika/gpt-engineer/assets/4467025/6e362e45-4a94-4b0d-973d-393a31d92d9b
-
-
+The Demo header is still under progress and is not ready. Thank you!
