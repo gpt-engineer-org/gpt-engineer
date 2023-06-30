@@ -1,12 +1,14 @@
-# GPT Engineer
-**Specify what you want it to build, the AI asks for clarification, and then builds it.**
+# GPT Engineer Online
+**Specify what you want it to build, the AI asks for clarification, and then builds it. Now all run in the web.**
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt. 
-
+######
+This Repository's main goal is to bring the great help that AntonOsika/gpt-engineer gave to the web.
 
 ## Project philosophy
 - Simple to get value
-- Flexible and easy to add new own "AI steps". See `steps.py`.
+- Add to the WWW
+- Flexible and easy to add new own "AI steps".
 - Incrementally build towards a user experience of:
   1. high level prompting
   2. giving feedback to the AI that it will remember over time
