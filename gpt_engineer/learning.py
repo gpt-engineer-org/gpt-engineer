@@ -10,6 +10,7 @@ from typing import List, Optional
 from dataclasses_json import dataclass_json
 from termcolor import colored
 
+from gpt_engineer.ai.AI import serializeMessages
 from gpt_engineer.db import DB, DBs
 from gpt_engineer.domain import Step
 
@@ -103,9 +104,10 @@ def logs_to_string(steps: List[Step], logs: DB):
 
 
 def format_messages(messages: List[dict]) -> str:
-    return "\n".join(
-        [f"{message['role']}:\n\n{message['content']}" for message in messages]
-    )
+    # return "\n".join(
+    #    [f"{message['role']}:\n\n{message['content']}" for message in messages]
+    # )
+    return serializeMessages(messages)  # not as pretty (yet)
 
 
 def extract_learning(

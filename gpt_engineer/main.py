@@ -1,4 +1,3 @@
-import json
 import logging
 import shutil
 
@@ -46,10 +45,15 @@ def main(
 
     model = fallback_model(model)
 
+    # langchain.llm_cache = SQLiteCache(database_path=".langchain.db")
+    # chat = ChatOpenAI()
+
     ai = AI(
         model=model,
         temperature=temperature,
     )
+
+    # langchain.llm_cache = InMemoryCache()
 
     dbs = DBs(
         memory=DB(memory_path),
@@ -62,7 +66,8 @@ def main(
     steps = STEPS[steps_config]
     for step in steps:
         messages = step(ai, dbs)
-        dbs.logs[step.__name__] = json.dumps(messages)
+        dbs.logs[step.__name__] = AI.serializeMessages(messages)
+        # dbs.logs[step.__name__] = json.dumps(messages)
 
     collect_learnings(model, temperature, steps, dbs)
 

@@ -1,4 +1,3 @@
-import json
 import re
 import subprocess
 
@@ -41,7 +40,7 @@ def get_prompt(dbs: DBs) -> str:
 def simple_gen(ai: AI, dbs: DBs) -> List[dict]:
     """Run the AI on the main prompt and save the results"""
     messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs))
-    to_files(messages[-1]["content"], dbs.workspace)
+    to_files(ai.lastMessageContent(messages), dbs.workspace)
     return messages
 
 
@@ -53,11 +52,12 @@ def clarify(ai: AI, dbs: DBs) -> List[dict]:
     user_input = get_prompt(dbs)
     while True:
         messages = ai.next(messages, user_input)
+        msg = ai.lastMessageContent(messages)
 
-        if messages[-1]["content"].strip() == "Nothing more to clarify.":
+        if msg == "Nothing more to clarify.":
             break
 
-        if messages[-1]["content"].strip().lower().startswith("no"):
+        if msg.lower().startswith("no"):
             print("Nothing more to clarify.")
             break
 
@@ -99,13 +99,14 @@ def gen_spec(ai: AI, dbs: DBs) -> List[dict]:
 
     messages = ai.next(messages, dbs.preprompts["spec"])
 
-    dbs.memory["specification"] = messages[-1]["content"]
+    dbs.memory["specification"] = ai.lastMessageContent(messages)
 
     return messages
 
 
 def respec(ai: AI, dbs: DBs) -> List[dict]:
-    messages = json.loads(dbs.logs[gen_spec.__name__])
+    # messages = json.loads(dbs.logs[gen_spec.__name__])
+    messages = AI.deserializeMessages(dbs.logs[gen_spec.__name__])
     messages += [ai.fsystem(dbs.preprompts["respec"])]
 
     messages = ai.next(messages)
@@ -121,7 +122,7 @@ def respec(ai: AI, dbs: DBs) -> List[dict]:
         ),
     )
 
-    dbs.memory["specification"] = messages[-1]["content"]
+    dbs.memory["specification"] = ai.lastMessageContent(messages)
     return messages
 
 
@@ -137,7 +138,7 @@ def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
 
     messages = ai.next(messages, dbs.preprompts["unit_tests"])
 
-    dbs.memory["unit_tests"] = messages[-1]["content"]
+    dbs.memory["unit_tests"] = ai.lastMessageContent(messages)
     to_files(dbs.memory["unit_tests"], dbs.workspace)
 
     return messages
@@ -146,14 +147,15 @@ def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
 def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     """Takes clarification and generates code"""
 
-    messages = json.loads(dbs.logs[clarify.__name__])
+    # messages = json.loads(dbs.logs[clarify.__name__])
+    messages = AI.deserializeMessages(dbs.logs[clarify.__name__])
 
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
     ] + messages[1:]
     messages = ai.next(messages, dbs.preprompts["use_qa"])
 
-    to_files(messages[-1]["content"], dbs.workspace)
+    to_files(ai.lastMessageContent(messages), dbs.workspace)
     return messages
 
 
@@ -167,7 +169,7 @@ def gen_code(ai: AI, dbs: DBs) -> List[dict]:
         ai.fuser(f"Unit tests:\n\n{dbs.memory['unit_tests']}"),
     ]
     messages = ai.next(messages, dbs.preprompts["use_qa"])
-    to_files(messages[-1]["content"], dbs.workspace)
+    to_files(ai.lastMessageContent(messages), dbs.workspace)
     return messages
 
 
@@ -228,7 +230,7 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     print()
 
     regex = r"```\S*\n(.+?)```"
-    matches = re.finditer(regex, messages[-1]["content"], re.DOTALL)
+    matches = re.finditer(regex, ai.lastMessageContent(messages), re.DOTALL)
     dbs.workspace["run.sh"] = "\n".join(match.group(1) for match in matches)
     return messages
 
@@ -241,12 +243,14 @@ def use_feedback(ai: AI, dbs: DBs):
         ai.fsystem(dbs.preprompts["use_feedback"]),
     ]
     messages = ai.next(messages, dbs.input["feedback"])
-    to_files(messages[-1]["content"], dbs.workspace)
+    to_files(ai.lastMessageContent(messages), dbs.workspace)
     return messages
 
 
 def fix_code(ai: AI, dbs: DBs):
-    code_output = json.loads(dbs.logs[gen_code.__name__])[-1]["content"]
+    # code_output = json.loads(dbs.logs[gen_code.__name__])[-1]["content"]
+    messages = AI.deserializeMessages(dbs.logs[gen_code.__name__])
+    code_output = ai.lastMessageContent(messages)
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
@@ -254,7 +258,7 @@ def fix_code(ai: AI, dbs: DBs):
         ai.fsystem(dbs.preprompts["fix_code"]),
     ]
     messages = ai.next(messages, "Please fix any errors in the code above.")
-    to_files(messages[-1]["content"], dbs.workspace)
+    to_files(ai.lastMessageContent(messages), dbs.workspace)
     return messages
 
 
