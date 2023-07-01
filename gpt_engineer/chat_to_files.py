@@ -1,5 +1,5 @@
 import re
-
+import os
 
 def parse_chat(chat):  # -> List[Tuple[str, str]]:
     # Get all ``` blocks and preceding filenames
@@ -40,3 +40,23 @@ def to_files(chat, workspace):
     files = parse_chat(chat)
     for file_name, file_content in files:
         workspace[file_name] = file_content
+
+def getCodeStrings(input):
+    filesPaths = input["file_list.txt"].split('\n')
+    filesDict = {}
+    for filePath in filesPaths:
+        with open(filePath, 'r') as file:
+            fileData = file.read()
+            fileName = os.path.basename(filePath).split('/')[-1]
+            filesDict[fileName] = fileData
+    print(filesDict)
+    return filesDict
+
+def formatFileToInput(fileName, fileContent):
+    filestr = f'''
+    {fileName}
+    ```
+    {fileContent}
+    ```
+    '''
+    return filestr
