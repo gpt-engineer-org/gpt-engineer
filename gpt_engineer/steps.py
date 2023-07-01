@@ -9,7 +9,7 @@ from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from termcolor import colored
 
 from gpt_engineer.ai import AI
-from gpt_engineer.chat_to_files import to_files, getCodeStrings, formatFileToInput
+from gpt_engineer.chat_to_files import formatFileToInput, getCodeStrings, to_files
 from gpt_engineer.db import DBs
 from gpt_engineer.learning import human_input
 
@@ -268,7 +268,8 @@ def use_feedback(ai: AI, dbs: DBs):
 
 def improve_existing_code(ai: AI, dbs: DBs):
     """
-    Based on a list of existing files, ask the AI agent to improve, fix or add a new functionality
+    Based on a list of existing files, ask the AI agent to
+    improve, fix or add a new functionality
     Necessary to have a 'file_list.txt' and a 'prompt' in the project folder.
     The file_list.txt should have the path of the code to be changed
     The prompt should have the request for change.
