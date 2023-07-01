@@ -15,7 +15,8 @@ from gpt_engineer.learning import human_input
 
 def setup_sys_prompt(dbs: DBs) -> str:
     return (
-        dbs.preprompts["generate"] + "\nUseful to know:\n" + dbs.preprompts["philosophy"]
+        dbs.preprompts["generate"] + "\nUseful to know:\n" +
+        dbs.preprompts["philosophy"]
     )
 
 
@@ -27,7 +28,8 @@ def get_prompt(dbs: DBs) -> str:
 
     if "prompt" not in dbs.input:
         print(
-            colored("Please put the prompt in the file `prompt`, not `main_prompt", "red")
+            colored(
+                "Please put the prompt in the file `prompt`, not `main_prompt", "red")
         )
         print()
         return dbs.input["main_prompt"]
@@ -223,7 +225,8 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
             "Do not use placeholders, use example values (like . for a folder argument) "
             "if necessary.\n"
         ),
-        user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
+        user="Information about the codebase:\n\n" +
+        dbs.workspace["all_output.txt"],
     )
     print()
 
@@ -255,6 +258,50 @@ def fix_code(ai: AI, dbs: DBs):
     ]
     messages = ai.next(messages, "Please fix any errors in the code above.")
     to_files(messages[-1]["content"], dbs.workspace)
+    return messages
+
+
+def integration_testing(ai: AI, dbs: DBs) -> List[dict]:
+    """
+    Determine the command to run tests based on the logs, execute it, and handle test failures.
+    """
+
+    messages = [
+        ai.fsystem(setup_sys_prompt(dbs)),
+        ai.fuser(f"Unit tests:\n\n{dbs.memory['unit_tests']}"),
+        ai.fuser(f"Logs:\n\n{dbs.workspace['all_output.txt']}"),
+    ]
+
+    messages = ai.next(
+        messages,
+        "Please put the command to run the integration tests in a file called test.sh in the current workspace."
+    )
+
+    to_files(messages[-1]["content"], dbs.workspace)
+
+    while True:
+        p = subprocess.Popen("bash test.sh", stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, shell=True, cwd=dbs.workspace.path)
+
+        try:
+            test_output, test_errors = p.communicate()
+        except Exception as e:
+            print(
+                f"An error occurred while running the integration tests: {e}")
+            continue
+
+        if p.returncode == 0:
+            break
+        else:
+            messages = ai.next(
+                messages,
+                f"The following issues were found when running the integration tests:\n{test_errors}"
+                f"\nAnd here is the test output:\n{test_output}"
+                f"\nPlease suggest ways to fix these issues by modifying `test.sh`."
+            )
+            to_files(messages[-1]["content"], dbs.workspace)
+
+    print("Integration tests good!")
     return messages
 
 
@@ -300,7 +347,7 @@ STEPS = {
         gen_spec,
         gen_unit_tests,
         gen_code,
-        fix_code,
+        integration_testing,
         gen_entrypoint,
         execute_entrypoint,
         human_review,
