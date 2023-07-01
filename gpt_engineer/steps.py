@@ -21,12 +21,15 @@ def setup_sys_prompt(dbs: DBs) -> str:
         dbs.preprompts["generate"] + "\nUseful to know:\n" + dbs.preprompts["philosophy"]
     )
 
+
 def setup_sys_prompt_existing_code(dbs: DBs) -> str:
     """
     Similar to code generation, but using an existing code base.
     """
     return (
-        dbs.preprompts["implement_on_existing"] + "\nUseful to know:\n" + dbs.preprompts["philosophy"]
+        dbs.preprompts["implement_on_existing"]
+        + "\nUseful to know:\n"
+        + dbs.preprompts["philosophy"]
     )
 
 
@@ -262,6 +265,7 @@ def use_feedback(ai: AI, dbs: DBs):
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
 
+
 def improve_existing_code(ai: AI, dbs: DBs):
     """
     Based on a list of existing files, ask the AI agent to improve, fix or add a new functionality
@@ -272,7 +276,7 @@ def improve_existing_code(ai: AI, dbs: DBs):
     filesInfo = getCodeStrings(dbs.input)
     messages = [
         ai.fsystem(setup_sys_prompt_existing_code(dbs)),
-        ai.fuser(f"Instructions: {dbs.input['prompt']}")
+        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
     ]
     # Add files as input
     for filename, filestr in filesInfo.items():
@@ -368,7 +372,7 @@ STEPS = {
     Config.USE_FEEDBACK: [use_feedback, gen_entrypoint, execute_entrypoint, human_review],
     Config.EXECUTE_ONLY: [execute_entrypoint],
     Config.EVALUATE: [execute_entrypoint, human_review],
-    Config.IMPROVE_CODE: [improve_existing_code]
+    Config.IMPROVE_CODE: [improve_existing_code],
 }
 
 # Future steps that can be added:
