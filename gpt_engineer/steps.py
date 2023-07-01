@@ -19,6 +19,9 @@ def setup_sys_prompt(dbs: DBs) -> str:
     )
 
 def setup_sys_prompt_existing_code(dbs: DBs) -> str:
+    """
+    Similar to code generation, but using an existing code base.
+    """
     return (
         dbs.preprompts["implement_on_existing"] + "\nUseful to know:\n" + dbs.preprompts["philosophy"]
     )
@@ -250,6 +253,12 @@ def use_feedback(ai: AI, dbs: DBs):
     return messages
 
 def improve_existing_code(ai: AI, dbs: DBs):
+    """
+    Based on a list of existing files, ask the AI agent to improve, fix or add a new functionality
+    Necessary to have a 'file_list.txt' and a 'prompt' in the project folder.
+    The file_list.txt should have the path of the code to be changed
+    The prompt should have the request for change.
+    """
     filesInfo = getCodeStrings(dbs.input)
     messages = [
         ai.fsystem(setup_sys_prompt_existing_code(dbs)),

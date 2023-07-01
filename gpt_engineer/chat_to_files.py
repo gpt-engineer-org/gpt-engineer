@@ -41,6 +41,7 @@ def to_files(chat, workspace):
     for file_name, file_content in files:
         workspace[file_name] = file_content
 
+# Get code content from a code list
 def getCodeStrings(input):
     filesPaths = input["file_list.txt"].split('\n')
     filesDict = {}
@@ -49,9 +50,9 @@ def getCodeStrings(input):
             fileData = file.read()
             fileName = os.path.basename(filePath).split('/')[-1]
             filesDict[fileName] = fileData
-    print(filesDict)
     return filesDict
 
+# Format file for inputing to chat prompt
 def formatFileToInput(fileName, fileContent):
     filestr = f'''
     {fileName}
