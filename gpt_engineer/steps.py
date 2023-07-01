@@ -3,25 +3,23 @@ import re
 import subprocess
 
 from enum import Enum
-from typing import Callable, List, TypeVar
+from typing import List
 
 from termcolor import colored
 
 from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.db import DBs
+from gpt_engineer.learning import human_input
 
 
-def setup_sys_prompt(dbs):
+def setup_sys_prompt(dbs: DBs) -> str:
     return (
         dbs.preprompts["generate"] + "\nUseful to know:\n" + dbs.preprompts["philosophy"]
     )
 
 
-Step = TypeVar("Step", bound=Callable[[AI, DBs], List[dict]])
-
-
-def get_prompt(dbs):
+def get_prompt(dbs: DBs) -> str:
     """While we migrate we have this fallback getter"""
     assert (
         "prompt" in dbs.input or "main_prompt" in dbs.input
@@ -32,18 +30,22 @@ def get_prompt(dbs):
             colored("Please put the prompt in the file `prompt`, not `main_prompt", "red")
         )
         print()
+        return dbs.input["main_prompt"]
 
-    return dbs.input.get("prompt", dbs.input["main_prompt"])
+    return dbs.input["prompt"]
 
 
-def simple_gen(ai: AI, dbs: DBs):
+# All steps below have the signature Step
+
+
+def simple_gen(ai: AI, dbs: DBs) -> List[dict]:
     """Run the AI on the main prompt and save the results"""
     messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs))
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
 
-def clarify(ai: AI, dbs: DBs):
+def clarify(ai: AI, dbs: DBs) -> List[dict]:
     """
     Ask the user if they want to clarify anything and save the results to the workspace
     """
@@ -51,6 +53,9 @@ def clarify(ai: AI, dbs: DBs):
     user_input = get_prompt(dbs)
     while True:
         messages = ai.next(messages, user_input)
+
+        if messages[-1]["content"].strip() == "Nothing more to clarify.":
+            break
 
         if messages[-1]["content"].strip().lower().startswith("no"):
             print("Nothing more to clarify.")
@@ -65,9 +70,7 @@ def clarify(ai: AI, dbs: DBs):
             print()
             messages = ai.next(
                 messages,
-                ai.fuser(
-                    "Make your own assumptions and state them explicitly before starting"
-                ),
+                "Make your own assumptions and state them explicitly before starting",
             )
             print()
             return messages
@@ -77,14 +80,14 @@ def clarify(ai: AI, dbs: DBs):
             "Is anything else unclear? If yes, only answer in the form:\n"
             "{remaining unclear areas} remaining questions.\n"
             "{Next question}\n"
-            'If everything is sufficiently clear, only answer "no".'
+            'If everything is sufficiently clear, only answer "Nothing more to clarify.".'
         )
 
     print()
     return messages
 
 
-def gen_spec(ai: AI, dbs: DBs):
+def gen_spec(ai: AI, dbs: DBs) -> List[dict]:
     """
     Generate a spec from the main prompt + clarifications and save the results to
     the workspace
@@ -101,7 +104,7 @@ def gen_spec(ai: AI, dbs: DBs):
     return messages
 
 
-def respec(ai: AI, dbs: DBs):
+def respec(ai: AI, dbs: DBs) -> List[dict]:
     messages = json.loads(dbs.logs[gen_spec.__name__])
     messages += [ai.fsystem(dbs.preprompts["respec"])]
 
@@ -122,7 +125,7 @@ def respec(ai: AI, dbs: DBs):
     return messages
 
 
-def gen_unit_tests(ai: AI, dbs: DBs):
+def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
     """
     Generate unit tests based on the specification, that should work.
     """
@@ -140,8 +143,8 @@ def gen_unit_tests(ai: AI, dbs: DBs):
     return messages
 
 
-def gen_clarified_code(ai: AI, dbs: DBs):
-    # get the messages from previous step
+def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
+    """Takes clarification and generates code"""
 
     messages = json.loads(dbs.logs[clarify.__name__])
 
@@ -154,7 +157,7 @@ def gen_clarified_code(ai: AI, dbs: DBs):
     return messages
 
 
-def gen_code(ai: AI, dbs: DBs):
+def gen_code(ai: AI, dbs: DBs) -> List[dict]:
     # get the messages from previous step
 
     messages = [
@@ -168,7 +171,7 @@ def gen_code(ai: AI, dbs: DBs):
     return messages
 
 
-def execute_entrypoint(ai, dbs):
+def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     command = dbs.workspace["run.sh"]
 
     print("Do you want to execute this code?")
@@ -183,20 +186,30 @@ def execute_entrypoint(ai, dbs):
     print("Executing the code...")
     print()
     print(
-        "\033[92m"  # green color
-        + "Note: If it does not work as expected, consider running the code"
-        + " in another way than above."
-        + "\033[0m"
+        colored(
+            "Note: If it does not work as expected, consider running the code"
+            + " in another way than above.",
+            "green",
+        )
     )
     print()
     print("You can press ctrl+c *once* to stop the execution.")
     print()
 
-    subprocess.run("bash run.sh", shell=True, cwd=dbs.workspace.path)
+    p = subprocess.Popen("bash run.sh", shell=True, cwd=dbs.workspace.path)
+    try:
+        p.wait()
+    except KeyboardInterrupt:
+        print()
+        print("Stopping execution.")
+        print("Execution stopped.")
+        p.kill()
+        print()
+
     return []
 
 
-def gen_entrypoint(ai, dbs):
+def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     messages = ai.start(
         system=(
             "You will get information about a codebase that is currently on disk in "
@@ -245,6 +258,12 @@ def fix_code(ai: AI, dbs: DBs):
     return messages
 
 
+def human_review(ai: AI, dbs: DBs):
+    review = human_input()
+    dbs.memory["review"] = review.to_json()  # type: ignore
+    return []
+
+
 class Config(str, Enum):
     DEFAULT = "default"
     BENCHMARK = "benchmark"
@@ -254,6 +273,7 @@ class Config(str, Enum):
     CLARIFY = "clarify"
     RESPEC = "respec"
     EXECUTE_ONLY = "execute_only"
+    EVALUATE = "evaluate"
     USE_FEEDBACK = "use_feedback"
 
 
@@ -264,6 +284,7 @@ STEPS = {
         gen_clarified_code,
         gen_entrypoint,
         execute_entrypoint,
+        human_review,
     ],
     Config.BENCHMARK: [simple_gen, gen_entrypoint],
     Config.SIMPLE: [simple_gen, gen_entrypoint, execute_entrypoint],
@@ -273,6 +294,7 @@ STEPS = {
         gen_code,
         gen_entrypoint,
         execute_entrypoint,
+        human_review,
     ],
     Config.TDD_PLUS: [
         gen_spec,
@@ -281,12 +303,14 @@ STEPS = {
         fix_code,
         gen_entrypoint,
         execute_entrypoint,
+        human_review,
     ],
     Config.CLARIFY: [
         clarify,
         gen_clarified_code,
         gen_entrypoint,
         execute_entrypoint,
+        human_review,
     ],
     Config.RESPEC: [
         gen_spec,
@@ -296,11 +320,13 @@ STEPS = {
         fix_code,
         gen_entrypoint,
         execute_entrypoint,
+        human_review,
     ],
-    Config.USE_FEEDBACK: [use_feedback, gen_entrypoint, execute_entrypoint],
+    Config.USE_FEEDBACK: [use_feedback, gen_entrypoint, execute_entrypoint, human_review],
     Config.EXECUTE_ONLY: [execute_entrypoint],
+    Config.EVALUATE: [execute_entrypoint, human_review],
 }
 
 # Future steps that can be added:
 # run_tests_and_fix_files
-# execute_entrypoint_and_fix_files_if_needed
+# execute_entrypoint_and_fix_files_if_it_results_in_error

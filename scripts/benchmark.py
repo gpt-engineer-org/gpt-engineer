@@ -1,6 +1,5 @@
 # list all folders in benchmark folder
 # for each folder, run the benchmark
-
 import contextlib
 import os
 import subprocess
@@ -68,7 +67,7 @@ def main(
                     "gpt_engineer.main",
                     bench_folder,
                     "--steps",
-                    "execute_only",
+                    "evaluate",
                 ],
             )
 

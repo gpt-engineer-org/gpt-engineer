@@ -3,22 +3,32 @@ requires = ["setuptools", "wheel"]
 
 [project]
 name = "gpt-engineer"
-version = "0.0.6"
+version = "0.0.7"
 description = "Specify what you want it to build, the AI asks for clarification, and then builds it."
 readme = "README.md"
-requires-python = ">=3"
+requires-python = ">=3.8"
 dependencies = [
   'black == 23.3.0',
+  'click >= 8.0.0',
   'mypy == 1.3.0',
   'openai == 0.27.8',
   'pre-commit == 3.3.3',
   'pytest == 7.3.1',
   'ruff == 0.0.272',
   'termcolor==2.3.0',
-  'typer == 0.9.0',
-  'requests == 2.28.2',
+  'typer >= 0.3.2',
   'rudder-sdk-python == 2.0.2',
   'dataclasses-json == 0.5.7',
+]
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
 [project.scripts]
@@ -27,7 +37,6 @@ gpt-engineer = 'gpt_engineer.main:app'
 [tool.setuptools]
 packages = ["gpt_engineer"]
 
-# https://beta.ruff.rs/docs/configuration/#using-rufftoml
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
 line-length = 90
@@ -56,7 +65,6 @@ exclude = [
 "Homepage" = "https://github.com/AntonOsika/gpt-engineer"
 "Bug Tracker" = "https://github.com/AntonOsika/gpt-engineer/issues"
 
-
 [tool.ruff.isort]
 known-first-party = []
 known-third-party = []
@@ -71,7 +79,6 @@ combine-as-imports = true
 split-on-trailing-comma = false
 lines-between-types = 1
 
-# https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html
 [tool.black]
 line-length = 90
 target-version = ["py311"]
