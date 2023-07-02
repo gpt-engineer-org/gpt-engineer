@@ -7,6 +7,7 @@ import typer
 
 from gpt_engineer import steps
 from gpt_engineer.ai import AI, fallback_model
+from gpt_engineer.collect import collect_learnings
 from gpt_engineer.db import DB, DBs
 from gpt_engineer.steps import STEPS
 
@@ -17,7 +18,7 @@ app = typer.Typer()
 def main(
     project_path: str = typer.Argument("example", help="path"),
     delete_existing: bool = typer.Argument(False, help="delete existing files"),
-    model: str = typer.Argument("gpt-4", help="model id string"),
+    modelid: str = typer.Argument("gpt-4", help="model id string"),
     temperature: float = 0.1,
     steps_config: steps.Config = typer.Option(
         steps.Config.DEFAULT, "--steps", "-s", help="decide which steps to run"
@@ -42,17 +43,12 @@ def main(
         shutil.rmtree(memory_path, ignore_errors=True)
         shutil.rmtree(workspace_path, ignore_errors=True)
 
-    model = fallback_model(model)
-
-    # langchain.llm_cache = SQLiteCache(database_path=".langchain.db")
-    # chat = ChatOpenAI()
+    modelid = fallback_model(modelid)
 
     ai = AI(
-        model=model,
+        modelid=modelid,
         temperature=temperature,
     )
-
-    # langchain.llm_cache = InMemoryCache()
 
     dbs = DBs(
         memory=DB(memory_path),
@@ -66,9 +62,8 @@ def main(
     for step in steps:
         messages = step(ai, dbs)
         dbs.logs[step.__name__] = AI.serializeMessages(messages)
-        # dbs.logs[step.__name__] = json.dumps(messages)
 
-    # collect_learnings(model, temperature, steps, dbs)
+    collect_learnings(modelid, temperature, steps, dbs)
 
 
 if __name__ == "__main__":

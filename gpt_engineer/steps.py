@@ -105,7 +105,6 @@ def gen_spec(ai: AI, dbs: DBs) -> List[dict]:
 
 
 def respec(ai: AI, dbs: DBs) -> List[dict]:
-    # messages = json.loads(dbs.logs[gen_spec.__name__])
     messages = AI.deserializeMessages(dbs.logs[gen_spec.__name__])
     messages += [ai.fsystem(dbs.preprompts["respec"])]
 
@@ -147,7 +146,6 @@ def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
 def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     """Takes clarification and generates code"""
 
-    # messages = json.loads(dbs.logs[clarify.__name__])
     messages = AI.deserializeMessages(dbs.logs[clarify.__name__])
 
     messages = [
@@ -248,7 +246,6 @@ def use_feedback(ai: AI, dbs: DBs):
 
 
 def fix_code(ai: AI, dbs: DBs):
-    # code_output = json.loads(dbs.logs[gen_code.__name__])[-1]["content"]
     messages = AI.deserializeMessages(dbs.logs[gen_code.__name__])
     code_output = ai.lastMessageContent(messages)
     messages = [
