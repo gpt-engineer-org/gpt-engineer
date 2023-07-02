@@ -1,9 +1,6 @@
 import hashlib
-import os
 
 from typing import List
-
-from termcolor import colored
 
 from gpt_engineer import steps
 from gpt_engineer.db import DBs
