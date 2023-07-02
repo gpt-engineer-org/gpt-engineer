@@ -58,7 +58,6 @@ def main(
     steps = STEPS[steps_config]
     for step in steps:
         messages = step(ai, dbs)
-        # TODO: Don't dump if step returns None
         # human_review, archive don't need to be dumped
         dbs.logs[step.__name__] = json.dumps(messages)
 
