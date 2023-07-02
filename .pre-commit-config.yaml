@@ -36,4 +36,3 @@ repos:
     rev: v2.2.5
     hooks:
     - id: codespell
-      additional_dependencies: [tomli]
