@@ -56,3 +56,5 @@ projects
 # Benchmark files
 benchmark
 !benchmark/*/prompt
+
+.gpte_consent

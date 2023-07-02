@@ -8,6 +8,7 @@ import typer
 from gpt_engineer.ai import AI, fallback_model
 from gpt_engineer.collect import collect_learnings
 from gpt_engineer.db import DB, DBs, archive
+from gpt_engineer.learning import collect_consent
 from gpt_engineer.steps import STEPS, Config as StepsConfig
 
 app = typer.Typer()
@@ -57,7 +58,8 @@ def main(
         messages = step(ai, dbs)
         dbs.logs[step.__name__] = json.dumps(messages)
 
-    collect_learnings(model, temperature, steps, dbs)
+    if collect_consent():
+        collect_learnings(model, temperature, steps, dbs)
 
 
 if __name__ == "__main__":
