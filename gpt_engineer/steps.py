@@ -8,7 +8,7 @@ from typing import List
 from termcolor import colored
 
 from gpt_engineer.ai import AI
-from gpt_engineer.chat_to_files import formatFileToInput, getCodeStrings, to_files
+from gpt_engineer.chat_to_files import format_file_to_input, get_code_strings, to_files
 from gpt_engineer.db import DBs
 from gpt_engineer.learning import human_input
 
@@ -264,14 +264,14 @@ def improve_existing_code(ai: AI, dbs: DBs):
     The file_list.txt should have the path of the code to be changed
     The prompt should have the request for change.
     """
-    filesInfo = getCodeStrings(dbs.input)
+    filesInfo = get_code_strings(dbs.input)
     messages = [
         ai.fsystem(setup_sys_prompt_existing_code(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
     ]
     # Add files as input
     for filename, filestr in filesInfo.items():
-        codeInput = formatFileToInput(filename, filestr)
+        codeInput = format_file_to_input(filename, filestr)
         messages.append(ai.fuser(f"{codeInput}"))
 
     messages = ai.next(messages)
