@@ -1,0 +1,1 @@
+Create a CLI tool in Python that allows users to resize images by specifying the desired width and height. Use the Pillow library for image manipulation.

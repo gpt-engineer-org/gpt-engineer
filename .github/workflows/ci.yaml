@@ -1,0 +1,30 @@
+name: Pip install and pytest
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "**.py"
+  push:
+    branches: [main]
+    paths:
+      - "**.py"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - name: Install package
+        run: pip install -e .
+
+      - name: Install test runner
+        run: pip install pytest pytest-cov
+
+      - name: Run unit tests
+        run: pytest --cov=gpt_engineer
