@@ -14,6 +14,8 @@ FILENAME
 CODE
 ```
 
+Do not comment on what every file does
+
 You will start with the "entrypoint" file, then go to the ones that are imported by that file, and so on.
 Please note that the code should be fully functional. No placeholders.
 

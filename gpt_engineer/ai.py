@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 
+from typing import Dict, List
+
 import openai
 
 logger = logging.getLogger(__name__)
@@ -29,7 +31,7 @@ class AI:
     def fassistant(self, msg):
         return {"role": "assistant", "content": msg}
 
-    def next(self, messages: list[dict[str, str]], prompt=None):
+    def next(self, messages: List[Dict[str, str]], prompt=None):
         if prompt:
             messages += [{"role": "user", "content": prompt}]
 
