@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 
 # This class represents a simple database that stores its data as files in a directory.
@@ -47,3 +48,4 @@ class DBs:
     preprompts: DB
     input: DB
     workspace: DB
+    archive: DB

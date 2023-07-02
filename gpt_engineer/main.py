@@ -1,6 +1,6 @@
 import json
 import logging
-import shutil
+import os
 
 from pathlib import Path
 
@@ -18,7 +18,6 @@ app = typer.Typer()
 @app.command()
 def main(
     project_path: str = typer.Argument("example", help="path"),
-    delete_existing: bool = typer.Argument(False, help="delete existing files"),
     model: str = typer.Argument("gpt-4", help="model id string"),
     temperature: float = 0.1,
     steps_config: steps.Config = typer.Option(
@@ -35,28 +34,25 @@ def main(
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
-    input_path = Path(project_path).absolute()
-    memory_path = input_path / f"{run_prefix}memory"
-    workspace_path = input_path / f"{run_prefix}workspace"
-
-    if delete_existing:
-        # Delete files and subdirectories in paths
-        shutil.rmtree(memory_path, ignore_errors=True)
-        shutil.rmtree(workspace_path, ignore_errors=True)
-
     model = fallback_model(model)
-
     ai = AI(
         model=model,
         temperature=temperature,
     )
 
+    input_path = Path(project_path).absolute()
+    memory_path = input_path / f"{run_prefix}memory"
+    workspace_path = input_path / f"{run_prefix}workspace"
+    archive_path = input_path / f"{run_prefix}archive"
+
+    initial_run = not os.path.exists(memory_path) and not os.path.exists(workspace_path)
     dbs = DBs(
         memory=DB(memory_path),
         logs=DB(memory_path / "logs"),
         input=DB(input_path),
         workspace=DB(workspace_path),
         preprompts=DB(Path(__file__).parent / "preprompts"),
+        archive=None if initial_run else DB(archive_path),
     )
 
     steps = STEPS[steps_config]

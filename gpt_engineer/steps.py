@@ -1,5 +1,8 @@
+import datetime
 import json
+import os
 import re
+import shutil
 import subprocess
 
 from enum import Enum
@@ -258,6 +261,16 @@ def fix_code(ai: AI, dbs: DBs):
     return messages
 
 
+def archive(ai: AI, dbs: DBs):
+    os.makedirs(dbs.archive.path, exist_ok=True)
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    shutil.move(dbs.memory.path, dbs.archive.path / timestamp / dbs.memory.path.name)
+    shutil.move(
+        dbs.workspace.path, dbs.archive.path / timestamp / dbs.workspace.path.name
+    )
+    return []
+
+
 def human_review(ai: AI, dbs: DBs):
     review = human_input()
     dbs.memory["review"] = review.to_json()  # type: ignore
@@ -280,15 +293,17 @@ class Config(str, Enum):
 # Different configs of what steps to run
 STEPS = {
     Config.DEFAULT: [
+        archive,
         clarify,
         gen_clarified_code,
         gen_entrypoint,
         execute_entrypoint,
         human_review,
     ],
-    Config.BENCHMARK: [simple_gen, gen_entrypoint],
-    Config.SIMPLE: [simple_gen, gen_entrypoint, execute_entrypoint],
+    Config.BENCHMARK: [archive, simple_gen, gen_entrypoint],
+    Config.SIMPLE: [archive, simple_gen, gen_entrypoint, execute_entrypoint],
     Config.TDD: [
+        archive,
         gen_spec,
         gen_unit_tests,
         gen_code,
@@ -297,6 +312,7 @@ STEPS = {
         human_review,
     ],
     Config.TDD_PLUS: [
+        archive,
         gen_spec,
         gen_unit_tests,
         gen_code,
@@ -306,6 +322,7 @@ STEPS = {
         human_review,
     ],
     Config.CLARIFY: [
+        archive,
         clarify,
         gen_clarified_code,
         gen_entrypoint,
@@ -313,6 +330,7 @@ STEPS = {
         human_review,
     ],
     Config.RESPEC: [
+        archive,
         gen_spec,
         respec,
         gen_unit_tests,
