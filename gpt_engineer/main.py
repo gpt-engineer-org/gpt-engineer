@@ -16,7 +16,7 @@ app = typer.Typer()
 
 @app.command()
 def main(
-    project_path: str = typer.Argument("example", help="path"),
+    project_path: str = typer.Argument("projects/example", help="path"),
     model: str = typer.Argument("gpt-4", help="model id string"),
     temperature: float = 0.1,
     steps_config: StepsConfig = typer.Option(
