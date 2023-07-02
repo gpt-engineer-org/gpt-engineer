@@ -125,7 +125,7 @@ def insert_markdown_section(file_path, section_title, section_text, level):
     if line_number != -1:
         lines.insert(line_number, new_section)
     else:
-        print(f"No section of level {level} found.")
+        print(f"Markdown file was of unexpected format. No section of level {level} found. Did not write results.")
         return
 
     # Write the file
