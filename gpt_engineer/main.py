@@ -58,7 +58,6 @@ def main(
     steps = STEPS[steps_config]
     for step in steps:
         messages = step(ai, dbs)
-        # human_review, archive don't need to be dumped
         dbs.logs[step.__name__] = json.dumps(messages)
 
     collect_learnings(model, temperature, steps, dbs)
