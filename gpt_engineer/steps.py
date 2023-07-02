@@ -262,7 +262,6 @@ def fix_code(ai: AI, dbs: DBs):
 
 
 def archive(ai: AI, dbs: DBs):
-    if dbs.archive is None:
         return
     os.makedirs(dbs.archive.path, exist_ok=True)
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
