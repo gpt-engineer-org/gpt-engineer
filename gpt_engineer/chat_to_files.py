@@ -1,9 +1,4 @@
-import re
-
-
-def parse_chat(chat):  # -> List[Tuple[str, str]]:
-    # Get all ``` blocks and preceding filenames
-    regex = r"(\S+)\n\s*```[^\n]*\n(.+?)```"
+regex = r"(\S+)\n\s*```[^\n]*\n(.+?)```"
     matches = re.finditer(regex, chat, re.DOTALL)
 
     files = []
@@ -20,6 +15,10 @@ def parse_chat(chat):  # -> List[Tuple[str, str]]:
         # Remove trailing ]
         path = re.sub(r"\]$", "", path)
 
+        # Validate and sanitize the filename
+        if not is_valid_filename(path):
+            path = sanitize_filename(path)
+
         # Get the code
         code = match.group(2)
 
@@ -27,16 +26,5 @@ def parse_chat(chat):  # -> List[Tuple[str, str]]:
         files.append((path, code))
 
     # Get all the text before the first ``` block
-    readme = chat.split("```")[0]
-    files.append(("README.md", readme))
+    readme = chat.split("
 
-    # Return the files
-    return files
-
-
-def to_files(chat, workspace):
-    workspace["all_output.txt"] = chat
-
-    files = parse_chat(chat)
-    for file_name, file_content in files:
-        workspace[file_name] = file_content
