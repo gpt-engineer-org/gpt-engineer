@@ -3,8 +3,7 @@ import os
 
 from unittest.mock import MagicMock
 
-from gpt_engineer.db import DB, DBs
-from gpt_engineer.steps import archive
+from gpt_engineer.db import DB, DBs, archive
 
 
 def freeze_at(monkeypatch, time):
@@ -28,7 +27,7 @@ def test_archive(tmp_path, monkeypatch):
         tmp_path, ["memory", "logs", "preprompts", "input", "workspace", "archive"]
     )
     freeze_at(monkeypatch, datetime.datetime(2020, 12, 25, 17, 5, 55))
-    archive(None, dbs)
+    archive(dbs)
     assert not os.path.exists(tmp_path / "memory")
     assert not os.path.exists(tmp_path / "workspace")
     assert os.path.isdir(tmp_path / "archive" / "20201225_170555")
@@ -37,7 +36,7 @@ def test_archive(tmp_path, monkeypatch):
         tmp_path, ["memory", "logs", "preprompts", "input", "workspace", "archive"]
     )
     freeze_at(monkeypatch, datetime.datetime(2022, 8, 14, 8, 5, 12))
-    archive(None, dbs)
+    archive(dbs)
     assert not os.path.exists(tmp_path / "memory")
     assert not os.path.exists(tmp_path / "workspace")
     assert os.path.isdir(tmp_path / "archive" / "20201225_170555")

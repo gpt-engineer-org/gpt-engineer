@@ -1,6 +1,8 @@
+import datetime
+import shutil
+
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 
 # This class represents a simple database that stores its data as files in a directory.
@@ -49,3 +51,15 @@ class DBs:
     input: DB
     workspace: DB
     archive: DB
+
+
+def archive(dbs: DBs):
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    shutil.move(
+        str(dbs.memory.path), str(dbs.archive.path / timestamp / dbs.memory.path.name)
+    )
+    shutil.move(
+        str(dbs.workspace.path),
+        str(dbs.archive.path / timestamp / dbs.workspace.path.name),
+    )
+    return []
