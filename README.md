@@ -37,10 +37,13 @@ For **development**:
 
 **Setup**
 
-With an api key that has GPT4 access run:
+With an OpenAI API key (preferably with GPT-4 access) run:
 
 - `export OPENAI_API_KEY=[your api key]`
 
+Alternative for Windows
+- `set OPENAI_API_KEY=[your api key]` on cmd
+- `$env:OPENAI_API_KEY="[your api key]"` on powershell
 
 **Run**:
 
