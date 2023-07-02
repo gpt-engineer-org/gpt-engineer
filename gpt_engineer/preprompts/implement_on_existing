@@ -4,8 +4,7 @@ Based on the request, you need to comprehend what needs to be modified by unders
 Think step by step and reason yourself to the right decisions to make sure we get it right.
 The files are organized in the following way:
 
-FILENAME is the lowercase file name including the file extension,
-LANG is the markup code block language for the code's language, and CODE is the code:
+FILENAME is the lowercase file name including the file extension and CODE is the code:
 
 FILENAME
 ```
