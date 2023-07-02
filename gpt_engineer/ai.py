@@ -55,6 +55,7 @@ class AI:
         messages += [r]  # AI Message
 
         logger.debug(f"Chat completion finished: {messages}")
+
         return messages
 
     def last_message_content(self, messages):
@@ -67,20 +68,13 @@ class AI:
 
     def serialize_messages(messages):
         # dicts = messages_to_dict(history.messages)
-        r = "[]"
-        try:
-            if messages and isinstance(messages, list) and len(messages) > 0:
-                r = json.dumps(messages_to_dict(messages))
-        except Exception as e:
-            logging.warn("Exception serializing messages, returning empty array", e)
+        r = []
+        if messages and isinstance(messages, list) and len(messages) > 0:
+            r = json.dumps(messages_to_dict(messages))
         return r
 
     def deserialize_messages(jsondictstr):
-        r = []
-        try:
-            r = messages_from_dict(json.loads(jsondictstr))
-        except Exception as e:
-            logging.warn("Exception deserializing messages, returning empty array", e)
+        r = messages_from_dict(json.loads(jsondictstr))
         return r
 
 
