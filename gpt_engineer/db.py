@@ -48,4 +48,4 @@ class DBs:
     preprompts: DB
     input: DB
     workspace: DB
-    archive: Optional[DB]
+    archive: DB
