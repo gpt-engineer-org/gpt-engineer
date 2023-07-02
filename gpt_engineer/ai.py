@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 
+from typing import Dict, List
+
 import openai
 
 logger = logging.getLogger(__name__)
@@ -10,17 +12,7 @@ logger = logging.getLogger(__name__)
 class AI:
     def __init__(self, model="gpt-4", temperature=0.1):
         self.temperature = temperature
-
-        try:
-            openai.Model.retrieve(model)
-            self.model = model
-        except openai.InvalidRequestError:
-            print(
-                f"Model {model} not available for provided API key. Reverting "
-                "to gpt-3.5-turbo. Sign up for the GPT-4 wait list here: "
-                "https://openai.com/waitlist/gpt-4-api"
-            )
-            self.model = "gpt-3.5-turbo"
+        self.model = model
 
     def start(self, system, user):
         messages = [
@@ -39,7 +31,7 @@ class AI:
     def fassistant(self, msg):
         return {"role": "assistant", "content": msg}
 
-    def next(self, messages: list[dict[str, str]], prompt=None):
+    def next(self, messages: List[Dict[str, str]], prompt=None):
         if prompt:
             messages += [{"role": "user", "content": prompt}]
 
@@ -53,7 +45,7 @@ class AI:
 
         chat = []
         for chunk in response:
-            delta = chunk["choices"][0]["delta"]
+            delta = chunk["choices"][0]["delta"]  # type: ignore
             msg = delta.get("content", "")
             print(msg, end="")
             chat.append(msg)
@@ -61,3 +53,16 @@ class AI:
         messages += [{"role": "assistant", "content": "".join(chat)}]
         logger.debug(f"Chat completion finished: {messages}")
         return messages
+
+
+def fallback_model(model: str) -> str:
+    try:
+        openai.Model.retrieve(model)
+        return model
+    except openai.InvalidRequestError:
+        print(
+            f"Model {model} not available for provided API key. Reverting "
+            "to gpt-3.5-turbo. Sign up for the GPT-4 wait list here: "
+            "https://openai.com/waitlist/gpt-4-api\n"
+        )
+        return "gpt-3.5-turbo"

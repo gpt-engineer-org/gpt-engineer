@@ -7,7 +7,7 @@ COLOR_CYAN=\033[1;36m
 COLOR_GREEN=\033[1;32m
 
 # Defines the targets help, install, dev-install, and run as phony targets. Phony targets are targets that are not really the name of files that are to be built. Instead, they are treated as commands.
-.PHONY: help install dev-install run
+.PHONY: help install run
 
 #sets the default goal to help when no target is specified on the command line.
 .DEFAULT_GOAL := help
@@ -23,11 +23,7 @@ help:
 	@echo "Please use 'make <target>' where <target> is one of the following:"
 	@echo "  help           	Return this message with usage instructions."
 	@echo "  install        	Will install the dependencies and create a virtual environment."
-	@echo "  dev-install    	Will install the dev dependencies too."
 	@echo "  run <folder_name>  Runs GPT Engineer on the folder with the given name."
-
-#Defines a target named dev-install. This target will install the dev dependencies too. This means that running make dev-install will first execute the install target before executing the commands specified in the dev-install target.
-dev-install: install
 
 #Defines a target named install. This target will create a virtual environment, upgrade pip, install the dependencies, and install the pre-commit hooks. This means that running make install will first execute the create-venv target, then the upgrade-pip target, then the install-dependencies target, and finally the install-pre-commit target.
 install: create-venv upgrade-pip install-dependencies install-pre-commit farewell
@@ -64,4 +60,3 @@ run:
 	@echo -e "$(COLOR_CYAN)Running GPT Engineer on $(COLOR_GREEN)$(name)$(COLOR_CYAN) folder...$(COLOR_RESET)" && \
 	source venv/bin/activate && \
 	gpt-engineer projects/$(name)
-

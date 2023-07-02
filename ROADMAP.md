@@ -1,12 +1,9 @@
 # Roadmap
 
-We are building AGI. The first step is creating the code generation tooling of the future.
-
 There are three main milestones we believe will 2x gpt-engineer's reliability and capability:
 - Continuous evaluation of our progress
 - Make code generation become small, verifiable steps
 - Run tests and fix errors with GPT4
-
 
 ## Steps to achieve our roadmap
 
@@ -32,13 +29,13 @@ performance over time
 task, by giving it few shot example of what are usually "the right-sized steps" to carry
 out for other projects
 
-
-
 # How you can help out
+
 You can:
+
 - Submit your first PR to address an [issue](https://github.com/AntonOsika/gpt-engineer/issues)
 - Submit PRs to address one of the items in the roadmap
-- Review your first PR/issue and propose next steps (further review, merge, close)
+- Do your first review of someone else's PR/issue and propose next steps (further review, merge, close)
 - Sign up to help [measure the progress of gpt-engineer towards recursively coding itself](https://forms.gle/TMX68mScyxQUsE6Y9)
 
 Volunteer work in any of these gets acknowledged.
@@ -48,4 +45,3 @@ Volunteer work in any of these gets acknowledged.
 
 ### Ad hoc experiments
 - [ ] Try Microsoft guidance, and benchmark if this helps improve performance
-

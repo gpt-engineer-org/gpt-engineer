@@ -49,3 +49,10 @@ scratchpad
 # Ignore GPT Engineer files
 projects
 !projects/example
+
+# Pyenv
+.python-version
+
+# Benchmark files
+benchmark
+!benchmark/*/prompt

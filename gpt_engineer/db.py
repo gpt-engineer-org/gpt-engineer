@@ -1,3 +1,6 @@
+import datetime
+import shutil
+
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -18,9 +21,15 @@ class DB:
         full_path = self.path / key
 
         if not full_path.is_file():
-            raise KeyError(key)
+            raise KeyError(f"File '{key}' could not be found in '{self.path}'")
         with full_path.open("r", encoding="utf-8") as f:
             return f.read()
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
 
     def __setitem__(self, key, val):
         full_path = self.path / key
@@ -41,3 +50,16 @@ class DBs:
     preprompts: DB
     input: DB
     workspace: DB
+    archive: DB
+
+
+def archive(dbs: DBs):
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    shutil.move(
+        str(dbs.memory.path), str(dbs.archive.path / timestamp / dbs.memory.path.name)
+    )
+    shutil.move(
+        str(dbs.workspace.path),
+        str(dbs.archive.path / timestamp / dbs.workspace.path.name),
+    )
+    return []
