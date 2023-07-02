@@ -57,7 +57,7 @@ class AI:
         logger.debug(f"Chat completion finished: {messages}")
         return messages
 
-    def lastMessageContent(self, messages):
+    def last_message_content(self, messages):
         m = messages[-1].content
         if m:
             m = m.strip()
@@ -65,7 +65,7 @@ class AI:
         print(m)
         return m
 
-    def serializeMessages(messages):
+    def serialize_messages(messages):
         # dicts = messages_to_dict(history.messages)
         r = "[]"
         try:
@@ -75,7 +75,7 @@ class AI:
             logging.warn("Exception serializing messages, returning empty array", e)
         return r
 
-    def deserializeMessages(jsondictstr):
+    def deserialize_messages(jsondictstr):
         r = []
         try:
             r = messages_from_dict(json.loads(jsondictstr))
@@ -97,5 +97,5 @@ def fallback_model(model: str) -> str:
         return "gpt-3.5-turbo"
 
 
-def serializeMessages(messages):
-    return AI.serializeMessages(messages)
+def serialize_messages(messages):
+    return AI.serialize_messages(messages)

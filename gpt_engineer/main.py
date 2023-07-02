@@ -61,7 +61,7 @@ def main(
     steps = STEPS[steps_config]
     for step in steps:
         messages = step(ai, dbs)
-        dbs.logs[step.__name__] = AI.serializeMessages(messages)
+        dbs.logs[step.__name__] = AI.serialize_messages(messages)
 
     collect_learnings(modelid, temperature, steps, dbs)
 

@@ -10,7 +10,7 @@ from typing import List, Optional
 from dataclasses_json import dataclass_json
 from termcolor import colored
 
-from gpt_engineer.ai import serializeMessages
+from gpt_engineer.ai import serialize_messages
 from gpt_engineer.db import DB, DBs
 from gpt_engineer.domain import Step
 
@@ -107,7 +107,7 @@ def logs_to_string(steps: List[Step], logs: DB):
 def format_messages(messages: List[dict]) -> str:
     msg = ""
     try:
-        msg = serializeMessages(messages)  # not as pretty (yet)
+        msg = serialize_messages(messages)  # not as pretty (yet)
     except Exception:
         pass
     return msg
