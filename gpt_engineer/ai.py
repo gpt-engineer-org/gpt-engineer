@@ -43,7 +43,7 @@ class AI:
 
         chat = []
         for chunk in response:
-            delta = chunk["choices"][0]["delta"]
+            delta = chunk["choices"][0]["delta"]  # type: ignore
             msg = delta.get("content", "")
             print(msg, end="")
             chat.append(msg)
