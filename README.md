@@ -58,6 +58,13 @@ By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/g
 **Results**
 - Check the generated files in `projects/my-new-project/workspace`
 
+## Getting Started with GitHub Codespaces
+
+To get started, create a codespace for this repository by clicking this 👇
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
+ 
+
 
 ## Features
 
