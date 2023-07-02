@@ -262,7 +262,6 @@ def fix_code(ai: AI, dbs: DBs):
 
 
 def archive(ai: AI, dbs: DBs):
-        return
     os.makedirs(dbs.archive.path, exist_ok=True)
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     shutil.move(dbs.memory.path, dbs.archive.path / timestamp / dbs.memory.path.name)
