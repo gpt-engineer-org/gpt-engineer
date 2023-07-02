@@ -36,4 +36,4 @@ def collect_learnings(model: str, temperature: float, steps: List[Step], dbs: DB
 def steps_file_hash():
     with open(steps.__file__, "r") as f:
         content = f.read()
-        return hashlib.sha256(content.encode("utf-8"), usedforsecurity=False).hexdigest()
+        return hashlib.sha256(content.encode("utf-8")).hexdigest()
