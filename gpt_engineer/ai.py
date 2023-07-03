@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+
 from dataclasses import dataclass
 
 import openai
@@ -34,9 +35,11 @@ class AI:
         try:
             self.tokenizer = tiktoken.encoding_for_model(model)
         except KeyError:
-            logger.debug(f"Tiktoken encoder for model {model} not found. Using "
-                        "cl100k_base encoder instead. The results may therefore be "
-                        "inaccurate and should only be used as estimate.")
+            logger.debug(
+                f"Tiktoken encoder for model {model} not found. Using "
+                "cl100k_base encoder instead. The results may therefore be "
+                "inaccurate and should only be used as estimate."
+            )
             self.tokenizer = tiktoken.get_encoding("cl100k_base")
 
     def start(self, system, user, step_name):
@@ -78,8 +81,9 @@ class AI:
         messages += [{"role": "assistant", "content": "".join(chat)}]
         logger.debug(f"Chat completion finished: {messages}")
 
-        self.update_token_usage_log(messages=messages, answer="".join(chat),
-                                    step_name=step_name)
+        self.update_token_usage_log(
+            messages=messages, answer="".join(chat), step_name=step_name
+        )
 
         return messages
 
@@ -92,29 +96,30 @@ class AI:
         self.cumulative_completion_tokens += completion_tokens
         self.cumulative_total_tokens += total_tokens
 
-        self.token_usage_log.append(TokenUsage(
-            step_name=step_name,
-            in_step_prompt_tokens=prompt_tokens,
-            in_step_completion_tokens=completion_tokens,
-            in_step_total_tokens=total_tokens,
-            total_prompt_tokens=self.cumulative_prompt_tokens,
-            total_completion_tokens=self.cumulative_completion_tokens,
-            total_tokens=self.cumulative_total_tokens
-        ))
-
+        self.token_usage_log.append(
+            TokenUsage(
+                step_name=step_name,
+                in_step_prompt_tokens=prompt_tokens,
+                in_step_completion_tokens=completion_tokens,
+                in_step_total_tokens=total_tokens,
+                total_prompt_tokens=self.cumulative_prompt_tokens,
+                total_completion_tokens=self.cumulative_completion_tokens,
+                total_tokens=self.cumulative_total_tokens,
+            )
+        )
 
     def format_token_usage_log(self):
         result = "step_name,"
         result += "prompt_tokens_in_step,completion_tokens_in_step,total_tokens_in_step"
         result += ",total_prompt_tokens,total_completion_tokens,total_tokens\n"
-        for l in self.token_usage_log:
-            result += l.step_name + ","
-            result += str(l.in_step_prompt_tokens) + ","
-            result += str(l.in_step_completion_tokens) + ","
-            result += str(l.in_step_total_tokens) + ","
-            result += str(l.total_prompt_tokens) + ","
-            result += str(l.total_completion_tokens) + ","
-            result += str(l.total_tokens) + "\n"
+        for L in self.token_usage_log:
+            result += L.step_name + ","
+            result += str(L.in_step_prompt_tokens) + ","
+            result += str(L.in_step_completion_tokens) + ","
+            result += str(L.in_step_total_tokens) + ","
+            result += str(L.total_prompt_tokens) + ","
+            result += str(L.total_completion_tokens) + ","
+            result += str(L.total_tokens) + "\n"
         return result
 
     def num_tokens(self, txt):
@@ -124,7 +129,9 @@ class AI:
         """Returns the number of tokens used by a list of messages."""
         n_tokens = 0
         for message in messages:
-            n_tokens += 4  # every message follows <im_start>{role/name}\n{content}<im_end>\n
+            n_tokens += (
+                4  # every message follows <im_start>{role/name}\n{content}<im_end>\n
+            )
             for key, value in message.items():
                 n_tokens += self.num_tokens(value)
                 if key == "name":  # if there's a name, the role is omitted
