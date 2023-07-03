@@ -61,6 +61,8 @@ def main(
     if collect_consent():
         collect_learnings(model, temperature, steps, dbs)
 
+    dbs.logs["token_usage"] = ai.format_token_usage_log()
+
 
 if __name__ == "__main__":
     app()
