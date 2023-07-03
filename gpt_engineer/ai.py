@@ -60,7 +60,7 @@ class AI:
     def fassistant(self, msg):
         return {"role": "assistant", "content": msg}
 
-    def next(self, messages: list[Dict[str, str]], prompt=None, *, step_name=None):
+    def next(self, messages: List[Dict[str, str]], prompt=None, *, step_name=None):
         if prompt:
             messages += [{"role": "user", "content": prompt}]
 
@@ -113,14 +113,14 @@ class AI:
         result = "step_name,"
         result += "prompt_tokens_in_step,completion_tokens_in_step,total_tokens_in_step"
         result += ",total_prompt_tokens,total_completion_tokens,total_tokens\n"
-        for L in self.token_usage_log:
-            result += L.step_name + ","
-            result += str(L.in_step_prompt_tokens) + ","
-            result += str(L.in_step_completion_tokens) + ","
-            result += str(L.in_step_total_tokens) + ","
-            result += str(L.total_prompt_tokens) + ","
-            result += str(L.total_completion_tokens) + ","
-            result += str(L.total_tokens) + "\n"
+        for log in self.token_usage_log:
+            result += log.step_name + ","
+            result += str(log.in_step_prompt_tokens) + ","
+            result += str(log.in_step_completion_tokens) + ","
+            result += str(log.in_step_total_tokens) + ","
+            result += str(log.total_prompt_tokens) + ","
+            result += str(log.total_completion_tokens) + ","
+            result += str(log.total_tokens) + "\n"
         return result
 
     def num_tokens(self, txt):
