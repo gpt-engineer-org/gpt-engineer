@@ -1,49 +1,66 @@
-import os
 import json
-import pathlib
+import logging
+
+from pathlib import Path
+
 import typer
 
-from gpt_engineer.chat_to_files import to_files
-from gpt_engineer.ai import AI
-from gpt_engineer.steps import STEPS
-from gpt_engineer.db import DB, DBs
-
+from gpt_engineer.ai import AI, fallback_model
+from gpt_engineer.collect import collect_learnings
+from gpt_engineer.db import DB, DBs, archive
+from gpt_engineer.learning import collect_consent
+from gpt_engineer.steps import STEPS, Config as StepsConfig
 
 app = typer.Typer()
 
 
 @app.command()
-def chat(
-    project_path: str = typer.Argument(str(pathlib.Path(os.path.curdir) / "example"), help="path"),
-    run_prefix: str = typer.Option(
-        "",
-        help="run prefix, if you want to run multiple variants of the same project and later compare them",
-    ),
-    model: str = "gpt-4",
+def main(
+    project_path: str = typer.Argument("example", help="path"),
+    model: str = typer.Argument("gpt-4", help="model id string"),
     temperature: float = 0.1,
-    steps_config: str = "default",
+    steps_config: StepsConfig = typer.Option(
+        StepsConfig.DEFAULT, "--steps", "-s", help="decide which steps to run"
+    ),
+    verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
-    app_dir = pathlib.Path(os.path.curdir)
-    input_path = project_path
-    memory_path = pathlib.Path(project_path) / (run_prefix + "memory")
-    workspace_path = pathlib.Path(project_path) / (run_prefix + "workspace")
+    logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
+    model = fallback_model(model)
     ai = AI(
         model=model,
         temperature=temperature,
     )
+
+    input_path = Path(project_path).absolute()
+    memory_path = input_path / "memory"
+    workspace_path = input_path / "workspace"
+    archive_path = input_path / "archive"
 
     dbs = DBs(
         memory=DB(memory_path),
         logs=DB(memory_path / "logs"),
         input=DB(input_path),
         workspace=DB(workspace_path),
-        identity=DB(app_dir / "identity"),
+        preprompts=DB(Path(__file__).parent / "preprompts"),
+        archive=DB(archive_path),
     )
 
-    for step in STEPS[steps_config]:
+    if steps_config not in [
+        StepsConfig.EXECUTE_ONLY,
+        StepsConfig.USE_FEEDBACK,
+        StepsConfig.EVALUATE,
+    ]:
+        archive(dbs)
+
+    steps = STEPS[steps_config]
+    for step in steps:
         messages = step(ai, dbs)
         dbs.logs[step.__name__] = json.dumps(messages)
+
+    if collect_consent():
+        collect_learnings(model, temperature, steps, dbs)
+
 
 if __name__ == "__main__":
     app()

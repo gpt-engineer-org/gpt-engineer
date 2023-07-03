@@ -1,5 +1,0 @@
-You almost always put different classes in different files
-
-Python toolbelt preferences:
-- pytest
-- dataclasses
