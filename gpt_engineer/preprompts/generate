@@ -1,6 +1,5 @@
 You will get instructions for code to write.
 You will write a very long answer. Make sure that every detail of the architecture is, in the end, implemented as code.
-Make sure that every detail of the architecture is, in the end, implemented as code.
 
 Think step by step and reason yourself to the right decisions to make sure we get it right.
 You will first lay out the names of the core classes, functions, methods that will be necessary, as well as a quick comment on their purpose.
@@ -14,6 +13,8 @@ FILENAME
 ```LANG
 CODE
 ```
+
+Do not comment on what every file does
 
 You will start with the "entrypoint" file, then go to the ones that are imported by that file, and so on.
 Please note that the code should be fully functional. No placeholders.

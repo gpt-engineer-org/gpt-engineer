@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 
 from dataclasses import dataclass
+from typing import Dict, List
 
 import openai
 import tiktoken
@@ -59,7 +60,7 @@ class AI:
     def fassistant(self, msg):
         return {"role": "assistant", "content": msg}
 
-    def next(self, messages: list[dict[str, str]], prompt=None, *, step_name=None):
+    def next(self, messages: list[Dict[str, str]], prompt=None, *, step_name=None):
         if prompt:
             messages += [{"role": "user", "content": prompt}]
 
@@ -73,7 +74,7 @@ class AI:
 
         chat = []
         for chunk in response:
-            delta = chunk["choices"][0]["delta"]
+            delta = chunk["choices"][0]["delta"]  # type: ignore
             msg = delta.get("content", "")
             print(msg, end="")
             chat.append(msg)
