@@ -61,7 +61,7 @@ def main(
 
     steps = STEPS[steps_config]
     for step in steps:
-        messages = step(ai, dbs, step_name=step.__name__)
+        messages = step(ai, dbs)
         dbs.logs[step.__name__] = json.dumps(messages)
 
     collect_learnings(model, temperature, steps, dbs)

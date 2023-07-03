@@ -1,11 +1,23 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 
-import tiktoken
 import openai
+import tiktoken
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class TokenUsage:
+    step_name: str
+    in_step_prompt_tokens: int
+    in_step_completion_tokens: int
+    in_step_total_tokens: int
+    total_prompt_tokens: int
+    total_completion_tokens: int
+    total_tokens: int
 
 
 class AI:
@@ -80,32 +92,29 @@ class AI:
         self.cumulative_completion_tokens += completion_tokens
         self.cumulative_total_tokens += total_tokens
 
-        self.token_usage_log.append({
-            "step_name": step_name,
-            "in_step": {
-                "prompt": prompt_tokens,
-                "completion": completion_tokens,
-                "total": total_tokens
-            },
-            "total": {
-                "prompt": self.cumulative_prompt_tokens,
-                "completion": self.cumulative_completion_tokens,
-                "total": self.cumulative_total_tokens,
-            }
-        })
+        self.token_usage_log.append(TokenUsage(
+            step_name=step_name,
+            in_step_prompt_tokens=prompt_tokens,
+            in_step_completion_tokens=completion_tokens,
+            in_step_total_tokens=total_tokens,
+            total_prompt_tokens=self.cumulative_prompt_tokens,
+            total_completion_tokens=self.cumulative_completion_tokens,
+            total_tokens=self.cumulative_total_tokens
+        ))
+
 
     def format_token_usage_log(self):
         result = "step_name,"
         result += "prompt_tokens_in_step,completion_tokens_in_step,total_tokens_in_step"
         result += ",total_prompt_tokens,total_completion_tokens,total_tokens\n"
         for l in self.token_usage_log:
-            result += l["step_name"] + ","
-            result += str(l["in_step"]["prompt"]) + ","
-            result += str(l["in_step"]["completion"]) + ","
-            result += str(l["in_step"]["total"]) + ","
-            result += str(l["total"]["prompt"]) + ","
-            result += str(l["total"]["completion"]) + ","
-            result += str(l["total"]["total"]) + "\n"
+            result += l.step_name + ","
+            result += str(l.in_step_prompt_tokens) + ","
+            result += str(l.in_step_completion_tokens) + ","
+            result += str(l.in_step_total_tokens) + ","
+            result += str(l.total_prompt_tokens) + ","
+            result += str(l.total_completion_tokens) + ","
+            result += str(l.total_tokens) + "\n"
         return result
 
     def num_tokens(self, txt):

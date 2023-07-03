@@ -1,7 +1,7 @@
+import inspect
 import json
 import re
 import subprocess
-
 from enum import Enum
 from typing import List
 
@@ -35,24 +35,28 @@ def get_prompt(dbs: DBs) -> str:
     return dbs.input["prompt"]
 
 
+def curr_fn() -> str:
+    """Get the name of the current function"""
+    return inspect.stack()[1].function
+
 # All steps below have the signature Step
 
 
-def simple_gen(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
+def simple_gen(ai: AI, dbs: DBs) -> List[dict]:
     """Run the AI on the main prompt and save the results"""
-    messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs),step_name=step_name)
+    messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs), step_name=curr_fn())
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
 
-def clarify(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
+def clarify(ai: AI, dbs: DBs) -> List[dict]:
     """
     Ask the user if they want to clarify anything and save the results to the workspace
     """
     messages = [ai.fsystem(dbs.preprompts["qa"])]
     user_input = get_prompt(dbs)
     while True:
-        messages = ai.next(messages, user_input, step_name=step_name)
+        messages = ai.next(messages, user_input, step_name=curr_fn())
 
         if messages[-1]["content"].strip() == "Nothing more to clarify.":
             break
@@ -71,7 +75,7 @@ def clarify(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
             messages = ai.next(
                 messages,
                 "Make your own assumptions and state them explicitly before starting",
-                step_name=step_name
+                step_name=curr_fn()
             )
             print()
             return messages
@@ -88,7 +92,7 @@ def clarify(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
     return messages
 
 
-def gen_spec(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
+def gen_spec(ai: AI, dbs: DBs) -> List[dict]:
     """
     Generate a spec from the main prompt + clarifications and save the results to
     the workspace
@@ -98,18 +102,18 @@ def gen_spec(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
         ai.fsystem(f"Instructions: {dbs.input['prompt']}"),
     ]
 
-    messages = ai.next(messages, dbs.preprompts["spec"], step_name=step_name)
+    messages = ai.next(messages, dbs.preprompts["spec"], step_name=curr_fn())
 
     dbs.memory["specification"] = messages[-1]["content"]
 
     return messages
 
 
-def respec(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
+def respec(ai: AI, dbs: DBs) -> List[dict]:
     messages = json.loads(dbs.logs[gen_spec.__name__])
     messages += [ai.fsystem(dbs.preprompts["respec"])]
 
-    messages = ai.next(messages, step_name=step_name)
+    messages = ai.next(messages, step_name=curr_fn())
     messages = ai.next(
         messages,
         (
@@ -120,14 +124,14 @@ def respec(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
             "If you are satisfied with the specification, just write out the "
             "specification word by word again."
         ),
-        step_name=step_name
+        step_name=curr_fn()
     )
 
     dbs.memory["specification"] = messages[-1]["content"]
     return messages
 
 
-def gen_unit_tests(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
+def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
     """
     Generate unit tests based on the specification, that should work.
     """
@@ -137,7 +141,7 @@ def gen_unit_tests(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
         ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
     ]
 
-    messages = ai.next(messages, dbs.preprompts["unit_tests"], step_name=step_name)
+    messages = ai.next(messages, dbs.preprompts["unit_tests"], step_name=curr_fn())
 
     dbs.memory["unit_tests"] = messages[-1]["content"]
     to_files(dbs.memory["unit_tests"], dbs.workspace)
@@ -145,20 +149,20 @@ def gen_unit_tests(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
     return messages
 
 
-def gen_clarified_code(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
+def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     """Takes clarification and generates code"""
     messages = json.loads(dbs.logs[clarify.__name__])
 
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
     ] + messages[1:]
-    messages = ai.next(messages, dbs.preprompts["use_qa"], step_name=step_name)
+    messages = ai.next(messages, dbs.preprompts["use_qa"], step_name=curr_fn())
 
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
 
-def gen_code(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
+def gen_code(ai: AI, dbs: DBs) -> List[dict]:
     # get the messages from previous step
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
@@ -166,12 +170,12 @@ def gen_code(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
         ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
         ai.fuser(f"Unit tests:\n\n{dbs.memory['unit_tests']}"),
     ]
-    messages = ai.next(messages, dbs.preprompts["use_qa"], step_name=step_name)
+    messages = ai.next(messages, dbs.preprompts["use_qa"], step_name=curr_fn())
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
 
-def execute_entrypoint(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
+def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     command = dbs.workspace["run.sh"]
 
     print("Do you want to execute this code?")
@@ -209,7 +213,7 @@ def execute_entrypoint(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
     return []
 
 
-def gen_entrypoint(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
+def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     messages = ai.start(
         system=(
             "You will get information about a codebase that is currently on disk in "
@@ -224,7 +228,7 @@ def gen_entrypoint(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
             "if necessary.\n"
         ),
         user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
-        step_name=step_name
+        step_name=curr_fn()
     )
     print()
 
@@ -234,19 +238,19 @@ def gen_entrypoint(ai: AI, dbs: DBs, step_name:str) -> List[dict]:
     return messages
 
 
-def use_feedback(ai: AI, dbs: DBs, step_name:str):
+def use_feedback(ai: AI, dbs: DBs):
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
         ai.fassistant(dbs.workspace["all_output.txt"]),
         ai.fsystem(dbs.preprompts["use_feedback"]),
     ]
-    messages = ai.next(messages, dbs.input["feedback"], step_name=step_name)
+    messages = ai.next(messages, dbs.input["feedback"], step_name=curr_fn())
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
 
-def fix_code(ai: AI, dbs: DBs, step_name:str):
+def fix_code(ai: AI, dbs: DBs):
     code_output = json.loads(dbs.logs[gen_code.__name__])[-1]["content"]
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
@@ -255,12 +259,12 @@ def fix_code(ai: AI, dbs: DBs, step_name:str):
         ai.fsystem(dbs.preprompts["fix_code"]),
     ]
     messages = ai.next(messages, "Please fix any errors in the code above.",
-                       step_name=step_name)
+                       step_name=curr_fn())
     to_files(messages[-1]["content"], dbs.workspace)
     return messages
 
 
-def human_review(ai: AI, dbs: DBs, step_name:str):
+def human_review(ai: AI, dbs: DBs):
     review = human_input()
     dbs.memory["review"] = review.to_json()  # type: ignore
     return []
