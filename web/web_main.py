@@ -18,6 +18,10 @@ def gettingstarted_page():
 def blog_page():
     return render_template('blog.html')
 
+@app.route('/community')
+def community_page():
+    return render_template('community.html')
+
 
 if __name__ == '__main__':
     app.run()
