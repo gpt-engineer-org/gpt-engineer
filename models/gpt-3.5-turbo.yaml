@@ -1,0 +1,11 @@
+_type: openai
+#best_of: 1
+frequency_penalty: 0.0
+#max_tokens: 4096
+#model_name: gpt-3.5-turbo
+model_name: gpt-3.5-turbo-16k-0613
+n: 1
+presence_penalty: 0.0
+request_timeout: null
+temperature: 0.0
+top_p: 1.0
