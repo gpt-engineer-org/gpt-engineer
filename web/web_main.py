@@ -14,6 +14,10 @@ def aboutus_page():
 def gettingstarted_page():
     return render_template('gettingstarted.html')
 
+@app.route('/blog')
+def blog_page():
+    return render_template('blog.html')
+
 
 if __name__ == '__main__':
     app.run()
