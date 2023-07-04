@@ -8,7 +8,7 @@ def home_page():
 
 @app.route('/aboutus')
 def aboutus_page():
-    return render_template('index.html')
+    return render_template('aboutus.html')
 
 
 if __name__ == '__main__':
