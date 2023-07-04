@@ -1,3 +1,5 @@
+import logging
+
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -36,6 +38,7 @@ class DB:
             full_path.write_text(val, encoding="utf-8")
         else:
             # If val is neither a string nor bytes, raise an error.
+            logging.warn("Can not store DB value: ", val)
             raise TypeError("val must be either a str or bytes")
 
 

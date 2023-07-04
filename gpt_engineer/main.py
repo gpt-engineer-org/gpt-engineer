@@ -6,8 +6,7 @@ from pathlib import Path
 import typer
 
 from gpt_engineer import steps
-from gpt_engineer.ai import AI, fallback_model
-from gpt_engineer.collect import collect_learnings
+from gpt_engineer.ai import AI
 from gpt_engineer.db import DB, DBs
 from gpt_engineer.steps import STEPS
 
@@ -43,8 +42,6 @@ def main(
         shutil.rmtree(memory_path, ignore_errors=True)
         shutil.rmtree(workspace_path, ignore_errors=True)
 
-    modelid = fallback_model(modelid)
-
     ai = AI(
         modelid=modelid,
         temperature=temperature,
@@ -61,9 +58,10 @@ def main(
     steps = STEPS[steps_config]
     for step in steps:
         messages = step(ai, dbs)
+        logging.info(messages)
         dbs.logs[step.__name__] = AI.serialize_messages(messages)
 
-    collect_learnings(modelid, temperature, steps, dbs)
+    # collect_learnings(modelid, temperature, steps, dbs)
 
 
 if __name__ == "__main__":

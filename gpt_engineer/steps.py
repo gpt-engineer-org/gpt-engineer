@@ -48,7 +48,7 @@ def clarify(ai: AI, dbs: DBs) -> List[dict]:
     """
     Ask the user if they want to clarify anything and save the results to the workspace
     """
-    messages = [ai.fsystem(dbs.preprompts["qa"])]
+    messages = [ai.fsystem(dbs.preprompts["clarify"])]
     user_input = get_prompt(dbs)
     while True:
         messages = ai.next(messages, user_input)
@@ -279,13 +279,25 @@ class Config(str, Enum):
 
 
 # Different configs of what steps to run
+"""
+CHAINS = {
+    Config.DEFAULT: SimpleSequentialChain(chains=[
+                                                    clarify_chain,
+                                                    # route base on new / existing project
+                                                    # route based on language
+                                                    # transform based on language
+
+                                                 ], verbose=True)
+}
+"""
+
 STEPS = {
     Config.DEFAULT: [
         clarify,
         gen_clarified_code,
         gen_entrypoint,
         execute_entrypoint,
-        human_review,
+        # human_review,
     ],
     Config.BENCHMARK: [simple_gen, gen_entrypoint],
     Config.SIMPLE: [simple_gen, gen_entrypoint, execute_entrypoint],
