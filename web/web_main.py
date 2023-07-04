@@ -10,6 +10,10 @@ def home_page():
 def aboutus_page():
     return render_template('aboutus.html')
 
+@app.route('/gettingstarted')
+def gettingstarted_page():
+    return render_template('gettingstarted.html')
+
 
 if __name__ == '__main__':
     app.run()

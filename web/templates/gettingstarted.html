@@ -1,0 +1,27 @@
+{% include 'includes/header.html' %}
+
+<div class="jumbotron p-3 p-md-5 text-white rounded bg-dark div-level-1">
+<h2>Getting Started with GPT-Engineer</h2>
+      <p>
+        To get started with GPT-Engineer and unleash the power of AI-assisted code generation, follow the steps below:
+      </p>
+      <ol>
+        <li>Choose either the stable or development release.</li>
+        <li>If you opt for the stable release, run the following command:</li>
+        <code>pip install gpt-engineer</code>
+        <li>If you prefer the development version, clone the repository and install it:</li>
+        <code>git clone https://github.com/AntonOsika/gpt-engineer.git
+cd gpt-engineer
+pip install -e .</code>
+        <li>Set up your OpenAI API key (preferably with GPT-4 access). For example:</li>
+        <code>export OPENAI_API_KEY=[your api key]</code>
+        <p>(Alternative for Windows: <code>set OPENAI_API_KEY=[your api key]</code> on cmd, or <code>$env:OPENAI_API_KEY="[your api key]"</code> on PowerShell)</p>
+        <li>Create a new project folder by copying the example project:</li>
+        <code>cp -r projects/example/ projects/my-new-project</code>
+        <li>Edit the <code>prompt</code> file in your new project folder to specify your code generation requirements.</li>
+        <li>Run GPT-Engineer on your project:</li>
+        <code>gpt-engineer projects/my-new-project</code>
+      </ol>
+</div>
+
+{% include 'includes/footer.html' %}
