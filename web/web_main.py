@@ -14,6 +14,10 @@ def aboutus_page():
 def gettingstarted_page():
     return render_template('gettingstarted.html')
 
+@app.route('/documentation')
+def documentation_page():
+    return render_template('documentation.html')
+
 @app.route('/blog')
 def blog_page():
     return render_template('blog.html')
