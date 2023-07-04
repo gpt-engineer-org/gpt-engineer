@@ -1,4 +1,5 @@
 import json
+import os
 import random
 import tempfile
 
@@ -83,7 +84,9 @@ def human_input() -> Review:
             "If you have time, please explain what was not working "
             + colored("(ok to leave blank)\n", "light_green")
         )
-    print(colored("Thank you", "light_green"))
+
+    check_consent()
+
     return Review(
         raw=", ".join([ran, perfect, useful]),
         ran={"y": True, "n": False, "u": None, "": None}[ran],
@@ -91,6 +94,63 @@ def human_input() -> Review:
         perfect={"y": True, "n": False, "u": None, "": None}[perfect],
         comments=comments,
     )
+
+
+def check_consent():
+    path = Path(".gpte_consent")
+    if path.exists() and path.read_text() == "true":
+        return
+    ans = input("Is it ok if we store your prompts to learn? (y/n)")
+    while ans.lower() not in ("y", "n"):
+        ans = input("Invalid input. Please enter y or n: ")
+
+    if ans.lower() == "y":
+        path.write_text("true")
+        print(colored("Thank you️", "light_green"))
+        print()
+        print("(If you change your mind, delete the file .gpte_consent)")
+    else:
+        print(colored("We understand ❤️", "light_green"))
+
+
+def collect_consent() -> bool:
+    opt_out = os.environ.get("COLLECT_LEARNINGS_OPT_OUT") == "true"
+    consent_flag = Path(".gpte_consent")
+    has_given_consent = consent_flag.exists() and consent_flag.read_text() == "true"
+
+    if opt_out:
+        if has_given_consent:
+            return ask_if_can_store()
+        return False
+
+    if has_given_consent:
+        return True
+
+    if ask_if_can_store():
+        consent_flag.write_text("true")
+        print()
+        print("(If you change your mind, delete the file .gpte_consent)")
+        return True
+    return False
+
+
+def ask_if_can_store() -> bool:
+    print()
+    can_store = input(
+        "Have you understood and agree to that "
+        + colored("OpenAI ", "light_green")
+        + "and "
+        + colored("gpt-engineer ", "light_green")
+        + "store anonymous learnings about how gpt-engineer is used "
+        + "(with the sole purpose of improving it)?\n(y/n)"
+    ).lower()
+    while can_store not in ("y", "n"):
+        can_store = input("Invalid input. Please enter y or n: ").lower()
+
+    if can_store == "n":
+        print(colored("Ok we understand", "light_green"))
+
+    return can_store == "y"
 
 
 def logs_to_string(steps: List[Step], logs: DB):

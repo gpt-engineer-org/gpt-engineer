@@ -30,17 +30,20 @@ For **stable** release:
 - `pip install gpt-engineer`
 
 For **development**:
-- `git clone git@github.com:AntonOsika/gpt-engineer.git`
+- `git clone https://github.com/AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
 - `pip install -e .`
   - (or: `make install && source venv/bin/activate` for a venv)
 
 **Setup**
 
-With an api key that has GPT4 access run:
+With an OpenAI API key (preferably with GPT-4 access) run:
 
 - `export OPENAI_API_KEY=[your api key]`
 
+Alternative for Windows
+- `set OPENAI_API_KEY=[your api key]` on cmd
+- `$env:OPENAI_API_KEY="[your api key]"` on powershell
 
 **Run**:
 
@@ -50,11 +53,16 @@ With an api key that has GPT4 access run:
 - `gpt-engineer projects/my-new-project`
   - (Note, `gpt-engineer --help` lets you see all available options. For example `--steps use_feedback` lets you improve/fix code in a project)
 
-By running gpt-engineer you agree to our [ToS](https://github.com/AntonOsika/gpt-engineer/TERMS_OF_USE.md).
+By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
 **Results**
 - Check the generated files in `projects/my-new-project/workspace`
 
+## Getting Started with GitHub Codespaces
+
+To get started, create a codespace for this repository by clicking this 👇
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
 
 ## Features
 
@@ -75,7 +83,7 @@ Contributing document [here](.github/CONTRIBUTING.md).
 We are currently looking for more maintainers and community organisers. Email anton.osika@gmail.com if you are interested in an official role.
 
 If you want to see our broader ambitions, check out the [roadmap](https://github.com/AntonOsika/gpt-engineer/blob/main/ROADMAP.md), and join
-[discord ](https://discord.gg/4t5vXHhu)
+[discord](https://discord.gg/8tcDQ89Ej2)
 to get input on how you can contribute to it.
 
 ## Example

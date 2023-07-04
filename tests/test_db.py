@@ -27,7 +27,7 @@ def test_DB_operations(tmp_path):
 
 
 def test_DBs_initialization(tmp_path):
-    dir_names = ["memory", "logs", "preprompts", "input", "workspace"]
+    dir_names = ["memory", "logs", "preprompts", "input", "workspace", "archive"]
     directories = [tmp_path / name for name in dir_names]
 
     # Create DB objects
@@ -41,6 +41,7 @@ def test_DBs_initialization(tmp_path):
     assert isinstance(dbs_instance.preprompts, DB)
     assert isinstance(dbs_instance.input, DB)
     assert isinstance(dbs_instance.workspace, DB)
+    assert isinstance(dbs_instance.archive, DB)
 
 
 def test_invalid_path():
@@ -106,11 +107,11 @@ def test_DBs_instantiation_with_wrong_number_of_arguments(tmp_path):
         DBs(db, db, db)
 
     with pytest.raises(TypeError):
-        DBs(db, db, db, db, db, db)
+        DBs(db, db, db, db, db, db, db)
 
 
 def test_DBs_dataclass_attributes(tmp_path):
-    dir_names = ["memory", "logs", "preprompts", "input", "workspace"]
+    dir_names = ["memory", "logs", "preprompts", "input", "workspace", "archive"]
     directories = [tmp_path / name for name in dir_names]
 
     # Create DB objects
