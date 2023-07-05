@@ -15,6 +15,8 @@ def parse_chat(chat):  # -> List[Tuple[str, str]]:
         path = re.sub(r"^\[(.*)\]$", r"\1", path)
 
         # Remove leading and trailing backticks
+        # Remove all backticks
+        path = re.sub(r"`", "", path)
         path = re.sub(r"^`(.*)`$", r"\1", path)
 
         # Remove trailing ]
@@ -40,3 +42,4 @@ def to_files(chat, workspace):
     files = parse_chat(chat)
     for file_name, file_content in files:
         workspace[file_name] = file_content
+
