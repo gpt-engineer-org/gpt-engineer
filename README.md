@@ -37,13 +37,11 @@ For **development**:
 
 **Setup**
 
-With an OpenAI API key (preferably with GPT-4 access) run:
+- Duplicate the `.env.template` file and rename it to `.env`
 
-- `export OPENAI_API_KEY=[your api key]`
+- Open the `.env` file and replace `$key` with an OpenAI API key (preferably with `gpt-4` access)
 
-Alternative for Windows
-- `set OPENAI_API_KEY=[your api key]` on cmd
-- `$env:OPENAI_API_KEY="[your api key]"` on powershell
+  - Note that `gpt-3.5-turbo-16k` is set as a fallback model for API keys without `gpt-4` privileges
 
 **Run**:
 
