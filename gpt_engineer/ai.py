@@ -187,10 +187,7 @@ class AI:
             n_tokens += (
                 4  # every message follows <im_start>{role/name}\n{content}<im_end>\n
             )
-            for key, value in message.items():
-                n_tokens += self.num_tokens(value)
-                if key == "name":  # if there's a name, the role is omitted
-                    n_tokens += -1  # role is always required and always 1 token
+            n_tokens += self.num_tokens(message.content)
         n_tokens += 2  # every reply is primed with <im_start>assistant
         return n_tokens
 
