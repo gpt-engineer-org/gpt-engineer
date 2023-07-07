@@ -4,6 +4,8 @@ import json
 import logging
 import re
 
+from pathlib import Path
+
 import openai
 
 
@@ -23,71 +25,19 @@ logger = logging.getLogger(__name__)
 class AI:
     def __init__(self, modelid="gpt-4", temperature=0.1):
         self.temperature = temperature
+        # __file__ is "<package_dir>/gpt-engineer/ai.py"
+        # therefore .parent.parent/models is "<package_dir>/models"
+        self.modeldir = Path(__file__).resolve().parent.parent / "models"
         self.modelid = fallback_model(modelid)
         self.llm = None
 
-        # self.llm = load_llm("models/" + self.modelid + ".yaml")
-
-        """
-        # HUGGINGFACEHUB_API_TOKEN="hf_ASMyUUNgbhrqFnUbfKVixDiVlGDdQiCIKhbg"
-        #repo_id = "facebook/mbart-large-50"
-        # repo_id = "google/flan-t5-xl"
-        # repo_id = "databricks/dolly-v2-3b"
-        repo_id = "stabilityai/stablelm-tuned-alpha-3b"
-        # repo_id = "Writer/camel-5b-hf"
-        # repo_id = "tiiuae/falcon-40b-instruct"
-        # repo_id = "TheBloke/Manticore-13B-Chat-Pyg-Guanaco-SuperHOT-8K-fp16"
-        self.llm = HuggingFaceHub(repo_id=repo_id, model_kwargs={ "temperature": 0 }) #,
-                           # huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN)
-        """
-        """
-        # Run models locally
-        self.llm = HuggingFacePipeline.from_model_id(model_id=repo_id,
-                                                     task="text-generation",
-                                                     model_kwargs={"temperature": 0 })
-        """
-
-        """
-        # HF Text generation Endpoint
-        llm = HuggingFaceTextGenInference(
-            inference_server_url="http://localhost:8010/",
-            #max_new_tokens=512,
-            #top_k=10,
-            #top_p=0.95,
-            #typical_p=0.95,
-            temperature=temperatu re,
-            #repetition_penalty=1.03,
-        )
-        # llm("What did foo say about bar?")
-        """
-
-        """
-        # Amazon Endpoint
-        api_url = "https://<api_gateway_id>.execute-api.<region>.amazonaws.com/LATEST/HF"
-        llm = AmazonAPIGateway(api_url=api_url)
-        """
-
-        # logging.info(self.llm)
-        # self.llm.save("models/" + repo_id + ".yaml")
-
-        # hf_embeddings = HuggingFaceEmbeddings(
-        #                  model_name='sentence-transformers/all-MiniLM-L6-v2')
         try:
-            # TODO: check for filename, if no yaml, try json
-            llm_filename = "models/" + self.modelid + ".yaml"
-            # cwd = os.getcwd()
-            # logging.info("Working Dir: " + cwd)
-            logging.info("LLM file name: " + llm_filename)
-            self.llm = load_llm(llm_filename)  # load llm from file
+            llm_filename = self.modeldir / f"{modelid}.yaml"
+            logging.info(f"LLM file name: {llm_filename}")
+            self.llm = load_llm(llm_filename)
+            print(f"DEBUG: type(self.llm) = {type(self.llm)}, self.llm = {self.llm}")
         except Exception as e:
-            logging.warning("Unable to load LLM", e)
-        """
-        try:
-            self.chat = ChatOpenAI(model=self.modelid, temperature=temperature)
-        except Exception as e:
-            # ? try a different model
-            logging.warning(e)
-        """
+            raise RuntimeError(f"Unable to load LLM {modelid} from file", e)
 
     def start(self, system, user):
         messages = [
