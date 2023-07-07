@@ -17,7 +17,7 @@ app = typer.Typer()
 def main(
     project_path: str = typer.Argument("example", help="path"),
     delete_existing: bool = typer.Argument(False, help="delete existing files"),
-    modelid: str = typer.Argument("gpt-4", help="model id string"),
+    model_id: str = typer.Argument("gpt-4", help="model id string"),
     temperature: float = 0.1,
     steps_config: steps.Config = typer.Option(
         steps.Config.DEFAULT, "--steps", "-s", help="decide which steps to run"
@@ -28,6 +28,15 @@ def main(
         help=(
             "run prefix, if you want to run multiple variants of the same project and "
             "later compare them"
+        ),
+    ),
+    model_dir: str = typer.Option(
+        None,
+        "--modeldir",
+        "-md",
+        help=(
+            "directory of your model yaml file. "
+            "Default is '<gpt-engineer package>/models/'."
         ),
     ),
 ):
@@ -43,7 +52,8 @@ def main(
         shutil.rmtree(workspace_path, ignore_errors=True)
 
     ai = AI(
-        modelid=modelid,
+        model_dir=model_dir,
+        model_id=model_id,
         temperature=temperature,
     )
 

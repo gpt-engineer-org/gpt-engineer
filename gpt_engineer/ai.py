@@ -22,20 +22,25 @@ logger = logging.getLogger(__name__)
 
 
 class AI:
-    def __init__(self, modelid="gpt-4", temperature=0.1):
+    def __init__(self, model_dir=None, model_id="gpt-4", temperature=0.1):
         self.temperature = temperature
-        # __file__ is "<package_dir>/gpt-engineer/ai.py"
-        # therefore .parent.parent/models is "<package_dir>/models"
-        self.modeldir = Path(__file__).resolve().parent.parent / "models"
-        self.modelid = fallback_model(modelid)
+        if model_dir:
+            self.model_dir = Path(model_dir)
+        else:
+            # __file__ is "<package_dir>/gpt-engineer/ai.py"
+            # therefore .parent.parent/models is "<package_dir>/models"
+            self.model_dir = Path(__file__).resolve().parent.parent / "models"
+        self.model_id = fallback_model(model_id)
         self.llm = None
 
+        llm_filename = self.model_dir / f"{model_id}.yaml"
         try:
-            llm_filename = self.modeldir / f"{modelid}.yaml"
             logging.info(f"LLM file name: {llm_filename}")
             self.llm = load_llm(llm_filename)
         except Exception as e:
-            raise RuntimeError(f"Unable to load LLM {modelid} from file", e)
+            raise RuntimeError(
+                f"Unable to load LLM {model_id} from file {llm_filename}", e
+            )
 
     def start(self, system, user):
         messages = [
