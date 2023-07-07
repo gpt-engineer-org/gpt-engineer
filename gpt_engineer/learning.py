@@ -154,12 +154,10 @@ def ask_if_can_store() -> bool:
     return can_store == "y"
 
 
-def logs_to_string(steps: List[Step], logs: DB):
+def logs_to_string(steps: List[Step], logs: DB) -> str:
     chunks = []
     for step in steps:
         chunks.append(f"--- {step.__name__} ---\n")
-        # messages = json.loads(logs[step.__name__])
-        # chunks.append(format_messages(messages))
         chunks.append(logs[step.__name__])
     return "\n".join(chunks)
 

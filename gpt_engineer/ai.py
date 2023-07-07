@@ -6,7 +6,7 @@ import re
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List
+from typing import Optional, Sequence
 
 import openai
 import tiktoken
@@ -15,6 +15,7 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.llms.loading import load_llm
 from langchain.schema import (
     AIMessage,
+    BaseMessage,
     HumanMessage,
     SystemMessage,
     messages_from_dict,
@@ -73,24 +74,23 @@ class AI:
             )
             self.tokenizer = tiktoken.get_encoding("cl100k_base")
 
-    def start(self, system, user, step_name):
+    def start(self, system: str, user: str, step_name: str) -> Sequence[BaseMessage]:
         messages = [
             SystemMessage(content=system),
             HumanMessage(content=user),
         ]
-
         return self.next(messages, step_name=step_name)
 
-    def fsystem(self, msg):
+    def fsystem(self, msg: str) -> SystemMessage:
         return SystemMessage(content=msg)
 
-    def fuser(self, msg):
+    def fuser(self, msg: str) -> HumanMessage:
         return HumanMessage(content=msg)
 
-    def fassistant(self, msg):
+    def fassistant(self, msg: str) -> AIMessage:
         return AIMessage(content=msg)
 
-    def combine_messages(self, messages: list[dict[str, str]]):
+    def combine_messages(self, messages: Sequence[BaseMessage]) -> str:
         msg_dict = messages_to_dict(messages)
         logging.debug(msg_dict)
         prompt = "\n".join(
@@ -99,9 +99,16 @@ class AI:
         logging.debug("Prompt: " + prompt)
         return prompt
 
-    def next(self, messages: List[Dict[str, str]], prompt=None, *, step_name=None):
+    def next(
+        self,
+        messages: Sequence[BaseMessage],
+        prompt: Optional[str] = None,
+        *,
+        step_name: str,
+    ) -> Sequence[BaseMessage]:
         if prompt:
-            messages += [self.fuser(prompt)]
+            # need to make message a mutable list before we can change it
+            messages = list(messages) + [self.fuser(prompt)]
 
         logger.debug(f"Creating a new chat completion: {messages}")
 
@@ -109,7 +116,8 @@ class AI:
         response = self.llm(msgs_as_prompt, callbacks=[StreamingStdOutCallbackHandler()])
         response = cleanup_reponse(response)
 
-        messages += [self.fassistant(response)]
+        # need to make message a mutable list before we can change it
+        messages = list(messages) + [self.fassistant(response)]
 
         logger.debug(f"Chat completion finished: {messages}")
 
@@ -119,25 +127,22 @@ class AI:
 
         return messages
 
-    def last_message_content(self, messages):
-        m = messages[-1].content
-        if m:
-            m = m.strip()
+    def last_message_content(self, messages: Sequence[BaseMessage]) -> str:
+        m = messages[-1].content.strip()
         logging.info(m)
-        print(m)
         return m
 
-    def serialize_messages(messages):
-        r = "[]"
-        if messages and isinstance(messages, list) and len(messages) > 0:
-            r = json.dumps(messages_to_dict(messages))
-        return r
+    @staticmethod
+    def serialize_messages(messages: Sequence[BaseMessage]) -> str:
+        return json.dumps(messages_to_dict(messages))
 
-    def deserialize_messages(jsondictstr):
-        r = messages_from_dict(json.loads(jsondictstr))
-        return r
+    @staticmethod
+    def deserialize_messages(jsondictstr: str) -> Sequence[BaseMessage]:
+        return messages_from_dict(json.loads(jsondictstr))
 
-    def update_token_usage_log(self, messages, answer, step_name):
+    def update_token_usage_log(
+        self, messages: Sequence[BaseMessage], answer: str, step_name: str
+    ) -> None:
         prompt_tokens = self.num_tokens_from_messages(messages)
         completion_tokens = self.num_tokens(answer)
         total_tokens = prompt_tokens + completion_tokens
@@ -158,7 +163,7 @@ class AI:
             )
         )
 
-    def format_token_usage_log(self):
+    def format_token_usage_log(self) -> str:
         result = "step_name,"
         result += "prompt_tokens_in_step,completion_tokens_in_step,total_tokens_in_step"
         result += ",total_prompt_tokens,total_completion_tokens,total_tokens\n"
@@ -172,10 +177,10 @@ class AI:
             result += str(log.total_tokens) + "\n"
         return result
 
-    def num_tokens(self, txt):
+    def num_tokens(self, txt: str) -> int:
         return len(self.tokenizer.encode(txt))
 
-    def num_tokens_from_messages(self, messages):
+    def num_tokens_from_messages(self, messages: Sequence[BaseMessage]) -> int:
         """Returns the number of tokens used by a list of messages."""
         n_tokens = 0
         for message in messages:
@@ -203,11 +208,11 @@ def fallback_model(model: str) -> str:
         return "gpt-3.5-turbo-16k"
 
 
-def serialize_messages(messages):
+def serialize_messages(messages: Sequence[BaseMessage]) -> str:
     return AI.serialize_messages(messages)
 
 
-def cleanup_reponse(response):
+def cleanup_reponse(response: str) -> str:
     response = re.sub(
         "\\n", "\n", response
     )  # for some reason models sometimes return \n instead of newline?
