@@ -3,14 +3,17 @@ import re
 import subprocess
 
 from enum import Enum
-from typing import List
+from typing import List, Union
 
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from termcolor import colored
 
 from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import to_files
 from gpt_engineer.db import DBs
 from gpt_engineer.learning import human_input
+
+Message = Union[AIMessage, HumanMessage, SystemMessage]
 
 
 def setup_sys_prompt(dbs: DBs) -> str:
@@ -43,18 +46,18 @@ def curr_fn() -> str:
 # All steps below have the signature Step
 
 
-def simple_gen(ai: AI, dbs: DBs) -> List[dict]:
+def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
     """Run the AI on the main prompt and save the results"""
     messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs), step_name=curr_fn())
     to_files(ai.last_message_content(messages), dbs.workspace)
     return messages
 
 
-def clarify(ai: AI, dbs: DBs) -> List[dict]:
+def clarify(ai: AI, dbs: DBs) -> List[Message]:
     """
     Ask the user if they want to clarify anything and save the results to the workspace
     """
-    messages = [ai.fsystem(dbs.preprompts["clarify"])]
+    messages: List[Message] = [ai.fsystem(dbs.preprompts["clarify"])]
     user_input = get_prompt(dbs)
     while True:
         messages = ai.next(messages, user_input, step_name=curr_fn())
@@ -94,7 +97,7 @@ def clarify(ai: AI, dbs: DBs) -> List[dict]:
     return messages
 
 
-def gen_spec(ai: AI, dbs: DBs) -> List[dict]:
+def gen_spec(ai: AI, dbs: DBs) -> List[Message]:
     """
     Generate a spec from the main prompt + clarifications and save the results to
     the workspace
@@ -111,7 +114,7 @@ def gen_spec(ai: AI, dbs: DBs) -> List[dict]:
     return messages
 
 
-def respec(ai: AI, dbs: DBs) -> List[dict]:
+def respec(ai: AI, dbs: DBs) -> List[Message]:
     messages = AI.deserialize_messages(dbs.logs[gen_spec.__name__])
     messages += [ai.fsystem(dbs.preprompts["respec"])]
 

@@ -101,11 +101,11 @@ def check_consent():
     path = Path(".gpte_consent")
     if path.exists() and path.read_text() == "true":
         return
-    ans = input("Is it ok if we store your prompts to learn? (y/n)")
-    while ans.lower() not in ("y", "n"):
-        ans = input("Invalid input. Please enter y or n: ")
+    answer = input("Is it ok if we store your prompts to learn? (y/n)")
+    while answer.lower() not in ("y", "n"):
+        answer = input("Invalid input. Please enter y or n: ")
 
-    if ans.lower() == "y":
+    if answer.lower() == "y":
         path.write_text("true")
         print(colored("Thank you️", "light_green"))
         print()

@@ -6,7 +6,7 @@ import re
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import List, Optional, Sequence, Union
 
 import openai
 import tiktoken
@@ -21,6 +21,8 @@ from langchain.schema import (
     messages_from_dict,
     messages_to_dict,
 )
+
+Message = Union[AIMessage, HumanMessage, SystemMessage]
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +76,7 @@ class AI:
             )
             self.tokenizer = tiktoken.get_encoding("cl100k_base")
 
-    def start(self, system: str, user: str, step_name: str) -> Sequence[BaseMessage]:
+    def start(self, system: str, user: str, step_name: str) -> List[Message]:
         messages = [
             SystemMessage(content=system),
             HumanMessage(content=user),
@@ -90,7 +92,7 @@ class AI:
     def fassistant(self, msg: str) -> AIMessage:
         return AIMessage(content=msg)
 
-    def combine_messages(self, messages: Sequence[BaseMessage]) -> str:
+    def combine_messages(self, messages: List[Message]) -> str:
         msg_dict = messages_to_dict(messages)
         logging.debug(msg_dict)
         prompt = "\n".join(
@@ -101,11 +103,11 @@ class AI:
 
     def next(
         self,
-        messages: Sequence[BaseMessage],
+        messages: List[Message],
         prompt: Optional[str] = None,
         *,
         step_name: str,
-    ) -> Sequence[BaseMessage]:
+    ) -> List[Message]:
         if prompt:
             # need to make message a mutable list before we can change it
             messages = list(messages) + [self.fuser(prompt)]
@@ -127,21 +129,45 @@ class AI:
 
         return messages
 
-    def last_message_content(self, messages: Sequence[BaseMessage]) -> str:
+    def last_message_content(self, messages: List[Message]) -> str:
         m = messages[-1].content.strip()
         logging.info(m)
         return m
 
     @staticmethod
-    def serialize_messages(messages: Sequence[BaseMessage]) -> str:
+    def serialize_messages(messages: List[Message]) -> str:
         return json.dumps(messages_to_dict(messages))
 
     @staticmethod
-    def deserialize_messages(jsondictstr: str) -> Sequence[BaseMessage]:
-        return messages_from_dict(json.loads(jsondictstr))
+    def deserialize_messages(jsondictstr: str) -> List[Message]:
+        return AI.parse_langchain_basemessages(
+            messages_from_dict(json.loads(jsondictstr))
+        )
+
+    @staticmethod
+    def parse_langchain_basemessages(messages: Sequence[BaseMessage]) -> List[Message]:
+        """LangChain saves message history as Sequence[BaseMessage], which is immutable.
+        To make our code cleaner, we parse it to List[Message], which is mutable."""
+        parsed_messages = []
+
+        msg_type_to_cls = {
+            msg_cls(content="").type: msg_cls
+            for msg_cls in [AIMessage, HumanMessage, SystemMessage]
+        }
+        msg_types = list(msg_type_to_cls.keys())
+
+        for m in messages:
+            if m.type not in msg_types:
+                raise ValueError(
+                    f"Encountered unkown message type {m.type}."
+                    f" Allowed types are: {', '.join(msg_types)}."
+                )
+            parsed_messages.append(msg_type_to_cls[m.type](m.content))
+
+        return parsed_messages
 
     def update_token_usage_log(
-        self, messages: Sequence[BaseMessage], answer: str, step_name: str
+        self, messages: List[Message], answer: str, step_name: str
     ) -> None:
         prompt_tokens = self.num_tokens_from_messages(messages)
         completion_tokens = self.num_tokens(answer)
@@ -180,7 +206,7 @@ class AI:
     def num_tokens(self, txt: str) -> int:
         return len(self.tokenizer.encode(txt))
 
-    def num_tokens_from_messages(self, messages: Sequence[BaseMessage]) -> int:
+    def num_tokens_from_messages(self, messages: List[Message]) -> int:
         """Returns the number of tokens used by a list of messages."""
         n_tokens = 0
         for message in messages:
@@ -205,7 +231,7 @@ def fallback_model(model: str) -> str:
         return "gpt-3.5-turbo-16k"
 
 
-def serialize_messages(messages: Sequence[BaseMessage]) -> str:
+def serialize_messages(messages: List[Message]) -> str:
     return AI.serialize_messages(messages)
 
 
