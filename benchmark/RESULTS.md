@@ -74,6 +74,6 @@ failing tests, 'WebDriver' object has no attribute 'find_element_by_id'
 
 pomodoro: doesn't run it only tests
 
-currency_converter: backend doesnt return anything
+currency_converter: backend doesn't return anything
 
 weather_app only runs test, no code existed

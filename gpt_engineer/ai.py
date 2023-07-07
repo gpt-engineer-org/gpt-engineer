@@ -4,9 +4,12 @@ import json
 import logging
 import re
 
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Dict, List
 
 import openai
+import tiktoken
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.llms.loading import load_llm
@@ -21,8 +24,19 @@ from langchain.schema import (
 logger = logging.getLogger(__name__)
 
 
+@dataclass
+class TokenUsage:
+    step_name: str
+    in_step_prompt_tokens: int
+    in_step_completion_tokens: int
+    in_step_total_tokens: int
+    total_prompt_tokens: int
+    total_completion_tokens: int
+    total_tokens: int
+
+
 class AI:
-    def __init__(self, model_dir=None, model_id="gpt-4", temperature=0.1):
+    def __init__(self, model_dir=None, model_name="gpt-4", temperature=0.1):
         self.temperature = temperature
         if model_dir:
             self.model_dir = Path(model_dir)
@@ -30,25 +44,42 @@ class AI:
             # __file__ is "<package_dir>/gpt-engineer/ai.py"
             # therefore .parent.parent/models is "<package_dir>/models"
             self.model_dir = Path(__file__).resolve().parent.parent / "models"
-        self.model_id = fallback_model(model_id)
+        self.model_name = fallback_model(model_name)
         self.llm = None
 
-        llm_filename = self.model_dir / f"{model_id}.yaml"
+        llm_filename = self.model_dir / f"{model_name}.yaml"
         try:
             logging.info(f"LLM file name: {llm_filename}")
             self.llm = load_llm(llm_filename)
         except Exception as e:
             raise RuntimeError(
-                f"Unable to load LLM {model_id} from file {llm_filename}", e
+                f"Unable to load LLM {model_name} from file {llm_filename}", e
             )
 
-    def start(self, system, user):
+        # initialize token usage log
+        self.cumulative_prompt_tokens = 0
+        self.cumulative_completion_tokens = 0
+        self.cumulative_total_tokens = 0
+        self.token_usage_log = []
+
+        # ToDo: Adapt to arbitrary model, currently assumes model using tiktoken
+        try:
+            self.tokenizer = tiktoken.encoding_for_model(model_name)
+        except KeyError:
+            logger.debug(
+                f"Tiktoken encoder for model {model_name} not found. Using "
+                "cl100k_base encoder instead. The results may therefore be "
+                "inaccurate and should only be used as estimate."
+            )
+            self.tokenizer = tiktoken.get_encoding("cl100k_base")
+
+    def start(self, system, user, step_name):
         messages = [
             SystemMessage(content=system),
             HumanMessage(content=user),
         ]
 
-        return self.next(messages)
+        return self.next(messages, step_name=step_name)
 
     def fsystem(self, msg):
         return SystemMessage(content=msg)
@@ -68,7 +99,7 @@ class AI:
         logging.debug("Prompt: " + prompt)
         return prompt
 
-    def next(self, messages: list[dict[str, str]], prompt=None):
+    def next(self, messages: List[Dict[str, str]], prompt=None, *, step_name=None):
         if prompt:
             messages += [self.fuser(prompt)]
 
@@ -81,6 +112,10 @@ class AI:
         messages += [self.fassistant(response)]
 
         logger.debug(f"Chat completion finished: {messages}")
+
+        self.update_token_usage_log(
+            messages=messages, answer=response, step_name=step_name
+        )
 
         return messages
 
@@ -102,6 +137,58 @@ class AI:
         r = messages_from_dict(json.loads(jsondictstr))
         return r
 
+    def update_token_usage_log(self, messages, answer, step_name):
+        prompt_tokens = self.num_tokens_from_messages(messages)
+        completion_tokens = self.num_tokens(answer)
+        total_tokens = prompt_tokens + completion_tokens
+
+        self.cumulative_prompt_tokens += prompt_tokens
+        self.cumulative_completion_tokens += completion_tokens
+        self.cumulative_total_tokens += total_tokens
+
+        self.token_usage_log.append(
+            TokenUsage(
+                step_name=step_name,
+                in_step_prompt_tokens=prompt_tokens,
+                in_step_completion_tokens=completion_tokens,
+                in_step_total_tokens=total_tokens,
+                total_prompt_tokens=self.cumulative_prompt_tokens,
+                total_completion_tokens=self.cumulative_completion_tokens,
+                total_tokens=self.cumulative_total_tokens,
+            )
+        )
+
+    def format_token_usage_log(self):
+        result = "step_name,"
+        result += "prompt_tokens_in_step,completion_tokens_in_step,total_tokens_in_step"
+        result += ",total_prompt_tokens,total_completion_tokens,total_tokens\n"
+        for log in self.token_usage_log:
+            result += log.step_name + ","
+            result += str(log.in_step_prompt_tokens) + ","
+            result += str(log.in_step_completion_tokens) + ","
+            result += str(log.in_step_total_tokens) + ","
+            result += str(log.total_prompt_tokens) + ","
+            result += str(log.total_completion_tokens) + ","
+            result += str(log.total_tokens) + "\n"
+        return result
+
+    def num_tokens(self, txt):
+        return len(self.tokenizer.encode(txt))
+
+    def num_tokens_from_messages(self, messages):
+        """Returns the number of tokens used by a list of messages."""
+        n_tokens = 0
+        for message in messages:
+            n_tokens += (
+                4  # every message follows <im_start>{role/name}\n{content}<im_end>\n
+            )
+            for key, value in message.items():
+                n_tokens += self.num_tokens(value)
+                if key == "name":  # if there's a name, the role is omitted
+                    n_tokens += -1  # role is always required and always 1 token
+        n_tokens += 2  # every reply is primed with <im_start>assistant
+        return n_tokens
+
 
 def fallback_model(model: str) -> str:
     try:
@@ -113,7 +200,7 @@ def fallback_model(model: str) -> str:
             "to gpt-3.5-turbo. Sign up for the GPT-4 wait list here: "
             "https://openai.com/waitlist/gpt-4-api\n"
         )
-        return "gpt-3.5-turbo"
+        return "gpt-3.5-turbo-16k"
 
 
 def serialize_messages(messages):

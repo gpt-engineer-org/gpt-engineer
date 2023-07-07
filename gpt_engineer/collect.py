@@ -1,5 +1,4 @@
 import hashlib
-import os
 
 from typing import List
 
@@ -23,10 +22,6 @@ def send_learning(learning: Learning):
 
 
 def collect_learnings(model: str, temperature: float, steps: List[Step], dbs: DBs):
-    if os.environ.get("COLLECT_LEARNINGS_OPT_IN") in ["false", "1"]:
-        print("COLLECT_LEARNINGS_OPT_IN is set to false, not collecting learning")
-        return
-
     learnings = extract_learning(
         model, temperature, steps, dbs, steps_file_hash=steps_file_hash()
     )
@@ -36,4 +31,4 @@ def collect_learnings(model: str, temperature: float, steps: List[Step], dbs: DB
 def steps_file_hash():
     with open(steps.__file__, "r") as f:
         content = f.read()
-        return hashlib.sha256(content.encode("utf-8"), usedforsecurity=False).hexdigest()
+        return hashlib.sha256(content.encode("utf-8")).hexdigest()
