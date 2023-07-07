@@ -159,7 +159,7 @@ class AI:
         for m in messages:
             if m.type not in msg_types:
                 raise ValueError(
-                    f"Encountered unkown message type {m.type}."
+                    f"Encountered unknown message type {m.type}."
                     f" Allowed types are: {', '.join(msg_types)}."
                 )
             parsed_messages.append(msg_type_to_cls[m.type](m.content))
