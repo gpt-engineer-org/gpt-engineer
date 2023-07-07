@@ -8,10 +8,9 @@ from pathlib import Path
 
 import openai
 
-
-# from langchain.chat_models import ChatOpenAI
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.llms.loading import load_llm
-from langchain.schema import (  # serialization
+from langchain.schema import (
     AIMessage,
     HumanMessage,
     SystemMessage,
@@ -35,7 +34,6 @@ class AI:
             llm_filename = self.modeldir / f"{modelid}.yaml"
             logging.info(f"LLM file name: {llm_filename}")
             self.llm = load_llm(llm_filename)
-            print(f"DEBUG: type(self.llm) = {type(self.llm)}, self.llm = {self.llm}")
         except Exception as e:
             raise RuntimeError(f"Unable to load LLM {modelid} from file", e)
 
@@ -58,12 +56,11 @@ class AI:
 
     def combine_messages(self, messages: list[dict[str, str]]):
         msg_dict = messages_to_dict(messages)
-        logging.info(msg_dict)
-        # prompt = "\n".join(msg_dict =>
+        logging.debug(msg_dict)
         prompt = "\n".join(
             "%s: %s" % (md["type"], md["data"]["content"]) for md in msg_dict
         )
-        logging.info("Prompt: " + prompt)
+        logging.debug("Prompt: " + prompt)
         return prompt
 
     def next(self, messages: list[dict[str, str]], prompt=None):
@@ -72,16 +69,11 @@ class AI:
 
         logger.debug(f"Creating a new chat completion: {messages}")
 
-        # r = self.chat(messages)
-        mp = self.combine_messages(messages)
-        r = self.llm(mp)
-        r = re.sub(
-            "\\n", "\n", r
-        )  # for some reason models sometimes return \n instead of newline?
+        msgs_as_prompt = self.combine_messages(messages)
+        response = self.llm(msgs_as_prompt, callbacks=[StreamingStdOutCallbackHandler()])
+        response = cleanup_reponse(response)
 
-        if isinstance(r, str):
-            r = self.fassistant(r)
-        messages += [r]  # AI Message
+        messages += [self.fassistant(response)]
 
         logger.debug(f"Chat completion finished: {messages}")
 
@@ -91,7 +83,7 @@ class AI:
         m = messages[-1].content
         if m:
             m = m.strip()
-        # logging.info(m)
+        logging.info(m)
         print(m)
         return m
 
@@ -121,3 +113,10 @@ def fallback_model(model: str) -> str:
 
 def serialize_messages(messages):
     return AI.serialize_messages(messages)
+
+
+def cleanup_reponse(response):
+    response = re.sub(
+        "\\n", "\n", response
+    )  # for some reason models sometimes return \n instead of newline?
+    return response

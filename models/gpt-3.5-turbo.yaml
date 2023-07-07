@@ -9,3 +9,4 @@ presence_penalty: 0.0
 request_timeout: null
 temperature: 0.0
 top_p: 1.0
+streaming: True
