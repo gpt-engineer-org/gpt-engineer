@@ -37,13 +37,13 @@ For **development**:
 
 **Setup**
 
-- Duplicate the `.env.template` file and rename it to `.env`
+- Duplicate the `.env.template` file and rename it to `.env`.
+- Open the `.env` file and replace `$key` with your OpenAI API key (preferably with `gpt-4` access). The key should be set as follows: `OPENAI_API_KEY=your_key_here`. Make sure there are no spaces around the equals sign and the key is enclosed in quotation marks if it contains special characters.
+  - If you want to set the OpenAI API key as an environment variable directly, you can do so using the following command in your terminal: `export OPENAI_API_KEY=your_key_here`. Please note that this environment variable will be available only for the current session. If you close the terminal or start a new session, you will need to set it again.
+  - `gpt-engineer` will first check if the `OPENAI_API_KEY` environment variable is set. If it is not, it will load the API key from the `.env` file.
+  - Note that `gpt-3.5-turbo-16k` is set as a fallback model for API keys without `gpt-4` privileges.
 
-- Open the `.env` file and replace `$key` with an OpenAI API key (preferably with `gpt-4` access)
-
-  - Note that `gpt-3.5-turbo-16k` is set as a fallback model for API keys without `gpt-4` privileges
-
-**Run**:
+**Run**
 
 - Create an empty folder. If inside the repo, you can run:
   - `cp -r projects/example/ projects/my-new-project`
