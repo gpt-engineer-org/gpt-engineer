@@ -1,1 +1,1 @@
-Build a simple markdown editor using HTML, CSS, and JavaScript. Allow users to input markdown text and display the formatted output in real-time.
+Build a simple markdown editor using HTML, CSS, and JavaScript. Allow users to input markdown text and display the formatted output in real-time. Please never forget that the developed markdown editor must support real-time PDF display.
