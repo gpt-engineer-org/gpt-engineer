@@ -1,9 +1,12 @@
 import json
 import logging
+import os
+from pathlib import Path
 
 from pathlib import Path
 
 import typer
+from dotenv import load_dotenv
 
 from gpt_engineer.ai import AI, fallback_model
 from gpt_engineer.collect import collect_learnings
@@ -12,6 +15,14 @@ from gpt_engineer.learning import collect_consent
 from gpt_engineer.steps import STEPS, Config as StepsConfig
 
 app = typer.Typer()
+
+def load_env_if_needed():
+    """
+    Check if API KEY env variable exist
+    If it doesn’t, call load_dotenv
+    """
+    if os.getenv("OPENAI_API_KEY") is None:
+        load_dotenv()
 
 
 @app.command()
@@ -25,6 +36,9 @@ def main(
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
+
+    # Call the new function before any actions that require environment variables
+    load_env_if_needed()
 
     model = fallback_model(model)
     ai = AI(
