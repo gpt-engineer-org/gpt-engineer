@@ -29,7 +29,7 @@ All errors are very easy to fix.
 
 One error was trying to modify a constant.
 One error was that the html template was not fully filled in.
-One error is that a dependency was used incorrectly and easy to fix
+One error is that a dependency was used incorrectly and easy to fix.
 
 ## 2023-06-19
 
