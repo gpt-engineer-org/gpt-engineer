@@ -291,18 +291,6 @@ class Config(str, Enum):
 
 
 # Different configs of what steps to run
-"""
-CHAINS = {
-    Config.DEFAULT: SimpleSequentialChain(chains=[
-                                                    clarify_chain,
-                                                    # route base on new / existing project
-                                                    # route based on language
-                                                    # transform based on language
-
-                                                 ], verbose=True)
-}
-"""
-
 STEPS = {
     Config.DEFAULT: [
         clarify,

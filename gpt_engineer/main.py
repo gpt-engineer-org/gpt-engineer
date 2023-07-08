@@ -22,13 +22,6 @@ def main(
         StepsConfig.DEFAULT, "--steps", "-s", help="decide which steps to run"
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
-    run_prefix: str = typer.Option(
-        "",
-        help=(
-            "run prefix, if you want to run multiple variants of the same project and "
-            "later compare them"
-        ),
-    ),
     model_dir: str = typer.Option(
         None,
         "--modeldir",

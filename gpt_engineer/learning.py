@@ -11,7 +11,6 @@ from typing import List, Optional
 from dataclasses_json import dataclass_json
 from termcolor import colored
 
-from gpt_engineer.ai import serialize_messages
 from gpt_engineer.db import DB, DBs
 from gpt_engineer.domain import Step
 
@@ -160,15 +159,6 @@ def logs_to_string(steps: List[Step], logs: DB) -> str:
         chunks.append(f"--- {step.__name__} ---\n")
         chunks.append(logs[step.__name__])
     return "\n".join(chunks)
-
-
-def format_messages(messages: List[dict]) -> str:
-    msg = ""
-    try:
-        msg = serialize_messages(messages)  # not as pretty (yet)
-    except Exception:
-        pass
-    return msg
 
 
 def extract_learning(

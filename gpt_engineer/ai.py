@@ -109,8 +109,7 @@ class AI:
         step_name: str,
     ) -> List[Message]:
         if prompt:
-            # need to make message a mutable list before we can change it
-            messages = list(messages) + [self.fuser(prompt)]
+            messages.append(self.fuser(prompt))
 
         logger.debug(f"Creating a new chat completion: {messages}")
 
@@ -118,8 +117,7 @@ class AI:
         response = self.llm(msgs_as_prompt, callbacks=[StreamingStdOutCallbackHandler()])
         response = cleanup_reponse(response)
 
-        # need to make message a mutable list before we can change it
-        messages = list(messages) + [self.fassistant(response)]
+        messages.append(self.fassistant(response))
 
         logger.debug(f"Chat completion finished: {messages}")
 
@@ -162,7 +160,7 @@ class AI:
                     f"Encountered unknown message type {m.type}."
                     f" Allowed types are: {', '.join(msg_types)}."
                 )
-            parsed_messages.append(msg_type_to_cls[m.type](m.content))
+            parsed_messages.append(msg_type_to_cls[m.type](content=m.content))
 
         return parsed_messages
 
