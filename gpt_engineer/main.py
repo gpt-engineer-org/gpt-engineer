@@ -23,6 +23,10 @@ def load_env_if_needed():
     """
     if os.getenv("OPENAI_API_KEY") is None:
         load_dotenv()
+        # After attempting to load from .env, check again
+        if os.getenv("OPENAI_API_KEY") is None:
+            raise ValueError("Cannot run the program without OPENAI_API_KEY environment variable.\nPlease set it in your environment or in a .env file.")
+
 
 
 @app.command()
