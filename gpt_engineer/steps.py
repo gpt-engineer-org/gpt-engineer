@@ -9,7 +9,13 @@ from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from termcolor import colored
 
 from gpt_engineer.ai import AI
-from gpt_engineer.chat_to_files import format_file_to_input, get_code_strings, to_files
+from gpt_engineer.chat_to_files import (
+    ask_for_files,
+    format_file_to_input,
+    get_code_strings,
+    overwrite_files,
+    to_files,
+)
 from gpt_engineer.db import DBs
 from gpt_engineer.learning import human_input
 
@@ -268,13 +274,33 @@ def use_feedback(ai: AI, dbs: DBs):
 
 def improve_existing_code(ai: AI, dbs: DBs):
     """
-    Based on a list of existing files, ask the AI agent to
+    Ask the user for a list of paths, ask the AI agent to
     improve, fix or add a new functionality
-    Necessary to have a 'file_list.txt' and a 'prompt' in the project folder.
-    The file_list.txt should have the path of the code to be changed
-    The prompt should have the request for change.
+    A file selection will appear to select the files.
+    The terminal will ask for the prompt.
     """
+    file_path_info = ask_for_files(dbs.input)
     filesInfo = get_code_strings(dbs.input)
+    dbs.input["prompt"] = input(
+        "\nWhat do you need to improve with the selected files?\n"
+    )
+
+    confirmstr = f"""
+-----------------------------
+The following files will be used in the improvement process:
+{dbs.input["file_list.txt"]}
+
+The inserted prompt is the following:
+'{dbs.input['prompt']}'
+-----------------------------
+
+You can change these files in .gpteng folder ({dbs.input.path}) in your project
+before proceeding.
+
+Press enter to proceed with modifications.
+
+"""
+    input(confirmstr)
     messages = [
         ai.fsystem(setup_sys_prompt_existing_code(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
@@ -285,7 +311,8 @@ def improve_existing_code(ai: AI, dbs: DBs):
         messages.append(ai.fuser(f"{codeInput}"))
 
     messages = ai.next(messages)
-    to_files(messages[-1]["content"], dbs.workspace)
+    # Maybe we should add another step called "replace" or "overwrite"
+    overwrite_files(messages[-1]["content"], dbs, replace_files=file_path_info)
     return messages
 
 

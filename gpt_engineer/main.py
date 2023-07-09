@@ -1,5 +1,8 @@
 import logging
 
+import os
+import shutil
+
 from pathlib import Path
 
 import typer
@@ -21,9 +24,37 @@ def main(
     steps_config: StepsConfig = typer.Option(
         StepsConfig.DEFAULT, "--steps", "-s", help="decide which steps to run"
     ),
+    improve_option: bool = typer.Option(
+        False,
+        "--improve",
+        "-i",
+        help="Improve code from existing project.",
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
+
+
+    input_path = Path(project_path).absolute()
+
+    # For the improve option take current project as path and add .gpteng folder
+    # By now, ignoring the 'project_path' argument
+    if improve_option:
+        input_path = Path(os.getcwd()).absolute() / ".gpteng"
+        input_path.mkdir(parents=True, exist_ok=True)
+        # The default option for the --improve is the IMPROVE_CODE, not DEFAULT
+        # I know this looks ugly, not sure if it is the best way to do that...
+        # we can change that in the future.
+        if steps_config == steps.Config.DEFAULT:
+            steps_config = steps.Config.IMPROVE_CODE
+
+    memory_path = input_path / f"{run_prefix}memory"
+    workspace_path = input_path / f"{run_prefix}workspace"
+
+    if delete_existing:
+        # Delete files and subdirectories in paths
+        shutil.rmtree(memory_path, ignore_errors=True)
+        shutil.rmtree(workspace_path, ignore_errors=True)
 
     model = fallback_model(model)
     ai = AI(
