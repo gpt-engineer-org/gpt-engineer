@@ -19,7 +19,7 @@ def test_collect_learnings(monkeypatch):
     model = "test_model"
     temperature = 0.5
     steps = [gen_code]
-    dbs = DBs(DB("/tmp"), DB("/tmp"), DB("/tmp"), DB("/tmp"), DB("/tmp"))
+    dbs = DBs(DB("/tmp"), DB("/tmp"), DB("/tmp"), DB("/tmp"), DB("/tmp"), DB("/tmp"))
     dbs.input = {
         "prompt": "test prompt\n with newlines",
         "feedback": "test feedback",
