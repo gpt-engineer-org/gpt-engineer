@@ -1,1 +1,19 @@
-We are writing snake in python. MVC components split in separate files. Keyboard control.
+Develop a platform that will act as a virtual assistant for handling and analyzing housing court case documents.
+
+The key features this platform should include are:
+
+1. Document Upload: Users should be able to upload PDF documents from a court case. In addition to accommodating other case-relevant documents, leverage GPT4 API to automatically categorize and tag these documents based on their type and relevance. 
+
+2. Real-Time AI Interaction: The application should effectively utilize the GPT4 API to analyze and comprehend the data from uploaded files. Ensure a real-time interaction interface where users can directly engage with the AI in a dedicated chat window, asking questions or seeking clarifications about the case, documents, or legal points.
+
+3. Case Understanding And Research: This goes beyond the AI reading and grasping the content of the case. It should also conduct in-depth research, synthesizing information to understand the case in detail.
+
+4. Legal Research and Updates: The AI should have the ability to not only research relevant laws pertaining to the documents and the case at hand but also stay up-to-date with changes and updates in laws and interpretations. 
+
+5. Web Consultation: The AI should also be able to conduct further research on the internet to gather additional information which may be helpful for the case.
+
+6. Advisory Role: Based on the analysis, the AI should be able to propose informed legal strategies, provide advice, highlight any potential misconduct or errors in the documents, and provide insight into ethical considerations. 
+
+7. Information Organizer: Include a specific section for data management where the uploaded documents, data gathered, and case notes can be stored. This should display the information in an organized way and establish connections between them visually, similar to a brainstorming diagram. Visual data representation tools, like infographics and diagrams, should be used to establish connections and patterns.
+
+In all tasks, ensure rigorous data protection measures. The user interface should be intuitive and user-friendly, with the layout that caters to the needs of users with diverse technical backgrounds.
