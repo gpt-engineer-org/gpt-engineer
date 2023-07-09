@@ -49,4 +49,16 @@ scratchpad
 # Ignore GPT Engineer files
 projects
 !projects/example
+
 .secrets/secrets.toml
+
+
+# Pyenv
+.python-version
+
+# Benchmark files
+benchmark
+!benchmark/*/prompt
+
+.gpte_consent
+

@@ -37,10 +37,13 @@ For **development**:
 
 **Setup**
 
-With an api key that has GPT4 access run:
+With an OpenAI API key (preferably with GPT-4 access) run:
 
 - `export OPENAI_API_KEY=[your api key]`
 
+Alternative for Windows
+- `set OPENAI_API_KEY=[your api key]` on cmd
+- `$env:OPENAI_API_KEY="[your api key]"` on powershell
 
 **Run**:
 
@@ -55,6 +58,11 @@ By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/g
 **Results**
 - Check the generated files in `projects/my-new-project/workspace`
 
+## Getting Started with GitHub Codespaces
+
+To get started, create a codespace for this repository by clicking this 👇
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
 
 ## Features
 
