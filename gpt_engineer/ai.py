@@ -2,17 +2,16 @@ from __future__ import annotations
 
 import json
 import logging
-import re
 
 from dataclasses import dataclass
-from pathlib import Path
 from typing import List, Optional, Sequence, Union
 
 import openai
 import tiktoken
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.llms.loading import load_llm
+from langchain.chat_models import ChatOpenAI
+from langchain.chat_models.base import BaseChatModel
 from langchain.schema import (
     AIMessage,
     BaseMessage,
@@ -39,25 +38,11 @@ class TokenUsage:
 
 
 class AI:
-    def __init__(self, model_dir=None, model_name="gpt-4", temperature=0.1):
+    def __init__(self, model_name="gpt-4", temperature=0.1):
         self.temperature = temperature
-        if model_dir:
-            self.model_dir = Path(model_dir)
-        else:
-            # __file__ is "<package_dir>/gpt-engineer/ai.py"
-            # therefore .parent.parent/models is "<package_dir>/models"
-            self.model_dir = Path(__file__).resolve().parent.parent / "models"
         self.model_name = fallback_model(model_name)
-        self.llm = None
-
-        llm_filename = self.model_dir / f"{model_name}.yaml"
-        try:
-            logging.info(f"LLM file name: {llm_filename}")
-            self.llm = load_llm(llm_filename)
-        except Exception as e:
-            raise RuntimeError(
-                f"Unable to load LLM {model_name} from file {llm_filename}", e
-            )
+        self.llm = create_chat_model(self.model_name, temperature)
+        self.tokenizer = get_tokenizer(self.model_name)
 
         # initialize token usage log
         self.cumulative_prompt_tokens = 0
@@ -65,19 +50,8 @@ class AI:
         self.cumulative_total_tokens = 0
         self.token_usage_log = []
 
-        # ToDo: Adapt to arbitrary model, currently assumes model using tiktoken
-        try:
-            self.tokenizer = tiktoken.encoding_for_model(model_name)
-        except KeyError:
-            logger.debug(
-                f"Tiktoken encoder for model {model_name} not found. Using "
-                "cl100k_base encoder instead. The results may therefore be "
-                "inaccurate and should only be used as estimate."
-            )
-            self.tokenizer = tiktoken.get_encoding("cl100k_base")
-
     def start(self, system: str, user: str, step_name: str) -> List[Message]:
-        messages = [
+        messages: List[Message] = [
             SystemMessage(content=system),
             HumanMessage(content=user),
         ]
@@ -92,15 +66,6 @@ class AI:
     def fassistant(self, msg: str) -> AIMessage:
         return AIMessage(content=msg)
 
-    def combine_messages(self, messages: List[Message]) -> str:
-        msg_dict = messages_to_dict(messages)
-        logging.debug(msg_dict)
-        prompt = "\n".join(
-            "%s: %s" % (md["type"], md["data"]["content"]) for md in msg_dict
-        )
-        logging.debug("Prompt: " + prompt)
-        return prompt
-
     def next(
         self,
         messages: List[Message],
@@ -113,23 +78,19 @@ class AI:
 
         logger.debug(f"Creating a new chat completion: {messages}")
 
-        msgs_as_prompt = self.combine_messages(messages)
-        response = self.llm(msgs_as_prompt, callbacks=[StreamingStdOutCallbackHandler()])
-        response = cleanup_reponse(response)
-
-        messages.append(self.fassistant(response))
+        response = self.llm(messages, callbacks=[StreamingStdOutCallbackHandler()])
+        messages.append(response)
 
         logger.debug(f"Chat completion finished: {messages}")
 
         self.update_token_usage_log(
-            messages=messages, answer=response, step_name=step_name
+            messages=messages, answer=response.content, step_name=step_name
         )
 
         return messages
 
     def last_message_content(self, messages: List[Message]) -> str:
         m = messages[-1].content.strip()
-        logging.info(m)
         return m
 
     @staticmethod
@@ -152,14 +113,8 @@ class AI:
             msg_cls(content="").type: msg_cls
             for msg_cls in [AIMessage, HumanMessage, SystemMessage]
         }
-        msg_types = list(msg_type_to_cls.keys())
 
         for m in messages:
-            if m.type not in msg_types:
-                raise ValueError(
-                    f"Encountered unknown message type {m.type}."
-                    f" Allowed types are: {', '.join(msg_types)}."
-                )
             parsed_messages.append(msg_type_to_cls[m.type](content=m.content))
 
         return parsed_messages
@@ -226,15 +181,39 @@ def fallback_model(model: str) -> str:
             "to gpt-3.5-turbo. Sign up for the GPT-4 wait list here: "
             "https://openai.com/waitlist/gpt-4-api\n"
         )
-        return "gpt-3.5-turbo-16k"
+        return "gpt-3.5-turbo"
+
+
+def create_chat_model(model: str, temperature) -> BaseChatModel:
+    if model == "gpt-4":
+        return ChatOpenAI(
+            model="gpt-4",
+            temperature=temperature,
+            streaming=True,
+            client=openai.ChatCompletion,
+        )
+    elif model == "gpt-3.5-turbo":
+        return ChatOpenAI(
+            model="gpt-3.5-turbo",
+            temperature=temperature,
+            streaming=True,
+            client=openai.ChatCompletion,
+        )
+    else:
+        raise ValueError(f"Model {model} is not supported.")
+
+
+def get_tokenizer(model: str):
+    if "gpt-4" in model or "gpt-3.5" in model:
+        return tiktoken.encoding_for_model(model)
+
+    logger.debug(
+        f"No encoder implemented for model {model}."
+        "Defaulting to tiktoken cl100k_base encoder."
+        "Use results only as estimates."
+    )
+    return tiktoken.get_encoding("cl100k_base")
 
 
 def serialize_messages(messages: List[Message]) -> str:
     return AI.serialize_messages(messages)
-
-
-def cleanup_reponse(response: str) -> str:
-    response = re.sub(
-        "\\n", "\n", response
-    )  # for some reason models sometimes return \n instead of newline?
-    return response

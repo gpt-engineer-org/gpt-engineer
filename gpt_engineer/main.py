@@ -22,21 +22,11 @@ def main(
         StepsConfig.DEFAULT, "--steps", "-s", help="decide which steps to run"
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
-    model_dir: str = typer.Option(
-        None,
-        "--modeldir",
-        "-md",
-        help=(
-            "directory of your model yaml file. "
-            "Default is '<gpt-engineer package>/models/'."
-        ),
-    ),
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
     model = fallback_model(model)
     ai = AI(
-        model_dir=model_dir,
         model_name=model,
         temperature=temperature,
     )
