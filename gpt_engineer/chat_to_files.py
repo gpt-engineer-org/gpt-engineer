@@ -1,7 +1,5 @@
 import os
 import re
-import tkinter as tk
-import tkinter.filedialog as fd
 
 
 def parse_chat(chat):  # -> List[Tuple[str, str]]:
@@ -97,29 +95,3 @@ def format_file_to_input(fileName: str, fileContent: str) -> str:
     ```
     """
     return filestr
-
-
-def ask_for_files(input) -> dict[str, str]:
-    """
-    Display a tkinter file selection window to select context files.
-    Return a dictionary of file_name as key and file_path as value
-    """
-    root = tk.Tk()
-    root.withdraw()
-    root.call("wm", "attributes", ".", "-topmost", True)
-    file_list = list(
-        fd.askopenfilenames(
-            parent=root,
-            initialdir=os.getcwd(),
-            title="Select relevant files for your change:",
-        )
-    )
-    file_list_string = ""
-    file_path_info = {}
-    for file_path in file_list:
-        file_list_string += file_path + "\n"
-        # Return a dict with key=file_name and value=file_path
-        file_path_info[os.path.basename(file_path).split("/")[-1]] = file_path
-    # Write in file_list so the user can edit and remember what was done
-    input["file_list.txt"] = file_list_string
-    return file_path_info
