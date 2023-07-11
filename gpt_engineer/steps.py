@@ -10,13 +10,13 @@ from termcolor import colored
 
 from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import (
-    ask_for_files,
     format_file_to_input,
     get_code_strings,
     overwrite_files,
     to_files,
 )
 from gpt_engineer.db import DBs
+from gpt_engineer.file_selector import ask_for_files
 from gpt_engineer.learning import human_input
 
 Message = Union[AIMessage, HumanMessage, SystemMessage]
