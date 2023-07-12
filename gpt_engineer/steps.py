@@ -297,7 +297,6 @@ STEPS = {
         gen_clarified_code,
         gen_entrypoint,
         execute_entrypoint,
-        # human_review,
     ],
     Config.BENCHMARK: [simple_gen, gen_entrypoint],
     Config.SIMPLE: [simple_gen, gen_entrypoint, execute_entrypoint],
