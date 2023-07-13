@@ -1,47 +1,55 @@
 # Roadmap
 
-There are three main milestones we believe will 2x gpt-engineer's reliability and capability:
-- Continuous evaluation of our progress
-- Make code generation become small, verifiable steps
-- Run tests and fix errors with GPT4
+There are three main milestones we believe will greatly increase gpt-engineer's reliability and capability:
+- [x] Continuous evaluation of our progress 🎉
+- [ ] Test code and fix errors with LLMs
+- [ ] Make code generation become small, verifiable steps
 
-## Steps to achieve our roadmap
+## Our current focus:
 
-- [ ] Continuous evaluation of our progress
-  - [ ] Create a step that asks “did it run/work/perfect” in the end of each run [#240](https://github.com/AntonOsika/gpt-engineer/issues/240)
-  - [ ] Run the benchmark multiple times, and document the results for the different "step configs" (`STEPS` in `steps.py`) [#239](https://github.com/AntonOsika/gpt-engineer/issues/239)
-  - [ ] Document the best performing configs, and feed these learnings into our roadmap
-  - [ ] Collect a dataset for gpt engineer to learn from, by storing code generation runs, and if they fail/succeed (on an opt out basis)
+- [x] Continuous evaluation of our progress 🎉
+  - [x] Create a step that asks “did it run/work/perfect” in the end of each run [#240](https://github.com/AntonOsika/gpt-engineer/issues/240) 🎉
+  - [x] Collect a dataset for gpt engineer to learn from, by storing code generation runs 🎉
+  - [ ] Run the benchmark multiple times, and document the results for the different "step configs" [#239](https://github.com/AntonOsika/gpt-engineer/issues/239)
+  - [ ] Document the best performing configs
 - [ ] Self healing code
-  - [ ] Feed the results of failing tests back into GPT4 and ask it to fix the code
+  - [ ] Run the generated tests
+  - [ ] Feed the results of failing tests back into LLM and ask it to fix the code
 - [ ] Let human give feedback
-  - [ ] Ask human for what is not working as expected in a loop, and feed it into GPT4 to fix the code, until the human is happy or gives up
+  - [ ] Ask human for what is not working as expected in a loop, and feed it into GPT4 to fix the code, until the human is happy
+- [ ] Improve existing projects
+  - [ ] Decide on the "flow" for the CLI commands and where the project files are created
+  - [ ] Add an "improve code" command
+  - [ ] Design how gpt-engineer becomes a platform
+  - [ ] Integrate Aider
+
+## Experimental research
+This is not current focus, but if you are interested in experimenting, please
+create a thread in our discord share your intentions in Discord's #general, and your findings as you
+go along.
 - [ ] Make code generation become small, verifiable steps
   - [ ] Ask GPT4 to decide how to sequence the entire generation, and do one
   prompt for each subcomponent
   - [ ] For each small part, generate tests for that subpart, and do the loop of running the tests for each part, feeding
 results into GPT4, and let it edit the code until they pass
-- [ ] LLM tests in CI
-  - [ ] Run very small tests with GPT3.5 in CI, to make sure we don't worsen
-performance over time
-- [ ] Dynamic planning
-  - [ ] Let gpt-engineer plan which "steps" to carry out itself, depending on the
+- [ ] Ad hoc experiments
+  - [ ] Try Microsoft guidance, and benchmark if this helps improve performance
+  - [ ] Dynamic planning: Let gpt-engineer plan which "steps" to carry out itself, depending on the
 task, by giving it few shot example of what are usually "the right-sized steps" to carry
-out for other projects
+out for such projects
+
+## Codebase improvements
+By improving the codebase and developer ergonomics we accelerate development
+acroess the board. A lot can be done, here are some examples:
+- [ ] Set up automatic PR review for all PRs with e.g. Codium pr-agent
+- [ ] LLM tests in CI: Run super small tests with GPT3.5 in CI, that check that simple code generation still works
 
 # How you can help out
 
 You can:
 
-- Submit your first PR to address an [issue](https://github.com/AntonOsika/gpt-engineer/issues)
+- Post a "design" as a google doc in our Discord and ask for feedback to address one of the items in the roadmap
 - Submit PRs to address one of the items in the roadmap
-- Do your first review of someone else's PR/issue and propose next steps (further review, merge, close)
-- Sign up to help [measure the progress of gpt-engineer towards recursively coding itself](https://forms.gle/TMX68mScyxQUsE6Y9)
+- Do a review of someone else's PR and propose next steps (further review, merge, close)
 
-Volunteer work in any of these gets acknowledged.
-
-### Repository ergonomics
-- [ ] Set up automatic PR review for all PRs (based on AI)
-
-### Ad hoc experiments
-- [ ] Try Microsoft guidance, and benchmark if this helps improve performance
+Volunteer work in any of these will get acknowledged.
