@@ -49,7 +49,7 @@ def curr_fn() -> str:
 def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
     """Run the AI on the main prompt and save the results"""
     messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs), step_name=curr_fn())
-    to_files(ai.last_message_content(messages), dbs.workspace)
+    to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
 
 
@@ -61,7 +61,7 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
     user_input = get_prompt(dbs)
     while True:
         messages = ai.next(messages, user_input, step_name=curr_fn())
-        msg = ai.last_message_content(messages)
+        msg = messages[-1].content.strip()
 
         if msg == "Nothing more to clarify.":
             break
@@ -109,7 +109,7 @@ def gen_spec(ai: AI, dbs: DBs) -> List[Message]:
 
     messages = ai.next(messages, dbs.preprompts["spec"], step_name=curr_fn())
 
-    dbs.memory["specification"] = ai.last_message_content(messages)
+    dbs.memory["specification"] = messages[-1].content.strip()
 
     return messages
 
@@ -132,7 +132,7 @@ def respec(ai: AI, dbs: DBs) -> List[Message]:
         step_name=curr_fn(),
     )
 
-    dbs.memory["specification"] = ai.last_message_content(messages)
+    dbs.memory["specification"] = messages[-1].content.strip()
     return messages
 
 
@@ -148,7 +148,7 @@ def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
 
     messages = ai.next(messages, dbs.preprompts["unit_tests"], step_name=curr_fn())
 
-    dbs.memory["unit_tests"] = ai.last_message_content(messages)
+    dbs.memory["unit_tests"] = messages[-1].content.strip()
     to_files(dbs.memory["unit_tests"], dbs.workspace)
 
     return messages
@@ -163,7 +163,7 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     ] + messages[1:]
     messages = ai.next(messages, dbs.preprompts["use_qa"], step_name=curr_fn())
 
-    to_files(ai.last_message_content(messages), dbs.workspace)
+    to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
 
 
@@ -176,7 +176,7 @@ def gen_code(ai: AI, dbs: DBs) -> List[dict]:
         ai.fuser(f"Unit tests:\n\n{dbs.memory['unit_tests']}"),
     ]
     messages = ai.next(messages, dbs.preprompts["use_qa"], step_name=curr_fn())
-    to_files(ai.last_message_content(messages), dbs.workspace)
+    to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
 
 
@@ -238,7 +238,7 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     print()
 
     regex = r"```\S*\n(.+?)```"
-    matches = re.finditer(regex, ai.last_message_content(messages), re.DOTALL)
+    matches = re.finditer(regex, messages[-1].content.strip(), re.DOTALL)
     dbs.workspace["run.sh"] = "\n".join(match.group(1) for match in matches)
     return messages
 
@@ -251,13 +251,13 @@ def use_feedback(ai: AI, dbs: DBs):
         ai.fsystem(dbs.preprompts["use_feedback"]),
     ]
     messages = ai.next(messages, dbs.input["feedback"], step_name=curr_fn())
-    to_files(ai.last_message_content(messages), dbs.workspace)
+    to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
 
 
 def fix_code(ai: AI, dbs: DBs):
     messages = AI.deserialize_messages(dbs.logs[gen_code.__name__])
-    code_output = ai.last_message_content(messages)
+    code_output = messages[-1].content.strip()
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
@@ -267,7 +267,7 @@ def fix_code(ai: AI, dbs: DBs):
     messages = ai.next(
         messages, "Please fix any errors in the code above.", step_name=curr_fn()
     )
-    to_files(ai.last_message_content(messages), dbs.workspace)
+    to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
 
 

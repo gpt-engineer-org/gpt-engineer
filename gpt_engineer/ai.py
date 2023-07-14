@@ -4,7 +4,7 @@ import json
 import logging
 
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Union
+from typing import List, Optional, Union
 
 import openai
 import tiktoken
@@ -14,7 +14,6 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import (
     AIMessage,
-    BaseMessage,
     HumanMessage,
     SystemMessage,
     messages_from_dict,
@@ -78,7 +77,8 @@ class AI:
 
         logger.debug(f"Creating a new chat completion: {messages}")
 
-        response = self.llm(messages, callbacks=[StreamingStdOutCallbackHandler()])
+        callsbacks = [StreamingStdOutCallbackHandler()]
+        response = self.llm(messages, callbacks=callsbacks)  # type: ignore
         messages.append(response)
 
         logger.debug(f"Chat completion finished: {messages}")
@@ -89,35 +89,13 @@ class AI:
 
         return messages
 
-    def last_message_content(self, messages: List[Message]) -> str:
-        m = messages[-1].content.strip()
-        return m
-
     @staticmethod
     def serialize_messages(messages: List[Message]) -> str:
         return json.dumps(messages_to_dict(messages))
 
     @staticmethod
     def deserialize_messages(jsondictstr: str) -> List[Message]:
-        return AI.parse_langchain_basemessages(
-            messages_from_dict(json.loads(jsondictstr))
-        )
-
-    @staticmethod
-    def parse_langchain_basemessages(messages: Sequence[BaseMessage]) -> List[Message]:
-        """LangChain saves message history as Sequence[BaseMessage], which is immutable.
-        To make our code cleaner, we parse it to List[Message], which is mutable."""
-        parsed_messages = []
-
-        msg_type_to_cls = {
-            msg_cls(content="").type: msg_cls
-            for msg_cls in [AIMessage, HumanMessage, SystemMessage]
-        }
-
-        for m in messages:
-            parsed_messages.append(msg_type_to_cls[m.type](content=m.content))
-
-        return parsed_messages
+        return list(messages_from_dict(json.loads(jsondictstr)))  # type: ignore
 
     def update_token_usage_log(
         self, messages: List[Message], answer: str, step_name: str
