@@ -44,7 +44,7 @@ def test_collect_learnings(monkeypatch):
     assert a == b
 
     assert json.dumps(code) in learnings.logs
-    assert json.dumps(code) in learnings.workspace
+    assert code in learnings.workspace
 
 
 if __name__ == "__main__":
