@@ -7,20 +7,20 @@ There are three main milestones we believe will greatly increase gpt-engineer's 
 
 ## Our current focus:
 
-- [x] **Continuous evaluation of our progress 🎉**
+- [x] **Continuous evaluation of progress 🎉**
   - [x] Create a step that asks “did it run/work/perfect” in the end of each run [#240](https://github.com/AntonOsika/gpt-engineer/issues/240) 🎉
   - [x] Collect a dataset for gpt engineer to learn from, by storing code generation runs 🎉
   - [ ] Run the benchmark multiple times, and document the results for the different "step configs" [#239](https://github.com/AntonOsika/gpt-engineer/issues/239)
-  - [ ] Document the best performing configs
+  - [ ] Improve the default config based on results
 - [ ] **Self healing code**
   - [ ] Run the generated tests
   - [ ] Feed the results of failing tests back into LLM and ask it to fix the code
 - [ ] **Let human give feedback**
-  - [ ] Ask human for what is not working as expected in a loop, and feed it into GPT4 to fix the code, until the human is happy
+  - [ ] Ask human for what is not working as expected in a loop, and feed it into LLM to fix the code, until the human is happy
 - [ ] **Improve existing projects**
   - [ ] Decide on the "flow" for the CLI commands and where the project files are created
   - [ ] Add an "improve code" command
-  - [ ] Design how gpt-engineer becomes a platform
+  - [ ] Architect how gpt-engineer becomes a platform
   - [ ] Integrate Aider
 
 ## Experimental research
