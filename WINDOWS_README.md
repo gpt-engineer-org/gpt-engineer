@@ -1,8 +1,11 @@
-# Windows Usage
+# Windows Setup
+## Short version
 
-These instructions are for Windows systems. For Unix, go [here](https://github.com/AntonOsika/gpt-engineer/blob/main/README.md).
+On Windows, follow the standard [README.md](https://github.com/AntonOsika/gpt-engineer/blob/main/README.md), but to set API key do one of:
+- `set OPENAI_API_KEY=[your api key]` on cmd
+- `$env:OPENAI_API_KEY="[your api key]"` on powershell
 
-## Usage
+## Full setup guide
 
 Choose either **stable** or **development**.
 
