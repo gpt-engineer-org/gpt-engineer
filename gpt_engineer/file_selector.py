@@ -35,7 +35,7 @@ class DisplayablePath(object):
             self.depth = self.parent.depth + 1
 
     @property
-    def displayname(self) -> str:
+    def display_name(self) -> str:
         """
         Get the display name of the file or directory.
 
@@ -102,7 +102,7 @@ class DisplayablePath(object):
             str: The displayable string representation.
         """
         if self.parent is None:
-            return self.displayname
+            return self.display_name
 
         _filename_prefix = (
             self.display_filename_prefix_last
@@ -110,7 +110,7 @@ class DisplayablePath(object):
             else self.display_filename_prefix_middle
         )
 
-        parts = ["{!s} {!s}".format(_filename_prefix, self.displayname)]
+        parts = ["{!s} {!s}".format(_filename_prefix, self.display_name)]
 
         parent = self.parent
         while parent and parent.parent is not None:
@@ -129,7 +129,7 @@ class TerminalFileSelector:
         self.number_of_selectable_items = 0
         self.selectable_file_paths: dict[int, str] = {}
         self.db_paths = DisplayablePath.make_tree(
-            root_folder_path, parent=None, criteria=self.is_in_ignoring_extentions
+            root_folder_path, parent=None, criteria=self.is_in_ignoring_extensions
         )
 
     def display(self):
@@ -160,6 +160,12 @@ class TerminalFileSelector:
         self.selectable_file_paths = file_path_enumeration
 
     def ask_for_selection(self) -> List[str]:
+        """
+        Ask user to select files from the terminal after displaying it
+
+        Returns:
+            List[str]: list of selected paths
+        """
         user_input = input(
             "Select files by entering the numbers separated by spaces or commas: "
         )
@@ -175,7 +181,7 @@ class TerminalFileSelector:
                 pass
         return selected_paths
 
-    def is_in_ignoring_extentions(self, path: Path) -> bool:
+    def is_in_ignoring_extensions(self, path: Path) -> bool:
         """
         Check if a path is not hidden or in the __pycache__ directory.
 
@@ -191,6 +197,13 @@ class TerminalFileSelector:
 
 
 def ask_for_files(db_input) -> dict[str, str]:
+    """
+    Ask user to select files to improve.
+    It can be done by terminal, gui, or using the old selection.
+
+    Returns:
+        dict[str, str]: Dictionary where key = file name and value = file path
+    """
     use_last_string = ""
     selection_number = 1
     if "file_list.txt" in db_input:
@@ -198,7 +211,7 @@ def ask_for_files(db_input) -> dict[str, str]:
         use_last_string = (
             f"3 - Use previous file list (available at {db_input.path / 'file_list.txt'})"
         )
-    selectionstr = f"""
+    selection_str = f"""
 How do you want to select the files?
 1 - Use terminal
 2 - Use a GUI
@@ -206,7 +219,7 @@ How do you want to select the files?
 
 Select the option and press enter (default=1) : """
     file_path_list = []
-    selected_number_str = input(selectionstr)
+    selected_number_str = input(selection_str)
     if selected_number_str:
         selection_number = int(selected_number_str)
     is_valid_selection = False
