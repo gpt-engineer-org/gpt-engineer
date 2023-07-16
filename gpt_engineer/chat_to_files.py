@@ -72,26 +72,26 @@ def get_code_strings(input) -> dict[str, str]:
     """
     Read file_list.txt and return file names and its content.
     """
-    filesPaths = input["file_list.txt"].strip().split("\n")
-    filesDict = {}
-    for filePath in filesPaths:
-        fileData = ""
-        with open(filePath, "r") as file:
-            fileData = file.read()
-        if fileData:
-            fileName = os.path.basename(filePath).split("/")[-1]
-            filesDict[fileName] = fileData
-    return filesDict
+    files_paths = input["file_list.txt"].strip().split("\n")
+    files_dict = {}
+    for file_path in files_paths:
+        file_data = ""
+        with open(file_path, "r") as file:
+            file_data = file.read()
+        if file_data:
+            file_name = os.path.basename(file_path).split("/")[-1]
+            files_dict[file_name] = file_data
+    return files_dict
 
 
-def format_file_to_input(fileName: str, fileContent: str) -> str:
+def format_file_to_input(file_name: str, file_content: str) -> str:
     """
     Format a file string to use as input to AI agent
     """
-    filestr = f"""
-    {fileName}
+    file_str = f"""
+    {file_name}
     ```
-    {fileContent}
+    {file_content}
     ```
     """
-    return filestr
+    return file_str

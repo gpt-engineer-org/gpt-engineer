@@ -280,12 +280,12 @@ def improve_existing_code(ai: AI, dbs: DBs):
     The terminal will ask for the prompt.
     """
     file_path_info = ask_for_files(dbs.input)
-    filesInfo = get_code_strings(dbs.input)
+    files_info = get_code_strings(dbs.input)
     dbs.input["prompt"] = input(
         "\nWhat do you need to improve with the selected files?\n"
     )
 
-    confirmstr = f"""
+    confirm_str = f"""
 -----------------------------
 The following files will be used in the improvement process:
 {dbs.input["file_list.txt"]}
@@ -300,15 +300,15 @@ before proceeding.
 Press enter to proceed with modifications.
 
 """
-    input(confirmstr)
+    input(confirm_str)
     messages = [
         ai.fsystem(setup_sys_prompt_existing_code(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
     ]
     # Add files as input
-    for filename, filestr in filesInfo.items():
-        codeInput = format_file_to_input(filename, filestr)
-        messages.append(ai.fuser(f"{codeInput}"))
+    for file_name, file_str in files_info.items():
+        code_input = format_file_to_input(file_name, file_str)
+        messages.append(ai.fuser(f"{code_input}"))
 
     messages = ai.next(messages)
     # Maybe we should add another step called "replace" or "overwrite"

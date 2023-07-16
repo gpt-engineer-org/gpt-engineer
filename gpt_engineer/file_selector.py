@@ -126,7 +126,6 @@ class DisplayablePath(object):
         return "".join(reversed(parts))
 
 
-
 class TerminalFileSelector:
     def __init__(self, root_folder_path: Path) -> None:
         self.number_of_selectable_items = 0
@@ -167,6 +166,12 @@ class TerminalFileSelector:
         self.selectable_file_paths = file_path_enumeration
 
     def ask_for_selection(self) -> List[str]:
+        """
+        Ask user to select files from the terminal after displaying it
+
+        Returns:
+            List[str]: list of selected paths
+        """
         user_input = input(
             "\nSelect files by entering the numbers separated by commas/spaces or specify range with a dash.\nExample: 1,2,3-5,7,9,13-15,18,20 (enter 'all' to select everything)\n\nSelect files: "
         )
@@ -216,6 +221,13 @@ def is_in_ignoring_extensions(path: Path) -> bool:
 
 
 def ask_for_files(db_input) -> dict[str, str]:
+    """
+    Ask user to select files to improve.
+    It can be done by terminal, gui, or using the old selection.
+
+    Returns:
+        dict[str, str]: Dictionary where key = file name and value = file path
+    """
     use_last_string = ""
     selection_number = 0
     is_valid_selection = False
