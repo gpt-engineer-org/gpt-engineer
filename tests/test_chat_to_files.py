@@ -165,7 +165,7 @@ def test_files_with_back_tick_and_colon():
 
     expected_files = {
         "file1.py": 'print("Hello, World!")\n',
-        "README.md": "\nThis is a sample program.\n\n`file1.py`\n",
+        "README.md": "\nThis is a sample program.\n\n1. `file1.py`\n",
     }
 
     for file_name, file_content in expected_files.items():
