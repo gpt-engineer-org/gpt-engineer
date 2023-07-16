@@ -41,7 +41,11 @@ With an OpenAI API key (preferably with GPT-4 access) run:
 
 - `export OPENAI_API_KEY=[your api key]`
 
-Alternative for Windows
+Alternative for Windows:
+    For Powershell:
+        -`$env:OPENAI_API_KEY=[your api key]`
+    For Command Prompt:
+        -`set OPENAI_API_KEY=[your api key]`
 
 **Run**:
 
