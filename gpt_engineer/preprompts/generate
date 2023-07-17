@@ -24,3 +24,10 @@ Make sure that files contain all imports, types etc. Make sure that code in diff
 Ensure to implement all code, if you are unsure, write a plausible implementation.
 Include module dependency or package manager dependency definition file.
 Before you finish, double check that all parts of the architecture is present in the files.
+
+Here is an example:
+
+hello_world.py
+```python
+print("hello world!")
+```
