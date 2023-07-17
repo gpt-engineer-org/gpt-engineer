@@ -72,7 +72,7 @@ Building the image:
 - `docker build --rm -t gpt-engineer .`
 
 Running the container:
-- `docker run -it --rm -e OPENAI_API_KEY="YOUR OPENAI KEY" -v ./wallpheaven-generator:/project gpt-engineer`
+- `docker run -it --rm -e OPENAI_API_KEY="YOUR OPENAI KEY" -v ./your-project:/project gpt-engineer`
 
 The `-v` flag mounts the `your-project` folder into the container. Make sure to have a `prompt` file in there.
 
