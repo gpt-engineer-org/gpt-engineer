@@ -44,6 +44,8 @@ def main(
 
     input_path = Path(project_path).absolute()
 
+    memory_path = input_path / f"{run_prefix}memory"
+    workspace_path = input_path / f"{run_prefix}workspace"
     # For the improve option take current project as path and add .gpteng folder
     # By now, ignoring the 'project_path' argument
     if improve_option:
@@ -54,9 +56,8 @@ def main(
         # we can change that in the future.
         if steps_config == steps.Config.DEFAULT:
             steps_config = steps.Config.IMPROVE_CODE
-
-    memory_path = input_path / f"{run_prefix}memory"
-    workspace_path = input_path / f"{run_prefix}workspace"
+        memory_path = input_path / f"{run_prefix}memory"
+        workspace_path = Path(os.getcwd()).absolute()
 
     if delete_existing:
         # Delete files and subdirectories in paths

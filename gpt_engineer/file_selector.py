@@ -167,6 +167,12 @@ class TerminalFileSelector:
         self.selectable_file_paths = file_path_enumeration
 
     def ask_for_selection(self) -> List[str]:
+        """
+        Ask user to select files from the terminal after displaying it
+
+        Returns:
+            List[str]: list of selected paths
+        """
         user_input = input(
             "\nSelect files by entering the numbers separated by commas/spaces or specify range with a dash.\nExample: 1,2,3-5,7,9,13-15,18,20 (enter 'all' to select everything)\n\nSelect files: "
         )
@@ -199,23 +205,29 @@ class TerminalFileSelector:
 
         return selected_paths
 
+    def is_in_ignoring_extensions(self, path: Path) -> bool:
+        """
+        Check if a path is not hidden or in the __pycache__ directory.
 
-def is_in_ignoring_extensions(path: Path) -> bool:
-    """
-    Check if a path is not hidden or in the __pycache__ directory.
+        Args:
+            path: The path to check.
 
-    Args:
-        path: The path to check.
-
-    Returns:
-        bool: True if the path is not in ignored rules. False otherwise.
-    """
-    is_hidden = not path.name.startswith(".")
-    is_pycache = "__pycache__" not in path.name
-    return is_hidden and is_pycache
+        Returns:
+            bool: True if the path is not in ignored rules. False otherwise.
+        """
+        is_hidden = not path.name.startswith(".")
+        is_pycache = "__pycache__" not in path.name
+        return is_hidden and is_pycache
 
 
 def ask_for_files(db_input) -> dict[str, str]:
+    """
+    Ask user to select files to improve.
+    It can be done by terminal, gui, or using the old selection.
+
+    Returns:
+        dict[str, str]: Dictionary where key = file name and value = file path
+    """
     use_last_string = ""
     selection_number = 0
     is_valid_selection = False
