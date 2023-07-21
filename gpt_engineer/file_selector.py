@@ -126,7 +126,6 @@ class DisplayablePath(object):
         return "".join(reversed(parts))
 
 
-
 class TerminalFileSelector:
     def __init__(self, root_folder_path: Path) -> None:
         self.number_of_selectable_items = 0
@@ -174,23 +173,27 @@ class TerminalFileSelector:
             List[str]: list of selected paths
         """
         user_input = input(
-            "\nSelect files by entering the numbers separated by commas/spaces or specify range with a dash.\nExample: 1,2,3-5,7,9,13-15,18,20 (enter 'all' to select everything)\n\nSelect files: "
+            "\nSelect files by entering the numbers separated by commas/spaces or "
+            + "specify range with a dash. "
+            + "Example: 1,2,3-5,7,9,13-15,18,20 (enter 'all' to select everything)"
+            + "\n\nSelect files:"
         )
         selected_paths = []
         regex = r"\d+(-\d+)?([, ]\d+(-\d+)?)*"
-
 
         if user_input.lower() == "all":
             selected_paths = self.file_path_list
         elif re.match(regex, user_input):
             try:
-                user_input = user_input.replace("", ",") if " " in user_input else user_input
+                user_input = (
+                    user_input.replace("", ",") if " " in user_input else user_input
+                )
                 selected_files = user_input.split(",")
                 for file_number_str in selected_files:
                     if "-" in file_number_str:
-                        start, end = file_number_str.split("-")
-                        start = int(start)
-                        end = int(end)
+                        start_str, end_str = file_number_str.split("-")
+                        start = int(start_str)
+                        end = int(end_str)
                         for num in range(start, end + 1):
                             selected_paths.append(str(self.selectable_file_paths[num]))
                     else:
@@ -235,7 +238,8 @@ def ask_for_files(db_input) -> dict[str, str]:
     if "file_list.txt" in db_input:
         can_use_last = True
         use_last_string = (
-            f"2. Use previous file list (available at {os.path.join(db_input.path, 'file_list.txt')})\n"
+            "2. Use previous file list (available at "
+            + f"{os.path.join(db_input.path, 'file_list.txt')})\n"
         )
     selection_str = f"""How do you want to select the files?
 
