@@ -60,6 +60,7 @@ doc = [
 
 [project.scripts]
 gpt-engineer = 'gpt_engineer.main:app'
+ge = 'gpt_engineer.main:app'
 
 [tool.setuptools]
 packages = ["gpt_engineer"]
