@@ -1,4 +1,3 @@
-import json
 import logging
 
 from pathlib import Path
@@ -28,7 +27,7 @@ def main(
 
     model = fallback_model(model)
     ai = AI(
-        model=model,
+        model_name=model,
         temperature=temperature,
     )
 
@@ -56,7 +55,7 @@ def main(
     steps = STEPS[steps_config]
     for step in steps:
         messages = step(ai, dbs)
-        dbs.logs[step.__name__] = json.dumps(messages)
+        dbs.logs[step.__name__] = AI.serialize_messages(messages)
 
     if collect_consent():
         collect_learnings(model, temperature, steps, dbs)

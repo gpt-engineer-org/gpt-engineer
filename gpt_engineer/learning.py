@@ -100,11 +100,11 @@ def check_consent():
     path = Path(".gpte_consent")
     if path.exists() and path.read_text() == "true":
         return
-    ans = input("Is it ok if we store your prompts to learn? (y/n)")
-    while ans.lower() not in ("y", "n"):
-        ans = input("Invalid input. Please enter y or n: ")
+    answer = input("Is it ok if we store your prompts to learn? (y/n)")
+    while answer.lower() not in ("y", "n"):
+        answer = input("Invalid input. Please enter y or n: ")
 
-    if ans.lower() == "y":
+    if answer.lower() == "y":
         path.write_text("true")
         print(colored("Thank you️", "light_green"))
         print()
@@ -153,19 +153,12 @@ def ask_if_can_store() -> bool:
     return can_store == "y"
 
 
-def logs_to_string(steps: List[Step], logs: DB):
+def logs_to_string(steps: List[Step], logs: DB) -> str:
     chunks = []
     for step in steps:
         chunks.append(f"--- {step.__name__} ---\n")
-        messages = json.loads(logs[step.__name__])
-        chunks.append(format_messages(messages))
+        chunks.append(logs[step.__name__])
     return "\n".join(chunks)
-
-
-def format_messages(messages: List[dict]) -> str:
-    return "\n".join(
-        [f"{message['role']}:\n\n{message['content']}" for message in messages]
-    )
 
 
 def extract_learning(
