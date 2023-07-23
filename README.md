@@ -41,7 +41,7 @@ With an OpenAI API key (preferably with GPT-4 access) run:
 
 - `export OPENAI_API_KEY=[your api key]`
 
-Alternative for Windows
+[Alternative for Windows](.github/WINDOWS_README.md).
 
 **Run**:
 
