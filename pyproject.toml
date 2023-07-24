@@ -1,28 +1,14 @@
 [build-system]
 requires = ["setuptools", "wheel"]
 
-[project]
+[tool.poetry]
 name = "gpt-engineer"
 version = "0.0.7"
 description = "Specify what you want it to build, the AI asks for clarification, and then builds it."
 readme = "README.md"
-requires-python = ">=3.8"
-dependencies = [
-  'black == 23.3.0',
-  'click >= 8.0.0',
-  'mypy == 1.3.0',
-  'openai == 0.27.8',
-  'pre-commit == 3.3.3',
-  'pytest == 7.3.1',
-  'ruff == 0.0.272',
-  'termcolor==2.3.0',
-  'typer >= 0.3.2',
-  'rudder-sdk-python == 2.0.2',
-  'dataclasses-json == 0.5.7',
-  'tiktoken',
-  'tabulate == 0.9.0',
-  'langchain',
-]
+authors = []
+license = "MIT"
+repository = "https://github.com/AntonOsika/gpt-engineer"
 
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -34,11 +20,49 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
+
+[tool.poetry.dependencies]
+python = ">=3.8.1,<4.0"
+black = "23.3.0"
+click = ">8.0.0"
+mypy ="1.3.0"
+openai = "0.27.8"
+pre-commit = "3.3.3"
+pytest = "7.3.1"
+ruff = "0.0.272"
+termcolor="2.3.0"
+typer = "^0.9.0"
+rudder-sdk-python = "2.0.2"
+dataclasses-json = "0.5.7"
+tiktoken = "0.4.0"
+tabulate = "0.9.0"
+langchain = "^0.0.240"
+
+
+
 [project.scripts]
 gpt-engineer = 'gpt_engineer.main:app'
 
 [tool.setuptools]
 packages = ["gpt_engineer"]
+
+
+[tool.poetry.group.docs.dependencies]
+autodoc_pydantic = "^1.8.0"
+myst_parser = "^0.18.1"
+nbsphinx = "^0.8.9"
+sphinx = "^4.5.0"
+sphinx-autobuild = "^2021.3.14"
+sphinx_book_theme = "^0.3.3"
+sphinx_rtd_theme = "^1.0.0"
+sphinx-typlog-theme = "^0.8.0"
+sphinx-panels = "^0.6.0"
+toml = "^0.10.2"
+myst-nb = "^0.17.1"
+linkchecker = "^10.2.1"
+sphinx-copybutton = "^0.5.1"
+markdown-include = "^0.6.0"
+
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]

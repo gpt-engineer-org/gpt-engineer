@@ -58,3 +58,22 @@ benchmark
 !benchmark/*/prompt
 
 .gpte_consent
+
+.gpte_consent
+
+# docs
+
+docs/_build
+docs/__init__
+docs/ai
+docs/chat_to_files
+docs/collect
+docs/learning
+docs/main
+docs/steps/
+docs/db
+docs/db/
+
+# poetry
+
+poetry.lock
