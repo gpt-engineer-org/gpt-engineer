@@ -40,7 +40,7 @@ Welcome to GPT-ENGINEER's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Chat Parsing & Self Code Execution.py:
+   :caption: ChAT PARSING & SELf EXECUTION:
 
    intro/chat_parsing.md
 
