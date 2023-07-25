@@ -6,6 +6,7 @@ Welcome to GPT-ENGINEER's documentation!
    :caption: INTRODUCTION:
 
    intro/quick_overview.md
+   intro/repository_stats.md
    intro/main_scrip.md
    intro/scripts.md
    intro/preprompts.md

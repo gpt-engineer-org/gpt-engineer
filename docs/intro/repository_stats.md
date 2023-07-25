@@ -13,11 +13,11 @@ The GPT-Engineer repository is a project developed by Anton Osika, which uses GP
 | **Full Name** | AntonOsika/gpt-engineer |
 | **Description** | Specify what you want it to build, the AI asks for clarification, and then builds it. |
 | **Created At** | 2023-04-29 |
-| **Updated At** | 2023-06-24 |
+| **Updated At** | 2023-07-25 |
 | **Language** | Python |
-| **Star Gazers** | 30959 |
-| **Forks** | 4944 |
-| **Open Issues** | 68 |
+| **Star Gazers** | 39.4|
+| **Forks** | 6.6k |
+| **Open Issues** | 52 |
 | **License** | MIT License |
 | **Repository Link** | https://github.com/AntonOsika/gpt-engineer |
 
