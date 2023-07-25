@@ -4,22 +4,6 @@
 API Reference
 =============
 
-:mod:`gpt_engineer.__init__`:   Init  
-=======================================
-
-.. automodule:: gpt_engineer.__init__
-    :no-members:
-    :no-inherited-members:
-
-Functions
---------------
-.. currentmodule:: gpt_engineer
-
-.. autosummary::
-    :toctree: __init__
-
-    __init__.get_version
-
 :mod:`gpt_engineer.ai`: Ai
 ===========================
 

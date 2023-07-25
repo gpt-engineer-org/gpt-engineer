@@ -30,8 +30,6 @@ ROOT_DIR = Path(__file__).parents[1].absolute()
 with open("../pyproject.toml") as f:
     data = toml.load(f)
 
-print(data)
-
 # The master toctree document.
 master_doc = 'index'
 

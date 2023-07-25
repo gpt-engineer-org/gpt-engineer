@@ -7,7 +7,8 @@ Welcome to GPT-ENGINEER's documentation!
 
    intro/quick_overview.md
    intro/repository_stats.md
-   intro/main_scrip.md
+   RESULTS.md
+   intro/main_script.md
    intro/scripts.md
    intro/preprompts.md
 
@@ -35,7 +36,7 @@ Welcome to GPT-ENGINEER's documentation!
    :maxdepth: 2
    :caption: HARMONEY OF AI, DB, & STEPS:
 
-   intro/harmoney_ai_db_steps.md
+   intro/harmoney_db_ai_steps.md
 
 .. toctree::
    :maxdepth: 2
