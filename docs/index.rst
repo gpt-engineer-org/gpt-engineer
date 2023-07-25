@@ -17,6 +17,7 @@ Welcome to GPT-ENGINEER's documentation!
    installation
    usage
    CONTRIBUTING.md
+   building_docs.md
    ROADMAP.md
 
 .. toctree::
