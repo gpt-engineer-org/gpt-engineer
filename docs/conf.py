@@ -65,7 +65,6 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
-    "sphinxcontrib.autodoc_pydantic",
     "sphinx_copybutton",
     "sphinx_panels",
     "myst_parser",
