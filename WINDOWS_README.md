@@ -11,7 +11,7 @@ Choose either **stable** or **development**.
 
 For **stable** release:
 
-Run `pip install gpt-engineer` in the command line
+Run `pip install gpt-engineer` in the command line as an administrator
 
 Or:
 
