@@ -4,7 +4,7 @@ import random
 import tempfile
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional
 
@@ -25,6 +25,8 @@ class Review:
     raw: str
 
 
+
+
 @dataclass_json
 @dataclass
 class Learning:
@@ -38,8 +40,11 @@ class Learning:
     feedback: Optional[str]
     session: str
     review: Optional[Review]
-    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    timestamp: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     version: str = "0.3"
+
 
 
 TERM_CHOICES = (
@@ -59,7 +64,7 @@ def human_input() -> Review:
     )
     print()
 
-    ran = input("Did the generated code run at all? " + TERM_CHOICES)
+    ran = input(f"Did the generated code run at all? {TERM_CHOICES}")
     while ran not in ("y", "n", "u"):
         ran = input("Invalid input. Please enter y, n, or u: ")
 
@@ -74,7 +79,7 @@ def human_input() -> Review:
             perfect = input("Invalid input. Please enter y, n, or u: ")
 
         if perfect != "y":
-            useful = input("Did the generated code do anything useful? " + TERM_CHOICES)
+            useful = input(f"Did the generated code do anything useful? {TERM_CHOICES}")
             while useful not in ("y", "n", "u"):
                 useful = input("Invalid input. Please enter y, n, or u: ")
 
@@ -119,10 +124,7 @@ def collect_consent() -> bool:
     has_given_consent = consent_flag.exists() and consent_flag.read_text() == "true"
 
     if opt_out:
-        if has_given_consent:
-            return ask_if_can_store()
-        return False
-
+        return ask_if_can_store() if has_given_consent else False
     if has_given_consent:
         return True
 
@@ -156,8 +158,7 @@ def ask_if_can_store() -> bool:
 def logs_to_string(steps: List[Step], logs: DB) -> str:
     chunks = []
     for step in steps:
-        chunks.append(f"--- {step.__name__} ---\n")
-        chunks.append(logs[step.__name__])
+        chunks.extend((f"--- {step.__name__} ---\n", logs[step.__name__]))
     return "\n".join(chunks)
 
 
@@ -167,7 +168,7 @@ def extract_learning(
     review = None
     if "review" in dbs.memory:
         review = Review.from_json(dbs.memory["review"])  # type: ignore
-    learning = Learning(
+    return Learning(
         prompt=dbs.input["prompt"],
         model=model,
         temperature=temperature,
@@ -179,7 +180,6 @@ def extract_learning(
         workspace=dbs.workspace["all_output.txt"],
         review=review,
     )
-    return learning
 
 
 def get_session():
@@ -194,4 +194,4 @@ def get_session():
             path.write_text(user_id)
         return user_id
     except IOError:
-        return "ephemeral_" + str(random.randint(0, 2**32))
+        return f"ephemeral_{random.randint(0, 2**32)}"

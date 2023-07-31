@@ -121,16 +121,18 @@ class AI:
         )
 
     def format_token_usage_log(self) -> str:
-        result = "step_name,"
-        result += "prompt_tokens_in_step,completion_tokens_in_step,total_tokens_in_step"
+        result = (
+            "step_name,"
+            + "prompt_tokens_in_step,completion_tokens_in_step,total_tokens_in_step"
+        )
         result += ",total_prompt_tokens,total_completion_tokens,total_tokens\n"
         for log in self.token_usage_log:
-            result += log.step_name + ","
-            result += str(log.in_step_prompt_tokens) + ","
-            result += str(log.in_step_completion_tokens) + ","
-            result += str(log.in_step_total_tokens) + ","
-            result += str(log.total_prompt_tokens) + ","
-            result += str(log.total_completion_tokens) + ","
+            result += f"{log.step_name},"
+            result += f"{str(log.in_step_prompt_tokens)},"
+            result += f"{str(log.in_step_completion_tokens)},"
+            result += f"{str(log.in_step_total_tokens)},"
+            result += f"{str(log.total_prompt_tokens)},"
+            result += f"{str(log.total_completion_tokens)},"
             result += str(log.total_tokens) + "\n"
         return result
 

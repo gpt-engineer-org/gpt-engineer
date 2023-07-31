@@ -97,8 +97,7 @@ def generate_report(benchmarks, benchmark_path):
     print("\nBenchmark report:\n")
     print(table)
     print()
-    append_to_results = ask_yes_no("Append report to the results file?")
-    if append_to_results:
+    if append_to_results := ask_yes_no("Append report to the results file?"):
         results_path = benchmark_path / "RESULTS.md"
         current_date = datetime.now().strftime("%Y-%m-%d")
         insert_markdown_section(results_path, current_date, table, 2)
@@ -115,13 +114,10 @@ def insert_markdown_section(file_path, section_title, section_text, level):
     header_prefix = "#" * level
     new_section = f"{header_prefix} {section_title}\n\n{section_text}\n\n"
 
-    # Find the first section with the specified level
-    line_number = -1
-    for i, line in enumerate(lines):
-        if line.startswith(header_prefix):
-            line_number = i
-            break
-
+    line_number = next(
+        (i for i, line in enumerate(lines) if line.startswith(header_prefix)),
+        -1,
+    )
     if line_number != -1:
         lines.insert(line_number, new_section)
     else:
@@ -138,7 +134,7 @@ def insert_markdown_section(file_path, section_title, section_text, level):
 
 def ask_yes_no(question: str) -> bool:
     while True:
-        response = input(question + " (y/n): ").lower().strip()
+        response = input(f"{question} (y/n): ").lower().strip()
         if response == "y":
             return True
         elif response == "n":

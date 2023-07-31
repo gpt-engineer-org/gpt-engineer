@@ -184,9 +184,7 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     command = dbs.workspace["run.sh"]
 
     print("Do you want to execute this code?")
-    print()
-    print(command)
-    print()
+    _extracted_from_execute_entrypoint_5(command)
     print('If yes, press enter. Otherwise, type "no"')
     print()
     if input() not in ["", "y", "yes"]:
@@ -201,10 +199,9 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
             "green",
         )
     )
-    print()
-    print("You can press ctrl+c *once* to stop the execution.")
-    print()
-
+    _extracted_from_execute_entrypoint_5(
+        "You can press ctrl+c *once* to stop the execution."
+    )
     p = subprocess.Popen("bash run.sh", shell=True, cwd=dbs.workspace.path)
     try:
         p.wait()
@@ -216,6 +213,13 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
         print()
 
     return []
+
+
+# TODO Rename this here and in `execute_entrypoint`
+def _extracted_from_execute_entrypoint_5(arg0):
+    print()
+    print(arg0)
+    print()
 
 
 def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
