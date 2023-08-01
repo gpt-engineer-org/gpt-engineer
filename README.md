@@ -41,7 +41,7 @@ With an OpenAI API key (preferably with GPT-4 access) run:
 
 - `export OPENAI_API_KEY=[your api key]`
 
-To set API key on windows check the [Windows README](.github/WINDOWS_README.md).
+To set API key on windows check the [Windows README](./WINDOWS_README.md).
 
 **Run**:
 
