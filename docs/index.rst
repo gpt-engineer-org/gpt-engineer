@@ -1,4 +1,4 @@
-Welcome to GPT-ENGINEER's documentation!
+Welcome to GPT-ENGINEER's Documentation!
 ========================================
 
 .. toctree::
@@ -20,16 +20,6 @@ Welcome to GPT-ENGINEER's documentation!
    usage
    README.md
    WINDOWS_README.md
-
-.. toctree::
-   :maxdepth: 2
-   :caption: CONTRIBUTING GUIDES:
-
-   CONTRIBUTING.md
-   DOCS_BUILDING.md
-   ROADMAP.md
-   CODE_OF_CONDUCT.md
-
 
 
 .. toctree::
@@ -53,6 +43,16 @@ Welcome to GPT-ENGINEER's documentation!
    :caption: CHAT PARSING & SELf EXECUTION:
 
    intro/chat_parsing.md
+
+.. toctree::
+   :maxdepth: 2
+   :caption: CONTRIBUTING GUIDES:
+
+   CONTRIBUTING.md
+   DOCS_BUILDING.md
+   ROADMAP.md
+   CODE_OF_CONDUCT.md
+   DISCLAIMER.md
 
 .. toctree::
    :maxdepth: 2
