@@ -39,6 +39,7 @@ cp WINDOWS_README.md docs/
 cp .github/CONTRIBUTING.md docs/
 cp .github/CODE_OF_CONDUCT.md docs/
 cp benchmark/RESULTS.md docs/
+cp DISCLAIMER.md docs/
 ```
 Update `repository_stats.md` file under `docs/`
 
