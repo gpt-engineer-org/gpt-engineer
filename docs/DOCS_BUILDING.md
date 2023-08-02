@@ -45,7 +45,7 @@ Update `repository_stats.md` file under `docs/`
 
 ```console
 # Install required Python dependencies (MkDocs etc.)
-poetry insall --with docs
+pip install -e .[doc]
 cd docs/
 # Create the `api_reference.rst` 
 python create_api_rst.py
