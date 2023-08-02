@@ -18,9 +18,19 @@ Welcome to GPT-ENGINEER's documentation!
 
    installation
    usage
+   README.md
+   WINDOWS_README.md
+
+.. toctree::
+   :maxdepth: 2
+   :caption: CONTRIBUTING GUIDES:
+
    CONTRIBUTING.md
-   building_docs.md
+   DOCS_BUILDING.md
    ROADMAP.md
+   CODE_OF_CONDUCT.md
+
+
 
 .. toctree::
    :maxdepth: 2
@@ -34,13 +44,13 @@ Welcome to GPT-ENGINEER's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: HARMONEY OF AI, DB, & STEPS:
+   :caption: HARMONY OF AI, DB, & STEPS:
 
-   intro/harmoney_db_ai_steps.md
+   intro/harmony_db_ai_steps.md
 
 .. toctree::
    :maxdepth: 2
-   :caption: ChAT PARSING & SELf EXECUTION:
+   :caption: CHAT PARSING & SELf EXECUTION:
 
    intro/chat_parsing.md
 

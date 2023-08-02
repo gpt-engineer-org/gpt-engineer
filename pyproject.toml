@@ -1,5 +1,7 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+#requires = ["setuptools", "wheel"]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "gpt-engineer"
@@ -62,7 +64,7 @@ myst-nb = "^0.17.1"
 linkchecker = "^10.2.1"
 sphinx-copybutton = "^0.5.1"
 markdown-include = "^0.6.0"
-
+sphinx_copybutton = "0.5.2" 
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]

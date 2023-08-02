@@ -29,6 +29,19 @@ locally (on your own laptop!).
 
 You can build and view this documentation project locally - we recommend that you activate a `Poetry` environment
 and dependency management tool.
+
+COPY files from project root to `docs/` to include in Documents
+```console
+cp README.md docs/
+cp ROADMAP.md docs/
+cp TERMS_OF_USE.md docs/
+cp WINDOWS_README.md docs/
+cp .github/CONTRIBUTING.md docs/
+cp .github/CODE_OF_CONDUCT.md docs/
+cp benchmark/RESULTS.md docs/
+```
+Update `repository_stats.md` file under `docs/`
+
 ```console
 # Install required Python dependencies (MkDocs etc.)
 poetry insall --with docs
