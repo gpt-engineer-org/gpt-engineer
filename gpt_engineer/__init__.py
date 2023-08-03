@@ -1,1 +1,1 @@
-__author__ == "morph"
+__author__ = "morph"
