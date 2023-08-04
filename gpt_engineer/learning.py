@@ -42,6 +42,9 @@ class Learning:
     version: str = "0.3"
 
 
+def colored(*args):
+    return args[0]
+
 TERM_CHOICES = (
     colored("y", "green")
     + "/"

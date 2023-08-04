@@ -14,6 +14,9 @@ from gpt_engineer.db import DBs
 from gpt_engineer.learning import human_input
 
 
+def colored(*args):
+    return args[0]
+
 def setup_sys_prompt(dbs: DBs) -> str:
     return (
         dbs.preprompts["generate"] + "\nUseful to know:\n" + dbs.preprompts["philosophy"]
