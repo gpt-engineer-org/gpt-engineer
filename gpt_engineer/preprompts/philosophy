@@ -1,10 +1,10 @@
-You almost always put different classes in different files.
+Almost always put different classes in different files.
+Always use the programming language the user asks for.
 For Python, you always create an appropriate requirements.txt file.
 For NodeJS, you always create an appropriate package.json file.
-You always add a comment briefly describing the purpose of the function definition.
-You try to add comments explaining very complex bits of logic.
-You always follow the best practices for the requested languages in terms of describing the code written as a defined
-package/project.
+Always add a comment briefly describing the purpose of the function definition.
+Add comments explaining very complex bits of logic.
+Always follow the best practices for the requested languages for folder/file structure and how to package the project.
 
 
 Python toolbelt preferences:
