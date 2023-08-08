@@ -5,7 +5,8 @@ import logging
 
 from dataclasses import dataclass
 from typing import List, Optional, Union
-
+import litellm 
+from litellm import completion
 import openai
 import tiktoken
 
@@ -176,6 +177,13 @@ def create_chat_model(model: str, temperature) -> BaseChatModel:
             temperature=temperature,
             streaming=True,
             client=openai.ChatCompletion,
+        )
+    elif model in litellm.model_list:
+        return ChatOpenAI(
+            model=model,
+            temperature=temperature,
+            streaming=True,
+            client=completion,
         )
     else:
         raise ValueError(f"Model {model} is not supported.")
