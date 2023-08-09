@@ -30,11 +30,12 @@ ROOT_DIR = Path(__file__).parents[1].absolute()
 with open("../pyproject.toml") as f:
     data = toml.load(f)
 
+
 # The master toctree document.
 master_doc = 'index'
 
 # General information about the project.
-project = data["tool"]["poetry"]["name"]
+project = data["project"]["name"]
 copyright = "2023 Anton Osika"
 author = " Anton Osika & Contributors"
 
@@ -43,9 +44,9 @@ author = " Anton Osika & Contributors"
 # the built documents.
 #
 # The short X.Y version.
-version = data["tool"]["poetry"]["version"]
+version = data["project"]["version"]
 # The full version, including alpha/beta/rc tags.
-release = data["tool"]["poetry"]["version"]
+release = data["project"]["version"]
 
 
 

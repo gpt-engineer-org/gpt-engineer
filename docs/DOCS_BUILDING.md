@@ -1,13 +1,13 @@
-Building Docs with Sphnix
+Building Docs with Sphinx
 =========================
 
-This example shows a basic Sphnix docs project with Read the Docs. This project is using `sphnix` with `readthedocs` 
+This example shows a basic Sphinx docs project with Read the Docs. This project is using `sphinx` with `readthedocs` 
 project template.
 
 Some useful links are given below to lear and contribute in the project.
 
 📚 [docs/](https://www.sphinx-doc.org/en/master/usage/quickstart.html)<br>
-A basic Sphnix project lives in `docs/`, it was generated using Sphnix defaults. All the `*.rst` & `*.md` make up sections in the documentation. Both `.rst` and `.md` formats are supported in this project
+A basic Sphinx project lives in `docs/`, it was generated using Sphinx defaults. All the `*.rst` & `*.md` make up sections in the documentation. Both `.rst` and `.md` formats are supported in this project
 
 ⚙️ [.readthedocs.yaml](https://docs.readthedocs.io/en/stable/config-file/v2.html)<br>
 Read the Docs Build configuration is stored in `.readthedocs.yaml`.

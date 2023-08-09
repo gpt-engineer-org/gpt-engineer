@@ -18,8 +18,8 @@ Welcome to GPT-ENGINEER's Documentation!
 
    installation
    usage
-   README.md
-   WINDOWS_README.md
+   readme_link
+   windows_readme_link
 
 
 .. toctree::
@@ -48,11 +48,11 @@ Welcome to GPT-ENGINEER's Documentation!
    :maxdepth: 2
    :caption: CONTRIBUTING GUIDES:
 
-   CONTRIBUTING.md
+   contributing_link
    DOCS_BUILDING.md
-   ROADMAP.md
-   CODE_OF_CONDUCT.md
-   DISCLAIMER.md
+   roadmap_link
+   code_conduct_link
+   disclaimer_link
 
 .. toctree::
    :maxdepth: 2
