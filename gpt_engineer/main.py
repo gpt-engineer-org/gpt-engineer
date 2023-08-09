@@ -1,13 +1,12 @@
 import logging
 
 import os
-import shutil
 
 from pathlib import Path
 
 import typer
 
-from gpt_engineer.ai import AI, fallback_model
+from gpt_engineer.ai import AI
 from gpt_engineer.collect import collect_learnings
 from gpt_engineer.db import DB, DBs, archive
 from gpt_engineer.learning import collect_consent
@@ -37,8 +36,8 @@ def main(
 
     input_path = Path(project_path).absolute()
 
-    memory_path = input_path / f"{run_prefix}memory"
-    workspace_path = input_path / f"{run_prefix}workspace"
+    memory_path = input_path / "memory"
+    workspace_path = input_path / "workspace"
     # For the improve option take current project as path and add .gpteng folder
     # By now, ignoring the 'project_path' argument
     if improve_option:
@@ -47,17 +46,11 @@ def main(
         # The default option for the --improve is the IMPROVE_CODE, not DEFAULT
         # I know this looks ugly, not sure if it is the best way to do that...
         # we can change that in the future.
-        if steps_config == steps.Config.DEFAULT:
-            steps_config = steps.Config.IMPROVE_CODE
-        memory_path = input_path / f"{run_prefix}memory"
+        if steps_config == StepsConfig.DEFAULT:
+            steps_config = StepsConfig.IMPROVE_CODE
+        memory_path = input_path / "memory"
         workspace_path = Path(os.getcwd()).absolute()
 
-    if delete_existing:
-        # Delete files and subdirectories in paths
-        shutil.rmtree(memory_path, ignore_errors=True)
-        shutil.rmtree(workspace_path, ignore_errors=True)
-
-    model = fallback_model(model)
     ai = AI(
         model_name=model,
         temperature=temperature,

@@ -132,7 +132,7 @@ class TerminalFileSelector:
         self.selectable_file_paths: dict[int, str] = {}
         self.file_path_list: list = []
         self.db_paths = DisplayablePath.make_tree(
-            root_folder_path, parent=None, criteria=self.is_in_ignoring_extensions
+            root_folder_path, parent=None, criteria=is_in_ignoring_extensions
         )
 
     def display(self):
@@ -207,7 +207,6 @@ class TerminalFileSelector:
             sys.exit(1)
 
         return selected_paths
-
 
 def is_in_ignoring_extensions(path: Path) -> bool:
     """
