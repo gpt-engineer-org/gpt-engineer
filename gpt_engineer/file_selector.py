@@ -7,6 +7,7 @@ import tkinter.filedialog as fd
 from pathlib import Path
 from typing import List, Union
 
+IGNORE_FOLDERS = {"site-packages", "node_modules"}
 
 class DisplayablePath(object):
     """
@@ -75,7 +76,7 @@ class DisplayablePath(object):
         count = 1
         for path in children:
             is_last = count == len(children)
-            if path.is_dir():
+            if path.is_dir() and path.name not in IGNORE_FOLDERS:
                 yield from cls.make_tree(
                     path, parent=displayable_root, is_last=is_last, criteria=criteria
                 )
@@ -232,19 +233,19 @@ def ask_for_files(db_input) -> dict[str, str]:
         dict[str, str]: Dictionary where key = file name and value = file path
     """
     use_last_string = ""
-    selection_number = 0
+    selection_number = 1
     is_valid_selection = False
     can_use_last = False
     if "file_list.txt" in db_input:
         can_use_last = True
         use_last_string = (
-            "2. Use previous file list (available at "
+            "3. Use previous file list (available at "
             + f"{os.path.join(db_input.path, 'file_list.txt')})\n"
         )
     selection_str = f"""How do you want to select the files?
 
-0. Use Command-Line.
-1. Use File explorer.
+1. Use Command-Line.
+2. Use File explorer.
 {use_last_string if len(use_last_string) > 1 else ""}
 Select option and press Enter (default={selection_number}): """
     file_path_list = []
@@ -255,16 +256,16 @@ Select option and press Enter (default={selection_number}): """
         except ValueError:
             print("Invalid number. Select a number from the list above.\n")
             sys.exit(1)
-    if selection_number == 0:
+    if selection_number == 1:
         # Open terminal selection
         file_path_list = terminal_file_selector()
         is_valid_selection = True
-    elif selection_number == 1:
+    elif selection_number == 2:
         # Open GUI selection
         file_path_list = gui_file_selector()
         is_valid_selection = True
     else:
-        if can_use_last and selection_number == 2:
+        if can_use_last and selection_number == 3:
             # Use previous file list
             is_valid_selection = True
     if not is_valid_selection:
@@ -273,7 +274,7 @@ Select option and press Enter (default={selection_number}): """
 
     file_list_string = ""
     file_path_info = {}
-    if not selection_number == 2:
+    if not selection_number == 3:
         # New files
         for file_path in file_path_list:
             file_list_string += str(file_path) + "\n"
