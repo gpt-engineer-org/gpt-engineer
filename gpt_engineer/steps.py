@@ -354,9 +354,9 @@ Press enter to proceed with modifications.
         code_input = format_file_to_input(file_name, file_str)
         messages.append(ai.fuser(f"{code_input}"))
 
-    messages = ai.next(messages)
+    messages = ai.next(messages, step_name=curr_fn())
     # Maybe we should add another step called "replace" or "overwrite"
-    overwrite_files(messages[-1]["content"], dbs, replace_files=file_path_info)
+    overwrite_files(messages[-1].content.strip(), dbs, replace_files=file_path_info)
     return messages
 
 
