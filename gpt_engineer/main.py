@@ -29,6 +29,12 @@ def main(
         "-i",
         help="Improve code from existing project.",
     ),
+    improve_option: bool = typer.Option(
+        False,
+        "--improve",
+        "-i",
+        help="Improve code from existing project.",
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
