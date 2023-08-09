@@ -233,7 +233,6 @@ def ask_for_files(db_input) -> dict[str, str]:
         dict[str, str]: Dictionary where key = file name and value = file path
     """
     use_last_string = ""
-    selection_number = 1
     is_valid_selection = False
     can_use_last = False
     if "file_list.txt" in db_input:
@@ -242,6 +241,9 @@ def ask_for_files(db_input) -> dict[str, str]:
             "3. Use previous file list (available at "
             + f"{os.path.join(db_input.path, 'file_list.txt')})\n"
         )
+        selection_number = 3
+    else:
+        selection_number = 1
     selection_str = f"""How do you want to select the files?
 
 1. Use Command-Line.
