@@ -27,21 +27,10 @@ development environment.
 This project has a standard readthedocs layout which is built by Read the Docs almost the same way that you would build it 
 locally (on your own laptop!).
 
-You can build and view this documentation project locally - we recommend that you activate a `Poetry` environment
+You can build and view this documentation project locally - we recommend that you activate a `poetry` or your choice of `venv`
 and dependency management tool.
 
-COPY files from project root to `docs/` to include in Documents
-```console
-cp README.md docs/
-cp ROADMAP.md docs/
-cp TERMS_OF_USE.md docs/
-cp WINDOWS_README.md docs/
-cp .github/CONTRIBUTING.md docs/
-cp .github/CODE_OF_CONDUCT.md docs/
-cp benchmark/RESULTS.md docs/
-cp DISCLAIMER.md docs/
-```
-Update `repository_stats.md` file under `docs/`
+Update `repository_stats.md` file under `docs/intro`
 
 ```console
 # Install required Python dependencies (MkDocs etc.)
