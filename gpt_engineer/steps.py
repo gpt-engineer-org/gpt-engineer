@@ -354,7 +354,18 @@ Press enter to proceed with modifications.
         code_input = format_file_to_input(file_name, file_str)
         messages.append(ai.fuser(f"{code_input}"))
 
-    messages = ai.next(messages, step_name=curr_fn())
+    output_format_str = """
+Make sure the output of any files is in the following format where
+FILENAME is the file name including the file extension,
+LANG is the markup code block language for the code's language, and CODE is the code:
+
+FILENAME
+```LANG
+CODE
+```
+"""
+
+    messages = ai.next(messages, output_format_str, step_name=curr_fn())
     # Maybe we should add another step called "replace" or "overwrite"
     overwrite_files(messages[-1].content.strip(), dbs, replace_files=file_path_info)
     return messages
