@@ -44,7 +44,6 @@ def main(
         input_path = Path(os.getcwd()).absolute() / ".gpteng"
         input_path.mkdir(parents=True, exist_ok=True)
         # The default option for the --improve is the IMPROVE_CODE, not DEFAULT
-        # I know this looks ugly, not sure if it is the best way to do that...
         # we can change that in the future.
         if steps_config == StepsConfig.DEFAULT:
             steps_config = StepsConfig.IMPROVE_CODE
