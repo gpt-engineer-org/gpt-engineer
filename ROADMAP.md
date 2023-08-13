@@ -23,8 +23,6 @@ There are three main milestones we believe will greatly increase gpt-engineer's 
 - [ ] **Improve existing projects**
   - [ ] Decide on the "flow" for the CLI commands and where the project files are created
   - [ ] Add an "improve code" command
-  - [ ] Architect how gpt-engineer becomes a platform
-  - [ ] Integrate Aider
 
 ## Experimental research
 This is not our current focus, but if you are interested in experimenting: Please
