@@ -35,7 +35,6 @@ def main(
 
 
 
-    memory_path = input_path / "memory"
     workspace_path = input_path / "workspace"
     # For the improve option take current project as path and add .gpteng folder
     # By now, ignoring the 'project_path' argument
