@@ -6,7 +6,7 @@ RUN apt-get update \
 WORKDIR /app
 
 COPY . .
-COPY docker/entrypoint.sh /entrypoint.sh
+COPY docker/entrypoint.sh ./entrypoint.sh
 
 RUN sudo pip install -e .
 
