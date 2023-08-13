@@ -41,7 +41,6 @@ def main(
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
-    # Call the new function before any actions that require environment variables
     load_env_if_needed()
 
     model = fallback_model(model)
