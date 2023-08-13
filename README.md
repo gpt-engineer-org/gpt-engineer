@@ -41,7 +41,7 @@ With an OpenAI API key (preferably with GPT-4 access) run:
 
 - `export OPENAI_API_KEY=[your api key]`
 
-To set API key on windows check the [Windows README](WINDOWS_README.md).
+To set API key on windows check the [Windows README](./WINDOWS_README.md).
 
 **Run**:
 
@@ -80,7 +80,7 @@ If you want to see our broader ambitions, check out the [roadmap](https://github
 [discord](https://discord.gg/8tcDQ89Ej2)
 to get input on how you can [contribute](.github/CONTRIBUTING.md) to it.
 
-We are currently looking for more maintainers and community organisers. Email anton.osika@gmail.com if you are interested in an official role.
+We are currently looking for more maintainers and community organizers. Email anton.osika@gmail.com if you are interested in an official role.
 
 
 ## Example
