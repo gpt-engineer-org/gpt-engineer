@@ -34,35 +34,29 @@ create-venv:
 	python -m venv venv
 
 #Defines a target named upgrade-pip. This target will upgrade pip to the latest version.
-upgrade-pip: load-env
+upgrade-pip:
 	@echo -e "$(COLOR_CYAN)Upgrading pip...$(COLOR_RESET)" && \
 	source venv/bin/activate && \
 	pip install --upgrade pip >> /dev/null
 
 #Defines a target named install-dependencies. This target will install the dependencies.
-install-dependencies: load-env
+install-dependencies:
 	@echo -e "$(COLOR_CYAN)Installing dependencies...$(COLOR_RESET)" && \
 	source venv/bin/activate && \
 	pip install -e . >> /dev/null
 
 #Defines a target named install-pre-commit. This target will install the pre-commit hooks.
-install-pre-commit: load-env
+install-pre-commit:
 	@echo -e "$(COLOR_CYAN)Installing pre-commit hooks...$(COLOR_RESET)" && \
 	source venv/bin/activate && \
 	pre-commit install
-
-#Defines a target named load-env. This target will load the environment variables from the .env file.
-load-env:
-	@echo -e "$(COLOR_CYAN)Loading environment variables...$(COLOR_RESET)" && \
-	source venv/bin/activate && \
-	python -m dotenv load
 
 #Defines a target named farewell. This target will print a farewell message.
 farewell:
 	@echo -e "$(COLOR_GREEN)All done!$(COLOR_RESET)"
 
 #Defines a target named run. This target will run GPT Engineer on the folder with the given name, name was defined earlier in the Makefile.
-run: load-env
+run:
 	@echo -e "$(COLOR_CYAN)Running GPT Engineer on $(COLOR_GREEN)$(name)$(COLOR_CYAN) folder...$(COLOR_RESET)" && \
 	source venv/bin/activate && \
 	gpt-engineer projects/$(name)

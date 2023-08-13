@@ -1,10 +1,10 @@
 import logging
 import os
-from pathlib import Path
 
 from pathlib import Path
 
 import typer
+
 from dotenv import load_dotenv
 
 from gpt_engineer.ai import AI, fallback_model
@@ -15,17 +15,10 @@ from gpt_engineer.steps import STEPS, Config as StepsConfig
 
 app = typer.Typer()
 
+
 def load_env_if_needed():
-    """
-    Check if API KEY env variable exist
-    If it doesn’t, call load_dotenv
-    """
     if os.getenv("OPENAI_API_KEY") is None:
         load_dotenv()
-        # After attempting to load from .env, check again
-        if os.getenv("OPENAI_API_KEY") is None:
-            raise ValueError("Cannot run the program without OPENAI_API_KEY environment variable.\nPlease set it in your environment or in a .env file.")
-
 
 
 @app.command()
