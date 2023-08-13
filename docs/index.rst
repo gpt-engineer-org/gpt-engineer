@@ -7,7 +7,7 @@ Welcome to GPT-ENGINEER's Documentation!
 
    intro/quick_overview.md
    intro/repository_stats.md
-   RESULTS.md
+   results_link
    intro/main_script.md
    intro/scripts.md
    intro/preprompts.md
@@ -57,7 +57,7 @@ Welcome to GPT-ENGINEER's Documentation!
 .. toctree::
    :maxdepth: 2
    :caption: PACKAGE API:
-   
+
    api_reference
 
 Indices and tables
