@@ -43,7 +43,7 @@ def test_collect_learnings(monkeypatch):
     b = {k: v for k, v in learnings.to_dict().items() if k != "timestamp"}
     assert a == b
 
-    assert code in learnings.logs
+    assert json.dumps(code) in learnings.logs
     assert code in learnings.workspace
 
 

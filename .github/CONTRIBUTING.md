@@ -26,6 +26,10 @@ To enforce this we use [`pre-commit`](https://pre-commit.com/) to run [`black`](
 ```bash
 $ pip install -e .
 
+# For docs building, install doc dependencies too
+
+$ pip install -e .[doc]
+
 # And then install the `pre-commit` hooks with:
 
 $ pre-commit install

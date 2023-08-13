@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 from pathlib import Path
@@ -31,7 +30,7 @@ def load_env_if_needed():
 
 @app.command()
 def main(
-    project_path: str = typer.Argument("example", help="path"),
+    project_path: str = typer.Argument("projects/example", help="path"),
     model: str = typer.Argument("gpt-4", help="model id string"),
     temperature: float = 0.1,
     steps_config: StepsConfig = typer.Option(
@@ -45,7 +44,7 @@ def main(
 
     model = fallback_model(model)
     ai = AI(
-        model=model,
+        model_name=model,
         temperature=temperature,
     )
 
@@ -73,7 +72,7 @@ def main(
     steps = STEPS[steps_config]
     for step in steps:
         messages = step(ai, dbs)
-        dbs.logs[step.__name__] = json.dumps(messages)
+        dbs.logs[step.__name__] = AI.serialize_messages(messages)
 
     if collect_consent():
         collect_learnings(model, temperature, steps, dbs)

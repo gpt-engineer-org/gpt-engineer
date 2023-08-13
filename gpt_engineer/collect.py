@@ -9,6 +9,15 @@ from gpt_engineer.learning import Learning, extract_learning
 
 
 def send_learning(learning: Learning):
+    """
+    Note:
+    This function is only called if consent is given to share data.
+
+    Data is not shared to a third party. It is used with the sole purpose of
+    improving gpt-engineer, and letting it handle more use cases.
+
+    Consent logic is in gpt_engineer/learning.py
+    """
     import rudderstack.analytics as rudder_analytics
 
     rudder_analytics.write_key = "2Re4kqwL61GDp7S8ewe6K5dbogG"
