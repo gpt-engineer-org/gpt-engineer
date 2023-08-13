@@ -27,23 +27,23 @@ Choose either **stable** or **development**.
 
 For **stable** release:
 
-- `pip install gpt-engineer`
+- `python -m pip install gpt-engineer`
 
 For **development**:
 - `git clone https://github.com/AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
-- `pip install -e .`
+- `python -m pip install -e .`
   - (or: `make install && source venv/bin/activate` for a venv)
 
-**Setup**
+**API Key**
 
-With an OpenAI API key (preferably with GPT-4 access) run:
+With an OpenAI API key run:
 
 - `export OPENAI_API_KEY=[your api key]`
 
-To set API key on windows check the [Windows README](./WINDOWS_README.md).
+Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
-**Run**:
+**Running**
 
 - Create an empty folder. If inside the repo, you can run:
   - `cp -r projects/example/ projects/my-new-project`
@@ -54,38 +54,15 @@ To set API key on windows check the [Windows README](./WINDOWS_README.md).
 By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
 **Results**
-- Check the generated files in `projects/my-new-project/workspace`
 
+Check the generated files in `projects/my-new-project/workspace`
 
-To **run in the browser** you can simply:
+**Alternatives**
+
+You can check [Docker instructions](docker/README.md) to use Docker, or simply
+do everything in your browser:
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
-
-
-## Getting Started using Docker
-
-**Running using docker cli**:
-
-Building the image:
-- `git clone https://github.com/AntonOsika/gpt-engineer.git`
-- `cd gpt-engineer`
-- `docker build --rm -t gpt-engineer .`
-
-Running the container:
-- `docker run -it --rm -e OPENAI_API_KEY="YOUR OPENAI KEY" -v ./your-project:/project gpt-engineer`
-
-The `-v` flag mounts the `your-project` folder into the container. Make sure to have a `prompt` file in there.
-
-**Running using docker-compose cli**:
-
-Building the image:
-- `git clone https://github.com/AntonOsika/gpt-engineer.git`
-- `cd gpt-engineer`
-- `docker-compose build`
-- `docker-compose run --rm gpt-engineer`
-
-Set the OPENAI_API_KEY in docker-compose.yml using .env file or environment variable, and mount your project folder into the container using volumes. for example "./projects/example:/project" ./projects/example is the path to your project folder.
-
 
 ## Features
 
