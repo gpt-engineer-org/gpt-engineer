@@ -1,1 +1,1 @@
-The current game boundry is 30x20 in main.py, please make that 40x40.  
+We are writing snake in python. MVC components split in separate files. Keyboard control.
