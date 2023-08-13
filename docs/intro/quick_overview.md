@@ -32,7 +32,7 @@ The main script uses the `Typer` library to create a command-line interface. It 
 <br>
 
 ### 5. Steps (`gpt_engineer/steps.py`)
-This module defines a series of steps that can be run in the main script.  Each step is a function that takes an instance of the AI class and an instance of the DBs class, and returns a list of messages. 
+This module defines a series of steps that can be run in the main script.  Each step is a function that takes an instance of the AI class and an instance of the DBs class, and returns a list of messages.
 
 <br>
 

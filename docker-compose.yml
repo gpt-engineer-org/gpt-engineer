@@ -16,4 +16,3 @@ services:
     image: gpt-engineer
     volumes:
       - ./projects/example:/project
-

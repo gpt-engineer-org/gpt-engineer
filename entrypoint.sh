@@ -11,4 +11,3 @@ for item in "$project_dir"/*; do
         chmod -R 777 "$item"
     fi
 done
-

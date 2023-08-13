@@ -1,7 +1,7 @@
 Building Docs with Sphinx
 =========================
 
-This example shows a basic Sphinx docs project with Read the Docs. This project is using `sphinx` with `readthedocs` 
+This example shows a basic Sphinx docs project with Read the Docs. This project is using `sphinx` with `readthedocs`
 project template.
 
 Some useful links are given below to lear and contribute in the project.
@@ -14,17 +14,17 @@ Read the Docs Build configuration is stored in `.readthedocs.yaml`.
 
 
 📍 [docs/requirements.txt](https://docs.readthedocs.io/en/stable/config-file/v2.html)<br>
-Python dependencies are [pinned](https://docs.readthedocs.io/en/latest/guides/reproducible-builds.html) (uses [pip-tools](https://pip-tools.readthedocs.io/en/latest/)) here. Make sure to add your Python dependencies to `requirements.txt` or if you choose [pip-tools](https://pip-tools.readthedocs.io/en/latest/), edit `docs/requirements.txt`. 
+Python dependencies are [pinned](https://docs.readthedocs.io/en/latest/guides/reproducible-builds.html) (uses [pip-tools](https://pip-tools.readthedocs.io/en/latest/)) here. Make sure to add your Python dependencies to `requirements.txt` or if you choose [pip-tools](https://pip-tools.readthedocs.io/en/latest/), edit `docs/requirements.txt`.
 
 
 
 Example Project usage
 ---------------------
 
-`Poetry` is the package manager for `gpt-engineer`. In order to build documentation, we have to add docs requirements in 
-development environment. 
+`Poetry` is the package manager for `gpt-engineer`. In order to build documentation, we have to add docs requirements in
+development environment.
 
-This project has a standard readthedocs layout which is built by Read the Docs almost the same way that you would build it 
+This project has a standard readthedocs layout which is built by Read the Docs almost the same way that you would build it
 locally (on your own laptop!).
 
 You can build and view this documentation project locally - we recommend that you activate a `poetry` or your choice of `venv`
@@ -36,14 +36,14 @@ Update `repository_stats.md` file under `docs/intro`
 # Install required Python dependencies (MkDocs etc.)
 pip install -e .[doc]
 cd docs/
-# Create the `api_reference.rst` 
+# Create the `api_reference.rst`
 python create_api_rst.py
 
-# Build the docs 
+# Build the docs
 make html
 ```
 
-Project Docs Structure 
+Project Docs Structure
 ----------------------
 If you are new to Read the Docs, you may want to refer to the [Read the Docs User documentation](https://docs.readthedocs.io/).
 
@@ -60,7 +60,7 @@ Below is the rundown of documentation structure for `pandasai`, you need to know
 Read the Docs tutorial
 ----------------------
 
-To get started with Read the Docs, you may also refer to the 
+To get started with Read the Docs, you may also refer to the
 [Read the Docs tutorial](https://docs.readthedocs.io/en/stable/tutorial/). I
 
-With every release, build the documentation manually. 
+With every release, build the documentation manually.

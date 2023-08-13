@@ -73,4 +73,3 @@ def greet():
 <br>
 
 This function would be saved to the workspace database as `greet.py`.
-
