@@ -36,10 +36,12 @@ For **development**:
   - (or: `make install && source venv/bin/activate` for a venv)
 
 **API Key**
-
-With an OpenAI API key run:
-
+Either just:
 - `export OPENAI_API_KEY=[your api key]`
+
+Or:
+- Create a copy of `.env.template` named `.env`
+- Add your OPENAI_API_KEY in .env
 
 Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
