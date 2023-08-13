@@ -34,7 +34,6 @@ def main(
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
 
-    input_path = Path(project_path).absolute()
 
     memory_path = input_path / "memory"
     workspace_path = input_path / "workspace"
