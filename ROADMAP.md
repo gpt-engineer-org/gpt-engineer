@@ -1,6 +1,6 @@
 # Roadmap
 
-![image](https://github.com/AntonOsika/gpt-engineer/assets/4467025/cf47e597-fac0-4324-bd46-bcf62d83d66c)
+<img width="800" alt="image" src="https://github.com/AntonOsika/gpt-engineer/assets/4467025/1af9a457-1ed8-4ab3-90e6-4fa52bbb8c09">
 
 
 There are three main milestones we believe will greatly increase gpt-engineer's reliability and capability:
@@ -23,6 +23,7 @@ There are three main milestones we believe will greatly increase gpt-engineer's 
 - [ ] **Improve existing projects**
   - [ ] Decide on the "flow" for the CLI commands and where the project files are created
   - [ ] Add an "improve code" command
+  - [ ] Benchmark capabilities against other tools
 
 ## Experimental research
 This is not our current focus, but if you are interested in experimenting: Please
