@@ -75,7 +75,6 @@ def get_code_strings(input) -> dict[str, str]:
     files_paths = input["file_list.txt"].strip().split("\n")
     files_dict = {}
     for file_path in files_paths:
-        file_data = ""
         with open(file_path, "r") as file:
             file_data = file.read()
         if file_data:
