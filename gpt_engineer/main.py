@@ -3,10 +3,10 @@ import os
 
 from pathlib import Path
 
+import openai
 import typer
 
 from dotenv import load_dotenv
-import openai
 
 from gpt_engineer.ai import AI, fallback_model
 from gpt_engineer.collect import collect_learnings
