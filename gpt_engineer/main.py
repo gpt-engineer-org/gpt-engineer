@@ -1,18 +1,30 @@
 import logging
+import os
 
 import os
 
 from pathlib import Path
 
+import openai
 import typer
 
+
+from dotenv import load_dotenv
+
 from gpt_engineer.ai import AI
+
 from gpt_engineer.collect import collect_learnings
 from gpt_engineer.db import DB, DBs, archive
 from gpt_engineer.learning import collect_consent
 from gpt_engineer.steps import STEPS, Config as StepsConfig
 
 app = typer.Typer()
+
+
+def load_env_if_needed():
+    if os.getenv("OPENAI_API_KEY") is None:
+        load_dotenv()
+    openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 @app.command()
@@ -34,17 +46,14 @@ def main(
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
 
-
     # For the improve option take current project as path and add .gpteng folder
     # By now, ignoring the 'project_path' argument
     if improve_option:
-        input_path = Path(os.getcwd()).absolute() / ".gpteng"
-        input_path.mkdir(parents=True, exist_ok=True)
         # The default option for the --improve is the IMPROVE_CODE, not DEFAULT
         if steps_config == StepsConfig.DEFAULT:
             steps_config = StepsConfig.IMPROVE_CODE
-        memory_path = input_path / "memory"
-        workspace_path = Path(os.getcwd()).absolute()
+
+    load_env_if_needed()
 
     ai = AI(
         model_name=model,
