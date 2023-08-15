@@ -3,6 +3,7 @@ import os
 
 from pathlib import Path
 
+import openai
 import typer
 
 from dotenv import load_dotenv
@@ -19,6 +20,7 @@ app = typer.Typer()
 def load_env_if_needed():
     if os.getenv("OPENAI_API_KEY") is None:
         load_dotenv()
+    openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 @app.command()
