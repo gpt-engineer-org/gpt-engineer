@@ -9,8 +9,14 @@ from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from termcolor import colored
 
 from gpt_engineer.ai import AI
-from gpt_engineer.chat_to_files import to_files
+from gpt_engineer.chat_to_files import (
+    format_file_to_input,
+    get_code_strings,
+    overwrite_files,
+    to_files,
+)
 from gpt_engineer.db import DBs
+from gpt_engineer.file_selector import ask_for_files
 from gpt_engineer.learning import human_input
 
 Message = Union[AIMessage, HumanMessage, SystemMessage]
@@ -19,6 +25,17 @@ Message = Union[AIMessage, HumanMessage, SystemMessage]
 def setup_sys_prompt(dbs: DBs) -> str:
     return (
         dbs.preprompts["generate"] + "\nUseful to know:\n" + dbs.preprompts["philosophy"]
+    )
+
+
+def setup_sys_prompt_existing_code(dbs: DBs) -> str:
+    """
+    Similar to code generation, but using an existing code base.
+    """
+    return (
+        dbs.preprompts["implement_on_existing"]
+        + "\nUseful to know:\n"
+        + dbs.preprompts["philosophy"]
     )
 
 
@@ -255,6 +272,105 @@ def use_feedback(ai: AI, dbs: DBs):
     return messages
 
 
+def improve_existing_code(ai: AI, dbs: DBs):
+    """
+    Ask the user for a list of paths, ask the AI agent to
+    improve, fix or add a new functionality
+    A file selection will appear to select the files.
+    The terminal will ask for the prompt.
+    """
+    file_path_info = ask_for_files(dbs.input)
+    files_info = get_code_strings(dbs.input)
+    dbs.input["prompt"] = input(
+        "\nWhat do you need to improve with the selected files?\n"
+    )
+
+    confirm_str = f"""
+-----------------------------
+The following files will be used in the improvement process:
+{dbs.input["file_list.txt"]}
+
+The inserted prompt is the following:
+'{dbs.input['prompt']}'
+-----------------------------
+
+You can change these files in .gpteng folder ({dbs.input.path}) in your project
+before proceeding.
+
+Press enter to proceed with modifications.
+
+"""
+    input(confirm_str)
+    messages = [
+        ai.fsystem(setup_sys_prompt_existing_code(dbs)),
+        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
+    ]
+    # Add files as input
+    for file_name, file_str in files_info.items():
+        code_input = format_file_to_input(file_name, file_str)
+        messages.append(ai.fuser(f"{code_input}"))
+
+    messages = ai.next(messages, step_name=curr_fn())
+    # Maybe we should add another step called "replace" or "overwrite"
+    overwrite_files(messages[-1].content.strip(), dbs, replace_files=file_path_info)
+    return messages
+
+
+def improve_existing_code(ai: AI, dbs: DBs):
+    """
+    Ask the user for a list of paths, ask the AI agent to
+    improve, fix or add a new functionality
+    A file selection will appear to select the files.
+    The terminal will ask for the prompt.
+    """
+    file_path_info = ask_for_files(dbs.input)
+    files_info = get_code_strings(dbs.input)
+    dbs.input["prompt"] = input(
+        "\nWhat do you need to improve with the selected files?\n"
+    )
+
+    confirm_str = f"""
+-----------------------------
+The following files will be used in the improvement process:
+{dbs.input["file_list.txt"]}
+
+The inserted prompt is the following:
+'{dbs.input['prompt']}'
+-----------------------------
+
+You can change these files in .gpteng folder ({dbs.input.path}) in your project
+before proceeding.
+
+Press enter to proceed with modifications.
+
+"""
+    input(confirm_str)
+    messages = [
+        ai.fsystem(setup_sys_prompt_existing_code(dbs)),
+        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
+    ]
+    # Add files as input
+    for file_name, file_str in files_info.items():
+        code_input = format_file_to_input(file_name, file_str)
+        messages.append(ai.fuser(f"{code_input}"))
+
+    output_format_str = """
+Make sure the output of any files is in the following format where
+FILENAME is the file name including the file extension,
+LANG is the markup code block language for the code's language, and CODE is the code:
+
+FILENAME
+```LANG
+CODE
+```
+"""
+
+    messages = ai.next(messages, output_format_str, step_name=curr_fn())
+    # Maybe we should add another step called "replace" or "overwrite"
+    overwrite_files(messages[-1].content.strip(), dbs, replace_files=file_path_info)
+    return messages
+
+
 def fix_code(ai: AI, dbs: DBs):
     messages = AI.deserialize_messages(dbs.logs[gen_code.__name__])
     code_output = messages[-1].content.strip()
@@ -288,6 +404,7 @@ class Config(str, Enum):
     EXECUTE_ONLY = "execute_only"
     EVALUATE = "evaluate"
     USE_FEEDBACK = "use_feedback"
+    IMPROVE_CODE = "improve_code"
 
 
 # Different configs of what steps to run
@@ -338,6 +455,7 @@ STEPS = {
     Config.USE_FEEDBACK: [use_feedback, gen_entrypoint, execute_entrypoint, human_review],
     Config.EXECUTE_ONLY: [execute_entrypoint],
     Config.EVALUATE: [execute_entrypoint, human_review],
+    Config.IMPROVE_CODE: [improve_existing_code],
 }
 
 # Future steps that can be added:
