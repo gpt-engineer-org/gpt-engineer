@@ -1,4 +1,4 @@
-Welcome to GPT-ENGINEER's Documentation!
+Welcome to GPT-ENGINEER's Documentation
 ========================================
 
 .. toctree::
@@ -40,7 +40,7 @@ Welcome to GPT-ENGINEER's Documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: CHAT PARSING & SELf EXECUTION:
+   :caption: CHAT PARSING & SELF EXECUTION:
 
    intro/chat_parsing.md
 
