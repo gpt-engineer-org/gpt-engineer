@@ -1,13 +1,10 @@
 import inspect
 import re
 import subprocess
-
 from enum import Enum
 from typing import List, Union
-
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from termcolor import colored
-
 from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import (
     format_file_to_input,
@@ -23,7 +20,10 @@ Message = Union[AIMessage, HumanMessage, SystemMessage]
 
 
 def setup_sys_prompt(dbs: DBs) -> str:
-    """Primes the AI with instructions as to how it should generate code and the philosophy to follow"""
+    """
+    Primes the AI with instructions as to how it should
+    generate code and the philosophy to follow
+    """
     return (
         dbs.preprompts["roadmap"]
         + dbs.preprompts["generate"]
@@ -63,9 +63,11 @@ def get_prompt(dbs: DBs) -> str:
 
 
 def curr_fn() -> str:
-    """Get the name of the current function
+    """
+    Get the name of the current function
     NOTE: This will be the name of the function that called this function,
-    so it serves to ensure we don't hardcode the function name in the step, but allow the step names to be refactored
+    so it serves to ensure we don't hardcode the function name in the step,
+    but allow the step names to be refactored
     """
     return inspect.stack()[1].function
 
@@ -280,7 +282,6 @@ def use_feedback(ai: AI, dbs: DBs):
         ai.fassistant(
             dbs.workspace["all_output.txt"]
         ),  # reload previously generated code
-        # ai.fsystem(dbs.preprompts["use_feedback"]),  # No prompt is currently used, but can be added from here
     ]
     if dbs.input["feedback"]:
         messages = ai.next(messages, dbs.input["feedback"], step_name=curr_fn())
@@ -288,7 +289,8 @@ def use_feedback(ai: AI, dbs: DBs):
         return messages
     else:
         print(
-            "No feedback was found in the input folder. Please create a file called 'feedback' in the same folder as the prompt file."
+            "No feedback was found in the input folder. Please create a file "
+            + "called 'feedback' in the same folder as the prompt file."
         )
         exit(1)
 

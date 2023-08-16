@@ -1,14 +1,8 @@
 import logging
 import os
-
-import os
-
 from pathlib import Path
-
 import openai
 import typer
-
-
 from dotenv import load_dotenv
 
 from gpt_engineer.ai import AI
