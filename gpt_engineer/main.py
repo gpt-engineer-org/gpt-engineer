@@ -1,18 +1,14 @@
 import logging
 import os
 
-import os
-
 from pathlib import Path
 
 import openai
 import typer
 
-
 from dotenv import load_dotenv
 
 from gpt_engineer.ai import AI
-
 from gpt_engineer.collect import collect_learnings
 from gpt_engineer.db import DB, DBs, archive
 from gpt_engineer.learning import collect_consent
@@ -44,7 +40,6 @@ def main(
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
-
 
     # For the improve option take current project as path and add .gpteng folder
     # By now, ignoring the 'project_path' argument
