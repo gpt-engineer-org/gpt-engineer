@@ -1,11 +1,8 @@
 import logging
 import os
-
 from pathlib import Path
-
 import openai
 import typer
-
 from dotenv import load_dotenv
 
 from gpt_engineer.ai import AI
@@ -14,7 +11,7 @@ from gpt_engineer.db import DB, DBs, archive
 from gpt_engineer.learning import collect_consent
 from gpt_engineer.steps import STEPS, Config as StepsConfig
 
-app = typer.Typer()
+app = typer.Typer()  # creates a CLI app
 
 
 def load_env_if_needed():
@@ -65,7 +62,9 @@ def main(
         logs=DB(memory_path / "logs"),
         input=DB(input_path),
         workspace=DB(workspace_path),
-        preprompts=DB(Path(__file__).parent / "preprompts"),
+        preprompts=DB(
+            Path(__file__).parent / "preprompts"
+        ),  # Loads preprompts from the preprompts directory
         archive=DB(archive_path),
     )
 

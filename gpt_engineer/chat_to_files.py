@@ -1,8 +1,13 @@
 import os
 import re
+from typing import List, Tuple
 
 
-def parse_chat(chat):  # -> List[Tuple[str, str]]:
+def parse_chat(chat) -> List[Tuple[str, str]]:
+    """
+    Extacts all code blocks from a chat and returns them
+    as a list of (filename, codeblock) tuples
+    """
     # Get all ``` blocks and preceding filenames
     regex = r"(\S+)\n\s*```[^\n]*\n(.+?)```"
     matches = re.finditer(regex, chat, re.DOTALL)
