@@ -46,13 +46,7 @@ This prompt instructs the AI to write tests according to a specification using T
 
 <br>
 
-### 8. Use QA (`gpt_engineer/preprompts/use_qa`)
-
-This prompt instructs the AI to generate code based on a set of instructions and clarifications. The AI is expected to think step by step and reason itself to the right decisions to make sure it gets it right. It should first lay out the names of the core classes, functions, methods that will be necessary, as well as a quick comment on their purpose. Then it should output the content of each file including ALL code.
-
-<br>
-
-### 9. Use Feedback (`gpt_engineer/preprompts/use_feedback`)
+### 8. Use Feedback (`gpt_engineer/preprompts/use_feedback`)
 This prompt instructs the AI to generate code based on a set of instructions and feedback defined by the user.
 
 <br>
