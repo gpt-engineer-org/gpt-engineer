@@ -89,5 +89,23 @@ def main(
     dbs.logs["token_usage"] = ai.format_token_usage_log()
 
 
+import subprocess
+import venv
+
+def handle_python_dependencies():
+    venv.create('venv', with_pip=True)
+    subprocess.run(['venv/bin/pip', 'install', '-r', 'requirements.txt'])
+    subprocess.run(['venv/bin/pip', 'freeze', '>', 'requirements.txt'])
+
+def handle_node_dependencies():
+    if not os.path.exists('package.json'):
+        subprocess.run(['npm', 'init', '-y'])
+    with open('package.json', 'r') as f:
+        package_json = json.load(f)
+    for dependency in package_json['dependencies']:
+        subprocess.run(['npm', 'install', dependency])
+
 if __name__ == "__main__":
+    handle_python_dependencies()
+    handle_node_dependencies()
     app()
