@@ -1,10 +1,13 @@
 import inspect
 import re
 import subprocess
+
 from enum import Enum
 from typing import List, Union
+
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from termcolor import colored
+
 from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import (
     format_file_to_input,
@@ -13,8 +16,8 @@ from gpt_engineer.chat_to_files import (
     to_files,
 )
 from gpt_engineer.db import DBs
-from gpt_engineer.learning import human_review_input
 from gpt_engineer.file_selector import ask_for_files
+from gpt_engineer.learning import human_review_input
 
 Message = Union[AIMessage, HumanMessage, SystemMessage]
 
