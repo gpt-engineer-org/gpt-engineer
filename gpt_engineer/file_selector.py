@@ -188,8 +188,7 @@ class TerminalFileSelector:
         elif re.match(regex, user_input):
             try:
                 user_input = (
-                    user_input.replace(
-                        "", ",") if " " in user_input else user_input
+                    user_input.replace("", ",") if " " in user_input else user_input
                 )
                 selected_files = user_input.split(",")
                 for file_number_str in selected_files:
@@ -198,12 +197,10 @@ class TerminalFileSelector:
                         start = int(start_str)
                         end = int(end_str)
                         for num in range(start, end + 1):
-                            selected_paths.append(
-                                str(self.selectable_file_paths[num]))
+                            selected_paths.append(str(self.selectable_file_paths[num]))
                     else:
                         num = int(file_number_str)
-                        selected_paths.append(
-                            str(self.selectable_file_paths[num]))
+                        selected_paths.append(str(self.selectable_file_paths[num]))
 
             except ValueError:
                 pass
