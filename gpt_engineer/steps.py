@@ -310,50 +310,6 @@ Press enter to proceed with modifications.
         code_input = format_file_to_input(file_name, file_str)
         messages.append(ai.fuser(f"{code_input}"))
 
-    messages = ai.next(messages, step_name=curr_fn())
-    # Maybe we should add another step called "replace" or "overwrite"
-    overwrite_files(messages[-1].content.strip(), dbs, replace_files=file_path_info)
-    return messages
-
-
-def improve_existing_code(ai: AI, dbs: DBs):
-    """
-    Ask the user for a list of paths, ask the AI agent to
-    improve, fix or add a new functionality
-    A file selection will appear to select the files.
-    The terminal will ask for the prompt.
-    """
-    file_path_info = ask_for_files(dbs.input)
-    files_info = get_code_strings(dbs.input)
-    dbs.input["prompt"] = input(
-        "\nWhat do you need to improve with the selected files?\n"
-    )
-
-    confirm_str = f"""
------------------------------
-The following files will be used in the improvement process:
-{dbs.input["file_list.txt"]}
-
-The inserted prompt is the following:
-'{dbs.input['prompt']}'
------------------------------
-
-You can change these files in .gpteng folder ({dbs.input.path}) in your project
-before proceeding.
-
-Press enter to proceed with modifications.
-
-"""
-    input(confirm_str)
-    messages = [
-        ai.fsystem(setup_sys_prompt_existing_code(dbs)),
-        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
-    ]
-    # Add files as input
-    for file_name, file_str in files_info.items():
-        code_input = format_file_to_input(file_name, file_str)
-        messages.append(ai.fuser(f"{code_input}"))
-
     output_format_str = """
 Make sure the output of any files is in the following format where
 FILENAME is the file name including the file extension,
