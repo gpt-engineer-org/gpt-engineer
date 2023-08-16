@@ -52,6 +52,7 @@ TERM_CHOICES = (
 
 
 def human_review_input() -> Review:
+<<<<<<< HEAD
     """
     Ask the user to review the generated code and return their review.
 
@@ -60,6 +61,8 @@ def human_review_input() -> Review:
     Review
         The user's review of the generated code.
     """
+=======
+>>>>>>> 6646d19 (refactor for clarity (#585))
     print()
     print(
         colored("To help gpt-engineer learn, please answer 3 questions:", "light_green")
