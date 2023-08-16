@@ -224,7 +224,7 @@ def is_in_ignoring_extensions(path: Path) -> bool:
     return is_hidden and is_pycache
 
 
-def ask_for_files(db_input) -> dict[str, str]:
+def ask_for_files(db_input) -> None:
     """
     Ask user to select files to improve.
     It can be done by terminal, gui, or using the old selection.
@@ -275,23 +275,13 @@ Select option and press Enter (default={selection_number}): """
         sys.exit(1)
 
     file_list_string = ""
-    file_path_info = {}
     if not selection_number == 3:
         # New files
         for file_path in file_path_list:
             file_list_string += str(file_path) + "\n"
-            # Return a dict with key=file_name and value=file_path
-            file_path_info[os.path.basename(file_path).split("/")[-1]] = file_path
+            
         # Write in file_list so the user can edit and remember what was done
         db_input["file_list.txt"] = file_list_string
-    else:
-        # If using the the previous file list, we don't need to write file_list.txt
-        file_list_string = db_input["file_list.txt"]
-        for file_path in file_path_list:
-            # Return a dict with key=file_name and value=file_path
-            file_path_info[os.path.basename(file_path).split("/")[-1]] = file_path
-
-    return file_path_info
 
 
 def gui_file_selector() -> List[str]:

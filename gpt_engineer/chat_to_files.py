@@ -51,21 +51,12 @@ def overwrite_files(chat, dbs, replace_files):
 
     files = parse_chat(chat)
     for file_name, file_content in files:
-        # Verify if the file created by the AI agent was in the input list
-        if file_name in replace_files:
-            # If the AI created a file from our input list, we replace it.
-            with open(replace_files[file_name], "w") as text_file:
-                text_file.write(file_content)
-        else:
-            # If the AI create a new file I don't know where to put it yet
-            # maybe we can think in a smarter solution for this in the future
-            # like asking the AI where to put it.
-            #
-            # by now, just add this to the workspace inside .gpteng folder
-            print(
-                f"Could not find file path for '{file_name}', creating file in workspace"
-            )
+        if file_name == "README.md":
+            # creating a README for notes from the AI.  
             dbs.workspace[file_name] = file_content
+        else:
+            with open(file_name, "w") as text_file:
+                text_file.write(file_content)
 
 
 def get_code_strings(input) -> dict[str, str]:

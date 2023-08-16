@@ -279,7 +279,7 @@ def improve_existing_code(ai: AI, dbs: DBs):
     A file selection will appear to select the files.
     The terminal will ask for the prompt.
     """
-    file_path_info = ask_for_files(dbs.input)
+    ask_for_files(dbs.input)
     files_info = get_code_strings(dbs.input)
     dbs.input["prompt"] = input(
         "\nWhat do you need to improve with the selected files?\n"
@@ -323,7 +323,7 @@ CODE
 
     messages = ai.next(messages, output_format_str, step_name=curr_fn())
     # Maybe we should add another step called "replace" or "overwrite"
-    overwrite_files(messages[-1].content.strip(), dbs, replace_files=file_path_info)
+    overwrite_files(messages[-1].content.strip(), dbs)
     return messages
 
 
