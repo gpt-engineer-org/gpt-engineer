@@ -1,0 +1,19 @@
+name: Mark stale issues
+on:
+  schedule:
+  - cron: '0 0 * * *'
+  issue:
+    types: [opened, updated]
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/stale@v4
+      with:
+        days-before-stale: 60
+        days-before-close: 7
+        stale-issue-label: 'stale'
+        close-issue-label: 'closed due to inactivity'
+        stale-issue-message: 'This issue has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs. Thank you for your contributions.'
+        close-issue-message: 'This issue has been automatically closed due to inactivity. If you still have this problem, please reopen the issue or create a new one.'
+
