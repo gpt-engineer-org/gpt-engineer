@@ -6,7 +6,6 @@ import typer
 from dotenv import load_dotenv
 
 from gpt_engineer.ai import AI
-
 from gpt_engineer.collect import collect_learnings
 from gpt_engineer.db import DB, DBs, archive
 from gpt_engineer.learning import collect_consent
