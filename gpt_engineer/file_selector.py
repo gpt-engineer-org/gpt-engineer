@@ -9,6 +9,7 @@ from typing import List, Union
 
 IGNORE_FOLDERS = {"site-packages", "node_modules"}
 
+
 class DisplayablePath(object):
     """
     A class representing a displayable path in a file explorer.
@@ -208,6 +209,7 @@ class TerminalFileSelector:
             sys.exit(1)
 
         return selected_paths
+
 
 def is_in_ignoring_extensions(path: Path) -> bool:
     """

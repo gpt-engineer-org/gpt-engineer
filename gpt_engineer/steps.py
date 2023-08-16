@@ -25,7 +25,10 @@ Message = Union[AIMessage, HumanMessage, SystemMessage]
 def setup_sys_prompt(dbs: DBs) -> str:
     """Primes the AI with instructions as to how it should generate code and the philosophy to follow"""
     return (
-        dbs.preprompts["roadmap"] + dbs.preprompts["generate"] + "\nUseful to know:\n" + dbs.preprompts["philosophy"]
+        dbs.preprompts["roadmap"]
+        + dbs.preprompts["generate"]
+        + "\nUseful to know:\n"
+        + dbs.preprompts["philosophy"]
     )
 
 
@@ -61,10 +64,11 @@ def get_prompt(dbs: DBs) -> str:
 
 def curr_fn() -> str:
     """Get the name of the current function
-       NOTE: This will be the name of the function that called this function,
-       so it serves to ensure we don't hardcode the function name in the step, but allow the step names to be refactored
+    NOTE: This will be the name of the function that called this function,
+    so it serves to ensure we don't hardcode the function name in the step, but allow the step names to be refactored
     """
     return inspect.stack()[1].function
+
 
 # All steps below have the signature Step
 
@@ -138,7 +142,7 @@ def gen_spec(ai: AI, dbs: DBs) -> List[Message]:
 
 
 def respec(ai: AI, dbs: DBs) -> List[Message]:
-    """ Asks the LLM to review the specs so far and reiterate them if necessary """
+    """Asks the LLM to review the specs so far and reiterate them if necessary"""
     messages = AI.deserialize_messages(dbs.logs[gen_spec.__name__])
     messages += [ai.fsystem(dbs.preprompts["respec"])]
 
@@ -184,7 +188,9 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
 
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
-    ] + messages[1:] # skip the first clarify message, which was the original clarify priming prompt
+    ] + messages[
+        1:
+    ]  # skip the first clarify message, which was the original clarify priming prompt
     messages = ai.next(messages, dbs.preprompts["generate"], step_name=curr_fn())
 
     to_files(messages[-1].content.strip(), dbs.workspace)
@@ -192,7 +198,7 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
 
 
 def gen_code_after_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
-    """ Generates project code after unit tests have been produced """
+    """Generates project code after unit tests have been produced"""
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
@@ -271,7 +277,9 @@ def use_feedback(ai: AI, dbs: DBs):
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
-        ai.fassistant(dbs.workspace["all_output.txt"]), # reload previously generated code
+        ai.fassistant(
+            dbs.workspace["all_output.txt"]
+        ),  # reload previously generated code
         # ai.fsystem(dbs.preprompts["use_feedback"]),  # No prompt is currently used, but can be added from here
     ]
     if dbs.input["feedback"]:
@@ -279,8 +287,11 @@ def use_feedback(ai: AI, dbs: DBs):
         to_files(messages[-1].content.strip(), dbs.workspace)
         return messages
     else:
-        print("No feedback was found in the input folder. Please create a file called 'feedback' in the same folder as the prompt file.")
+        print(
+            "No feedback was found in the input folder. Please create a file called 'feedback' in the same folder as the prompt file."
+        )
         exit(1)
+
 
 def improve_existing_code(ai: AI, dbs: DBs):
     """
@@ -354,7 +365,7 @@ def fix_code(ai: AI, dbs: DBs):
 
 
 def human_review(ai: AI, dbs: DBs):
-    """ Collects and stores human review of the code """
+    """Collects and stores human review of the code"""
     review = human_review_input()
     dbs.memory["review"] = review.to_json()  # type: ignore
     return []
@@ -384,12 +395,12 @@ STEPS = {
         human_review,
     ],
     Config.BENCHMARK: [
-        simple_gen, 
+        simple_gen,
         gen_entrypoint,
     ],
     Config.SIMPLE: [
-        simple_gen, 
-        gen_entrypoint, 
+        simple_gen,
+        gen_entrypoint,
         execute_entrypoint,
     ],
     Config.TDD: [
@@ -427,21 +438,19 @@ STEPS = {
         human_review,
     ],
     Config.USE_FEEDBACK: [
-        use_feedback, 
-        gen_entrypoint, 
-        execute_entrypoint, 
+        use_feedback,
+        gen_entrypoint,
+        execute_entrypoint,
         human_review,
     ],
     Config.EXECUTE_ONLY: [
         execute_entrypoint,
     ],
     Config.EVALUATE: [
-        execute_entrypoint, 
+        execute_entrypoint,
         human_review,
     ],
-    Config.IMPROVE_CODE: [
-        improve_existing_code
-    ],
+    Config.IMPROVE_CODE: [improve_existing_code],
 }
 
 # Future steps that can be added:

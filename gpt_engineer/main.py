@@ -18,7 +18,7 @@ from gpt_engineer.db import DB, DBs, archive
 from gpt_engineer.learning import collect_consent
 from gpt_engineer.steps import STEPS, Config as StepsConfig
 
-app = typer.Typer() # creates a CLI app
+app = typer.Typer()  # creates a CLI app
 
 
 def load_env_if_needed():
@@ -45,7 +45,6 @@ def main(
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
-
     # For the improve option take current project as path and add .gpteng folder
     # By now, ignoring the 'project_path' argument
     if improve_option:
@@ -70,7 +69,9 @@ def main(
         logs=DB(memory_path / "logs"),
         input=DB(input_path),
         workspace=DB(workspace_path),
-        preprompts=DB(Path(__file__).parent / "preprompts"), # Loads preprompts from the preprompts directory
+        preprompts=DB(
+            Path(__file__).parent / "preprompts"
+        ),  # Loads preprompts from the preprompts directory
         archive=DB(archive_path),
     )
 
