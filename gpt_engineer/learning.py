@@ -1,5 +1,4 @@
 import json
-import os
 import random
 import tempfile
 
@@ -114,14 +113,8 @@ def check_consent():
 
 
 def collect_consent() -> bool:
-    opt_out = os.environ.get("COLLECT_LEARNINGS_OPT_OUT") == "true"
     consent_flag = Path(".gpte_consent")
     has_given_consent = consent_flag.exists() and consent_flag.read_text() == "true"
-
-    if opt_out:
-        if has_given_consent:
-            return ask_if_can_store()
-        return False
 
     if has_given_consent:
         return True

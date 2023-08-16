@@ -20,7 +20,7 @@ python scripts/benchmark.py
 | password_generator | ✅  | ✅    | ✅      |
 | todo_list          | ✅  | ✅    | ✅      |
 
-## Notes on the errors
+### Notes on the errors
 
 Most errors come from that the "generate entrypoint" are incorrect. Ignoring
 those, we get 8/11 fully correct.
@@ -47,7 +47,7 @@ One error is that a dependency was used incorrectly and easy to fix
 | password_generator | ✅  | ✅    | ✅      |
 | todo_list          | ✅  | ❌    | ❌      |
 
-## Notes on the errors
+### Notes on the errors
 
 **timer_app** almost works with unit tests config
 

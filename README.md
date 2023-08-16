@@ -27,23 +27,25 @@ Choose either **stable** or **development**.
 
 For **stable** release:
 
-- `pip install gpt-engineer`
+- `python -m pip install gpt-engineer`
 
 For **development**:
 - `git clone https://github.com/AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
-- `pip install -e .`
+- `python -m pip install -e .`
   - (or: `make install && source venv/bin/activate` for a venv)
 
-**Setup**
-
-With an OpenAI API key (preferably with GPT-4 access) run:
-
+**API Key**
+Either just:
 - `export OPENAI_API_KEY=[your api key]`
 
-To set API key on windows check the [Windows README](./WINDOWS_README.md).
+Or:
+- Create a copy of `.env.template` named `.env`
+- Add your OPENAI_API_KEY in .env
 
-**Run**:
+Check the [Windows README](./WINDOWS_README.md) for windows usage.
+
+**Running**
 
 - Create an empty folder. If inside the repo, you can run:
   - `cp -r projects/example/ projects/my-new-project`
@@ -54,14 +56,15 @@ To set API key on windows check the [Windows README](./WINDOWS_README.md).
 By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
 **Results**
-- Check the generated files in `projects/my-new-project/workspace`
 
+Check the generated files in `projects/my-new-project/workspace`
 
-To **run in the browser** you can simply:
+**Alternatives**
+
+You can check [Docker instructions](docker/README.md) to use Docker, or simply
+do everything in your browser:
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
-
-
 
 ## Features
 
@@ -80,7 +83,7 @@ If you want to see our broader ambitions, check out the [roadmap](https://github
 [discord](https://discord.gg/8tcDQ89Ej2)
 to get input on how you can [contribute](.github/CONTRIBUTING.md) to it.
 
-We are currently looking for more maintainers and community organisers. Email anton.osika@gmail.com if you are interested in an official role.
+We are currently looking for more maintainers and community organizers. Email anton.osika@gmail.com if you are interested in an official role.
 
 
 ## Example
