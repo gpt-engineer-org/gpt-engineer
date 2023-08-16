@@ -72,6 +72,10 @@ class AI:
         *,
         step_name: str,
     ) -> List[Message]:
+        """
+        Advances the conversation by sending message history
+        to LLM and updating with the response.
+        """
         if prompt:
             messages.append(self.fuser(prompt))
 

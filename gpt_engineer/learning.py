@@ -51,7 +51,7 @@ TERM_CHOICES = (
 )
 
 
-def human_input() -> Review:
+def human_review_input() -> Review:
     print()
     print(
         colored("To help gpt-engineer learn, please answer 3 questions:", "light_green")
@@ -175,7 +175,8 @@ def extract_learning(
     return learning
 
 
-def get_session():
+def get_session() -> str:
+    """Returns a unique user id for the current user project (session)"""
     path = Path(tempfile.gettempdir()) / "gpt_engineer_user_id.txt"
 
     try:
