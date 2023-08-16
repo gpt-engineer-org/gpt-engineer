@@ -51,12 +51,7 @@ def overwrite_files(chat, dbs, replace_files):
 
     files = parse_chat(chat)
     for file_name, file_content in files:
-        if file_name == "README.md":
-            # creating a README for notes from the AI.  
-            dbs.workspace[file_name] = file_content
-        else:
-            with open(file_name, "w") as text_file:
-                text_file.write(file_content)
+        dbs.workspace[file_name] = file_content
 
 
 def get_code_strings(input) -> dict[str, str]:
