@@ -275,35 +275,29 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     regex = r"```\S*\n(.+?)```"
     matches = re.finditer(regex, messages[-1].content.strip(), re.DOTALL)
     dbs.workspace["run.sh"] = "\n".join(match.group(1) for match in matches)
-    return messages
-
-
-import os
-
-def use_feedback(ai: AI, dbs: DBs):
-    if not os.path.exists(dbs.workspace["all_output.txt"]):
-        print("all_output.txt does not exist. Skipping use_feedback step.")
-        def use_feedback(ai: AI, dbs: DBs):
-            if not os.path.exists(dbs.workspace["all_output.txt"]):
-                print("all_output.txt does not exist. Skipping use_feedback step.")
-                return []
-            messages = [
-                ai.fsystem(setup_sys_prompt(dbs)),
-                ai.fuser(f"Instructions: {dbs.input['prompt']}"),
-                ai.fassistant(
-                    dbs.workspace["all_output.txt"]
-                ),  # reload previously generated code
-            ]
-            if dbs.input["feedback"]:
-                messages = ai.next(messages, dbs.input["feedback"], step_name=curr_fn())
-                to_files(messages[-1].content.strip(), dbs.workspace)
-                return messages
-            else:
-                print(
-                    "No feedback was found in the input folder. Please create a file "
-                    + "called 'feedback' in the same folder as the prompt file."
-                )
-                exit(1)
+    import os
+    
+    def use_feedback(ai: AI, dbs: DBs):
+        if not os.path.exists(dbs.workspace["all_output.txt"]):
+            print("all_output.txt does not exist. Skipping use_feedback step.")
+            return []
+        messages = [
+            ai.fsystem(setup_sys_prompt(dbs)),
+            ai.fuser(f"Instructions: {dbs.input['prompt']}"),
+            ai.fassistant(
+                dbs.workspace["all_output.txt"]
+            ),  # reload previously generated code
+        ]
+        if dbs.input["feedback"]:
+            messages = ai.next(messages, dbs.input["feedback"], step_name=curr_fn())
+            to_files(messages[-1].content.strip(), dbs.workspace)
+            return messages
+        else:
+            print(
+                "No feedback was found in the input folder. Please create a file "
+                + "called 'feedback' in the same folder as the prompt file."
+            )
+            exit(1)
 
 
 def improve_existing_code(ai: AI, dbs: DBs):
