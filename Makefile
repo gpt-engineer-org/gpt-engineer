@@ -41,9 +41,11 @@ upgrade-pip:
 
 #Defines a target named install-dependencies. This target will install the dependencies.
 install-dependencies:
-	@echo -e "$(COLOR_CYAN)Installing dependencies...$(COLOR_RESET)" && \
+	@echo -e "$(COLOR_CYAN)Creating virtual environment...$(COLOR_RESET)" && \
+	python -m venv venv && \
 	source venv/bin/activate && \
-	pip install -e . >> /dev/null
+	pip install -e . >> /dev/null && \
+	pip freeze > requirements.txt
 
 #Defines a target named install-pre-commit. This target will install the pre-commit hooks.
 install-pre-commit:
