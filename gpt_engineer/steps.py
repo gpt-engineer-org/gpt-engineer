@@ -254,6 +254,10 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
 
 
 def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
+    # Create 'all_output.txt' file
+    with open(dbs.workspace.path + "/all_output.txt", "w") as file:
+        file.write("")
+
     messages = ai.start(
         system=(
             "You will get information about a codebase that is currently on disk in "
@@ -279,11 +283,14 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
 
 
 def use_feedback(ai: AI, dbs: DBs):
+    # Ensure 'all_output.txt' is accessed from the correct location
+    all_output_path = dbs.workspace.path + "/all_output.txt"
+
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
         ai.fassistant(
-            dbs.workspace["all_output.txt"]
+            all_output_path
         ),  # reload previously generated code
     ]
     if dbs.input["feedback"]:
