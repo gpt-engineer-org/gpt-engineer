@@ -6,6 +6,20 @@ from typing import List, Tuple
 
 def parse_chat(chat) -> List[Tuple[str, str]]:
     """
+    Extracts all code blocks from a chat and returns them
+    as a list of (filename, codeblock) tuples.
+
+    Parameters
+    ----------
+    chat : str
+        The chat to parse
+
+    Returns
+    -------
+    List[Tuple[str, str]]
+        The list of (filename, codeblock) tuples
+    """
+    """
     Extacts all code blocks from a chat and returns them
     as a list of (filename, codeblock) tuples
     """
@@ -42,6 +56,16 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
 
 
 def to_files(chat, workspace):
+    """
+    Write the chat to files in the workspace.
+
+    Parameters
+    ----------
+    chat : str
+        The chat to write to files
+    workspace : dict
+        The workspace to write the files to
+    """
     workspace["all_output.txt"] = chat
 
     files = parse_chat(chat)
@@ -50,6 +74,18 @@ def to_files(chat, workspace):
 
 
 def overwrite_files(chat, dbs, replace_files):
+    """
+    Replace the AI files to the older local files.
+
+    Parameters
+    ----------
+    chat : str
+        The chat to use for replacing files
+    dbs : DBs
+        The database to use for replacing files
+    replace_files : dict
+        The files to replace
+    """
     """
     Replace the AI files to the older local files.
     """
@@ -77,6 +113,19 @@ def overwrite_files(chat, dbs, replace_files):
 def get_code_strings(input) -> dict[str, str]:
     """
     Read file_list.txt and return file names and its content.
+
+    Parameters
+    ----------
+    input : dict
+        The input to get the code strings from
+
+    Returns
+    -------
+    dict[str, str]
+        The file names and their content
+    """
+    """
+    Read file_list.txt and return file names and its content.
     """
     files_paths = input["file_list.txt"].strip().split("\n")
     files_dict = {}
@@ -90,6 +139,21 @@ def get_code_strings(input) -> dict[str, str]:
 
 
 def format_file_to_input(file_name: str, file_content: str) -> str:
+    """
+    Format a file string to use as input to AI agent.
+
+    Parameters
+    ----------
+    file_name : str
+        The name of the file to format
+    file_content : str
+        The content of the file to format
+
+    Returns
+    -------
+    str
+        The formatted file string
+    """
     """
     Format a file string to use as input to AI agent
     """
