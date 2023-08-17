@@ -24,6 +24,19 @@ Message = Union[AIMessage, HumanMessage, SystemMessage]
 
 def setup_sys_prompt(dbs: DBs) -> str:
     """
+    Get the system prompt for setting up the AI.
+
+    Parameters
+    ----------
+    dbs : DBs
+        The database to get the system prompt from
+
+    Returns
+    -------
+    str
+        The system prompt
+    """
+    """
     Primes the AI with instructions as to how it should
     generate code and the philosophy to follow
     """
@@ -37,6 +50,19 @@ def setup_sys_prompt(dbs: DBs) -> str:
 
 def setup_sys_prompt_existing_code(dbs: DBs) -> str:
     """
+    Get the system prompt for setting up the AI with existing code.
+
+    Parameters
+    ----------
+    dbs : DBs
+        The database to get the system prompt from
+
+    Returns
+    -------
+    str
+        The system prompt
+    """
+    """
     Similar to code generation, but using an existing code base.
     """
     return (
@@ -47,6 +73,19 @@ def setup_sys_prompt_existing_code(dbs: DBs) -> str:
 
 
 def get_prompt(dbs: DBs) -> str:
+    """
+    Get the user's prompt for the project from the prompt file.
+
+    Parameters
+    ----------
+    dbs : DBs
+        The database to get the prompt from
+
+    Returns
+    -------
+    str
+        The user's prompt for the project
+    """
     """
     Loads the user's prompt for the project from prompt file
     (While we migrate we have this fallback getter)
@@ -67,6 +106,14 @@ def get_prompt(dbs: DBs) -> str:
 
 def curr_fn() -> str:
     """
+    Get the name of the current function.
+
+    Returns
+    -------
+    str
+        The name of the current function
+    """
+    """
     Get the name of the current function
     NOTE: This will be the name of the function that called this function,
     so it serves to ensure we don't hardcode the function name in the step,
@@ -79,6 +126,21 @@ def curr_fn() -> str:
 
 
 def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
+    """
+    Run the AI on the main prompt and save the results.
+
+    Parameters
+    ----------
+    ai : AI
+        The AI to run
+    dbs : DBs
+        The database to save the results to
+
+    Returns
+    -------
+    List[Message]
+        The list of messages from the AI
+    """
     """Run the AI on the main prompt and save the results"""
     messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs), step_name=curr_fn())
     to_files(messages[-1].content.strip(), dbs.workspace)
@@ -86,6 +148,21 @@ def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
 
 
 def clarify(ai: AI, dbs: DBs) -> List[Message]:
+    """
+    Ask the user if they want to clarify anything and save the results to the workspace.
+
+    Parameters
+    ----------
+    ai : AI
+        The AI to ask for clarification
+    dbs : DBs
+        The database to save the results to
+
+    Returns
+    -------
+    List[Message]
+        The list of messages from the AI
+    """
     """
     Ask the user if they want to clarify anything and save the results to the workspace
     """
@@ -132,6 +209,22 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
 def gen_spec(ai: AI, dbs: DBs) -> List[Message]:
     """
     Generate a spec from the main prompt + clarifications and save the results to
+    the workspace.
+
+    Parameters
+    ----------
+    ai : AI
+        The AI to generate the spec
+    dbs : DBs
+        The database to save the results to
+
+    Returns
+    -------
+    List[Message]
+        The list of messages from the AI
+    """
+    """
+    Generate a spec from the main prompt + clarifications and save the results to
     the workspace
     """
     messages = [
@@ -147,6 +240,21 @@ def gen_spec(ai: AI, dbs: DBs) -> List[Message]:
 
 
 def respec(ai: AI, dbs: DBs) -> List[Message]:
+    """
+    Ask the AI to review the specs so far and reiterate them if necessary.
+
+    Parameters
+    ----------
+    ai : AI
+        The AI to review the specs
+    dbs : DBs
+        The database to save the results to
+
+    Returns
+    -------
+    List[Message]
+        The list of messages from the AI
+    """
     """Asks the LLM to review the specs so far and reiterate them if necessary"""
     messages = AI.deserialize_messages(dbs.logs[gen_spec.__name__])
     messages += [ai.fsystem(dbs.preprompts["respec"])]
@@ -172,6 +280,21 @@ def respec(ai: AI, dbs: DBs) -> List[Message]:
 def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
     """
     Generate unit tests based on the specification, that should work.
+
+    Parameters
+    ----------
+    ai : AI
+        The AI to generate the unit tests
+    dbs : DBs
+        The database to save the results to
+
+    Returns
+    -------
+    List[dict]
+        The list of unit tests
+    """
+    """
+    Generate unit tests based on the specification, that should work.
     """
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
@@ -188,6 +311,21 @@ def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
 
 
 def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
+    """
+    Generate code based on the clarified prompt and save the results to the workspace.
+
+    Parameters
+    ----------
+    ai : AI
+        The AI to generate the code
+    dbs : DBs
+        The database to save the results to
+
+    Returns
+    -------
+    List[dict]
+        The list of messages from the AI
+    """
     """Takes clarification and generates code"""
     messages = AI.deserialize_messages(dbs.logs[clarify.__name__])
 
@@ -203,6 +341,21 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
 
 
 def gen_code_after_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
+    """
+    Generate project code after unit tests have been produced.
+
+    Parameters
+    ----------
+    ai : AI
+        The AI to generate the code
+    dbs : DBs
+        The database to save the results to
+
+    Returns
+    -------
+    List[dict]
+        The list of messages from the AI
+    """
     """Generates project code after unit tests have been produced"""
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
@@ -216,6 +369,21 @@ def gen_code_after_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
 
 
 def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
+    """
+    Execute the entrypoint of the project.
+
+    Parameters
+    ----------
+    ai : AI
+        The AI to execute the entrypoint
+    dbs : DBs
+        The database to save the results to
+
+    Returns
+    -------
+    List[dict]
+        An empty list
+    """
     command = dbs.workspace["run.sh"]
 
     print("Do you want to execute this code?")
@@ -254,6 +422,21 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
 
 
 def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
+    """
+    Generate the entrypoint of the project.
+
+    Parameters
+    ----------
+    ai : AI
+        The AI to generate the entrypoint
+    dbs : DBs
+        The database to save the results to
+
+    Returns
+    -------
+    List[dict]
+        The list of messages from the AI
+    """
     messages = ai.start(
         system=(
             "You will get information about a codebase that is currently on disk in "
@@ -279,6 +462,16 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
 
 
 def use_feedback(ai: AI, dbs: DBs):
+    """
+    Collect and store human review of the code.
+
+    Parameters
+    ----------
+    ai : AI
+        The AI to collect the review from
+    dbs : DBs
+        The database to store the review in
+    """
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
@@ -299,6 +492,16 @@ def use_feedback(ai: AI, dbs: DBs):
 
 
 def improve_existing_code(ai: AI, dbs: DBs):
+    """
+    Improve existing code.
+
+    Parameters
+    ----------
+    ai : AI
+        The AI to improve the code
+    dbs : DBs
+        The database to save the results to
+    """
     """
     Ask the user for a list of paths, ask the AI agent to
     improve, fix or add a new functionality
@@ -354,6 +557,16 @@ CODE
 
 
 def fix_code(ai: AI, dbs: DBs):
+    """
+    Fix any errors in the code.
+
+    Parameters
+    ----------
+    ai : AI
+        The AI to fix the code
+    dbs : DBs
+        The database to save the results to
+    """
     messages = AI.deserialize_messages(dbs.logs[gen_code_after_unit_tests.__name__])
     code_output = messages[-1].content.strip()
     messages = [
@@ -370,6 +583,16 @@ def fix_code(ai: AI, dbs: DBs):
 
 
 def human_review(ai: AI, dbs: DBs):
+    """
+    Collect and store human review of the code.
+
+    Parameters
+    ----------
+    ai : AI
+        The AI to collect the review from
+    dbs : DBs
+        The database to store the review in
+    """
     """Collects and stores human review of the code"""
     review = human_review_input()
     dbs.memory["review"] = review.to_json()  # type: ignore
@@ -377,6 +600,34 @@ def human_review(ai: AI, dbs: DBs):
 
 
 class Config(str, Enum):
+    """
+    An enumeration of configuration options.
+
+    Attributes
+    ----------
+    DEFAULT : str
+        The default configuration
+    BENCHMARK : str
+        The benchmark configuration
+    SIMPLE : str
+        The simple configuration
+    TDD : str
+        The test-driven development configuration
+    TDD_PLUS : str
+        The test-driven development plus configuration
+    CLARIFY : str
+        The clarify configuration
+    RESPEC : str
+        The respec configuration
+    EXECUTE_ONLY : str
+        The execute only configuration
+    EVALUATE : str
+        The evaluate configuration
+    USE_FEEDBACK : str
+        The use feedback configuration
+    IMPROVE_CODE : str
+        The improve code configuration
+    """
     DEFAULT = "default"
     BENCHMARK = "benchmark"
     SIMPLE = "simple"
