@@ -4,7 +4,7 @@ services:
   gpt-engineer:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     stdin_open: true
     tty: true
     # Set the API key from the .env file
@@ -12,7 +12,7 @@ services:
       - .env
     ##  OR set the API key directly
     # environment:
-    #   - OPENAI_API_KEY="YOUR_API_KEY_HERE"
+      # - OPENAI_API_KEY=YOUR_API_KEY
     image: gpt-engineer
     volumes:
       - ./projects/example:/project
