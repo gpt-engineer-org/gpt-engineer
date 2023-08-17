@@ -279,6 +279,9 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     def use_feedback(ai: AI, dbs: DBs):
         if not os.path.exists(dbs.workspace["all_output.txt"]):
             print("all_output.txt does not exist. Skipping use_feedback step.")
+    def use_feedback(ai: AI, dbs: DBs):
+        if not os.path.exists(dbs.workspace['all_output.txt']):
+            print('all_output.txt does not exist. Skipping use_feedback step.')
             return []
         messages = [
             ai.fsystem(setup_sys_prompt(dbs)),
