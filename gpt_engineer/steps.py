@@ -254,8 +254,8 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
 
 
 def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
-    # Create 'all_output.txt' file
-    with open(dbs.workspace.path + "/all_output.txt", "w") as file:
+    # Append to 'all_output.txt' file
+    with open(dbs.workspace.path + "/all_output.txt", "a") as file:
         file.write("")
 
     messages = ai.start(
@@ -285,6 +285,10 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
 def use_feedback(ai: AI, dbs: DBs):
     # Ensure 'all_output.txt' is accessed from the correct location
     all_output_path = dbs.workspace.path + "/all_output.txt"
+    # Check if 'all_output.txt' exists, if not, create it
+    if not os.path.isfile(all_output_path):
+        with open(all_output_path, "w") as file:
+            file.write("")
 
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
