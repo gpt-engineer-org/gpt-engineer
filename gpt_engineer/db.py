@@ -10,14 +10,53 @@ class DB:
     """A simple key-value store, where keys are filenames and values are file contents."""
 
     def __init__(self, path):
+        """
+        Initialize the DB class.
+
+        Parameters
+        ----------
+        path : str
+            The path to the directory where the database files are stored.
+        """
         self.path = Path(path).absolute()
 
         self.path.mkdir(parents=True, exist_ok=True)
 
     def __contains__(self, key):
+        """
+        Check if a file with the specified name exists in the database.
+    
+        Parameters
+        ----------
+        key : str
+            The name of the file to check.
+    
+        Returns
+        -------
+        bool
+            True if the file exists, False otherwise.
+        """
         return (self.path / key).is_file()
 
     def __getitem__(self, key):
+        """
+        Get the content of a file in the database.
+    
+        Parameters
+        ----------
+        key : str
+            The name of the file to get the content of.
+    
+        Returns
+        -------
+        str
+            The content of the file.
+    
+        Raises
+        ------
+        KeyError
+            If the file does not exist in the database.
+        """
         full_path = self.path / key
 
         if not full_path.is_file():
@@ -26,12 +65,42 @@ class DB:
             return f.read()
 
     def get(self, key, default=None):
+        """
+        Get the content of a file in the database, or a default value if the file does not exist.
+    
+        Parameters
+        ----------
+        key : str
+            The name of the file to get the content of.
+        default : any, optional
+            The default value to return if the file does not exist, by default None.
+    
+        Returns
+        -------
+        any
+            The content of the file, or the default value if the file does not exist.
+        """
         try:
             return self[key]
         except KeyError:
             return default
 
     def __setitem__(self, key, val):
+        """
+        Set the content of a file in the database.
+    
+        Parameters
+        ----------
+        key : str
+            The name of the file to set the content of.
+        val : str
+            The content to set.
+    
+        Raises
+        ------
+        TypeError
+            If val is neither a string nor bytes.
+        """
         full_path = self.path / key
         full_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -54,6 +123,14 @@ class DBs:
 
 
 def archive(dbs: DBs):
+    """
+    Archive the memory and workspace databases.
+
+    Parameters
+    ----------
+    dbs : DBs
+        The databases to archive.
+    """
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     shutil.move(
         str(dbs.memory.path), str(dbs.archive.path / timestamp / dbs.memory.path.name)
