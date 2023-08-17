@@ -48,6 +48,7 @@ class AI:
         temperature : float, optional
             The temperature to use for the model, by default 0.1
         """
+
         self.temperature = temperature
         self.model_name = fallback_model(model_name)
         self.llm = create_chat_model(self.model_name, temperature)
