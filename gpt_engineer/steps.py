@@ -279,8 +279,9 @@ def improve_existing_code(ai: AI, dbs: DBs):
     A file selection will appear to select the files.
     The terminal will ask for the prompt.
     """
-    ask_for_files(dbs.input)
-    files_info = get_code_strings(dbs.input)
+    ask_for_files(dbs.input)  # stores files as full paths.
+    files_info = get_code_strings(dbs.input)  # this only has file names not paths
+
     dbs.input["prompt"] = input(
         "\nWhat do you need to improve with the selected files?\n"
     )
@@ -312,7 +313,8 @@ Press enter to proceed with modifications.
 
     output_format_str = """
 Make sure the output of any files is in the following format where
-FILENAME is the file name including the file extension,
+FILENAME is the file name including the file extension, and the file path.  Do not
+forget to include the file path.
 LANG is the markup code block language for the code's language, and CODE is the code:
 
 FILENAME

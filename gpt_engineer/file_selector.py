@@ -188,7 +188,7 @@ class TerminalFileSelector:
         elif re.match(regex, user_input):
             try:
                 user_input = (
-                    user_input.replace("", ",") if " " in user_input else user_input
+                    user_input.replace(" ", ",") if " " in user_input else user_input
                 )
                 selected_files = user_input.split(",")
                 for file_number_str in selected_files:

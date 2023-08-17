@@ -43,7 +43,7 @@ def to_files(chat, workspace):
         workspace[file_name] = file_content
 
 
-def overwrite_files(chat, dbs, replace_files):
+def overwrite_files(chat, dbs):
     """
     Replace the AI files to the older local files.
     """
@@ -51,7 +51,13 @@ def overwrite_files(chat, dbs, replace_files):
 
     files = parse_chat(chat)
     for file_name, file_content in files:
-        dbs.workspace[file_name] = file_content
+        if file_name.find("../") > -1:
+            raise Exception(f"File name {file_name} attempted to access parent path.")
+        elif file_name == "README.md":
+            dbs.workspace["ExistingCodeModificationsREADME.md"] = file_content
+        else:
+            full_path = os.path.join(dbs.input.path, file_name)
+            dbs.workspace[full_path] = file_content
 
 
 def get_code_strings(input) -> dict[str, str]:
@@ -60,11 +66,11 @@ def get_code_strings(input) -> dict[str, str]:
     """
     files_paths = input["file_list.txt"].strip().split("\n")
     files_dict = {}
-    for file_path in files_paths:
-        with open(file_path, "r") as file:
+    for full_file_path in files_paths:
+        with open(full_file_path, "r") as file:
             file_data = file.read()
         if file_data:
-            file_name = os.path.basename(file_path).split("/")[-1]
+            file_name = os.path.relpath(full_file_path, input.path)
             files_dict[file_name] = file_data
     return files_dict
 
