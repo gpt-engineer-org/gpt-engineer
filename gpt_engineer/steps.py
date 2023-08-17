@@ -1,3 +1,4 @@
+import os
 import inspect
 import re
 import subprocess
@@ -275,8 +276,6 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     regex = r"```\S*\n(.+?)```"
     matches = re.finditer(regex, messages[-1].content.strip(), re.DOTALL)
     dbs.workspace["run.sh"] = "\n".join(match.group(1) for match in matches)
-    import os
-    
     def use_feedback(ai: AI, dbs: DBs):
         if not os.path.exists(dbs.workspace["all_output.txt"]):
             print("all_output.txt does not exist. Skipping use_feedback step.")
