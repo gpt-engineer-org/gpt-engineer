@@ -10,3 +10,8 @@ gha_enabled: True
 description: ''
 
 # Default Values: https://github.com/sweepai/sweep/blob/main/sweep.yaml
+sandbox:
+  enabled: true
+  image: "Python3"
+  install: "python -m venv venv; . venv/bin/activate; pip install black"
+  formatter: ". venv/bin/activate; black {files}"
