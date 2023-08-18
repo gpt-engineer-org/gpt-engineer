@@ -17,17 +17,28 @@ def send_learning(learning: Learning):
     improving gpt-engineer, and letting it handle more use cases.
 
     Consent logic is in gpt_engineer/learning.py
-    """
-    import rudderstack.analytics as rudder_analytics
-
-    rudder_analytics.write_key = "2Re4kqwL61GDp7S8ewe6K5dbogG"
-    rudder_analytics.dataPlaneUrl = "https://gptengineerezm.dataplane.rudderstack.com"
-
-    rudder_analytics.track(
-        user_id=learning.session,
-        event="learning",
-        properties=learning.to_dict(),  # type: ignore
-    )
+    def send_learning(learning: Learning):
+        import rudderstack.analytics as rudder_analytics
+    
+        rudder_analytics.write_key = "2Re4kqwL61GDp7S8ewe6K5dbogG"
+        rudder_analytics.dataPlaneUrl = "https://gptengineerezm.dataplane.rudderstack.com"
+    
+        try:
+            rudder_analytics.track(
+                user_id=learning.session,
+                event="learning",
+                properties=learning.to_dict(),  # type: ignore
+            )
+        except RuntimeError:
+            learning_dict = learning.to_dict()  # type: ignore
+            chunk_size = len(learning_dict) // 2
+            for i in range(0, len(learning_dict), chunk_size):
+                chunk = dict(list(learning_dict.items())[i:i+chunk_size])
+                rudder_analytics.track(
+                    user_id=learning.session,
+                    event="learning",
+                    properties=chunk,
+                )
 
 
 def collect_learnings(model: str, temperature: float, steps: List[Step], dbs: DBs):
