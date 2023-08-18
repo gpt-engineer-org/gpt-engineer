@@ -163,13 +163,12 @@ def extract_learning(
     learning = Learning(
         prompt=dbs.input["prompt"],
         model=model,
-        temperature=temperature,
+        temperature=round(temperature, 2),
         steps=json.dumps([step.__name__ for step in steps]),
         steps_file_hash=steps_file_hash,
         feedback=dbs.input.get("feedback"),
         session=get_session(),
         logs=logs_to_string(steps, dbs.logs),
-        workspace=dbs.workspace["all_output.txt"],
         review=review,
     )
     return learning
