@@ -49,7 +49,7 @@ def to_files(chat, workspace):
         workspace[file_name] = file_content
 
 
-def overwrite_files(chat, dbs, replace_files):
+def overwrite_files(chat, dbs):
     """
     Replace the AI files to the older local files.
     """
@@ -57,21 +57,13 @@ def overwrite_files(chat, dbs, replace_files):
 
     files = parse_chat(chat)
     for file_name, file_content in files:
-        # Verify if the file created by the AI agent was in the input list
-        if file_name in replace_files:
-            # If the AI created a file from our input list, we replace it.
-            with open(replace_files[file_name], "w") as text_file:
-                text_file.write(file_content)
+        if file_name.find("../") > -1:
+            raise Exception(f"File name {file_name} attempted to access parent path.")
+        elif file_name == "README.md":
+            dbs.workspace["ExistingCodeModificationsREADME.md"] = file_content
         else:
-            # If the AI create a new file I don't know where to put it yet
-            # maybe we can think in a smarter solution for this in the future
-            # like asking the AI where to put it.
-            #
-            # by now, just add this to the workspace inside .gpteng folder
-            print(
-                f"Could not find file path for '{file_name}', creating file in workspace"
-            )
-            dbs.workspace[file_name] = file_content
+            full_path = os.path.join(dbs.input.path, file_name)
+            dbs.workspace[full_path] = file_content
 
 
 def get_code_strings(input) -> dict[str, str]:
@@ -80,11 +72,11 @@ def get_code_strings(input) -> dict[str, str]:
     """
     files_paths = input["file_list.txt"].strip().split("\n")
     files_dict = {}
-    for file_path in files_paths:
-        with open(file_path, "r") as file:
+    for full_file_path in files_paths:
+        with open(full_file_path, "r") as file:
             file_data = file.read()
         if file_data:
-            file_name = os.path.basename(file_path).split("/")[-1]
+            file_name = os.path.relpath(full_file_path, input.path)
             files_dict[file_name] = file_data
     return files_dict
 
