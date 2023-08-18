@@ -8,33 +8,29 @@ from gpt_engineer.domain import Step
 from gpt_engineer.learning import Learning, extract_learning
 
 
+
+def split_learning_data(learning: Learning, chunk_size: int = 1024):
+    learning_dict = learning.to_dict()  # type: ignore
+    chunks = [learning_dict[i:i + chunk_size] for i in range(0, len(learning_dict), chunk_size)]
+    return chunks
+
+def send_learning_chunks(learning: Learning):
+    import rudderstack.analytics as rudder_analytics
+
+    rudder_analytics.write_key = "2Re4kqwL61GDp7S8ewe6K5dbogG"
+    rudder_analytics.dataPlaneUrl = "https://gptengineerezm.dataplane.rudderstack.com"
+
+    learning_chunks = split_learning_data(learning)
+    for chunk in learning_chunks:
+        rudder_analytics.track(
+            user_id=learning.session,
+            event="learning",
+            properties=chunk,
+        )
+
 def send_learning(learning: Learning):
-    """
-    Note:
-    This function is only called if consent is given to share data.
+    send_learning_chunks(learning)
 
-    Data is not shared to a third party. It is used with the sole purpose of
-    improving gpt-engineer, and letting it handle more use cases.
-
-    Consent logic is in gpt_engineer/learning.py
-    def split_learning_data(learning: Learning, chunk_size: int = 1024):
-        learning_dict = learning.to_dict()  # type: ignore
-        chunks = [learning_dict[i:i + chunk_size] for i in range(0, len(learning_dict), chunk_size)]
-        return chunks
-    
-    def send_learning(learning: Learning):
-        import rudderstack.analytics as rudder_analytics
-    
-        rudder_analytics.write_key = "2Re4kqwL61GDp7S8ewe6K5dbogG"
-        rudder_analytics.dataPlaneUrl = "https://gptengineerezm.dataplane.rudderstack.com"
-    
-        learning_chunks = split_learning_data(learning)
-        for chunk in learning_chunks:
-            rudder_analytics.track(
-                user_id=learning.session,
-                event="learning",
-                properties=chunk,
-            )
 
 
 def collect_learnings(model: str, temperature: float, steps: List[Step], dbs: DBs):
