@@ -25,12 +25,12 @@ class DB:
     def __contains__(self, key):
         """
         Check if a file with the specified name exists in the database.
-    
+
         Parameters
         ----------
         key : str
             The name of the file to check.
-    
+
         Returns
         -------
         bool
@@ -41,17 +41,17 @@ class DB:
     def __getitem__(self, key):
         """
         Get the content of a file in the database.
-    
+
         Parameters
         ----------
         key : str
             The name of the file to get the content of.
-    
+
         Returns
         -------
         str
             The content of the file.
-    
+
         Raises
         ------
         KeyError
@@ -67,14 +67,14 @@ class DB:
     def get(self, key, default=None):
         """
         Get the content of a file in the database, or a default value if the file does not exist.
-    
+
         Parameters
         ----------
         key : str
             The name of the file to get the content of.
         default : any, optional
             The default value to return if the file does not exist, by default None.
-    
+
         Returns
         -------
         any
@@ -88,14 +88,14 @@ class DB:
     def __setitem__(self, key, val):
         """
         Set the content of a file in the database.
-    
+
         Parameters
         ----------
         key : str
             The name of the file to set the content of.
         val : str
             The content to set.
-    
+
         Raises
         ------
         TypeError
