@@ -6,8 +6,18 @@ from typing import List, Tuple
 
 def parse_chat(chat) -> List[Tuple[str, str]]:
     """
-    Extacts all code blocks from a chat and returns them
-    as a list of (filename, codeblock) tuples
+    Extracts all code blocks from a chat and returns them
+    as a list of (filename, codeblock) tuples.
+
+    Parameters
+    ----------
+    chat : str
+        The chat to extract code blocks from.
+
+    Returns
+    -------
+    List[Tuple[str, str]]
+        A list of tuples, where each tuple contains a filename and a code block.
     """
     # Get all ``` blocks and preceding filenames
     regex = r"(\S+)\n\s*```[^\n]*\n(.+?)```"
@@ -42,6 +52,16 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
 
 
 def to_files(chat, workspace):
+    """
+    Parse the chat and add all extracted files to the workspace.
+
+    Parameters
+    ----------
+    chat : str
+        The chat to parse.
+    workspace : dict
+        The workspace to add the files to.
+    """
     workspace["all_output.txt"] = chat
 
     files = parse_chat(chat)
@@ -49,49 +69,72 @@ def to_files(chat, workspace):
         workspace[file_name] = file_content
 
 
-def overwrite_files(chat, dbs, replace_files):
+def overwrite_files(chat, dbs):
     """
-    Replace the AI files to the older local files.
+    Replace the AI files with the older local files.
+
+    Parameters
+    ----------
+    chat : str
+        The chat containing the AI files.
+    dbs : DBs
+        The database containing the workspace.
+    replace_files : dict
+        A dictionary mapping file names to file paths of the local files.
     """
     dbs.workspace["all_output.txt"] = chat
 
     files = parse_chat(chat)
     for file_name, file_content in files:
-        # Verify if the file created by the AI agent was in the input list
-        if file_name in replace_files:
-            # If the AI created a file from our input list, we replace it.
-            with open(replace_files[file_name], "w") as text_file:
-                text_file.write(file_content)
+        if file_name.find("../") > -1:
+            raise Exception(f"File name {file_name} attempted to access parent path.")
+        elif file_name == "README.md":
+            dbs.workspace["ExistingCodeModificationsREADME.md"] = file_content
         else:
-            # If the AI create a new file I don't know where to put it yet
-            # maybe we can think in a smarter solution for this in the future
-            # like asking the AI where to put it.
-            #
-            # by now, just add this to the workspace inside .gpteng folder
-            print(
-                f"Could not find file path for '{file_name}', creating file in workspace"
-            )
-            dbs.workspace[file_name] = file_content
+            full_path = os.path.join(dbs.input.path, file_name)
+            dbs.workspace[full_path] = file_content
 
 
 def get_code_strings(input) -> dict[str, str]:
     """
-    Read file_list.txt and return file names and its content.
+    Read file_list.txt and return file names and their content.
+
+    Parameters
+    ----------
+    input : dict
+        A dictionary containing the file_list.txt.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary mapping file names to their content.
     """
     files_paths = input["file_list.txt"].strip().split("\n")
     files_dict = {}
-    for file_path in files_paths:
-        with open(file_path, "r") as file:
+    for full_file_path in files_paths:
+        with open(full_file_path, "r") as file:
             file_data = file.read()
         if file_data:
-            file_name = os.path.basename(file_path).split("/")[-1]
+            file_name = os.path.relpath(full_file_path, input.path)
             files_dict[file_name] = file_data
     return files_dict
 
 
 def format_file_to_input(file_name: str, file_content: str) -> str:
     """
-    Format a file string to use as input to AI agent
+    Format a file string to use as input to the AI agent.
+
+    Parameters
+    ----------
+    file_name : str
+        The name of the file.
+    file_content : str
+        The content of the file.
+
+    Returns
+    -------
+    str
+        The formatted file string.
     """
     file_str = f"""
     {file_name}
