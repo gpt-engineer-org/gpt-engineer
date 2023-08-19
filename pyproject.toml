@@ -68,7 +68,7 @@ packages = ["gpt_engineer"]
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
-line-length = 90
+line-length = 100
 show-fixes = false
 target-version = "py311"
 task-tags = ["TODO", "FIXME"]
