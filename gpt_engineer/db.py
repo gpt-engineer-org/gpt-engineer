@@ -107,7 +107,7 @@ class DB:
         if isinstance(val, str):
             full_path.write_text(val, encoding="utf-8")
         else:
-            # If val is neither a string nor bytes, raise an error.
+            # If val is not string, raise an error.
             raise TypeError("val must be either a str or bytes")
 
 
