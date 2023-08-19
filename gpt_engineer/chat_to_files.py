@@ -6,8 +6,18 @@ from typing import List, Tuple
 
 def parse_chat(chat) -> List[Tuple[str, str]]:
     """
-    Extacts all code blocks from a chat and returns them
-    as a list of (filename, codeblock) tuples
+    Extracts all code blocks from a chat and returns them
+    as a list of (filename, codeblock) tuples.
+
+    Parameters
+    ----------
+    chat : str
+        The chat to extract code blocks from.
+
+    Returns
+    -------
+    List[Tuple[str, str]]
+        A list of tuples, where each tuple contains a filename and a code block.
     """
     # Get all ``` blocks and preceding filenames
     regex = r"(\S+)\n\s*```[^\n]*\n(.+?)```"
@@ -42,6 +52,16 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
 
 
 def to_files(chat, workspace):
+    """
+    Parse the chat and add all extracted files to the workspace.
+
+    Parameters
+    ----------
+    chat : str
+        The chat to parse.
+    workspace : dict
+        The workspace to add the files to.
+    """
     workspace["all_output.txt"] = chat
 
     files = parse_chat(chat)
@@ -51,7 +71,16 @@ def to_files(chat, workspace):
 
 def overwrite_files(chat, dbs):
     """
-    Replace the AI files to the older local files.
+    Replace the AI files with the older local files.
+
+    Parameters
+    ----------
+    chat : str
+        The chat containing the AI files.
+    dbs : DBs
+        The database containing the workspace.
+    replace_files : dict
+        A dictionary mapping file names to file paths of the local files.
     """
     dbs.workspace["all_output.txt"] = chat
 
@@ -68,7 +97,17 @@ def overwrite_files(chat, dbs):
 
 def get_code_strings(input) -> dict[str, str]:
     """
-    Read file_list.txt and return file names and its content.
+    Read file_list.txt and return file names and their content.
+
+    Parameters
+    ----------
+    input : dict
+        A dictionary containing the file_list.txt.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary mapping file names to their content.
     """
     files_paths = input["file_list.txt"].strip().split("\n")
     files_dict = {}
@@ -83,7 +122,19 @@ def get_code_strings(input) -> dict[str, str]:
 
 def format_file_to_input(file_name: str, file_content: str) -> str:
     """
-    Format a file string to use as input to AI agent
+    Format a file string to use as input to the AI agent.
+
+    Parameters
+    ----------
+    file_name : str
+        The name of the file.
+    file_content : str
+        The content of the file.
+
+    Returns
+    -------
+    str
+        The formatted file string.
     """
     file_str = f"""
     {file_name}
