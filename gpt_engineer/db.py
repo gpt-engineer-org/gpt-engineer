@@ -99,7 +99,7 @@ class DB:
         Raises
         ------
         TypeError
-            If val is neither a string nor bytes.
+            If val is not string.
         """
         full_path = self.path / key
         full_path.parent.mkdir(parents=True, exist_ok=True)
