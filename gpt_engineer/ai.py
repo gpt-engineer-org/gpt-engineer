@@ -62,7 +62,7 @@ class AI:
     def start(self, system: str, user: str, step_name: str) -> List[Message]:
         """
         Start the conversation with a system message and a user message.
-    
+
         Parameters
         ----------
         system : str
@@ -71,7 +71,7 @@ class AI:
             The content of the user message.
         step_name : str
             The name of the step.
-    
+
         Returns
         -------
         List[Message]
@@ -86,12 +86,12 @@ class AI:
     def fsystem(self, msg: str) -> SystemMessage:
         """
         Create a system message.
-    
+
         Parameters
         ----------
         msg : str
             The content of the message.
-    
+
         Returns
         -------
         SystemMessage
@@ -102,12 +102,12 @@ class AI:
     def fuser(self, msg: str) -> HumanMessage:
         """
         Create a user message.
-    
+
         Parameters
         ----------
         msg : str
             The content of the message.
-    
+
         Returns
         -------
         HumanMessage
@@ -118,12 +118,12 @@ class AI:
     def fassistant(self, msg: str) -> AIMessage:
         """
         Create an AI message.
-    
+
         Parameters
         ----------
         msg : str
             The content of the message.
-    
+
         Returns
         -------
         AIMessage
@@ -141,7 +141,7 @@ class AI:
         """
         Advances the conversation by sending message history
         to LLM and updating with the response.
-    
+
         Parameters
         ----------
         messages : List[Message]
@@ -150,7 +150,7 @@ class AI:
             The prompt to use, by default None.
         step_name : str
             The name of the step.
-    
+
         Returns
         -------
         List[Message]
@@ -181,12 +181,12 @@ class AI:
     def serialize_messages(messages: List[Message]) -> str:
         """
         Serialize a list of messages to a JSON string.
-    
+
         Parameters
         ----------
         messages : List[Message]
             The list of messages to serialize.
-    
+
         Returns
         -------
         str
@@ -198,12 +198,12 @@ class AI:
     def deserialize_messages(jsondictstr: str) -> List[Message]:
         """
         Deserialize a JSON string to a list of messages.
-    
+
         Parameters
         ----------
         jsondictstr : str
             The JSON string to deserialize.
-    
+
         Returns
         -------
         List[Message]
@@ -216,7 +216,7 @@ class AI:
     ) -> None:
         """
         Update the token usage log with the number of tokens used in the current step.
-    
+
         Parameters
         ----------
         messages : List[Message]
@@ -249,7 +249,7 @@ class AI:
     def format_token_usage_log(self) -> str:
         """
         Format the token usage log as a CSV string.
-    
+
         Returns
         -------
         str
@@ -271,12 +271,12 @@ class AI:
     def num_tokens(self, txt: str) -> int:
         """
         Get the number of tokens in a text.
-    
+
         Parameters
         ----------
         txt : str
             The text to count the tokens in.
-    
+
         Returns
         -------
         int
@@ -287,12 +287,12 @@ class AI:
     def num_tokens_from_messages(self, messages: List[Message]) -> int:
         """
         Get the total number of tokens used by a list of messages.
-    
+
         Parameters
         ----------
         messages : List[Message]
             The list of messages to count the tokens in.
-    
+
         Returns
         -------
         int
