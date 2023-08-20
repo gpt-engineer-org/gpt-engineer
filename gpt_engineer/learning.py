@@ -228,7 +228,7 @@ def extract_learning(
     learning = Learning(
         prompt=dbs.input["prompt"],
         model=model,
-        temperature=round(temperature, 2),
+        temperature=temperature,
         steps=json.dumps([step.__name__ for step in steps]),
         steps_file_hash=steps_file_hash,
         feedback=dbs.input.get("feedback"),
