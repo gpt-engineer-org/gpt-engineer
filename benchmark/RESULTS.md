@@ -4,6 +4,29 @@
 python scripts/benchmark.py
 ```
 
+## 2023-08-20 (8358b60e1c6dcfc517c47c15708422d9a7d1d83a)
+| Benchmark          | Version       | Ran | Works | Perfect |
+|--------------------|---------------|-----|-------|---------|
+| currency_converter | GPT3.5 default| ✅  | ❌    | ❌       |
+| image_resizer      | GPT3.5 default| ✅  | ✅    | ✅      |
+| pomodoro_timer     | GPT3.5 default| ✅  | ✅    | ❌      |
+| url_shortener      | GPT3.5 default| ❌  | ❌    | ❌      |
+| file_explorer      | GPT3.5 default| ✅  | ✅    | ❌      |
+| markdown_editor    | GPT3.5 default| ✅  | ❌    | ❌      |
+| timer_app          | GPT3.5 default| ✅  | ✅    | ✅      |
+| file_organizer     | GPT3.5 default| ✅  | ✅    | ❌      |
+| password_generator | GPT3.5 default| ✅  | ✅    | ✅      |
+| todo_list          | GPT3.5 default| ✅  | ✅    | ❌      |
+
+### Notes on the errors
+
+#### GPT3.5
+- `pomodoro_timer`: notifications didn't work.
+- `file_explorer`: deletion didn't work.
+- `file_organizer`: only handled a very small set of formats.
+- `todo_list`: tasks couldn't be marked as completed.
+- `url_shortener`: file names were wrong. Nothing could be run.
+
 ## 2023-06-21
 
 | Benchmark          | Ran | Works | Perfect |
