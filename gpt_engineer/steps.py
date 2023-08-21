@@ -78,14 +78,14 @@ def curr_fn() -> str:
 # All steps below have the Step signature 
 
 
-def simple_gen(ai: AI, dbs: DBs, **kwargs) -> List[Message]:
+def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
     """Run the AI on the main prompt and save the results"""
     messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs), step_name=curr_fn())
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
 
 
-def clarify(ai: AI, dbs: DBs, **kwargs) -> List[Message]:
+def clarify(ai: AI, dbs: DBs) -> List[Message]:
     """
     Ask the user if they want to clarify anything and save the results to the workspace
     """
@@ -129,7 +129,7 @@ def clarify(ai: AI, dbs: DBs, **kwargs) -> List[Message]:
     return messages
 
 
-def gen_spec(ai: AI, dbs: DBs, **kwargs) -> List[Message]:
+def gen_spec(ai: AI, dbs: DBs) -> List[Message]:
     """
     Generate a spec from the main prompt + clarifications and save the results to
     the workspace
@@ -169,7 +169,7 @@ def respec(ai: AI, dbs: DBs) -> List[Message]:
     return messages
 
 
-def gen_unit_tests(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
+def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
     """
     Generate unit tests based on the specification, that should work.
     """
@@ -187,7 +187,7 @@ def gen_unit_tests(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
     return messages
 
 
-def gen_clarified_code(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
+def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     """Takes clarification and generates code"""
     messages = AI.deserialize_messages(dbs.logs[clarify.__name__])
 
@@ -215,7 +215,7 @@ def gen_code_after_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
     return messages
 
 
-def execute_entrypoint(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
+def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     command = dbs.workspace["run.sh"]
 
     print("Do you want to execute this code?")
@@ -253,7 +253,7 @@ def execute_entrypoint(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
     return []
 
 
-def gen_entrypoint(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
+def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     messages = ai.start(
         system=(
             "You will get information about a codebase that is currently on disk in "
@@ -278,7 +278,7 @@ def gen_entrypoint(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
     return messages
 
 
-def use_feedback(ai: AI, dbs: DBs, **kwargs):
+def use_feedback(ai: AI, dbs: DBs):
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
