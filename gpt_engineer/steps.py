@@ -63,14 +63,14 @@ def curr_fn() -> str:
 # All steps below have the Step signature 
 
 
-def simple_gen(ai: AI, dbs: DBs, **kwargs) -> List[Message]:
+def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
     """Run the AI on the main prompt and save the results"""
     messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs), step_name=curr_fn())
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
 
 
-def clarify(ai: AI, dbs: DBs, **kwargs) -> List[Message]:
+def clarify(ai: AI, dbs: DBs) -> List[Message]:
     """
     Ask the user if they want to clarify anything and save the results to the workspace
     """
@@ -114,7 +114,7 @@ def clarify(ai: AI, dbs: DBs, **kwargs) -> List[Message]:
     return messages
 
 
-def gen_spec(ai: AI, dbs: DBs, **kwargs) -> List[Message]:
+def gen_spec(ai: AI, dbs: DBs) -> List[Message]:
     """
     Generate a spec from the main prompt + clarifications and save the results to
     the workspace
@@ -131,7 +131,7 @@ def gen_spec(ai: AI, dbs: DBs, **kwargs) -> List[Message]:
     return messages
 
 
-def respec(ai: AI, dbs: DBs, **kwargs) -> List[Message]:
+def respec(ai: AI, dbs: DBs) -> List[Message]:
     messages = AI.deserialize_messages(dbs.logs[gen_spec.__name__])
     messages += [ai.fsystem(dbs.preprompts["respec"])]
 
@@ -153,7 +153,7 @@ def respec(ai: AI, dbs: DBs, **kwargs) -> List[Message]:
     return messages
 
 
-def gen_unit_tests(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
+def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
     """
     Generate unit tests based on the specification, that should work.
     """
@@ -171,7 +171,7 @@ def gen_unit_tests(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
     return messages
 
 
-def gen_clarified_code(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
+def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     """Takes clarification and generates code"""
     messages = AI.deserialize_messages(dbs.logs[clarify.__name__])
 
@@ -184,7 +184,7 @@ def gen_clarified_code(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
     return messages
 
 
-def gen_code(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
+def gen_code(ai: AI, dbs: DBs) -> List[dict]:
     # get the messages from previous step
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
@@ -197,7 +197,7 @@ def gen_code(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
     return messages
 
 
-def execute_entrypoint(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
+def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     command = dbs.workspace["run.sh"]
 
     print("Do you want to execute this code?")
@@ -235,7 +235,7 @@ def execute_entrypoint(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
     return []
 
 
-def gen_entrypoint(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
+def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     messages = ai.start(
         system=(
             "You will get information about a codebase that is currently on disk in "
@@ -260,7 +260,7 @@ def gen_entrypoint(ai: AI, dbs: DBs, **kwargs) -> List[dict]:
     return messages
 
 
-def use_feedback(ai: AI, dbs: DBs, **kwargs):
+def use_feedback(ai: AI, dbs: DBs):
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
@@ -272,13 +272,13 @@ def use_feedback(ai: AI, dbs: DBs, **kwargs):
     return messages
 
 
-def set_improve_filelist(ai: AI, dbs: DBs, **kwargs):
+def set_improve_filelist(ai: AI, dbs: DBs):
     """Sets the file list for files to work with in existing code mode."""
     ask_for_files(dbs.input)  # stores files as full paths.
     return []
 
 
-def assert_files_ready(ai: AI, dbs: DBs, **kwargs):
+def assert_files_ready(ai: AI, dbs: DBs):
     """Checks that the required files are present for headless
     improve code execution.  """
     assert 'file_list.txt' in dbs.input, "For auto_mode file_list.txt need to be in your project folder."
@@ -286,7 +286,7 @@ def assert_files_ready(ai: AI, dbs: DBs, **kwargs):
     return []
 
 
-def get_improve_prompt(ai: AI, dbs: DBs, **kwargs):
+def get_improve_prompt(ai: AI, dbs: DBs):
     """
     Asks the user what they would like to fix.  
     """
@@ -314,7 +314,7 @@ def get_improve_prompt(ai: AI, dbs: DBs, **kwargs):
     return []
 
 
-def improve_existing_code(ai: AI, dbs: DBs, **kwargs):
+def improve_existing_code(ai: AI, dbs: DBs):
     """
     After the file list and prompt have been aquired, this function is called 
     to sent the formatted prompt to the LLM.  
@@ -349,7 +349,7 @@ def improve_existing_code(ai: AI, dbs: DBs, **kwargs):
     return messages
 
 
-def fix_code(ai: AI, dbs: DBs, **kwargs):
+def fix_code(ai: AI, dbs: DBs):
     messages = AI.deserialize_messages(dbs.logs[gen_code.__name__])
     code_output = messages[-1].content.strip()
     messages = [
@@ -365,7 +365,7 @@ def fix_code(ai: AI, dbs: DBs, **kwargs):
     return messages
 
 
-def human_review(ai: AI, dbs: DBs, **kwargs):
+def human_review(ai: AI, dbs: DBs):
     review = human_input()
     dbs.memory["review"] = review.to_json()  # type: ignore
     return []
