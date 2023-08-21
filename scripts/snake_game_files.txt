@@ -1,18 +1,11 @@
+
 main.py
 ```python
 from game import Game
-from controller import Controller
-from view import View
 
 def main():
     game = Game()
-    controller = Controller(game)
-    view = View(game)
-
-    while game.is_running:
-        controller.handle_input()
-        game.update()
-        view.draw()
+    game.run()
 
 if __name__ == "__main__":
     main()
@@ -22,97 +15,115 @@ game.py
 ```python
 from snake import Snake
 from food import Food
+from grid import Grid
+from controller import Controller
+from view import View
 
 class Game:
     def __init__(self):
         self.snake = Snake()
         self.food = Food()
-        self.is_running = True
+        self.grid = Grid()
+        self.controller = Controller()
+        self.view = View()
 
-    def update(self):
-        self.snake.move()
-        if self.snake.has_collided_with_self():
-            self.is_running = False
-        elif self.snake.has_eaten(self.food):
-            self.snake.grow()
-            self.food.place()
-
-    def handle_input(self, direction):
-        self.snake.change_direction(direction)
-```
-
-controller.py
-```python
-import pygame
-
-class Controller:
-    def __init__(self, game):
-        self.game = game
-
-    def handle_input(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.game.is_running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    self.game.handle_input('up')
-                elif event.key == pygame.K_DOWN:
-                    self.game.handle_input('down')
-                elif event.key == pygame.K_LEFT:
-                    self.game.handle_input('left')
-                elif event.key == pygame.K_RIGHT:
-                    self.game.handle_input('right')
-```
-
-view.py
-```python
-import pygame
-
-class View:
-    def __init__(self, game):
-        self.game = game
-
-    def draw(self):
-        # Draw the grid, the snake, and the food
-        pass
+    def run(self):
+        while True:
+            self.controller.read_input()
+            self.snake.move(self.controller.direction)
+            if self.snake.eat(self.food):
+                self.snake.grow()
+                self.food.place()
+            if self.snake.collide(self.grid):
+                break
+            self.view.draw(self.grid, self.snake, self.food)
 ```
 
 snake.py
 ```python
 class Snake:
     def __init__(self):
-        # Initialize the snake
-        pass
+        self.body = [(0, 0)]
+        self.direction = (0, 1)
 
-    def move(self):
-        # Move the snake in the current direction
-        pass
+    def move(self, direction):
+        self.direction = direction
+        head = self.body[0]
+        new_head = (head[0] + direction[0], head[1] + direction[1])
+        self.body.insert(0, new_head)
+        self.body.pop()
 
     def grow(self):
-        # Increase the length of the snake
-        pass
+        self.body.append(self.body[-1])
 
-    def has_collided_with_self(self):
-        # Check if the snake has collided with itself
-        pass
+    def eat(self, food):
+        return self.body[0] == food.position
 
-    def has_eaten(self, food):
-        # Check if the snake has eaten the food
-        pass
-
-    def change_direction(self, direction):
-        # Change the direction of the snake
-        pass
+    def collide(self, grid):
+        head = self.body[0]
+        return head in self.body[1:] or not (0 <= head[0] < grid.width and 0 <= head[1] < grid.height)
 ```
 
 food.py
 ```python
+import random
+
 class Food:
-    def __init__(self):
-        # Initialize the food
-        pass
+    def __init__(self, width=10, height=10):
+        self.width = width
+        self.height = height
+        self.position = (0, 0)
+        self.place()
 
     def place(self):
-        # Place the food at a random location within the grid
-        pass
+        self.position = (random.randint(0, self.width-1), random.randint(0, self.height-1))
+```
+
+grid.py
+```python
+class Grid:
+    def __init__(self, width=10, height=10):
+        self.width = width
+        self.height = height
+```
+
+controller.py
+```python
+import msvcrt
+
+class Controller:
+    def __init__(self):
+        self.direction = (0, 1)
+
+    def read_input(self):
+        key = msvcrt.getch()
+        if key == b'w':
+            self.direction = (-1, 0)
+        elif key == b's':
+            self.direction = (1, 0)
+        elif key == b'a':
+            self.direction = (0, -1)
+        elif key == b'd':
+            self.direction = (0, 1)
+```
+
+view.py
+```python
+class View:
+    def draw(self, grid, snake, food):
+        for i in range(grid.height):
+            for j in range(grid.width):
+                if (i, j) in snake.body:
+                    print('S', end='')
+                elif (i, j) == food.position:
+                    print('F', end='')
+                else:
+                    print('.', end='')
+            print()
+        print()
+```
+
+requirements.txt
+```plaintext
+msvcrt==1.0
 ```
