@@ -35,6 +35,10 @@ def main(
         help="Improve code from existing project.",
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
+    skip_feedback: bool = typer.Option(
+        False, "--skip_feedback", "-sf", 
+        help="accepts all defaults and bypasses any human feedback"
+    ),
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
