@@ -37,7 +37,7 @@ class TokenUsage:
 
 
 class AI:
-    def __init__(self, model_name="gpt-4", temperature=0.1):
+    def __init__(self, model_name="gpt-4", temperature=0.1, api_key=None):
         """
         Initialize the AI class.
 
@@ -50,8 +50,10 @@ class AI:
         """
         self.temperature = temperature
         self.model_name = fallback_model(model_name)
-        self.llm = create_chat_model(self.model_name, temperature)
-        self.tokenizer = get_tokenizer(self.model_name)
+        self.api_key = api_key
+        if self.api_key is not None:
+            self.llm = create_chat_model(self.model_name, temperature)
+            self.tokenizer = get_tokenizer(self.model_name)
 
         # initialize token usage log
         self.cumulative_prompt_tokens = 0
@@ -160,6 +162,9 @@ class AI:
         Advances the conversation by sending message history
         to LLM and updating with the response.
         """
+        if self.api_key is None:
+            return self.next_web_mode(messages, prompt, step_name=step_name)
+
         if prompt:
             messages.append(self.fuser(prompt))
 
@@ -176,6 +181,16 @@ class AI:
         )
 
         return messages
+
+    def next_web_mode(
+        self,
+        messages: List[Message],
+        prompt: Optional[str] = None,
+        *,
+        step_name: str,
+    ) -> List[Message]:
+        # TODO: Implement the method to interact with the ongoing session of ChatGPT and get responses.
+        pass
 
     @staticmethod
     def serialize_messages(messages: List[Message]) -> str:
