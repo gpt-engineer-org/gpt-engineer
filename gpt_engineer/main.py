@@ -19,7 +19,7 @@ app = typer.Typer()  # creates a CLI app
 
 def load_env_if_needed():
     if os.getenv("OPENAI_API_KEY") is None:
-        load_dotenv()
+        return
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
@@ -37,6 +37,12 @@ def main(
         "-i",
         help="Improve code from existing project.",
     ),
+    web_mode: bool = typer.Option(
+        False,
+        "--web-mode",
+        "-w",
+        help="Use web mode of ChatGPT instead of API.",
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
@@ -48,11 +54,15 @@ def main(
         if steps_config == StepsConfig.DEFAULT:
             steps_config = StepsConfig.IMPROVE_CODE
 
-    load_env_if_needed()
+    api_key = None
+    if not web_mode:
+        load_env_if_needed()
+        api_key = os.getenv("OPENAI_API_KEY")
 
     ai = AI(
         model_name=model,
         temperature=temperature,
+        api_key=api_key,
     )
 
     input_path = Path(project_path).absolute()
