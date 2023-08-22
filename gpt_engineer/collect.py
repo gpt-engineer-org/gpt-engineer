@@ -8,6 +8,26 @@ from gpt_engineer.domain import Step
 from gpt_engineer.learning import Learning, extract_learning
 
 
+def split_learning_data(learning: Learning, max_size: int) -> List[Learning]:
+    chunks = []
+    chunk = Learning()
+    size = 0
+
+    for item in learning.to_dict():  # type: ignore
+        item_size = len(str(item))
+        if size + item_size > max_size:
+            chunks.append(chunk)
+            chunk = Learning()
+            size = 0
+        chunk.append(item)
+        size += item_size
+
+    if chunk:
+        chunks.append(chunk)
+
+    return chunks
+
+
 def send_learning(learning: Learning):
     """
     Send the learning data to RudderStack for analysis.
@@ -28,11 +48,24 @@ def send_learning(learning: Learning):
     rudder_analytics.write_key = "2Re4kqwL61GDp7S8ewe6K5dbogG"
     rudder_analytics.dataPlaneUrl = "https://gptengineerezm.dataplane.rudderstack.com"
 
-    rudder_analytics.track(
-        user_id=learning.session,
-        event="learning",
-        properties=learning.to_dict(),  # type: ignore
-    )
+    chunks = split_learning_data(learning, 32 << 10)
+
+    for chunk in chunks:
+        try:
+            rudder_analytics.track(
+                user_id=learning.session,
+                event="learning",
+                properties=chunk.to_dict(),  # type: ignore
+            )
+        except RuntimeError as e:
+            print(f"WARNING: Chunk too big, removing some parts. Error: {e}")
+            chunk = split_learning_data(chunk, 32 << 10)
+            for sub_chunk in chunk:
+                rudder_analytics.track(
+                    user_id=learning.session,
+                    event="learning",
+                    properties=sub_chunk.to_dict(),  # type: ignore
+                )
 
 
 def collect_learnings(model: str, temperature: float, steps: List[Step], dbs: DBs):
