@@ -21,6 +21,34 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 - Fast handovers back and forth between AI and human
 - Simplicity, all computation is "resumable" and persisted to the filesystem
 
+## Workflow
+
+**Step 1: Installation**
+- Before you can begin using GPT-Engineer, you need to ensure that it's installed on your system. You can install it using the following command:
+```
+pip install gpt-engineer
+```
+**Step 2: Initial Code Generation**
+- To start the code generation process, you provide a prompt to GPT-Engineer. This prompt outlines the task you want the generated code to accomplish. For example:
+```
+gpt-engineer --prompt "Generate a Python function that calculates the factorial of a number."
+```
+- GPT-Engineer will then generate a preliminary code snippet based on the provided prompt.
+
+**Step 3: Inspecting and Refining the Initial Code**
+- After generating the initial code, it's time to inspect and refine it according to your preferences. You might need to make adjustments to the generated code to better suit your requirements or coding style. You can do this manually by editing the generated code.
+
+**Step 4: User Feedback**
+- The feedback step is a crucial part. It involves providing feedback to GPT-Engineer on the generated code. This feedback helps the model understand your preferences and allows it to improve subsequent code generations.
+```
+gpt-engineer --steps feedback
+```
+- When prompted, you can provide feedback on the generated code. For example, you might point out specific improvements, request changes, or explain why certain parts of the code need adjustment.
+
+**Step 5: Iterative Refinement**
+- Based on the feedback you provide, GPT-Engineer learns to generate code that aligns better with your requirements. The model adapts its output to incorporate your suggestions, leading to more accurate and relevant code generations in the future.
+
+
 ## Usage
 
 Choose either **stable** or **development**.
