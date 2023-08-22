@@ -1,4 +1,4 @@
-# Roadmap
+ # Roadmap
 
 <img width="800" alt="image" src="https://github.com/AntonOsika/gpt-engineer/assets/4467025/1af9a457-1ed8-4ab3-90e6-4fa52bbb8c09">
 
@@ -6,7 +6,8 @@
 There are three main milestones we believe will greatly increase gpt-engineer's reliability and capability:
 - [x] Continuous evaluation of our progress 🎉
 - [ ] Test code and fix errors with LLMs
-- [ ] Make code generation become small, verifiable steps
+- [ ] Make code generation become small, verifiable step
+nice development method
 
 ## Our current focus:
 
