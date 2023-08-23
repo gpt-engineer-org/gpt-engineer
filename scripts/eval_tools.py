@@ -1,21 +1,21 @@
 from pathlib import Path
 
 
-def assert_exists_in_source_code(fpath: Path, existing_code: str) -> bool:
-    source_body = open(fpath).read()
-    return source_body.find(existing_code) > -1
+def assert_exists_in_source_code(eval: dict) -> bool:
+    source_body = open(eval['fpath']).read()
+    return source_body.find(eval['existing_code']) > -1
 
 
-def run_python_code(source_file: Path) -> bool:
+def run_python_code(eval: dict) -> bool:
     # Placeholder function
     return True
 
 
-def run_code_class_has_property(language: str, source_file: Path) -> bool:
-    if language == 'python':
-        return run_python_code(source_file)
+def run_code_class_has_property(eval: dict) -> bool:
+    if eval['language'] == 'python':
+        return run_python_code(eval)
     else:
-        raise Exception(f"Language '{language}' is not supported.")
+        raise Exception(f"Language '{eval['language']}' is not supported.")
 
 
 def check_evaluation_component(eval: dict):
