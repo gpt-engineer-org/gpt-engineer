@@ -1,6 +1,6 @@
 evaluations:
  - name: simple_code_modify
-   SNAKE_EVAL_FOLDER: "projects/snake_game_eval"
+   project_root: "projects/snake_game_eval"
    SNAKE_GAME_CODE_BLOB: "scripts/snake_game_files.txt"
    IMPROVE_CODE_PROMPT: "The grid is currently 10x10, change the grid to be 42x42."
    expected_results:
@@ -13,4 +13,22 @@ evaluations:
     - type: run_code_class_has_property
       language: "python"
       source_file: "grid.py"
-      existing_string: "height=42"
+      class_name: Grid
+      property_name: "height"
+    - type: run_code_class_has_property
+      language: "python"
+      source_file: "grid.py"
+      class_name: Grid
+      property_name: "width"
+    - type: run_code_class_has_property_w_value
+      language: "python"
+      source_file: "grid.py"
+      class_name: Grid
+      property_name: "height"
+      expected_value: 42
+    - type: run_code_class_has_property_w_value
+      language: "python"
+      source_file: "grid.py"
+      class_name: Grid
+      property_name: "width"
+      expected_value: 42
