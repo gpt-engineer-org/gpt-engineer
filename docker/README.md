@@ -17,7 +17,7 @@ The `-v` flag mounts the `your-project` folder into the container. Make sure to 
 Building the image:
 - `git clone https://github.com/AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
-- `docker-compose build -f docker/docker-compose.yml`
+- `docker-compose -f docker-compose.yml build`
 - `docker-compose run --rm gpt-engineer`
 
 
