@@ -32,3 +32,16 @@ evaluations:
       class_name: Grid
       property_name: "width"
       expected_value: 42
+ - name: simple_code_modify
+   project_root: "projects/web_todo_list"
+   SNAKE_GAME_CODE_BLOB: "scripts/web_todo_files.txt"
+   IMPROVE_CODE_PROMPT: "Fix the margins around the form to be 45px, and make the background color orange."
+   expected_results:
+   # if we installed the Python CSS parser we could add language support for CSS
+   # and do tests more dynamic than this.
+    - type: assert_exists_in_source_code
+      source_file: "sytles.css"
+      existing_string: "#task-form {\n    margin: 45px;"
+    - type: assert_exists_in_source_code
+      source_file: "sytles.css"
+      existing_string: "background-color: orange;"
