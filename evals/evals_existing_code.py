@@ -27,7 +27,7 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
     file_list_string = ""
     code_base_abs = Path(os.getcwd()) / eval_ob["project_root"]
 
-    files = parse_chat(open(eval_ob["SNAKE_GAME_CODE_BLOB"]).read())
+    files = parse_chat(open(eval_ob["code_blob"]).read())
     for file_name, file_content in files:
         absolute_path = code_base_abs / file_name
         print("creating: ", absolute_path)
@@ -38,7 +38,7 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
     workspace["file_list.txt"] = file_list_string
 
     # create the prompt
-    workspace["prompt"] = eval_ob["IMPROVE_CODE_PROMPT"]
+    workspace["prompt"] = eval_ob["improve_code_prompt"]
 
     # Step 2.  run the project in improve code mode,
     # make sure the flag -sf is set to skip feedback
@@ -120,7 +120,7 @@ def generate_report(evals: list[dict], res: list[list[bool]]) -> None:
     print()
 
     output_lines.append(f"### {title}\n\n{detail_table}\n\n")
-    with open("scripts/Improve_code_RESULTS.md", "a") as file:
+    with open("evals/IMPROVE_CODE_RESULTS.md", "a") as file:
         file.writelines(output_lines)
 
 
@@ -147,5 +147,5 @@ def run_all_evaluations(eval_list: list[dict]) -> None:
 
 
 if __name__ == "__main__":
-    eval_list = load_evaluations_from_file("scripts/existing_code_eval.yaml")
+    eval_list = load_evaluations_from_file("evals/existing_code_eval.yaml")
     run_all_evaluations(eval_list)
