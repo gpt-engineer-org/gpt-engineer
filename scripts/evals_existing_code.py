@@ -120,7 +120,7 @@ def generate_report(evals: list[dict], res: list[list[bool]]) -> None:
     print()
 
     output_lines.append(f"### {title}\n\n{detail_table}\n\n")
-    with open("scripts/Improve_code_RESULTS.md", "w") as file:
+    with open("scripts/Improve_code_RESULTS.md", "a") as file:
         file.writelines(output_lines)
 
 

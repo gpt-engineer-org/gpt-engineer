@@ -32,7 +32,7 @@ evaluations:
       class_name: Grid
       property_name: "width"
       expected_value: 42
- - name: simple_code_modify
+ - name: modify_web_app_appearance
    project_root: "projects/web_todo_list"
    SNAKE_GAME_CODE_BLOB: "scripts/web_todo_files.txt"
    IMPROVE_CODE_PROMPT: "Fix the margins around the form to be 45px, and make the background color orange."
@@ -45,3 +45,11 @@ evaluations:
     - type: assert_exists_in_source_code
       source_file: "sytles.css"
       existing_string: "background-color: orange;"
+ - name: modify_functionality
+   project_root: "projects/snake_game_eval"
+   SNAKE_GAME_CODE_BLOB: "scripts/snake_game_files.txt"
+   IMPROVE_CODE_PROMPT: "Add a 2 second delay before the game starts."
+   expected_results:
+    - type: assert_exists_in_source_code
+      source_file: "main.py"
+      existing_string: "pygame.time.delay(2000)"
