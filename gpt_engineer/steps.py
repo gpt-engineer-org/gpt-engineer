@@ -75,7 +75,7 @@ def curr_fn() -> str:
     return inspect.stack()[1].function
 
 
-# All steps below have the Step signature 
+# All steps below have the Step signature
 
 
 def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
@@ -306,15 +306,17 @@ def set_improve_filelist(ai: AI, dbs: DBs):
 
 def assert_files_ready(ai: AI, dbs: DBs):
     """Checks that the required files are present for headless
-    improve code execution.  """
-    assert 'file_list.txt' in dbs.input, "For auto_mode file_list.txt need to be in your project folder."
-    assert 'prompt' in dbs.input, "For auto_mode a prompt file must exist."
+    improve code execution."""
+    assert (
+        "file_list.txt" in dbs.input
+    ), "For auto_mode file_list.txt need to be in your project folder."
+    assert "prompt" in dbs.input, "For auto_mode a prompt file must exist."
     return []
 
 
 def get_improve_prompt(ai: AI, dbs: DBs):
     """
-    Asks the user what they would like to fix.  
+    Asks the user what they would like to fix.
     """
 
     dbs.input["prompt"] = input(
@@ -342,10 +344,10 @@ def get_improve_prompt(ai: AI, dbs: DBs):
 
 def improve_existing_code(ai: AI, dbs: DBs):
     """
-    After the file list and prompt have been aquired, this function is called 
-    to sent the formatted prompt to the LLM.  
+    After the file list and prompt have been aquired, this function is called
+    to sent the formatted prompt to the LLM.
     """
-        
+
     files_info = get_code_strings(dbs.input)  # this only has file names not paths
 
     messages = [
@@ -468,7 +470,11 @@ STEPS = {
     Config.USE_FEEDBACK: [use_feedback, gen_entrypoint, execute_entrypoint, human_review],
     Config.EXECUTE_ONLY: [execute_entrypoint],
     Config.EVALUATE: [execute_entrypoint, human_review],
-    Config.IMPROVE_CODE: [set_improve_filelist, get_improve_prompt, improve_existing_code],
+    Config.IMPROVE_CODE: [
+        set_improve_filelist,
+        get_improve_prompt,
+        improve_existing_code,
+    ],
     Config.EVAL_IMPROVE_CODE: [assert_files_ready, improve_existing_code],
 }
 
