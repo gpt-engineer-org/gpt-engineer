@@ -74,6 +74,16 @@ Editing the `preprompts`, and evolving how you write the project prompt, is how 
 
 Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
 
+### Running with open source models
+
+You can use gpt-engineer with open source models by using an OpenAI compatible API, such as the one offered by the [text-generator-ui extension `openai`](https://github.com/oobabooga/text-generation-webui/blob/main/extensions/openai/README.md). This can easily be setup with [TheBloke's Runpod template](https://www.runpod.io/console/gpu-secure-cloud?template=f1pf20op0z).
+
+To do so, first set up the API according to the instructions linked above.
+
+Then, as an example we can now run it with WizardCoder-Python-34B hosted on Runpod: `OPENAI_API_BASE=http://<host>:<port>/v1 python -m gpt_engineer.main benchmark/pomodoro_timer --steps benchmark TheBloke_WizardCoder-Python-34B-V1.0-GPTQ`
+
+Check your Runpod dashboard for the host and (exposed TCP) port, mine was something like 40125.
+
 ## Vision
 The gpt-engineer community is building the **open platform for devs to tinker with and build their personal code-generation toolbox**.
 
