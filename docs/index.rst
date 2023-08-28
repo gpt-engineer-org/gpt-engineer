@@ -20,6 +20,7 @@ Welcome to GPT-ENGINEER's Documentation
    usage
    readme_link
    windows_readme_link
+   open_models
 
 
 .. toctree::
