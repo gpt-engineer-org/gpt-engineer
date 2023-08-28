@@ -374,7 +374,8 @@ def fix_code(ai: AI, dbs: DBs):
 def human_review(ai: AI, dbs: DBs):
     """Collects and stores human review of the code"""
     review = human_review_input()
-    dbs.memory["review"] = review.to_json()  # type: ignore
+    if review:
+        dbs.memory["review"] = review.to_json()  # type: ignore
     return []
 
 
