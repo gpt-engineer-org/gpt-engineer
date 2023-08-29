@@ -37,6 +37,13 @@ def main(
         "-i",
         help="Improve code from existing project.",
     ),
+    azure_endpoint: str = typer.Option(
+        "",
+        "--azure",
+        "-a",
+        help="""Endpoint for your Azure OpenAI Service (https://xx.openai.azure.com).
+            In that case, the given model is the deployment name chosen in the Azure AI Studio.""",
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
@@ -53,6 +60,7 @@ def main(
     ai = AI(
         model_name=model,
         temperature=temperature,
+        azure_endpoint=azure_endpoint,
     )
 
     input_path = Path(project_path).absolute()
