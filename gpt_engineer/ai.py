@@ -10,8 +10,7 @@ import openai
 import tiktoken
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.chat_models import ChatOpenAI
-from langchain.chat_models import AzureChatOpenAI
+from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import (
     AIMessage,
