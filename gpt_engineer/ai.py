@@ -51,7 +51,9 @@ class AI:
         """
         self.temperature = temperature
         self.azure_endpoint = azure_endpoint
-        self.model_name = fallback_model(model_name) if azure_endpoint == "" else model_name
+        self.model_name = (
+            fallback_model(model_name) if azure_endpoint == "" else model_name
+        )
         self.llm = create_chat_model(self, self.model_name, self.temperature)
         self.tokenizer = get_tokenizer(self.model_name)
         logger.debug(f"Using model {self.model_name} with llm {self.llm}")
@@ -354,15 +356,15 @@ def create_chat_model(self, model: str, temperature) -> BaseChatModel:
     BaseChatModel
         The created chat model.
     """
-    if(self.azure_endpoint):
+    if self.azure_endpoint:
         return AzureChatOpenAI(
-            #client=openai.ChatCompletion,
+            # client=openai.ChatCompletion,
             openai_api_base=self.azure_endpoint,
-            openai_api_version="2023-05-15", # might need to be flexible in the future
+            openai_api_version="2023-05-15",  # might need to be flexible in the future
             deployment_name=model,
             openai_api_type="azure",
             streaming=True,
-            #tiktoken_model_name
+            # tiktoken_model_name
         )
     if model == "gpt-4":
         return ChatOpenAI(

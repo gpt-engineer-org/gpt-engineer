@@ -61,7 +61,7 @@ def human_review_input() -> Review:
         The user's review of the generated code.
     """
     print()
-    if(not check_consent()):
+    if not check_consent():
         return None
     print()
     print(
