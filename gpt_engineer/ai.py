@@ -10,7 +10,7 @@ import openai
 import tiktoken
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import (
     AIMessage,
@@ -37,7 +37,7 @@ class TokenUsage:
 
 
 class AI:
-    def __init__(self, model_name="gpt-4", temperature=0.1):
+    def __init__(self, model_name="gpt-4", temperature=0.1, azure_endpoint=""):
         """
         Initialize the AI class.
 
@@ -49,9 +49,13 @@ class AI:
             The temperature to use for the model, by default 0.1.
         """
         self.temperature = temperature
-        self.model_name = fallback_model(model_name)
-        self.llm = create_chat_model(self.model_name, temperature)
+        self.azure_endpoint = azure_endpoint
+        self.model_name = (
+            fallback_model(model_name) if azure_endpoint == "" else model_name
+        )
+        self.llm = create_chat_model(self, self.model_name, self.temperature)
         self.tokenizer = get_tokenizer(self.model_name)
+        logger.debug(f"Using model {self.model_name} with llm {self.llm}")
 
         # initialize token usage log
         self.cumulative_prompt_tokens = 0
@@ -335,7 +339,7 @@ def fallback_model(model: str) -> str:
         return "gpt-3.5-turbo"
 
 
-def create_chat_model(model: str, temperature) -> BaseChatModel:
+def create_chat_model(self, model: str, temperature) -> BaseChatModel:
     """
     Create a chat model with the specified model name and temperature.
 
@@ -351,6 +355,16 @@ def create_chat_model(model: str, temperature) -> BaseChatModel:
     BaseChatModel
         The created chat model.
     """
+    if self.azure_endpoint:
+        return AzureChatOpenAI(
+            # client=openai.ChatCompletion,
+            openai_api_base=self.azure_endpoint,
+            openai_api_version="2023-05-15",  # might need to be flexible in the future
+            deployment_name=model,
+            openai_api_type="azure",
+            streaming=True,
+            # tiktoken_model_name
+        )
     if model == "gpt-4":
         return ChatOpenAI(
             model="gpt-4",

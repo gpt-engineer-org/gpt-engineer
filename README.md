@@ -55,6 +55,13 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
 By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
+**Azure OpenAI Service**
+
+You'll set your Azure OpenAI KEY 1 or KEY 2 as:
+- `export OPENAI_API_KEY=[your api key]`
+
+Then you call `gpt-engineer` with your service endpoint `--azure https://aoi-resource-name.openai.azure.com` and set your deployment name (which you created in the Azure AI Studio) as the model name. Example: `gpt-engineer --azure https://myairesource.openai.azure.com ./projects/example/ my-gpt4-deployment-name`
+
 **Results**
 
 Check the generated files in `projects/my-new-project/workspace`
