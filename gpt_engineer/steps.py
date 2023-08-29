@@ -218,11 +218,17 @@ def gen_code_after_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
 def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     command = dbs.workspace["run.sh"]
 
-    print("Do you want to execute this code?")
+    print()
+    print(
+        colored(
+            "Do you want to execute this code? (y/n)",
+            "red",
+        )
+    )
     print()
     print(command)
     print()
-    print('If yes, press enter. Otherwise, type "no"')
+    print("To execute, you can also press enter.")
     print()
     if input() not in ["", "y", "yes"]:
         print("Ok, not executing the code.")
@@ -374,7 +380,7 @@ def fix_code(ai: AI, dbs: DBs):
 def human_review(ai: AI, dbs: DBs):
     """Collects and stores human review of the code"""
     review = human_review_input()
-    if review:
+    if review is not None:
         dbs.memory["review"] = review.to_json()  # type: ignore
     return []
 
