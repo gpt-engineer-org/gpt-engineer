@@ -365,22 +365,19 @@ def create_chat_model(self, model: str, temperature) -> BaseChatModel:
             streaming=True,
             # tiktoken_model_name
         )
-    if model == "gpt-4":
+    # Fetch available models from OpenAI API
+    supported = [model["id"] for model in openai.Model.list()["data"]]
+    if model in supported:
         return ChatOpenAI(
-            model="gpt-4",
-            temperature=temperature,
-            streaming=True,
-            client=openai.ChatCompletion,
-        )
-    elif model == "gpt-3.5-turbo":
-        return ChatOpenAI(
-            model="gpt-3.5-turbo",
+            model=model,
             temperature=temperature,
             streaming=True,
             client=openai.ChatCompletion,
         )
     else:
-        raise ValueError(f"Model {model} is not supported.")
+        raise ValueError(
+            f"Model {model} is not supported, supported models are: {supported}"
+        )
 
 
 def get_tokenizer(model: str):
