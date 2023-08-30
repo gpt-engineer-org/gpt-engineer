@@ -61,6 +61,9 @@ def human_review_input() -> Review:
         The user's review of the generated code.
     """
     print()
+    if not check_consent():
+        return None
+    print()
     print(
         colored("To help gpt-engineer learn, please answer 3 questions:", "light_green")
     )
@@ -92,8 +95,6 @@ def human_review_input() -> Review:
             + colored("(ok to leave blank)\n", "light_green")
         )
 
-    check_consent()
-
     return Review(
         raw=", ".join([ran, perfect, useful]),
         ran={"y": True, "n": False, "u": None, "": None}[ran],
@@ -103,14 +104,14 @@ def human_review_input() -> Review:
     )
 
 
-def check_consent():
+def check_consent() -> bool:
     """
     Check if the user has given consent to store their data.
     If not, ask for their consent.
     """
     path = Path(".gpte_consent")
     if path.exists() and path.read_text() == "true":
-        return
+        return True
     answer = input("Is it ok if we store your prompts to learn? (y/n)")
     while answer.lower() not in ("y", "n"):
         answer = input("Invalid input. Please enter y or n: ")
@@ -120,8 +121,10 @@ def check_consent():
         print(colored("Thank you️", "light_green"))
         print()
         print("(If you change your mind, delete the file .gpte_consent)")
+        return True
     else:
         print(colored("We understand ❤️", "light_green"))
+        return False
 
 
 def collect_consent() -> bool:
