@@ -77,3 +77,4 @@ docs/db/
 # poetry
 
 poetry.lock
+.aider*
