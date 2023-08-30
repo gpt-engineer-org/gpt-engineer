@@ -75,7 +75,7 @@ def curr_fn() -> str:
     return inspect.stack()[1].function
 
 
-# All steps below have the signature Step
+# All steps below have the Step signature
 
 
 def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
@@ -304,36 +304,58 @@ def use_feedback(ai: AI, dbs: DBs):
         exit(1)
 
 
-def improve_existing_code(ai: AI, dbs: DBs):
-    """
-    Ask the user for a list of paths, ask the AI agent to
-    improve, fix or add a new functionality
-    A file selection will appear to select the files.
-    The terminal will ask for the prompt.
-    """
+def set_improve_filelist(ai: AI, dbs: DBs):
+    """Sets the file list for files to work with in existing code mode."""
     ask_for_files(dbs.input)  # stores files as full paths.
-    files_info = get_code_strings(dbs.input)  # this only has file names not paths
+    return []
+
+
+def assert_files_ready(ai: AI, dbs: DBs):
+    """Checks that the required files are present for headless
+    improve code execution."""
+    assert (
+        "file_list.txt" in dbs.input
+    ), "For auto_mode file_list.txt need to be in your project folder."
+    assert "prompt" in dbs.input, "For auto_mode a prompt file must exist."
+    return []
+
+
+def get_improve_prompt(ai: AI, dbs: DBs):
+    """
+    Asks the user what they would like to fix.
+    """
 
     dbs.input["prompt"] = input(
         "\nWhat do you need to improve with the selected files?\n"
     )
 
     confirm_str = f"""
------------------------------
-The following files will be used in the improvement process:
-{dbs.input["file_list.txt"]}
+    -----------------------------
+    The following files will be used in the improvement process:
+    {dbs.input["file_list.txt"]}
 
-The inserted prompt is the following:
-'{dbs.input['prompt']}'
------------------------------
+    The inserted prompt is the following:
+    '{dbs.input['prompt']}'
+    -----------------------------
 
-You can change these files in .gpteng folder ({dbs.input.path}) in your project
-before proceeding.
+    You can change these files in .gpteng folder ({dbs.input.path}) in your project
+    before proceeding.
 
-Press enter to proceed with modifications.
+    Press enter to proceed with modifications.
 
-"""
+    """
     input(confirm_str)
+    return []
+
+
+def improve_existing_code(ai: AI, dbs: DBs):
+    """
+    After the file list and prompt have been aquired, this function is called
+    to sent the formatted prompt to the LLM.
+    """
+
+    files_info = get_code_strings(dbs.input)  # this only has file names not paths
+
     messages = [
         ai.fsystem(setup_sys_prompt_existing_code(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
@@ -344,16 +366,16 @@ Press enter to proceed with modifications.
         messages.append(ai.fuser(f"{code_input}"))
 
     output_format_str = """
-Make sure the output of any files is in the following format where
-FILENAME is the file name including the file extension, and the file path.  Do not
-forget to include the file path.
-LANG is the markup code block language for the code's language, and CODE is the code:
+    Make sure the output of any files is in the following format where
+    FILENAME is the file name including the file extension, and the file path.  Do not
+    forget to include the file path.
+    LANG is the markup code block language for the code's language, and CODE is the code:
 
-FILENAME
-```LANG
-CODE
-```
-"""
+    FILENAME
+    ```LANG
+    CODE
+    ```
+    """
 
     messages = ai.next(messages, output_format_str, step_name=curr_fn())
     # Maybe we should add another step called "replace" or "overwrite"
@@ -397,6 +419,7 @@ class Config(str, Enum):
     EVALUATE = "evaluate"
     USE_FEEDBACK = "use_feedback"
     IMPROVE_CODE = "improve_code"
+    EVAL_IMPROVE_CODE = "eval_improve_code"
 
 
 # Define the steps to run for different configs
@@ -451,20 +474,15 @@ STEPS = {
         execute_entrypoint,
         human_review,
     ],
-    Config.USE_FEEDBACK: [
-        use_feedback,
-        gen_entrypoint,
-        execute_entrypoint,
-        human_review,
+    Config.USE_FEEDBACK: [use_feedback, gen_entrypoint, execute_entrypoint, human_review],
+    Config.EXECUTE_ONLY: [execute_entrypoint],
+    Config.EVALUATE: [execute_entrypoint, human_review],
+    Config.IMPROVE_CODE: [
+        set_improve_filelist,
+        get_improve_prompt,
+        improve_existing_code,
     ],
-    Config.EXECUTE_ONLY: [
-        execute_entrypoint,
-    ],
-    Config.EVALUATE: [
-        execute_entrypoint,
-        human_review,
-    ],
-    Config.IMPROVE_CODE: [improve_existing_code],
+    Config.EVAL_IMPROVE_CODE: [assert_files_ready, improve_existing_code],
 }
 
 # Future steps that can be added:
