@@ -1,5 +1,4 @@
 import json
-import os
 import random
 import tempfile
 
@@ -52,7 +51,18 @@ TERM_CHOICES = (
 )
 
 
-def human_input() -> Review:
+def human_review_input() -> Review:
+    """
+    Ask the user to review the generated code and return their review.
+
+    Returns
+    -------
+    Review
+        The user's review of the generated code.
+    """
+    print()
+    if not check_consent():
+        return None
     print()
     print(
         colored("To help gpt-engineer learn, please answer 3 questions:", "light_green")
@@ -85,8 +95,6 @@ def human_input() -> Review:
             + colored("(ok to leave blank)\n", "light_green")
         )
 
-    check_consent()
-
     return Review(
         raw=", ".join([ran, perfect, useful]),
         ran={"y": True, "n": False, "u": None, "": None}[ran],
@@ -96,10 +104,14 @@ def human_input() -> Review:
     )
 
 
-def check_consent():
+def check_consent() -> bool:
+    """
+    Check if the user has given consent to store their data.
+    If not, ask for their consent.
+    """
     path = Path(".gpte_consent")
     if path.exists() and path.read_text() == "true":
-        return
+        return True
     answer = input("Is it ok if we store your prompts to learn? (y/n)")
     while answer.lower() not in ("y", "n"):
         answer = input("Invalid input. Please enter y or n: ")
@@ -109,19 +121,24 @@ def check_consent():
         print(colored("Thank you️", "light_green"))
         print()
         print("(If you change your mind, delete the file .gpte_consent)")
+        return True
     else:
         print(colored("We understand ❤️", "light_green"))
+        return False
 
 
 def collect_consent() -> bool:
-    opt_out = os.environ.get("COLLECT_LEARNINGS_OPT_OUT") == "true"
+    """
+    Check if the user has given consent to store their data.
+    If not, ask for their consent.
+
+    Returns
+    -------
+    bool
+        True if the user has given consent, False otherwise.
+    """
     consent_flag = Path(".gpte_consent")
     has_given_consent = consent_flag.exists() and consent_flag.read_text() == "true"
-
-    if opt_out:
-        if has_given_consent:
-            return ask_if_can_store()
-        return False
 
     if has_given_consent:
         return True
@@ -135,6 +152,14 @@ def collect_consent() -> bool:
 
 
 def ask_if_can_store() -> bool:
+    """
+    Ask the user if their data can be stored.
+
+    Returns
+    -------
+    bool
+        True if the user agrees to have their data stored, False otherwise.
+    """
     print()
     can_store = input(
         "Have you understood and agree to that "
@@ -154,6 +179,21 @@ def ask_if_can_store() -> bool:
 
 
 def logs_to_string(steps: List[Step], logs: DB) -> str:
+    """
+    Convert the logs of the steps to a string.
+
+    Parameters
+    ----------
+    steps : List[Step]
+        The list of steps.
+    logs : DB
+        The database containing the logs.
+
+    Returns
+    -------
+    str
+        The logs of the steps as a string.
+    """
     chunks = []
     for step in steps:
         chunks.append(f"--- {step.__name__} ---\n")
@@ -164,6 +204,27 @@ def logs_to_string(steps: List[Step], logs: DB) -> str:
 def extract_learning(
     model: str, temperature: float, steps: List[Step], dbs: DBs, steps_file_hash
 ) -> Learning:
+    """
+    Extract the learning data from the steps and databases.
+
+    Parameters
+    ----------
+    model : str
+        The name of the model used.
+    temperature : float
+        The temperature used.
+    steps : List[Step]
+        The list of steps.
+    dbs : DBs
+        The databases containing the input, logs, memory, and workspace.
+    steps_file_hash : str
+        The hash of the steps file.
+
+    Returns
+    -------
+    Learning
+        The extracted learning data.
+    """
     review = None
     if "review" in dbs.memory:
         review = Review.from_json(dbs.memory["review"])  # type: ignore
@@ -182,7 +243,15 @@ def extract_learning(
     return learning
 
 
-def get_session():
+def get_session() -> str:
+    """
+    Returns a unique user id for the current user project (session).
+
+    Returns
+    -------
+    str
+        The unique user id.
+    """
     path = Path(tempfile.gettempdir()) / "gpt_engineer_user_id.txt"
 
     try:

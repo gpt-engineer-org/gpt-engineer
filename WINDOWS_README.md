@@ -1,7 +1,7 @@
 # Windows Setup
 ## Short version
 
-On Windows, follow the standard [README.md](https://github.com/AntonOsika/gpt-engineer/blob/main/README.md), but to set API key do one of:
+On Windows, follow the standard [README.md](./README.md), but to set API key do one of:
 - `set OPENAI_API_KEY=[your api key]` on cmd
 - `$env:OPENAI_API_KEY="[your api key]"` on powershell
 
@@ -11,7 +11,7 @@ Choose either **stable** or **development**.
 
 For **stable** release:
 
-Run `pip install gpt-engineer` in the command line
+Run `pip install gpt-engineer` in the command line as an administrator
 
 Or:
 
