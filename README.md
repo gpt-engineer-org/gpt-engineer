@@ -49,9 +49,6 @@ source ~/.zshrc
 ```
 echo $OPENAI_API_KEY
 ```
-  
-     
-    
 **Step 2: Installation**
 - Before you can begin using GPT-Engineer, you need to ensure that it is installed on your system. You can install it using the following command:
 ```
