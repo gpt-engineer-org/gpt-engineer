@@ -2,6 +2,18 @@
 Usage
 =====
 
+Setup
+=====
+
+With an OpenAI API key (preferably with GPT-4 access) run:
+
+- `export OPENAI_API_KEY=[your api key]`
+
+To set API key on windows check the [Windows README](.github/WINDOWS_README.md).
+
+Run
+===
+
 - Create an empty folder. If inside the repo, you can run:
   - `cp -r projects/example/ projects/my-new-project`
 - Fill in the `prompt` file in your new folder
