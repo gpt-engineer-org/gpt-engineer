@@ -3,26 +3,27 @@ import shutil
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any, Optional, Union
 
 
 # This class represents a simple database that stores its data as files in a directory.
 class DB:
     """A simple key-value store, where keys are filenames and values are file contents."""
 
-    def __init__(self, path):
+    def __init__(self, path: Union[str, Path]):
         """
         Initialize the DB class.
 
         Parameters
         ----------
-        path : str
+        path : Union[str, Path]
             The path to the directory where the database files are stored.
         """
-        self.path = Path(path).absolute()
+        self.path: Path = Path(path).absolute()
 
         self.path.mkdir(parents=True, exist_ok=True)
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         """
         Check if a file with the specified name exists in the database.
 
@@ -38,7 +39,7 @@ class DB:
         """
         return (self.path / key).is_file()
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> str:
         """
         Get the content of a file in the database.
 
@@ -64,7 +65,7 @@ class DB:
         with full_path.open("r", encoding="utf-8") as f:
             return f.read()
 
-    def get(self, key, default=None):
+    def get(self, key: str, default: Optional[Any] = None) -> Any:
         """
         Get the content of a file in the database, or a default value if the file does not exist.
 
@@ -85,13 +86,13 @@ class DB:
         except KeyError:
             return default
 
-    def __setitem__(self, key: str | Path, val: str):
+    def __setitem__(self, key: Union[str, Path], val: str) -> None:
         """
         Set the content of a file in the database.
 
         Parameters
         ----------
-        key : str
+        key : Union[str, Path]
             The name of the file to set the content of.
         val : str
             The content to set.
@@ -125,7 +126,7 @@ class DBs:
     archive: DB
 
 
-def archive(dbs: DBs):
+def archive(dbs: DBs) -> None:
     """
     Archive the memory and workspace databases.
 
