@@ -49,7 +49,6 @@ def main(
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
     # For the improve option take current project as path and add .gpteng folder
-    # By now, ignoring the 'project_path' argument
     if improve_option:
         # The default option for the --improve is the IMPROVE_CODE, not DEFAULT
         if steps_config == StepsConfig.DEFAULT:
@@ -83,8 +82,14 @@ def main(
         StepsConfig.EXECUTE_ONLY,
         StepsConfig.USE_FEEDBACK,
         StepsConfig.EVALUATE,
+        StepsConfig.IMPROVE_CODE,
     ]:
         archive(dbs)
+
+        if not dbs.input.get("prompt"):
+            dbs.input["prompt"] = input(
+                "\nWhat application do you want gpt-engineer to generate?\n"
+            )
 
     steps = STEPS[steps_config]
     for step in steps:

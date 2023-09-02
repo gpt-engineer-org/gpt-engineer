@@ -7,7 +7,8 @@ import tkinter.filedialog as fd
 from pathlib import Path
 from typing import List, Union
 
-IGNORE_FOLDERS = {"site-packages", "node_modules"}
+IGNORE_FOLDERS = {"site-packages", "node_modules", "venv"}
+FILE_LIST_NAME = "file_list.txt"
 
 
 class DisplayablePath(object):
@@ -235,10 +236,7 @@ def ask_for_files(db_input) -> None:
         dict[str, str]: Dictionary where key = file name and value = file path
     """
     use_last_string = ""
-    is_valid_selection = False
-    can_use_last = False
     if "file_list.txt" in db_input:
-        can_use_last = True
         use_last_string = (
             "3. Use previous file list (available at "
             + f"{os.path.join(db_input.path, 'file_list.txt')})\n"
@@ -246,12 +244,17 @@ def ask_for_files(db_input) -> None:
         selection_number = 3
     else:
         selection_number = 1
-    selection_str = f"""How do you want to select the files?
+    selection_str = "\n".join(
+        [
+            "How do you want to select the files?",
+            "",
+            "1. Use File explorer.",
+            "2. Use Command-Line.",
+            use_last_string if len(use_last_string) > 1 else "",
+            f"Select option and press Enter (default={selection_number}): ",
+        ]
+    )
 
-1. Use Command-Line.
-2. Use File explorer.
-{use_last_string if len(use_last_string) > 1 else ""}
-Select option and press Enter (default={selection_number}): """
     file_path_list = []
     selected_number_str = input(selection_str)
     if selected_number_str:
@@ -260,30 +263,23 @@ Select option and press Enter (default={selection_number}): """
         except ValueError:
             print("Invalid number. Select a number from the list above.\n")
             sys.exit(1)
+
     if selection_number == 1:
-        # Open terminal selection
-        file_path_list = terminal_file_selector()
-        is_valid_selection = True
-    elif selection_number == 2:
         # Open GUI selection
         file_path_list = gui_file_selector()
-        is_valid_selection = True
-    else:
-        if can_use_last and selection_number == 3:
-            # Use previous file list
-            is_valid_selection = True
-    if not is_valid_selection:
+    elif selection_number == 2:
+        # Open terminal selection
+        file_path_list = terminal_file_selector()
+    if (
+        selection_number <= 0
+        or selection_number > 3
+        or (selection_number == 3 and not use_last_string)
+    ):
         print("Invalid number. Select a number from the list above.\n")
         sys.exit(1)
 
-    file_list_string = ""
     if not selection_number == 3:
-        # New files
-        for file_path in file_path_list:
-            file_list_string += str(file_path) + "\n"
-
-        # Write in file_list so the user can edit and remember what was done
-        db_input["file_list.txt"] = file_list_string
+        db_input["file_list.txt"] = "\n".join(file_path_list)
 
 
 def gui_file_selector() -> List[str]:

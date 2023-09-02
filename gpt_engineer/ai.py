@@ -365,17 +365,16 @@ def create_chat_model(self, model: str, temperature) -> BaseChatModel:
         )
     # Fetch available models from OpenAI API
     supported = [model["id"] for model in openai.Model.list()["data"]]
-    if model in supported:
-        return ChatOpenAI(
-            model=model,
-            temperature=temperature,
-            streaming=True,
-            client=openai.ChatCompletion,
-        )
-    else:
+    if model not in supported:
         raise ValueError(
             f"Model {model} is not supported, supported models are: {supported}"
         )
+    return ChatOpenAI(
+        model=model,
+        temperature=temperature,
+        streaming=True,
+        client=openai.ChatCompletion,
+    )
 
 
 def get_tokenizer(model: str):
