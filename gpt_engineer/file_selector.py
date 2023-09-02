@@ -176,10 +176,14 @@ class TerminalFileSelector:
             List[str]: list of selected paths
         """
         user_input = input(
-            "\nSelect files by entering the numbers separated by commas/spaces or "
-            + "specify range with a dash. "
-            + "Example: 1,2,3-5,7,9,13-15,18,20 (enter 'all' to select everything)"
-            + "\n\nSelect files:"
+            "\n".join(
+                [
+                    "Select files by entering the numbers separated by commas/spaces or",
+                    "specify range with a dash. ",
+                    "Example: 1,2,3-5,7,9,13-15,18,20 (enter 'all' to select everything)",
+                    "\n\nSelect files:",
+                ]
+            )
         )
         selected_paths = []
         regex = r"\d+(-\d+)?([, ]\d+(-\d+)?)*"
