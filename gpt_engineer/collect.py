@@ -7,6 +7,8 @@ from gpt_engineer.db import DBs
 from gpt_engineer.domain import Step
 from gpt_engineer.learning import Learning, extract_learning
 
+FILE_LIST_NAME = "gpteng_file_list"
+
 
 def send_learning(learning: Learning):
     """
