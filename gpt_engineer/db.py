@@ -13,14 +13,19 @@ class DB:
     def __init__(self, path: Union[str, Path]):
         """
         Initialize the DB class.
-
+    
         Parameters
         ----------
         path : Union[str, Path]
             The path to the directory where the database files are stored.
         """
-        self.path: Path = Path(path).absolute()
-
+        if path in ['memory', 'archive']:
+            self.path: Path = Path('.gpteng/' + path).absolute()
+        elif path in ['workspace', 'input']:
+            self.path: Path = Path(path).absolute()
+        else:
+            raise ValueError("Invalid path")
+    
         self.path.mkdir(parents=True, exist_ok=True)
 
     def __contains__(self, key: str) -> bool:
