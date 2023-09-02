@@ -97,7 +97,7 @@ def test_error_messages(tmp_path):
     with pytest.raises(TypeError) as e:
         db["key"] = ["Invalid", "value"]
 
-    assert str(e.value) == "val must be either a str or bytes"
+    assert str(e.value) == "val must be str"
 
 
 def test_DBs_instantiation_with_wrong_number_of_arguments(tmp_path):
