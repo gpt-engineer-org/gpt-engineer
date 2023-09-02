@@ -19,14 +19,14 @@ def main(
     temperature: float = 0.1,
 ):
     ai = AI(
-        model=model,
+        model_name=model,
         temperature=temperature,
     )
 
     with open(messages_path) as f:
         messages = json.load(f)
 
-    messages = ai.next(messages)
+    messages = ai.next(messages, step_name="rerun")
 
     if out_path:
         to_files(messages[-1]["content"], out_path)
