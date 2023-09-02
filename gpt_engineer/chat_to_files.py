@@ -112,6 +112,7 @@ def get_code_strings(input) -> dict[str, str]:
         with open(full_file_path, "r") as file:
             file_data = file.read()
         if file_data:
+            # TODO: Should below be the full path?
             file_name = os.path.relpath(full_file_path, input.path)
             files_dict[file_name] = file_data
     return files_dict

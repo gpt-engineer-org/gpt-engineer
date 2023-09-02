@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import List, Union
 
 IGNORE_FOLDERS = {"site-packages", "node_modules", "venv"}
+FILE_LIST_NAME = "file_list.txt"
 
 
 class DisplayablePath(object):

@@ -16,7 +16,7 @@ from gpt_engineer.chat_to_files import (
     to_files,
 )
 from gpt_engineer.db import DBs
-from gpt_engineer.file_selector import ask_for_files
+from gpt_engineer.file_selector import FILE_LIST_NAME, ask_for_files
 from gpt_engineer.learning import human_review_input
 
 Message = Union[AIMessage, HumanMessage, SystemMessage]
@@ -334,14 +334,14 @@ def get_improve_prompt(ai: AI, dbs: DBs):
         [
             "-----------------------------",
             "The following files will be used in the improvement process:",
+            f"{FILE_LIST_NAME}:",
             str(dbs.input["file_list.txt"]),
             "",
             "The inserted prompt is the following:",
             f"'{dbs.input['prompt']}'",
             "-----------------------------",
             "",
-            "You can change these files in .gpteng folder ({dbs.input.path}) in your "
-            + "project before proceeding.",
+            "You can change these files in your project before proceeding.",
             "",
             "Press enter to proceed with modifications.",
             "",
