@@ -4,6 +4,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.history/
 
 # Distribution / packaging
 dist/
