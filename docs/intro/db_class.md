@@ -6,7 +6,7 @@ The DB class represents a simple database that stores its data as files in a dir
 ### DB Class
 Methods and how they are being used:
 
-`__init__(self, path)`: The constructor takes a path as an argument and creates a directory at that path if it does not already exist.
+`__init__(self, path)`: The constructor takes a path as an argument. If the path is `memory` or `archive`, it appends `.gpteng/` to the path. If the path is `workspace` or `input`, it does not append `.gpteng/` to the path. It then creates a directory at that path if it does not already exist.
 
 `__contains__(self, key)`: This method checks if a key (filename) exists in the database. It returns True if the file exists and False otherwise.
 
