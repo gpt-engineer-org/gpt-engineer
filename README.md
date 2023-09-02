@@ -17,7 +17,7 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 - Incrementally build towards a user experience of:
   1. high level prompting
   2. giving feedback to the AI that it will remember over time
-- Fast handovers back and forth between AI and human
+- Fast handovers, back and forth, between AI and human
 - Simplicity, all computation is "resumable" and persisted to the filesystem
 
 ## Usage
