@@ -86,13 +86,10 @@ def overwrite_files(chat, dbs):
 
     files = parse_chat(chat)
     for file_name, file_content in files:
-        if file_name.find("../") > -1:
-            raise Exception(f"File name {file_name} attempted to access parent path.")
-        elif file_name == "README.md":
-            dbs.workspace["ExistingCodeModificationsREADME.md"] = file_content
+        if file_name == "README.md":
+            dbs.workspace["LAST_MODIFICATION_README.md"] = file_content
         else:
-            full_path = os.path.join(dbs.input.path, file_name)
-            dbs.workspace[full_path] = file_content
+            dbs.workspace[file_name] = file_content
 
 
 def get_code_strings(input) -> dict[str, str]:

@@ -325,25 +325,28 @@ def get_improve_prompt(ai: AI, dbs: DBs):
     Asks the user what they would like to fix.
     """
 
-    dbs.input["prompt"] = input(
-        "\nWhat do you need to improve with the selected files?\n"
+    if not dbs.input.get("prompt"):
+        dbs.input["prompt"] = input(
+            "\nWhat do you need to improve with the selected files?\n"
+        )
+
+    confirm_str = "\n".join(
+        [
+            "-----------------------------",
+            "The following files will be used in the improvement process:",
+            str(dbs.input["file_list.txt"]),
+            "",
+            "The inserted prompt is the following:",
+            f"'{dbs.input['prompt']}'",
+            "-----------------------------",
+            "",
+            "You can change these files in .gpteng folder ({dbs.input.path}) in your "
+            + "project before proceeding.",
+            "",
+            "Press enter to proceed with modifications.",
+            "",
+        ]
     )
-
-    confirm_str = f"""
-    -----------------------------
-    The following files will be used in the improvement process:
-    {dbs.input["file_list.txt"]}
-
-    The inserted prompt is the following:
-    '{dbs.input['prompt']}'
-    -----------------------------
-
-    You can change these files in .gpteng folder ({dbs.input.path}) in your project
-    before proceeding.
-
-    Press enter to proceed with modifications.
-
-    """
     input(confirm_str)
     return []
 

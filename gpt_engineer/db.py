@@ -85,7 +85,7 @@ class DB:
         except KeyError:
             return default
 
-    def __setitem__(self, key, val):
+    def __setitem__(self, key: str | Path, val: str):
         """
         Set the content of a file in the database.
 
@@ -101,6 +101,9 @@ class DB:
         TypeError
             If val is not string.
         """
+        if str(key).startswith("../"):
+            raise ValueError(f"File name {key} attempted to access parent path.")
+
         full_path = self.path / key
         full_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -108,7 +111,7 @@ class DB:
             full_path.write_text(val, encoding="utf-8")
         else:
             # If val is not string, raise an error.
-            raise TypeError("val must be either a str or bytes")
+            raise TypeError("val must be str")
 
 
 # dataclass for all dbs:
