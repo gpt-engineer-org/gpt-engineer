@@ -357,13 +357,11 @@ def create_chat_model(self, model: str, temperature) -> BaseChatModel:
     """
     if self.azure_endpoint:
         return AzureChatOpenAI(
-            # client=openai.ChatCompletion,
             openai_api_base=self.azure_endpoint,
             openai_api_version="2023-05-15",  # might need to be flexible in the future
             deployment_name=model,
             openai_api_type="azure",
             streaming=True,
-            # tiktoken_model_name
         )
     # Fetch available models from OpenAI API
     supported = [model["id"] for model in openai.Model.list()["data"]]

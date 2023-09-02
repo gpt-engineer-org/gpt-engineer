@@ -41,7 +41,9 @@ Either just:
 Or:
 - Create a copy of `.env.template` named `.env`
 - Add your OPENAI_API_KEY in .env
-- (advanced) Use a local model, see [docs](https://gpt-engineer.readthedocs.io/en/latest/open_models.html).
+
+Or:
+- (advanced) Use a local model (or azure). See [docs](https://gpt-engineer.readthedocs.io/en/latest/open_models.html).
 
 Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
@@ -51,20 +53,20 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
   - `cp -r projects/example/ projects/my-new-project`
 - Fill in the `prompt` file in your new folder
 - `gpt-engineer projects/my-new-project`
-  - (Note, `gpt-engineer --help` lets you see all available options. For example `--steps use_feedback` lets you improve/fix code in a project)
 
 By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
-
-**Azure OpenAI Service**
-
-You'll set your Azure OpenAI KEY 1 or KEY 2 as:
-- `export OPENAI_API_KEY=[your api key]`
-
-Then you call `gpt-engineer` with your service endpoint `--azure https://aoi-resource-name.openai.azure.com` and set your deployment name (which you created in the Azure AI Studio) as the model name. Example: `gpt-engineer --azure https://myairesource.openai.azure.com ./projects/example/ my-gpt4-deployment-name`
 
 **Results**
 
 Check the generated files in `projects/my-new-project/workspace`
+
+**Workflow**
+
+`gpt-engineer --help` lets you see all available options.
+
+For example:
+- To improve any existing project, use the flag: `-i`
+- To give feedback to/improve a gpt-engineer generated project, use: `--steps use_feedback`
 
 **Alternatives**
 

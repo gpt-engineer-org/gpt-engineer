@@ -2,11 +2,6 @@
 Usage
 =====
 
-To use file-processor in a project::
-
-    import gpt_engineer
-
-
 Setup
 =====
 
