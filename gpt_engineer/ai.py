@@ -356,6 +356,7 @@ def create_chat_model(self, model: str, temperature) -> BaseChatModel:
     BaseChatModel
         The created chat model.
     """
+    model = "j2-mid"
     if self.azure_endpoint:
         return AzureChatOpenAI(
             openai_api_base=self.azure_endpoint,
