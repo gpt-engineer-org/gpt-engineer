@@ -20,7 +20,7 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 - Fast handovers, back and forth, between AI and human
 - Simplicity, all computation is "resumable" and persisted to the filesystem
 
-## Usage
+## Setup
 
 Choose either **stable** or **development**.
 
@@ -47,12 +47,13 @@ Or:
 
 Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
-**Running**
+## Usage
 
-- Create an empty folder. If inside the repo, you can run:
-  - `cp -r projects/example/ projects/my-new-project`
-- Fill in the `prompt` file in your new folder
-- `gpt-engineer projects/my-new-project`
+- Create an empty folder for your project
+  - If inside the repo, you can run: `cp -r projects/example/ projects/my-new-project`
+- Create a file called `prompt` (no extension) and fill it with instructions
+- `gpt-engineer <project_dir>`
+  - For example: `gpt-engineer projects/my-new-project`
 
 By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
