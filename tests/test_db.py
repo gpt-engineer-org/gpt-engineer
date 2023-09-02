@@ -43,6 +43,11 @@ def test_DBs_initialization(tmp_path):
     assert isinstance(dbs_instance.workspace, DB)
     assert isinstance(dbs_instance.archive, DB)
 
+    assert str(dbs_instance.memory.path).startswith('.gpteng/')
+    assert str(dbs_instance.archive.path).startswith('.gpteng/')
+    assert not str(dbs_instance.workspace.path).startswith('.gpteng/')
+    assert not str(dbs_instance.input.path).startswith('.gpteng/')
+
 
 def test_invalid_path():
     with pytest.raises((PermissionError, OSError)):
