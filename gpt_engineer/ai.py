@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import logging
+import difflib
+import unidiff
 
 from dataclasses import dataclass
 from typing import List, Optional, Union
@@ -311,6 +313,53 @@ class AI:
             n_tokens += self.num_tokens(message.content)
         n_tokens += 2  # every reply is primed with <im_start>assistant
         return n_tokens
+
+    def generate_diff(self, original_code: str, refactored_code: str) -> str:
+        """
+        Generate a diff from the original code and the refactored code.
+
+        Parameters
+        ----------
+        original_code : str
+            The original code.
+        refactored_code : str
+            The refactored code.
+
+        Returns
+        -------
+        str
+            The generated diff.
+        """
+        original_code_lines = original_code.splitlines()
+        refactored_code_lines = refactored_code.splitlines()
+        diff = difflib.unified_diff(original_code_lines, refactored_code_lines)
+        return '\n'.join(diff)
+
+    def apply_diff(self, codebase: str, diff: str) -> str:
+        """
+        Apply a diff to the existing codebase.
+
+        Parameters
+        ----------
+        codebase : str
+            The existing codebase.
+        diff : str
+            The generated diff.
+
+        Returns
+        -------
+        str
+            The updated codebase.
+        """
+        patch_set = unidiff.PatchSet(diff)
+        for patched_file in patch_set:
+            for hunk in patched_file:
+                for line in hunk:
+                    if line.is_added:
+                        codebase += line.value
+                    elif line.is_removed:
+                        codebase = codebase.replace(line.value, '')
+        return codebase
 
 
 def fallback_model(model: str) -> str:
