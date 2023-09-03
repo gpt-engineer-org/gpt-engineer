@@ -21,3 +21,6 @@ assignees: ''
 
 **Sweep**
 [Adding the label "sweep" will automatically turn the issue into a coded pull request. Works best for mechanical tasks. More info/syntax at: https://docs.sweep.dev/]
+
+**Stale issue policy**
+[Maintainers will close issues that have been stale for 14 days if they contain relevant answers.]
