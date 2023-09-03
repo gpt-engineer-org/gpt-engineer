@@ -12,3 +12,9 @@ assignees: ''
 
 **Motivation/Application**
 [Why is this feature useful?]
+
+**Additional labels**
+[Consider adding the label "good first issue" for interesting, but easy features.]
+
+**Sweep**
+[Adding the label "sweep" will automatically turn the issue into a coded pull request. Works best for mechanical tasks. More info/syntax at: https://docs.sweep.dev/]
