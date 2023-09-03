@@ -13,13 +13,14 @@ def freeze_at(monkeypatch, time):
 
 
 def setup_dbs(tmp_path, dir_names):
-    directories = [tmp_path / name for name in dir_names]
+    directories = {name: tmp_path / name for name in dir_names}
 
     # Create DB objects
-    dbs = [DB(dir) for dir in directories]
+    dbs = {k: DB(dir) for k, dir in directories.items()}
 
     # Create DBs instance
-    return DBs(*dbs)
+
+    return DBs(**dbs)
 
 
 def test_archive(tmp_path, monkeypatch):
@@ -31,7 +32,9 @@ def test_archive(tmp_path, monkeypatch):
     assert not os.path.exists(tmp_path / "memory")
     assert os.path.isdir(tmp_path / "archive" / "20201225_170555")
 
-    dbs = setup_dbs(tmp_path, ["memory", "logs", "preprompts", "input", "archive"])
+    dbs = setup_dbs(
+        tmp_path, ["memory", "logs", "preprompts", "input", "workspace", "archive"]
+    )
     freeze_at(monkeypatch, datetime.datetime(2022, 8, 14, 8, 5, 12))
     archive(dbs)
     assert not os.path.exists(tmp_path / "memory")
