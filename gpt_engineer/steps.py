@@ -314,8 +314,8 @@ def assert_files_ready(ai: AI, dbs: DBs):
     """Checks that the required files are present for headless
     improve code execution."""
     assert (
-        "file_list.txt" in dbs.input
-    ), "For auto_mode file_list.txt need to be in your project folder."
+        FILE_LIST_NAME in dbs.input
+    ), f"For auto_mode {FILE_LIST_NAME} need to be in your project folder."
     assert "prompt" in dbs.input, "For auto_mode a prompt file must exist."
     return []
 
