@@ -34,8 +34,8 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
         workspace[absolute_path] = file_content
         file_list_string += str(absolute_path) + "\n"
 
-    # create file_list.txt (should be full paths)
-    workspace["file_list.txt"] = file_list_string
+    # create FILE_LIST_NAME (should be full paths)
+    workspace[FILE_LIST_NAME] = file_list_string
 
     # create the prompt
     workspace["prompt"] = eval_ob["improve_code_prompt"]
