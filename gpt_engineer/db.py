@@ -139,3 +139,8 @@ def archive(dbs: DBs) -> None:
     shutil.move(
         str(dbs.memory.path), str(dbs.archive.path / timestamp / dbs.memory.path.name)
     )
+    shutil.move(
+        str(dbs.workspace.path),
+        str(dbs.archive.path / timestamp / dbs.workspace.path.name),
+    )
+    return []

@@ -48,6 +48,12 @@ def main(
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
+    # For the improve option take current project as path and add .gpteng folder
+    if improve_option:
+        # The default option for the --improve is the IMPROVE_CODE, not DEFAULT
+        if steps_config == StepsConfig.DEFAULT:
+            steps_config = StepsConfig.IMPROVE_CODE
+
     load_env_if_needed()
 
     ai = AI(
@@ -56,11 +62,10 @@ def main(
         azure_endpoint=azure_endpoint,
     )
 
-    path = Path(project_path).absolute()
-    input_path = path
-    workspace_path = path
-    memory_path = path / ".gpteng" / "memory"
-    archive_path = path / ".gpteng" / "archive"
+    input_path = Path(project_path).absolute()
+    memory_path = input_path / "memory"
+    workspace_path = input_path / "workspace"
+    archive_path = input_path / "archive"
 
     dbs = DBs(
         memory=DB(memory_path),
@@ -72,12 +77,6 @@ def main(
         ),  # Loads preprompts from the preprompts directory
         archive=DB(archive_path),
     )
-
-    # For the improve option take current project as path and add .gpteng folder
-    if improve_option:
-        # The default option for the --improve is the IMPROVE_CODE, not DEFAULT
-        if steps_config == StepsConfig.DEFAULT:
-            steps_config = StepsConfig.IMPROVE_CODE
 
     if steps_config not in [
         StepsConfig.EXECUTE_ONLY,

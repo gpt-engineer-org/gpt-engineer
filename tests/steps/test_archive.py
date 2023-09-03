@@ -29,11 +29,15 @@ def test_archive(tmp_path, monkeypatch):
     freeze_at(monkeypatch, datetime.datetime(2020, 12, 25, 17, 5, 55))
     archive(dbs)
     assert not os.path.exists(tmp_path / "memory")
+    assert not os.path.exists(tmp_path / "workspace")
     assert os.path.isdir(tmp_path / "archive" / "20201225_170555")
 
-    dbs = setup_dbs(tmp_path, ["memory", "logs", "preprompts", "input", "archive"])
+    dbs = setup_dbs(
+        tmp_path, ["memory", "logs", "preprompts", "input", "workspace", "archive"]
+    )
     freeze_at(monkeypatch, datetime.datetime(2022, 8, 14, 8, 5, 12))
     archive(dbs)
     assert not os.path.exists(tmp_path / "memory")
-    assert os.path.isdir(dbs.archive.path / "20201225_170555")
-    assert os.path.isdir(dbs.archive.path / "20220814_080512")
+    assert not os.path.exists(tmp_path / "workspace")
+    assert os.path.isdir(tmp_path / "archive" / "20201225_170555")
+    assert os.path.isdir(tmp_path / "archive" / "20220814_080512")
