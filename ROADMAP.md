@@ -6,6 +6,7 @@ The roadmap itself is a function of our ["key problems to solve"](ROADMAP.md#pro
 
 Anyone is welcome to suggest changes the roadmap via DM or PR.
 
+![image](https://github.com/AntonOsika/gpt-engineer/assets/4467025/4c1c6233-2e99-42a8-bb41-eba702041d76)
 
 # Problems to solve
 
