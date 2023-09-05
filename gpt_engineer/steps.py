@@ -29,7 +29,7 @@ def setup_sys_prompt(dbs: DBs) -> str:
     """
     return (
         dbs.preprompts["roadmap"]
-        + dbs.preprompts["generate"]
+        + dbs.preprompts["generate"].replace("FILE_FORMAT", dbs.preprompts["file_format"])
         + "\nUseful to know:\n"
         + dbs.preprompts["philosophy"]
     )
@@ -40,7 +40,7 @@ def setup_sys_prompt_existing_code(dbs: DBs) -> str:
     Similar to code generation, but using an existing code base.
     """
     return (
-        dbs.preprompts["implement_on_existing"]
+        dbs.preprompts["improve"].replace("FILE_FORMAT", dbs.preprompts["file_format"])
         + "\nUseful to know:\n"
         + dbs.preprompts["philosophy"]
     )
@@ -196,7 +196,11 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     ] + messages[
         1:
     ]  # skip the first clarify message, which was the original clarify priming prompt
-    messages = ai.next(messages, dbs.preprompts["generate"], step_name=curr_fn())
+    messages = ai.next(
+        messages,
+        dbs.preprompts["generate"].replace("FILE_FORMAT", dbs.preprompts["file_format"]),
+        step_name=curr_fn(),
+    )
 
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
@@ -210,7 +214,11 @@ def gen_code_after_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
         ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
         ai.fuser(f"Unit tests:\n\n{dbs.memory['unit_tests']}"),
     ]
-    messages = ai.next(messages, dbs.preprompts["generate"], step_name=curr_fn())
+    messages = ai.next(
+        messages,
+        dbs.preprompts["generate"].replace("FILE_FORMAT", dbs.preprompts["file_format"]),
+        step_name=curr_fn(),
+    )
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
 
@@ -361,27 +369,16 @@ def improve_existing_code(ai: AI, dbs: DBs):
 
     messages = [
         ai.fsystem(setup_sys_prompt_existing_code(dbs)),
-        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
     ]
     # Add files as input
     for file_name, file_str in files_info.items():
         code_input = format_file_to_input(file_name, file_str)
         messages.append(ai.fuser(f"{code_input}"))
 
-    output_format_str = """
-    Make sure the output of any files is in the following format where
-    FILENAME is the file name including the file extension, and the file path.  Do not
-    forget to include the file path.
-    LANG is the markup code block language for the code's language, and CODE is the code:
+    messages.append(ai.fuser(f"Request: {dbs.input['prompt']}"))
 
-    FILENAME
-    ```LANG
-    CODE
-    ```
-    """
+    messages = ai.next(messages, step_name=curr_fn())
 
-    messages = ai.next(messages, output_format_str, step_name=curr_fn())
-    # Maybe we should add another step called "replace" or "overwrite"
     overwrite_files(messages[-1].content.strip(), dbs)
     return messages
 
