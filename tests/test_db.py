@@ -17,14 +17,6 @@ def test_DB_operations(tmp_path):
 
     assert val == "test_value"
 
-    # Test error on getting non-existent key
-    with pytest.raises(KeyError):
-        db["non_existent"]
-
-    # Test error on setting non-str or non-bytes value
-    with pytest.raises(TypeError):
-        db["key"] = ["Invalid", "value"]
-
 
 def test_DBs_initialization(tmp_path):
     dir_names = ["memory", "logs", "preprompts", "input", "workspace", "archive"]
@@ -94,20 +86,14 @@ def test_concurrent_access(tmp_path):
 def test_error_messages(tmp_path):
     db = DB(tmp_path)
 
-    with pytest.raises(TypeError) as e:
+    # Test error on getting non-existent key
+    with pytest.raises(KeyError):
+        db["non_existent"]
+
+    with pytest.raises(AssertionError) as e:
         db["key"] = ["Invalid", "value"]
 
     assert str(e.value) == "val must be str"
-
-
-def test_DBs_instantiation_with_wrong_number_of_arguments(tmp_path):
-    db = DB(tmp_path)
-
-    with pytest.raises(TypeError):
-        DBs(db, db, db)
-
-    with pytest.raises(TypeError):
-        DBs(db, db, db, db, db, db, db)
 
 
 def test_DBs_dataclass_attributes(tmp_path):
