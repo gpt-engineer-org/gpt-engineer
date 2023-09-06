@@ -46,25 +46,6 @@ def setup_sys_prompt_existing_code(dbs: DBs) -> str:
     )
 
 
-def get_prompt(dbs: DBs) -> str:
-    """
-    Loads the user's prompt for the project from prompt file
-    (While we migrate we have this fallback getter)
-    """
-    assert (
-        "prompt" in dbs.input or "main_prompt" in dbs.input
-    ), "Please put your prompt in the file `prompt` in the project directory"
-
-    if "prompt" not in dbs.input:
-        print(
-            colored("Please put the prompt in the file `prompt`, not `main_prompt", "red")
-        )
-        print()
-        return dbs.input["main_prompt"]
-
-    return dbs.input["prompt"]
-
-
 def curr_fn() -> str:
     """
     Get the name of the current function
@@ -80,7 +61,7 @@ def curr_fn() -> str:
 
 def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
     """Run the AI on the main prompt and save the results"""
-    messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs), step_name=curr_fn())
+    messages = ai.start(setup_sys_prompt(dbs), dbs.input["prompt"], step_name=curr_fn())
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
 
@@ -90,7 +71,7 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
     Ask the user if they want to clarify anything and save the results to the workspace
     """
     messages: List[Message] = [ai.fsystem(dbs.preprompts["clarify"])]
-    user_input = get_prompt(dbs)
+    user_input = dbs.input["prompt"]
     while True:
         messages = ai.next(messages, user_input, step_name=curr_fn())
         msg = messages[-1].content.strip()

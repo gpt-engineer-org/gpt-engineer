@@ -1,4 +1,4 @@
-Think step by step and reason yourself to the right decisions to make sure we get it right.
+Think step by step and reason yourself to the correct decisions to make sure we get it right.
 First lay out the names of the core classes, functions, methods that will be necessary, As well as a quick comment on their purpose.
 
 FILE_FORMAT
@@ -11,3 +11,5 @@ Make sure that files contain all imports, types etc.  The code should be fully f
 Ensure to implement all code, if you are unsure, write a plausible implementation.
 Include module dependency or package manager dependency definition file.
 Before you finish, double check that all parts of the architecture is present in the files.
+
+When you are done, write finish with "this concludes a fully working implementation".
