@@ -34,4 +34,3 @@ If possible, provide detailed steps for reproducing the issue.
 ### Failure Logs
 
 Any relevant log snippets or files here.
-
