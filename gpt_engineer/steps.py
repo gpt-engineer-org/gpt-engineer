@@ -29,7 +29,7 @@ def setup_sys_prompt(dbs: DBs) -> str:
     """
     return (
         dbs.preprompts["roadmap"]
-        + dbs.preprompts["generate"]
+        + dbs.preprompts["generate"].replace("FILE_FORMAT", dbs.preprompts["file_format"])
         + "\nUseful to know:\n"
         + dbs.preprompts["philosophy"]
     )
@@ -40,29 +40,10 @@ def setup_sys_prompt_existing_code(dbs: DBs) -> str:
     Similar to code generation, but using an existing code base.
     """
     return (
-        dbs.preprompts["implement_on_existing"]
+        dbs.preprompts["improve"].replace("FILE_FORMAT", dbs.preprompts["file_format"])
         + "\nUseful to know:\n"
         + dbs.preprompts["philosophy"]
     )
-
-
-def get_prompt(dbs: DBs) -> str:
-    """
-    Loads the user's prompt for the project from prompt file
-    (While we migrate we have this fallback getter)
-    """
-    assert (
-        "prompt" in dbs.input or "main_prompt" in dbs.input
-    ), "Please put your prompt in the file `prompt` in the project directory"
-
-    if "prompt" not in dbs.input:
-        print(
-            colored("Please put the prompt in the file `prompt`, not `main_prompt", "red")
-        )
-        print()
-        return dbs.input["main_prompt"]
-
-    return dbs.input["prompt"]
 
 
 def curr_fn() -> str:
@@ -80,7 +61,7 @@ def curr_fn() -> str:
 
 def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
     """Run the AI on the main prompt and save the results"""
-    messages = ai.start(setup_sys_prompt(dbs), get_prompt(dbs), step_name=curr_fn())
+    messages = ai.start(setup_sys_prompt(dbs), dbs.input["prompt"], step_name=curr_fn())
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
 
@@ -90,7 +71,7 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
     Ask the user if they want to clarify anything and save the results to the workspace
     """
     messages: List[Message] = [ai.fsystem(dbs.preprompts["clarify"])]
-    user_input = get_prompt(dbs)
+    user_input = dbs.input["prompt"]
     while True:
         messages = ai.next(messages, user_input, step_name=curr_fn())
         msg = messages[-1].content.strip()
@@ -196,7 +177,11 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     ] + messages[
         1:
     ]  # skip the first clarify message, which was the original clarify priming prompt
-    messages = ai.next(messages, dbs.preprompts["generate"], step_name=curr_fn())
+    messages = ai.next(
+        messages,
+        dbs.preprompts["generate"].replace("FILE_FORMAT", dbs.preprompts["file_format"]),
+        step_name=curr_fn(),
+    )
 
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
@@ -210,7 +195,11 @@ def gen_code_after_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
         ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
         ai.fuser(f"Unit tests:\n\n{dbs.memory['unit_tests']}"),
     ]
-    messages = ai.next(messages, dbs.preprompts["generate"], step_name=curr_fn())
+    messages = ai.next(
+        messages,
+        dbs.preprompts["generate"].replace("FILE_FORMAT", dbs.preprompts["file_format"]),
+        step_name=curr_fn(),
+    )
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
 
@@ -361,27 +350,16 @@ def improve_existing_code(ai: AI, dbs: DBs):
 
     messages = [
         ai.fsystem(setup_sys_prompt_existing_code(dbs)),
-        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
     ]
     # Add files as input
     for file_name, file_str in files_info.items():
         code_input = format_file_to_input(file_name, file_str)
         messages.append(ai.fuser(f"{code_input}"))
 
-    output_format_str = """
-    Make sure the output of any files is in the following format where
-    FILENAME is the file name including the file extension, and the file path.  Do not
-    forget to include the file path.
-    LANG is the markup code block language for the code's language, and CODE is the code:
+    messages.append(ai.fuser(f"Request: {dbs.input['prompt']}"))
 
-    FILENAME
-    ```LANG
-    CODE
-    ```
-    """
+    messages = ai.next(messages, step_name=curr_fn())
 
-    messages = ai.next(messages, output_format_str, step_name=curr_fn())
-    # Maybe we should add another step called "replace" or "overwrite"
     overwrite_files(messages[-1].content.strip(), dbs)
     return messages
 
