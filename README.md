@@ -35,15 +35,15 @@ For **development**:
   - (or: `make install && source venv/bin/activate` for a venv)
 
 **API Key**
-Either just:
-- `export OPENAI_API_KEY=[your api key]`
 
-Or:
-- Create a copy of `.env.template` named `.env`
-- Add your OPENAI_API_KEY in .env
-
-Or:
-- (advanced) Use a local model (or azure). See [docs](https://gpt-engineer.readthedocs.io/en/latest/open_models.html).
+Choose **one** of:
+- Export env variable (you can add this to .bashrc so that you don't have to do it each time you start the terminal)
+    - `export OPENAI_API_KEY=[your api key]`
+- .env file:
+    - Create a copy of `.env.template` named `.env`
+    - Add your OPENAI_API_KEY in .env
+- Custom model:
+    - See [docs](https://gpt-engineer.readthedocs.io/en/latest/open_models.html), supports local model, azure, etc.
 
 Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
