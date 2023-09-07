@@ -4,6 +4,7 @@ import re
 from typing import List, Tuple
 
 from gpt_engineer.db import DB
+from gpt_engineer.file_selector import FILE_LIST_NAME
 
 
 def parse_chat(chat) -> List[Tuple[str, str]]:
