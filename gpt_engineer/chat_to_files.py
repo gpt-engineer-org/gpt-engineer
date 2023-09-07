@@ -108,7 +108,7 @@ def get_code_strings(input: DB) -> dict[str, str]:
     dict[str, str]
         A dictionary mapping file names to their content.
     """
-    files_paths = input["file_list.txt"].strip().split("\n")
+    files_paths = input[FILE_LIST_NAME].strip().split("\n")
     files_dict = {}
     for full_file_path in files_paths:
         with open(full_file_path, "r") as file:
