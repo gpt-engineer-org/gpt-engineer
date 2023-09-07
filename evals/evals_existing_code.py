@@ -4,15 +4,11 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 
-import yaml
-
-from eval_tools import check_evaluation_component
+from eval_tools import check_evaluation_component, load_evaluations_from_file, to_emoji
 from tabulate import tabulate
 
 from gpt_engineer.chat_to_files import parse_chat
 from gpt_engineer.db import DB
-
-EVAL_LIST_NAME = "evaluations"  # the top level list in the YAML file
 
 
 def single_evaluate(eval_ob: dict) -> list[bool]:
@@ -75,10 +71,6 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
     return evaluation_results
 
 
-def to_emoji(value: bool) -> str:
-    return "\U00002705" if value else "\U0000274C"
-
-
 def generate_report(evals: list[dict], res: list[list[bool]]) -> None:
     # High level shows if all the expected_results passed
     # Detailed shows all the test cases and a pass/fail for each
@@ -122,19 +114,6 @@ def generate_report(evals: list[dict], res: list[list[bool]]) -> None:
     output_lines.append(f"### {title}\n\n{detail_table}\n\n")
     with open("evals/IMPROVE_CODE_RESULTS.md", "a") as file:
         file.writelines(output_lines)
-
-
-def load_evaluations_from_file(file_path):
-    """Loads the evaluations from a YAML file."""
-    try:
-        with open(file_path, "r") as file:
-            data = yaml.safe_load(file)
-            if EVAL_LIST_NAME in data:
-                return data[EVAL_LIST_NAME]
-            else:
-                print(f"'{EVAL_LIST_NAME}' not found in {file_path}")
-    except FileNotFoundError:
-        print(f"File not found: {file_path}")
 
 
 def run_all_evaluations(eval_list: list[dict]) -> None:
