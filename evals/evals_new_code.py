@@ -26,25 +26,25 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
     prompt_path = code_base_abs / 'prompt'
     workspace[prompt_path] = f"{eval_ob['code_prompt']}\n"
 
-    # # Step 2. Run gpt-engineer 
-    # log_path = code_base_abs / "log.txt"
-    # log_file = open(log_path, "w")
-    # process = subprocess.Popen(
-    #     [
-    #         "python",
-    #         "-u",  # Unbuffered output
-    #         "-m",
-    #         "gpt_engineer.main",
-    #         eval_ob["project_root"],
-    #         "--steps",
-    #         "eval_new_code",
-    #     ],
-    #     stdout=log_file,
-    #     stderr=log_file,
-    #     bufsize=0,
-    # )
-    # print(f"waiting for {eval_ob['name']} to finish.")
-    # process.wait()  # we want to wait until it finishes.
+    # Step 2. Run gpt-engineer 
+    log_path = code_base_abs / "log.txt"
+    log_file = open(log_path, "w")
+    process = subprocess.Popen(
+        [
+            "python",
+            "-u",  # Unbuffered output
+            "-m",
+            "gpt_engineer.main",
+            eval_ob["project_root"],
+            "--steps",
+            "eval_new_code",
+        ],
+        stdout=log_file,
+        stderr=log_file,
+        bufsize=0,
+    )
+    print(f"waiting for {eval_ob['name']} to finish.")
+    process.wait()  # we want to wait until it finishes.
 
     print("running tests on the newly generated code")
     # TODO: test the code we should have an executable name
