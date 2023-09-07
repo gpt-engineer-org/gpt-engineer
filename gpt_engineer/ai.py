@@ -171,13 +171,12 @@ class AI:
 
         callsbacks = [StreamingStdOutCallbackHandler()]
         response = self.llm(messages, callbacks=callsbacks)  # type: ignore
-        messages.append(response)
-
-        logger.debug(f"Chat completion finished: {messages}")
 
         self.update_token_usage_log(
             messages=messages, answer=response.content, step_name=step_name
         )
+        messages.append(response)
+        logger.debug(f"Chat completion finished: {messages}")
 
         return messages
 
