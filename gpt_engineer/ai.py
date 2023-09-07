@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
-import os
-import litellm
+
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
@@ -11,7 +10,7 @@ import openai
 import tiktoken
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.chat_models import AzureChatOpenAI, ChatOpenAI, ChatLiteLLM
+from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import (
     AIMessage,
@@ -356,19 +355,12 @@ def create_chat_model(self, model: str, temperature) -> BaseChatModel:
     BaseChatModel
         The created chat model.
     """
-    model = "j2-mid"
     if self.azure_endpoint:
         return AzureChatOpenAI(
             openai_api_base=self.azure_endpoint,
             openai_api_version="2023-05-15",  # might need to be flexible in the future
             deployment_name=model,
             openai_api_type="azure",
-            streaming=True,
-        )
-    elif model in litellm.model_list or model.split("/", 1)[0] in litellm.provider_list:
-        return ChatLiteLLM(
-            model=model,
-            temperature=temperature,
             streaming=True,
         )
     # Fetch available models from OpenAI API
