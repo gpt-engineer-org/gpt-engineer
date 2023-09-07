@@ -240,10 +240,10 @@ def ask_for_files(db_input) -> None:
         dict[str, str]: Dictionary where key = file name and value = file path
     """
     use_last_string = ""
-    if "file_list.txt" in db_input:
+    if FILE_LIST_NAME in db_input:
         use_last_string = (
             "3. Use previous file list (available at "
-            + f"{os.path.join(db_input.path, 'file_list.txt')})\n"
+            + f"{os.path.join(db_input.path, FILE_LIST_NAME)})\n"
         )
         selection_number = 3
     else:
@@ -283,7 +283,7 @@ def ask_for_files(db_input) -> None:
         sys.exit(1)
 
     if not selection_number == 3:
-        db_input["file_list.txt"] = "\n".join(file_path_list)
+        db_input[FILE_LIST_NAME] = "\n".join(file_path_list)
 
 
 def gui_file_selector() -> List[str]:
