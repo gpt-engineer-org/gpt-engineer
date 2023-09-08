@@ -129,6 +129,16 @@ def run_all_evaluations(eval_list: list[dict]) -> None:
     generate_report(eval_list, results)
 
 
-if __name__ == "__main__":
-    eval_list = load_evaluations_from_file("evals/existing_code_eval.yaml")
+@app.command()
+def main(
+    test_file_path: str = typer.Argument("evals/existing_code_eval.yaml", help="path"),
+):
+    if not os.path.isfile(test_file_path):
+        raise Exception(f"sorry the file: {test_file_path} does not exist.")
+
+    eval_list = load_evaluations_from_file(test_file_path)
     run_all_evaluations(eval_list)
+
+
+if __name__ == "__main__":
+    app()
