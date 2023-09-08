@@ -17,7 +17,7 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
 
     # write to the consent file so we don't get a prompt that hangs
     consent_file = base_abs / ".gpte_consent"
-    consent_file.write_text("true")
+    consent_file.write_text("false")
 
     # Step 1. Setup known project
     # write the folder and prompt file
