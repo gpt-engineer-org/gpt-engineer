@@ -9,4 +9,4 @@ evaluations:
     - type: check_executable_satisfies_function
       executable_name: "python passwordgenerator.py"
       executable_arguments: "10 d"
-      output_satisfies: "tf = lambda a : len(a) == 10"s
+      output_satisfies: "tf = lambda a : len(a) == 10"

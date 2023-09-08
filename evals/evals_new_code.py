@@ -1,11 +1,16 @@
 import os
 import subprocess
 
+import typer
+
 from datetime import datetime
 from pathlib import Path
 
 from eval_tools import load_evaluations_from_file, to_emoji, check_evaluation_component
 from gpt_engineer.db import DB
+
+app = typer.Typer()  # creates a CLI app
+
 
 def single_evaluate(eval_ob: dict) -> list[bool]:
     """Evaluates a single prompt for creating a new project."""
@@ -69,6 +74,18 @@ def run_all_evaluations(eval_list: list[dict]) -> None:
     # Step 4. Generate Report
     generate_report(eval_list, results)
 
-if __name__ == "__main__":
-    eval_list = load_evaluations_from_file("evals/new_code_eval.yaml")
+
+@app.command()
+def main(
+    test_file_path: str = typer.Argument("evals/new_code_eval.yaml", help="path"),
+):
+    
+    if not os.path.isfile(test_file_path):
+        raise Exception(f"sorry the file: {test_file_path} does not exist.")
+    
+    eval_list = load_evaluations_from_file(test_file_path)
     run_all_evaluations(eval_list)
+
+
+if __name__ == "__main__":
+    app()
