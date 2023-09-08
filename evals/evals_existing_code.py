@@ -4,11 +4,15 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 
+import typer
+
 from eval_tools import check_evaluation_component, load_evaluations_from_file, to_emoji
 from tabulate import tabulate
 
 from gpt_engineer.chat_to_files import parse_chat
 from gpt_engineer.db import DB
+
+app = typer.Typer()  # creates a CLI app
 
 
 def single_evaluate(eval_ob: dict) -> list[bool]:
