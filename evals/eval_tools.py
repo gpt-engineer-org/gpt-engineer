@@ -9,8 +9,9 @@ The scope will bre relatively limited to a few languages but this could
 be expanded.
 """
 
-import yaml
 import subprocess
+
+import yaml
 
 EVAL_LIST_NAME = "evaluations"  # the top level list in the YAML file
 
@@ -64,7 +65,9 @@ def run_code_eval_function(eval_d: dict) -> bool:
 
 def run_executable(eval_d: dict) -> subprocess.Popen:
     code_dir = eval_d["project_root"] / "workspace"
-    process_args = eval_d["executable_name"].split(' ') + eval_d["executable_arguments"].split(' ')
+    process_args = eval_d["executable_name"].split(" ") + eval_d[
+        "executable_arguments"
+    ].split(" ")
     process = subprocess.Popen(
         process_args,
         bufsize=0,
@@ -74,24 +77,27 @@ def run_executable(eval_d: dict) -> subprocess.Popen:
     process.wait()
     return process
 
+
 def check_executable_exits_normally(eval_d: dict) -> bool:
     """This simply runs an executable with arguments and checks the process exit code."""
     process = run_executable(eval_d=eval_d)
     return process.returncode == 0
 
+
 def check_executable_satisfies_function(eval_d: dict) -> bool:
-    """This function allows the test writer to define in Python conditions for a passfail.  
+    """This function allows the test writer to define in Python conditions for a passfail.
     The conditions are checked by a user defined function called tf with a single argument
-    the output of the executable.  tf() can be defined as either a lambda or a regular function.  
-    tf() is set in the `output_satisfies` field.  Here is an example using lambdas: 
+    the output of the executable.  tf() can be defined as either a lambda or a regular function.
+    tf() is set in the `output_satisfies` field.  Here is an example using lambdas:
     output_satisfies: "tf = lambda a : len(a) == 10"
     """
     process = run_executable(eval_d=eval_d)
     process_output = process.communicate()[0].strip()
 
-    exec(eval_d['output_satisfies'])
+    exec(eval_d["output_satisfies"])
     checking_function_ref = locals().get("tf")
     return checking_function_ref(process_output)
+
 
 def check_evaluation_component(eval_d: dict) -> bool:
     """Switch on evaluation components"""
