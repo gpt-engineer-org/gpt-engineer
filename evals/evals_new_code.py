@@ -1,12 +1,12 @@
 import os
 import subprocess
 
-import typer
-
-from datetime import datetime
 from pathlib import Path
 
-from eval_tools import load_evaluations_from_file, to_emoji, check_evaluation_component
+import typer
+
+from eval_tools import check_evaluation_component, load_evaluations_from_file
+
 from gpt_engineer.db import DB
 
 app = typer.Typer()  # creates a CLI app
@@ -28,10 +28,10 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
     # write the folder and prompt file
 
     print(f"prompt: {eval_ob['code_prompt']}")
-    prompt_path = code_base_abs / 'prompt'
+    prompt_path = code_base_abs / "prompt"
     workspace[prompt_path] = f"{eval_ob['code_prompt']}\n"
 
-    # Step 2. Run gpt-engineer 
+    # Step 2. Run gpt-engineer
     log_path = code_base_abs / "log.txt"
     log_file = open(log_path, "w")
     process = subprocess.Popen(
@@ -63,7 +63,7 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
 
 
 def generate_report(evals: list[dict], res: list[list[bool]]) -> None:
-    pass # TODO: modify the code from existing code evals.  
+    pass  # TODO: modify the code from existing code evals.
 
 
 def run_all_evaluations(eval_list: list[dict]) -> None:
@@ -79,10 +79,9 @@ def run_all_evaluations(eval_list: list[dict]) -> None:
 def main(
     test_file_path: str = typer.Argument("evals/new_code_eval.yaml", help="path"),
 ):
-    
     if not os.path.isfile(test_file_path):
         raise Exception(f"sorry the file: {test_file_path} does not exist.")
-    
+
     eval_list = load_evaluations_from_file(test_file_path)
     run_all_evaluations(eval_list)
 
