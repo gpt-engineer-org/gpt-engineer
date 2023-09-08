@@ -141,7 +141,6 @@ def collect_consent() -> bool:
     if consent_flag.exists():
         return consent_flag.read_text() == "true"
 
-
     if ask_if_can_store():
         consent_flag.write_text("true")
         print()
