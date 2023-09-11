@@ -93,7 +93,8 @@ def overwrite_files(chat, dbs):
             ] = file_content  # TODO store this in memory db instead
         else:
             full_path = os.path.join(dbs.input.path, file_name)
-            dbs.workspace[full_path] = file_content            
+            dbs.workspace[full_path] = file_content
+                        
 
 def get_code_strings(input: DB) -> dict[str, str]:
     """
