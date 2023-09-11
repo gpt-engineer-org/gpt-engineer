@@ -92,8 +92,8 @@ def overwrite_files(chat, dbs):
                 "LAST_MODIFICATION_README.md"
             ] = file_content  # TODO store this in memory db instead
         else:
-            dbs.workspace[file_name] = file_content
-
+            full_path = os.path.join(dbs.input.path, file_name)
+            dbs.workspace[full_path] = file_content            
 
 def get_code_strings(input: DB) -> dict[str, str]:
     """
