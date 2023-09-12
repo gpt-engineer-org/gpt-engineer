@@ -9,6 +9,12 @@ The scope will bre relatively limited to a few languages but this could
 be expanded.
 """
 
+import subprocess
+
+import yaml
+
+EVAL_LIST_NAME = "evaluations"  # the top level list in the YAML file
+
 
 def check_language(eval_d: dict) -> None:
     if eval_d["language"] != "python":
@@ -46,7 +52,7 @@ def run_code_class_has_property_w_value(eval_d: dict) -> bool:
     return getattr(ob, eval_d["property_name"]) == eval_d["expected_value"]
 
 
-def run_code_eval_function(eval_d) -> bool:
+def run_code_eval_function(eval_d: dict) -> bool:
     """Similar to run_code_class_has_property() except is evaluates a function call."""
     check_language(eval_d)
     source_body = open(eval_d["project_root"] / eval_d["source_file"]).read()
@@ -55,6 +61,42 @@ def run_code_eval_function(eval_d) -> bool:
 
     # TODO: add the ability to have function arguments
     return function_ref() == eval_d["expected_value"]
+
+
+def run_executable(eval_d: dict) -> subprocess.Popen:
+    code_dir = eval_d["project_root"] / "workspace"
+    process_args = eval_d["executable_name"].split(" ") + eval_d[
+        "executable_arguments"
+    ].split(" ")
+    process = subprocess.Popen(
+        process_args,
+        bufsize=0,
+        cwd=code_dir.absolute(),
+        stdout=subprocess.PIPE,
+    )
+    process.wait()
+    return process
+
+
+def check_executable_exits_normally(eval_d: dict) -> bool:
+    """This simply runs an executable with arguments and checks the process exit code."""
+    process = run_executable(eval_d=eval_d)
+    return process.returncode == 0
+
+
+def check_executable_satisfies_function(eval_d: dict) -> bool:
+    """This function allows the test writer to define in Python conditions for a passfail.
+    The conditions are checked by a user defined function called tf with a single argument
+    the output of the executable.  tf() can be defined as either a lambda or a regular function.
+    tf() is set in the `output_satisfies` field.  Here is an example using lambdas:
+    output_satisfies: "tf = lambda a : len(a) == 10"
+    """
+    process = run_executable(eval_d=eval_d)
+    process_output = process.communicate()[0].strip()
+
+    exec(eval_d["output_satisfies"])
+    checking_function_ref = locals().get("tf")
+    return checking_function_ref(process_output)
 
 
 def check_evaluation_component(eval_d: dict) -> bool:
@@ -68,5 +110,27 @@ def check_evaluation_component(eval_d: dict) -> bool:
         return run_code_class_has_property_w_value(eval_d)
     elif test_type == "run_code_eval_function":
         return run_code_eval_function(eval_d)
+    # The following are for new code
+    elif test_type == "check_executable_exits_normally":
+        return check_executable_exits_normally(eval_d)
+    elif test_type == "check_executable_satisfies_function":
+        return check_executable_satisfies_function(eval_d)
     else:
         raise Exception(f"Test type '{test_type}' is not recognized.")
+
+
+def load_evaluations_from_file(file_path):
+    """Loads the evaluations from a YAML file."""
+    try:
+        with open(file_path, "r") as file:
+            data = yaml.safe_load(file)
+            if EVAL_LIST_NAME in data:
+                return data[EVAL_LIST_NAME]
+            else:
+                print(f"'{EVAL_LIST_NAME}' not found in {file_path}")
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+
+
+def to_emoji(value: bool) -> str:
+    return "\U00002705" if value else "\U0000274C"

@@ -401,6 +401,7 @@ class Config(str, Enum):
     USE_FEEDBACK = "use_feedback"
     IMPROVE_CODE = "improve_code"
     EVAL_IMPROVE_CODE = "eval_improve_code"
+    EVAL_NEW_CODE = "eval_new_code"
 
 
 # Define the steps to run for different configs
@@ -464,6 +465,7 @@ STEPS = {
         improve_existing_code,
     ],
     Config.EVAL_IMPROVE_CODE: [assert_files_ready, improve_existing_code],
+    Config.EVAL_NEW_CODE: [simple_gen],
 }
 
 # Future steps that can be added:
