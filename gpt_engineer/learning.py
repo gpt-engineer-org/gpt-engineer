@@ -138,10 +138,8 @@ def collect_consent() -> bool:
         True if the user has given consent, False otherwise.
     """
     consent_flag = Path(".gpte_consent")
-    has_given_consent = consent_flag.exists() and consent_flag.read_text() == "true"
-
-    if has_given_consent:
-        return True
+    if consent_flag.exists():
+        return consent_flag.read_text() == "true"
 
     if ask_if_can_store():
         consent_flag.write_text("true")
