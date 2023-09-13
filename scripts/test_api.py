@@ -26,8 +26,8 @@ if __name__ == "__main__":
 
     arguments = {
         "input": "We are writing snake in python. MVC components split \
-            in separate files. Keyboard control.",  # our prompt
-        "additional_input": {"improve": False},
+        in separate files. Keyboard control.",  # our prompt
+        "additional_input": {"improve_option": False},
     }
 
     # create a task
@@ -37,6 +37,6 @@ if __name__ == "__main__":
 
     sleep(1)  # this is not needed
 
-    response = post_data(f"{URL_BASE}/agent/tasks/{task_id}/steps", arguments)
-
+    # execute the step for our task
+    response = post_data(f"{URL_BASE}/agent/tasks/{task_id}/steps", {})
     print(response.json())

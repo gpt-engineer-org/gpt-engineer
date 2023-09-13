@@ -18,7 +18,8 @@ async def task_handler(task: Task) -> None:
     """
 
     # make sure we have a prompt or bail.
-    assert task.input is not None, "No input prompt in the 'input' field."
+    if task.input is None:
+        raise Exception("No input prompt in the 'input' field.")
 
     workspace = DB(f"projects/{task.task_id}")
 
@@ -29,29 +30,37 @@ async def task_handler(task: Task) -> None:
     consent_file = Path(os.getcwd()) / ".gpte_consent"
     consent_file.write_text("false")
 
-    print("Options: task.additional_input: ", task.additional_input)
-
-    # TODO: disable feedback prompt
-
     await Agent.db.create_artifact(
         task_id=task.task_id,
         relative_path="projects/",
         file_name=f"projects/{task.task_id}",
     )
 
-    await Agent.db.create_step(task_id=task.task_id, name="create_code", is_last=True)
+    # pass options onto additional_properties
+    await Agent.db.create_step(
+        task_id=task.task_id,
+        name="create_code",
+        is_last=True,
+        additional_properties=task.additional_input.__root__,
+    )
 
 
 async def step_handler(step: Step) -> Step:
-    # run the code here.
+    """
+    The code generation is run here.  Any options are passed via task.additional_input.
+
+    Improve code mode is not yet supported, but it would not be much work to support it.
+    A list of 'focus' files would need to be submitted in: task.additional_input.
+    """
+
     main(
-        f"projects/{step.task_id}",
-        "gpt-4",
-        0.1,
+        f"projects/{step.task_id}",  # we could also make this an option
+        step.additional_properties.get("model", "gpt-4"),
+        step.additional_properties.get("temperature", 0.1),
         "benchmark",  # this needs to be headless mode
         False,
-        "",
-        False,
+        step.additional_properties.get("azure_endpoint", ""),
+        step.additional_properties.get("verbose", False),
     )
 
     return step
