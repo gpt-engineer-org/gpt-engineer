@@ -49,11 +49,20 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
 ## Usage
 
+There are two ways to work with GPT-engineer: new code mode (the default), and improve existing code mode (the `-i` option).
+
+### Creating new code
 - Create an empty folder for your project
   - If inside the repo, you can run: `cp -r projects/example/ projects/my-new-project`
 - Create a file called `prompt` (no extension) and fill it with instructions
 - `gpt-engineer <project_dir>`
   - For example: `gpt-engineer projects/my-new-project`
+
+### Improving Existing Code
+- Take the code you want to improve and place it in a folder inside the `projects/` folder.  The code can be another Git repository as `projects/` is ignored by Git.
+- Create a file called prompt (no extension) and fill it with instructions for how you want to improve the code.
+- `gpt-engineer <project_dir> -i`
+- You will be prompted to select files which you want to work with, you can use the GUI or a command line tool to select the files to work with.  You only need to select on the first run, subsequent runs will allow you to reuse the file list from earlier runs.
 
 By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
