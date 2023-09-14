@@ -41,7 +41,7 @@ async def task_handler(task: Task) -> None:
         task_id=task.task_id,
         name="create_code",
         is_last=True,
-        additional_properties=task.additional_input.__root__,
+        additional_properties=task.additional_input.__root__ if task.additional_input is not None else None,
     )
 
 
@@ -52,16 +52,26 @@ async def step_handler(step: Step) -> Step:
     Improve code mode is not yet supported, but it would not be much work to support it.
     A list of 'focus' files would need to be submitted in: task.additional_input.
     """
-
-    main(
-        f"projects/{step.task_id}",  # we could also make this an option
-        step.additional_properties.get("model", "gpt-4"),
-        step.additional_properties.get("temperature", 0.1),
-        "benchmark",  # this needs to be headless mode
-        False,
-        step.additional_properties.get("azure_endpoint", ""),
-        step.additional_properties.get("verbose", False),
-    )
+    if step.additional_properties is not None:
+        main(
+            f"projects/{step.task_id}",  # we could also make this an option
+            step.additional_properties.get("model", "gpt-4"),
+            step.additional_properties.get("temperature", 0.1),
+            "benchmark",  # this needs to be headless mode
+            False,
+            step.additional_properties.get("azure_endpoint", ""),
+            step.additional_properties.get("verbose", False),
+        )
+    else:
+        main(
+            project_path=f"projects/{step.task_id}",
+            model="gpt-4",
+            temperature=0.1,
+            steps_config="benchmark",  # this needs to be headless mode
+            improve_option=False,
+            azure_endpoint="",
+            verbose=False,
+        )
 
     return step
 
