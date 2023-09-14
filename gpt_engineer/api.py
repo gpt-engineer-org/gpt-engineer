@@ -41,7 +41,9 @@ async def task_handler(task: Task) -> None:
         task_id=task.task_id,
         name="create_code",
         is_last=True,
-        additional_properties=task.additional_input.__root__ if task.additional_input is not None else None,
+        additional_properties=task.additional_input.__root__
+        if task.additional_input is not None
+        else None,
     )
 
 
