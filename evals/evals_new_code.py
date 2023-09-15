@@ -5,7 +5,11 @@ from pathlib import Path
 
 import typer
 
-from eval_tools import check_evaluation_component, generate_report, load_evaluations_from_file
+from eval_tools import (
+    check_evaluation_component,
+    generate_report,
+    load_evaluations_from_file,
+)
 
 from gpt_engineer.db import DB
 
