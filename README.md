@@ -70,6 +70,17 @@ By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/g
 
 Check the generated files in `projects/my-new-project/workspace`
 
+**[Storing Results in Weights & Biases](https://docs.wandb.ai/guides/prompts)**
+
+W&B Prompts is a suite of LLMOps tools built for the development of LLM-powered applications. Use W&B Prompts to visualize and inspect the execution flow of your LLMs, analyze the inputs and outputs of your LLMs, view the intermediate results and securely store and manage your prompts and LLM chain configurations.
+
+ [Sign up here](wandb.ai)
+
+ ```shell
+$ export WANDB_API_KEY=
+$ export LANGCHAIN_WANDB_TRACING=true
+```
+
 **Workflow**
 
 `gpt-engineer --help` lets you see all available options.
