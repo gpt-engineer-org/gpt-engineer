@@ -1,4 +1,4 @@
-name: Pip install, pytest and protocol test
+name: Pip install pytest and protocol test
 on:
   pull_request:
     branches: [main]
