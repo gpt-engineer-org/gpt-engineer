@@ -11,7 +11,11 @@ be expanded.
 
 import subprocess
 
+from datetime import datetime
+
 import yaml
+
+from tabulate import tabulate
 
 EVAL_LIST_NAME = "evaluations"  # the top level list in the YAML file
 
@@ -134,3 +138,48 @@ def load_evaluations_from_file(file_path):
 
 def to_emoji(value: bool) -> str:
     return "\U00002705" if value else "\U0000274C"
+
+
+def generate_report(evals: list[dict], res: list[list[bool]], report_path: str) -> None:
+    # High level shows if all the expected_results passed
+    # Detailed shows all the test cases and a pass/fail for each
+    output_lines = []
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    output_lines.append(f"## {current_date}\n\n")
+
+    # Create a summary table
+    headers = ["Project", "Evaluation", "All Tests Pass"]
+    rows = []
+    for i, eval_ob in enumerate(evals):
+        rows.append(
+            [eval_ob["project_root"], eval_ob["name"], to_emoji(all(res[i]))]
+        )  # logical AND of all tests
+    table: str = tabulate(rows, headers, tablefmt="pipe")
+    title = "Existing Code Evaluation Summary:"
+    print(f"\n{title}\n")
+    print(table)
+    print()
+    output_lines.append(f"### {title}\n\n{table}\n\n")
+
+    # Create a detailed table
+    headers = ["Project", "Evaluation", "Test", "Pass"]
+    rows = []
+    for i, eval_ob in enumerate(evals):
+        for j, test in enumerate(eval_ob["expected_results"]):
+            rows.append(
+                [
+                    eval_ob["project_root"],
+                    eval_ob["name"],
+                    eval_ob["expected_results"][j]["type"],
+                    to_emoji(res[i][j]),
+                ]
+            )
+    detail_table: str = tabulate(rows, headers, tablefmt="pipe")
+    title = "Detailed Test Results:"
+    print(f"\n{title} \n")
+    print(detail_table)
+    print()
+
+    output_lines.append(f"### {title}\n\n{detail_table}\n\n")
+    with open(report_path, "a") as file:
+        file.writelines(output_lines)

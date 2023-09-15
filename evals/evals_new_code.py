@@ -5,7 +5,11 @@ from pathlib import Path
 
 import typer
 
-from eval_tools import check_evaluation_component, load_evaluations_from_file
+from eval_tools import (
+    check_evaluation_component,
+    generate_report,
+    load_evaluations_from_file,
+)
 
 from gpt_engineer.db import DB
 
@@ -43,6 +47,8 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
             eval_ob["project_root"],
             "--steps",
             "eval_new_code",
+            "--temperature",
+            "0",
         ],
         stdout=log_file,
         stderr=log_file,
@@ -62,17 +68,13 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
     return evaluation_results
 
 
-def generate_report(evals: list[dict], res: list[list[bool]]) -> None:
-    pass  # TODO: modify the code from existing code evals.
-
-
 def run_all_evaluations(eval_list: list[dict]) -> None:
     results = []
     for eval_ob in eval_list:
         results.append(single_evaluate(eval_ob))
 
     # Step 4. Generate Report
-    generate_report(eval_list, results)
+    generate_report(eval_list, results, "evals/EVAL_NEW_CODE_RESULTS.md")
 
 
 @app.command()
