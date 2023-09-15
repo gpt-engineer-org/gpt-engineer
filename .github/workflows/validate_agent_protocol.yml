@@ -33,7 +33,10 @@ jobs:
         run: pip install -e .
 
       - name: Run agent
-        run: python gpt_engineer/api.py
+        run: python gpt_engineer/api.py &
+
+      - name: Wait for server to start
+        run: sleep 10
 
       - name: Validate agent protocol compliance
         run: agent-protocol test --url http://127.0.0.1:8000
