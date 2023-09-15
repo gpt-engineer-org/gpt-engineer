@@ -30,7 +30,7 @@ jobs:
         run: pip install agent-protocol
 
       - name: Install gpt-engineer
-        run: pip install .
+        run: pip install -e .
 
       - name: Run agent
         run: python gpt_engineer/api.py
