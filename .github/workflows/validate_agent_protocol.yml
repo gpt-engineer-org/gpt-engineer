@@ -36,7 +36,7 @@ jobs:
         run: python gpt_engineer/api.py &
 
       - name: Wait for server to start
-        run: sleep 10
+        run: sleep 1
 
       - name: Validate agent protocol compliance
         run: agent-protocol test --url http://127.0.0.1:8000
