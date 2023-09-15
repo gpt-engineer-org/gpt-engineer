@@ -29,14 +29,8 @@ jobs:
       - name: Install agent protocol
         run: pip install agent-protocol
 
-      - name: Print current working directory
-        run: pwd
-
-      - name: List directory contents
-        run: ls -al
-
       - name: Run agent
-        run: python api.py
+        run: python gpt_engineer/api.py
 
       - name: Validate agent protocol compliance
         run: agent-protocol test --url http://127.0.0.1:8000
