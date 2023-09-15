@@ -10,9 +10,12 @@ be expanded.
 """
 
 import subprocess
-from tabulate import tabulate
+
 from datetime import datetime
+
 import yaml
+
+from tabulate import tabulate
 
 EVAL_LIST_NAME = "evaluations"  # the top level list in the YAML file
 

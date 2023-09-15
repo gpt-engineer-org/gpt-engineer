@@ -5,11 +5,7 @@ from pathlib import Path
 
 import typer
 
-from eval_tools import (
-    check_evaluation_component,
-    load_evaluations_from_file,
-    generate_report,
-)
+from eval_tools import check_evaluation_component, generate_report, load_evaluations_from_file
 
 from gpt_engineer.chat_to_files import parse_chat
 from gpt_engineer.db import DB
