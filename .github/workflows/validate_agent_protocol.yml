@@ -34,6 +34,8 @@ jobs:
 
       - name: Run agent
         run: python gpt_engineer/api.py &
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Wait for server to start
         run: sleep 1
