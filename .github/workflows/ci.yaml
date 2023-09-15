@@ -6,14 +6,13 @@ on:
       - "**.py"
       - "**.yaml"
       - "**.yml"
-      - "**.json"
   push:
     branches: [ main ]
     paths:
       - "**.py"
       - "**.yaml"
       - "**.yml"
-      - "**.json"
+
 jobs:
   test:
     runs-on: ubuntu-latest
