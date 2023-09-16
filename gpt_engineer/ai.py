@@ -271,6 +271,27 @@ class AI:
             result += str(log.total_tokens) + "\n"
         return result
 
+    def usage_cost(self) -> float:
+        """
+        Return the total cost in USD of the api usage.
+
+        Returns
+        -------
+        float
+            Cost in USD.
+        """
+        prompt_price = 0.03
+        completion_price = 0.06
+        if self.model_name == "gpt-3.5-turbo":
+            prompt_price = 0.0015
+            completion_price = 0.002
+
+        result = 0
+        for log in self.token_usage_log:
+            result += log.total_prompt_tokens / 1000 * prompt_price
+            result += log.total_completion_tokens / 1000 * completion_price
+        return result
+
     def num_tokens(self, txt: str) -> int:
         """
         Get the number of tokens in a text.
