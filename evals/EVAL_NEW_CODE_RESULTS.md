@@ -12,4 +12,3 @@
 |:---------------------------|:-------------|:------------------------------------|:-------|
 | projects/password_gen_eval | password_gen | check_executable_exits_normally     | ✅     |
 | projects/password_gen_eval | password_gen | check_executable_satisfies_function | ✅     |
-
