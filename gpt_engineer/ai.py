@@ -9,6 +9,7 @@ from typing import List, Optional, Union
 import openai
 import tiktoken
 
+from langchain.callbacks.openai_info import MODEL_COST_PER_1K_TOKENS
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
@@ -280,11 +281,8 @@ class AI:
         float
             Cost in USD.
         """
-        prompt_price = 0.03
-        completion_price = 0.06
-        if self.model_name == "gpt-3.5-turbo":
-            prompt_price = 0.0015
-            completion_price = 0.002
+        prompt_price = MODEL_COST_PER_1K_TOKENS[self.model_name]
+        completion_price = MODEL_COST_PER_1K_TOKENS[self.model_name + "-completion"]
 
         result = 0
         for log in self.token_usage_log:
