@@ -63,4 +63,3 @@
 | projects/web_todo_list   | modify_web_app_appearance | assert_exists_in_source_code        | ❌     |
 | projects/web_todo_list   | modify_web_app_appearance | assert_exists_in_source_code        | ❌     |
 | projects/snake_game_eval | modify_functionality      | assert_exists_in_source_code        | ❌     |
-
