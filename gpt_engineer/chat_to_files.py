@@ -1,59 +1,29 @@
-import os
-import re
-
-from typing import List, Tuple
-
-from gpt_engineer.db import DB
-from gpt_engineer.file_selector import FILE_LIST_NAME
+from gpt_engineer.constants import FILE_LIST_NAME
 
 
-def parse_chat(chat) -> List[Tuple[str, str]]:
+def get_code_strings(input: DB) -> dict[str, str]:
     """
-    Extracts all code blocks from a chat and returns them
-    as a list of (filename, codeblock) tuples.
+    Read file_list.txt and return file names and their content.
 
     Parameters
     ----------
-    chat : str
-        The chat to extract code blocks from.
+    input : dict
+        A dictionary containing the file_list.txt.
 
     Returns
     -------
-    List[Tuple[str, str]]
-        A list of tuples, where each tuple contains a filename and a code block.
+    dict[str, str]
+        A dictionary mapping file names to their content.
     """
-    # Get all ``` blocks and preceding filenames
-    regex = r"(\S+)\n\s*```[^\n]*\n(.+?)```"
-    matches = re.finditer(regex, chat, re.DOTALL)
-
-    files = []
-    for match in matches:
-        # Strip the filename of any non-allowed characters and convert / to \
-        path = re.sub(r'[\:<>"|?*]', "", match.group(1))
-
-        # Remove leading and trailing brackets
-        path = re.sub(r"^\[(.*)\]$", r"\1", path)
-
-        # Remove leading and trailing backticks
-        path = re.sub(r"^`(.*)`$", r"\1", path)
-
-        # Remove trailing ]
-        path = re.sub(r"[\]\:]$", "", path)
-
-        # Get the code
-        code = match.group(2)
-
-        # Add the file to the list
-        files.append((path, code))
-
-    # Get all the text before the first ``` block
-    readme = chat.split("```")[0]
-    files.append(("README.md", readme))
-
-    # Return the files
-    return files
-
-
+    files_paths = input[FILE_LIST_NAME].strip().split("\n")
+    files_dict = {}
+    for full_file_path in files_paths:
+        with open(full_file_path, "r") as file:
+            file_data = file.read()
+        if file_data:
+            file_name = os.path.relpath(full_file_path, input.path)
+            files_dict[file_name] = file_data
+    return files_dict
 def to_files(chat: str, workspace: DB):
     """
     Parse the chat and add all extracted files to the workspace.
