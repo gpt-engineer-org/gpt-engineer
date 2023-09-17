@@ -99,7 +99,7 @@ def main(
         raise Exception(f"sorry the file: {test_file_path} does not exist.")
 
     eval_list = load_evaluations_from_file(test_file_path)
-    run_all_evaluations(eval_list)
+    run_all_evaluations(eval_list, FILE_LIST_NAME)
 
 
 if __name__ == "__main__":
