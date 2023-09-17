@@ -9,6 +9,7 @@ from typing import List, Optional, Union
 import openai
 import tiktoken
 
+from langchain.callbacks.openai_info import MODEL_COST_PER_1K_TOKENS
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
@@ -269,6 +270,24 @@ class AI:
             result += str(log.total_prompt_tokens) + ","
             result += str(log.total_completion_tokens) + ","
             result += str(log.total_tokens) + "\n"
+        return result
+
+    def usage_cost(self) -> float:
+        """
+        Return the total cost in USD of the api usage.
+
+        Returns
+        -------
+        float
+            Cost in USD.
+        """
+        prompt_price = MODEL_COST_PER_1K_TOKENS[self.model_name]
+        completion_price = MODEL_COST_PER_1K_TOKENS[self.model_name + "-completion"]
+
+        result = 0
+        for log in self.token_usage_log:
+            result += log.total_prompt_tokens / 1000 * prompt_price
+            result += log.total_completion_tokens / 1000 * completion_price
         return result
 
     def num_tokens(self, txt: str) -> int:
