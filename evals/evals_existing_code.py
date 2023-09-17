@@ -17,6 +17,9 @@ from gpt_engineer.db import DB
 app = typer.Typer()  # creates a CLI app
 
 
+from gpt_engineer.constants import FILE_LIST_NAME
+
+
 def single_evaluate(eval_ob: dict) -> list[bool]:
     """Evaluates a single prompt."""
     print(f"running evaluation: {eval_ob['name']}")
@@ -37,7 +40,7 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
         file_list_string += str(absolute_path) + "\n"
 
     # create file_list.txt (should be full paths)
-    workspace["file_list.txt"] = file_list_string
+    workspace[FILE_LIST_NAME] = file_list_string
 
     # create the prompt
     workspace["prompt"] = eval_ob["improve_code_prompt"]
