@@ -76,12 +76,12 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
         messages = ai.next(messages, user_input, step_name=curr_fn())
         msg = messages[-1].content.strip()
 
-        if msg == "Nothing more to clarify.":
+        if "nothing to clarify" in msg.lower():
             break
 
         if msg.lower().startswith("no"):
-            print("Nothing more to clarify.")
             break
+            print("Nothing to clarify.")
 
         print()
         user_input = input('(answer in text, or "c" to move on)\n')
@@ -99,11 +99,11 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
             return messages
 
         user_input += (
-            "\n\n"
-            "Is anything else unclear? If yes, only answer in the form:\n"
-            "{remaining unclear areas} remaining questions.\n"
-            "{Next question}\n"
-            'If everything is sufficiently clear, only answer "Nothing more to clarify.".'
+            """
+            \n\n
+            Is anything else unclear? If yes, ask another question.\n
+            Otherwise state: "Nothing to clarify"
+            """
         )
 
     print()
