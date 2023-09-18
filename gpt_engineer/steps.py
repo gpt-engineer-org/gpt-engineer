@@ -12,7 +12,7 @@ from gpt_engineer.ai import AI
 from gpt_engineer.chat_to_files import (
     format_file_to_input,
     get_code_strings,
-    overwrite_files,
+    overwrite_files_with_edits,
     to_files,
 )
 from gpt_engineer.db import DBs
@@ -360,7 +360,7 @@ def improve_existing_code(ai: AI, dbs: DBs):
 
     messages = ai.next(messages, step_name=curr_fn())
 
-    overwrite_files(messages[-1].content.strip(), dbs)
+    overwrite_files_with_edits(messages[-1].content.strip(), dbs)
     return messages
 
 
