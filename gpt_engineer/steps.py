@@ -80,8 +80,8 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
             break
 
         if msg.lower().startswith("no"):
-            break
             print("Nothing to clarify.")
+            break
 
         print()
         user_input = input('(answer in text, or "c" to move on)\n')
