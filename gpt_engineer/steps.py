@@ -98,13 +98,11 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
             print()
             return messages
 
-        user_input += (
-            """
+        user_input += """
             \n\n
             Is anything else unclear? If yes, ask another question.\n
             Otherwise state: "Nothing to clarify"
             """
-        )
 
     print()
     return messages
