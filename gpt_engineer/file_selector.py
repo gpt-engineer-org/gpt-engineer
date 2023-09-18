@@ -270,10 +270,10 @@ def ask_for_files(db_input) -> None:
 
     if selection_number == 1:
         # Open GUI selection
-        file_path_list = gui_file_selector()
+        file_path_list = gui_file_selector(db_input.path)
     elif selection_number == 2:
         # Open terminal selection
-        file_path_list = terminal_file_selector()
+        file_path_list = terminal_file_selector(db_input.path)
     if (
         selection_number <= 0
         or selection_number > 3
@@ -286,7 +286,7 @@ def ask_for_files(db_input) -> None:
         db_input[FILE_LIST_NAME] = "\n".join(file_path_list)
 
 
-def gui_file_selector() -> List[str]:
+def gui_file_selector(input_path: str) -> List[str]:
     """
     Display a tkinter file selection window to select context files.
     """
@@ -296,18 +296,18 @@ def gui_file_selector() -> List[str]:
     file_list = list(
         fd.askopenfilenames(
             parent=root,
-            initialdir=os.getcwd(),
+            initialdir=input_path,
             title="Select files to improve (or give context):",
         )
     )
     return file_list
 
 
-def terminal_file_selector() -> List[str]:
+def terminal_file_selector(input_path: str) -> List[str]:
     """
     Display a terminal file selection to select context files.
     """
-    file_selector = TerminalFileSelector(Path(os.getcwd()))
+    file_selector = TerminalFileSelector(Path(input_path))
     file_selector.display()
     selected_list = file_selector.ask_for_selection()
     return selected_list
