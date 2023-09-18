@@ -59,7 +59,7 @@ There are two ways to work with GPT-engineer: new code mode (the default), and i
 
 ### Improving Existing Code
 - Locate a folder with code which you want to improve anywhere on your computer
-- Create a file called `prompt` (no extension) inside your new folder and fill it with instruction for how you want to improve the codes
+- Create a file called `prompt` (no extension) inside your new folder and fill it with instructions for how you want to improve the code
 - Run `gpt-engineer <project_dir> -i` with a relative path to your folder
   - For example: `gpt-engineer projects/my-old-project` from the gpt-engineer directory root with your folder in `projects/`
 
