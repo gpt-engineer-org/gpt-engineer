@@ -5,7 +5,7 @@ import tkinter as tk
 import tkinter.filedialog as fd
 
 from pathlib import Path
-from typing import List, Mapping, Union
+from typing import List, Union
 
 from gpt_engineer.db import DB, DBs
 
@@ -241,6 +241,13 @@ def ask_for_files(metadata_db: DB, workspace_db: DB) -> None:
     Returns:
         dict[str, str]: Dictionary where key = file name and value = file path
     """
+    if FILE_LIST_NAME in metadata_db:
+        print(
+            f"File list detected at {metadata_db.path / FILE_LIST_NAME}. "
+            "Edit or delete it if you want to select new files."
+        )
+        return
+
     use_last_string = ""
     if FILE_LIST_NAME in metadata_db:
         use_last_string = (

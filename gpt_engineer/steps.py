@@ -149,7 +149,7 @@ def respec(ai: AI, dbs: DBs) -> List[Message]:
     return messages
 
 
-def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
+def gen_unit_tests(ai: AI, dbs: DBs) -> List[Message]:
     """
     Generate unit tests based on the specification, that should work.
     """
