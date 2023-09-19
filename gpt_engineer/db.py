@@ -122,6 +122,7 @@ class DBs:
     input: DB
     workspace: DB
     archive: DB
+    project_metadata: DB
 
 
 def archive(dbs: DBs) -> None:

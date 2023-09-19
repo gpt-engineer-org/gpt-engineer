@@ -24,7 +24,16 @@ def setup_dbs(tmp_path, dir_names):
 
 def test_archive(tmp_path, monkeypatch):
     dbs = setup_dbs(
-        tmp_path, ["memory", "logs", "preprompts", "input", "workspace", "archive"]
+        tmp_path,
+        [
+            "memory",
+            "logs",
+            "preprompts",
+            "input",
+            "workspace",
+            "archive",
+            "project_metadata",
+        ],
     )
     freeze_at(monkeypatch, datetime.datetime(2020, 12, 25, 17, 5, 55))
     archive(dbs)
@@ -33,7 +42,16 @@ def test_archive(tmp_path, monkeypatch):
     assert os.path.isdir(tmp_path / "archive" / "20201225_170555")
 
     dbs = setup_dbs(
-        tmp_path, ["memory", "logs", "preprompts", "input", "workspace", "archive"]
+        tmp_path,
+        [
+            "memory",
+            "logs",
+            "preprompts",
+            "input",
+            "workspace",
+            "archive",
+            "project_metadata",
+        ],
     )
     freeze_at(monkeypatch, datetime.datetime(2022, 8, 14, 8, 5, 12))
     archive(dbs)

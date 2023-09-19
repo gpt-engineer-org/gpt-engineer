@@ -49,7 +49,8 @@ def setup_sys_prompt_existing_code(dbs: DBs) -> str:
 def curr_fn() -> str:
     """
     Get the name of the current function
-    NOTE: This will be the name of the function that called this function,
+
+    This will be the name of the function that called this function,
     so it serves to ensure we don't hardcode the function name in the step,
     but allow the step names to be refactored
     """
@@ -295,7 +296,7 @@ def use_feedback(ai: AI, dbs: DBs):
 
 def set_improve_filelist(ai: AI, dbs: DBs):
     """Sets the file list for files to work with in existing code mode."""
-    ask_for_files(dbs.input)  # stores files as full paths.
+    ask_for_files(dbs.project_metadata, dbs.input)  # stores files as full paths.
     return []
 
 
@@ -303,8 +304,8 @@ def assert_files_ready(ai: AI, dbs: DBs):
     """Checks that the required files are present for headless
     improve code execution."""
     assert (
-        "file_list.txt" in dbs.input
-    ), "For auto_mode file_list.txt need to be in your project folder."
+        "file_list.txt" in dbs.project_metadata
+    ), "For auto_mode file_list.txt need to be in your .gpteng folder."
     assert "prompt" in dbs.input, "For auto_mode a prompt file must exist."
     return []
 
@@ -324,7 +325,7 @@ def get_improve_prompt(ai: AI, dbs: DBs):
             "-----------------------------",
             "The following files will be used in the improvement process:",
             f"{FILE_LIST_NAME}:",
-            str(dbs.input["file_list.txt"]),
+            str(dbs.project_metadata["file_list.txt"]),
             "",
             "The inserted prompt is the following:",
             f"'{dbs.input['prompt']}'",
@@ -346,7 +347,9 @@ def improve_existing_code(ai: AI, dbs: DBs):
     to sent the formatted prompt to the LLM.
     """
 
-    files_info = get_code_strings(dbs.input)  # this only has file names not paths
+    files_info = get_code_strings(
+        dbs.input.path, dbs.project_metadata
+    )  # this has file names relative to the workspace path
 
     messages = [
         ai.fsystem(setup_sys_prompt_existing_code(dbs)),
