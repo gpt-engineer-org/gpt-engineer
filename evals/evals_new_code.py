@@ -58,7 +58,7 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
     process.wait()  # we want to wait until it finishes.
 
     print("running tests on the newly generated code")
-    # TODO: test the code we should have an executable name
+    # test the code with the executable name in the config file
     evaluation_results = []
     for test_case in eval_ob["expected_results"]:
         print(f"checking: {test_case['type']}")
