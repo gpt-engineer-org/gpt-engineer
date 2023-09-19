@@ -3,7 +3,7 @@ import re
 
 from typing import List, Tuple
 
-from gpt_engineer.db import DB
+from gpt_engineer.db import DB, DBs
 from gpt_engineer.file_selector import FILE_LIST_NAME
 
 
@@ -72,9 +72,9 @@ def to_files(chat: str, workspace: DB):
         workspace[file_name] = file_content
 
 
-def overwrite_files(chat, dbs):
+def overwrite_files(chat: str, dbs: DBs) -> None:
     """
-    Replace the AI files with the older local files.
+    Parse the chat and overwrite all files in the workspace.
 
     Parameters
     ----------
@@ -83,14 +83,12 @@ def overwrite_files(chat, dbs):
     dbs : DBs
         The database containing the workspace.
     """
-    dbs.workspace["all_output.txt"] = chat  # TODO store this in memory db instead
+    dbs.memory["all_output_overwrite.txt"] = chat
 
     files = parse_chat(chat)
     for file_name, file_content in files:
         if file_name == "README.md":
-            dbs.workspace[
-                "LAST_MODIFICATION_README.md"
-            ] = file_content  # TODO store this in memory db instead
+            dbs.memory["LAST_MODIFICATION_README.md"] = file_content
         else:
             dbs.workspace[file_name] = file_content
 
