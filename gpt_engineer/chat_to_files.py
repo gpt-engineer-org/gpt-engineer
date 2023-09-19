@@ -157,21 +157,23 @@ class Edit:
     before: str
     after: str
 
+
 def parse_edits(llm_response):
     def parse_one_edit(lines):
-        HEAD   = '<<<<<<< HEAD'
-        DIVIDER  = '======='
-        UPDATE = '>>>>>>> updated'
-        
+        HEAD = "<<<<<<< HEAD"
+        DIVIDER = "======="
+        UPDATE = ">>>>>>> updated"
+
         filename = lines.pop(0)
-        text = '\n'.join(lines)
+        text = "\n".join(lines)
         splits = text.split(DIVIDER)
-        if len(splits)!=2: raise ValueError(f"Could not parse following text as code edit: \n{text}")
+        if len(splits) != 2:
+            raise ValueError(f"Could not parse following text as code edit: \n{text}")
         before, after = splits
 
-        before = before.replace(HEAD, '').strip()
-        after = after.replace(UPDATE, '').strip()
-        
+        before = before.replace(HEAD, "").strip()
+        after = after.replace(UPDATE, "").strip()
+
         return Edit(filename, before, after)
 
     def parse_all_edits(txt):
@@ -179,26 +181,30 @@ def parse_edits(llm_response):
         current_edit = []
         in_fence = False
 
-        for line in txt.split('\n'):
-            if line.startswith('```') and in_fence:
+        for line in txt.split("\n"):
+            if line.startswith("```") and in_fence:
                 edits.append(parse_one_edit(current_edit))
                 current_edit = []
                 in_fence = False
                 continue
-            elif line.startswith('```') and not in_fence:
-                in_fence = True        
+            elif line.startswith("```") and not in_fence:
+                in_fence = True
                 continue
 
-            if in_fence: current_edit.append(line)
+            if in_fence:
+                current_edit.append(line)
 
         return edits
 
     return parse_all_edits(llm_response)
 
+
 def apply_edits(edits: List[Edit], workspace: DB):
     for edit in edits:
-        filename = edit.filename.replace('workspace/', '')
-        if edit.before == '':
+        filename = edit.filename.replace("workspace/", "")
+        if edit.before == "":
             workspace[filename] = edit.after  # new file
         else:
-            workspace[filename] = workspace[filename].replace(edit.before, edit.after)  # existing file
+            workspace[filename] = workspace[filename].replace(
+                edit.before, edit.after
+            )  # existing file
