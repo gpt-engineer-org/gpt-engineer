@@ -19,7 +19,15 @@ def test_DB_operations(tmp_path):
 
 
 def test_DBs_initialization(tmp_path):
-    dir_names = ["memory", "logs", "preprompts", "input", "workspace", "archive"]
+    dir_names = [
+        "memory",
+        "logs",
+        "preprompts",
+        "input",
+        "workspace",
+        "archive",
+        "project_metadata",
+    ]
     directories = [tmp_path / name for name in dir_names]
 
     # Create DB objects
@@ -34,6 +42,7 @@ def test_DBs_initialization(tmp_path):
     assert isinstance(dbs_instance.input, DB)
     assert isinstance(dbs_instance.workspace, DB)
     assert isinstance(dbs_instance.archive, DB)
+    assert isinstance(dbs_instance.project_metadata, DB)
 
 
 def test_invalid_path():
@@ -97,7 +106,15 @@ def test_error_messages(tmp_path):
 
 
 def test_DBs_dataclass_attributes(tmp_path):
-    dir_names = ["memory", "logs", "preprompts", "input", "workspace", "archive"]
+    dir_names = [
+        "memory",
+        "logs",
+        "preprompts",
+        "input",
+        "workspace",
+        "archive",
+        "project_metadata",
+    ]
     directories = [tmp_path / name for name in dir_names]
 
     # Create DB objects
@@ -111,3 +128,5 @@ def test_DBs_dataclass_attributes(tmp_path):
     assert dbs_instance.preprompts == dbs[2]
     assert dbs_instance.input == dbs[3]
     assert dbs_instance.workspace == dbs[4]
+    assert dbs_instance.archive == dbs[5]
+    assert dbs_instance.project_metadata == dbs[6]
