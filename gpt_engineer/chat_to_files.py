@@ -208,4 +208,7 @@ def parse_edits(llm_response):
 def apply_edits(edits: List[Edit], workspace: DB):
     for edit in edits:
         filename = edit.filename.replace('workspace/', '')
-        workspace[filename] = workspace[filename].replace(edit.before, edit.after)
+        if edit.before == '':
+            workspace[filename] = edit.after  # new file
+        else:
+            workspace[filename] = workspace[filename].replace(edit.before, edit.after)  # existing file
