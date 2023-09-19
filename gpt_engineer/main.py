@@ -96,6 +96,8 @@ def main(
         messages = step(ai, dbs)
         dbs.logs[step.__name__] = AI.serialize_messages(messages)
 
+    print("Total api cost: $ ", ai.usage_cost())
+
     if collect_consent():
         collect_learnings(model, temperature, steps, dbs)
 
