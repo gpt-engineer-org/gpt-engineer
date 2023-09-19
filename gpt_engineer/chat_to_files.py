@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import re
 
 from typing import List, Tuple
@@ -93,7 +94,7 @@ def overwrite_files(chat: str, dbs: DBs) -> None:
             dbs.workspace[file_name] = file_content
 
 
-def get_code_strings(input: DB) -> dict[str, str]:
+def get_code_strings(workspace_path: Path, metadata_db: DB) -> dict[str, str]:
     """
     Read file_list.txt and return file names and their content.
 
@@ -107,13 +108,13 @@ def get_code_strings(input: DB) -> dict[str, str]:
     dict[str, str]
         A dictionary mapping file names to their content.
     """
-    files_paths = input[FILE_LIST_NAME].strip().split("\n")
+    files_paths = metadata_db[FILE_LIST_NAME].strip().split("\n")
     files_dict = {}
     for full_file_path in files_paths:
         with open(full_file_path, "r") as file:
             file_data = file.read()
         if file_data:
-            file_name = os.path.relpath(full_file_path, input.path)
+            file_name = os.path.relpath(full_file_path, workspace_path)
             files_dict[file_name] = file_data
     return files_dict
 
