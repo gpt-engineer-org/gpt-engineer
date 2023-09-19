@@ -96,7 +96,7 @@ def check_executable_satisfies_function(eval_d: dict) -> bool:
     output_satisfies: "tf = lambda a : len(a) == 10"
     """
     process = run_executable(eval_d=eval_d)
-    process_output = process.communicate()[0].strip()
+    process_output = str(process.communicate()[0].strip(), "utf-8")
 
     exec(eval_d["output_satisfies"])
     checking_function_ref = locals().get("tf")
