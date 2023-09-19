@@ -148,16 +148,6 @@ def format_file_to_input(file_name: str, file_content: str) -> str:
 
 def overwrite_files_with_edits(chat, dbs: DBs):
     edits = parse_edits(chat)
-
-    # # # # DEBUG
-    print('\nEDITS:\n\n')
-    for e in edits:
-        print('filename:', e.filename)
-        print('before:',e.before)
-        print('after:',e.after)
-        print('----\n')
-    # # # # 
-
     apply_edits(edits, dbs.workspace)
 
 
