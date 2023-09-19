@@ -1,0 +1,2 @@
+The improve prompt is strongly based on https://github.com/paul-gauthier/aider/blob/main/aider/coders/editblock_coder.py
+h/t Paul Gauthier
