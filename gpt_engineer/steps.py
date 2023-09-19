@@ -407,8 +407,7 @@ class Config(str, Enum):
 # Define the steps to run for different configs
 STEPS = {
     Config.DEFAULT: [
-        clarify,
-        gen_clarified_code,
+        simple_gen,
         gen_entrypoint,
         execute_entrypoint,
         human_review,
