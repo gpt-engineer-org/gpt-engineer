@@ -63,6 +63,8 @@ def main(
     )
 
     input_path = Path(project_path).absolute()
+    print("Running gpt-engineer in", input_path, "\n")
+
     workspace_path = input_path / "workspace"
     project_metadata_path = input_path / ".gpteng"
     memory_path = project_metadata_path / "memory"
