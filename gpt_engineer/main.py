@@ -63,9 +63,10 @@ def main(
     )
 
     input_path = Path(project_path).absolute()
-    memory_path = input_path / "memory"
     workspace_path = input_path / "workspace"
-    archive_path = input_path / "archive"
+    project_metadata_path = input_path / ".gpteng"
+    memory_path = project_metadata_path / "memory"
+    archive_path = project_metadata_path / "archive"
 
     dbs = DBs(
         memory=DB(memory_path),
@@ -76,6 +77,7 @@ def main(
             Path(__file__).parent / "preprompts"
         ),  # Loads preprompts from the preprompts directory
         archive=DB(archive_path),
+        project_metadata=DB(project_metadata_path),
     )
 
     if steps_config not in [

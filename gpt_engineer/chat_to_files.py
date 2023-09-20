@@ -1,10 +1,11 @@
 import os
+from pathlib import Path
 import re
 
 from dataclasses import dataclass
 from typing import List, Tuple
 
-from gpt_engineer.db import DBs, DB
+from gpt_engineer.db import DB, DBs
 from gpt_engineer.file_selector import FILE_LIST_NAME
 
 
@@ -73,9 +74,9 @@ def to_files(chat: str, workspace: DB):
         workspace[file_name] = file_content
 
 
-def overwrite_files(chat, dbs: DBs):
+def overwrite_files(chat: str, dbs: DBs) -> None:
     """
-    Replace the AI files with the older local files.
+    Parse the chat and overwrite all files in the workspace.
 
     Parameters
     ----------
@@ -84,19 +85,17 @@ def overwrite_files(chat, dbs: DBs):
     dbs : DBs
         The database containing the workspace.
     """
-    dbs.workspace["all_output.txt"] = chat  # TODO store this in memory db instead
+    dbs.memory["all_output_overwrite.txt"] = chat
 
     files = parse_chat(chat)
     for file_name, file_content in files:
         if file_name == "README.md":
-            dbs.workspace[
-                "LAST_MODIFICATION_README.md"
-            ] = file_content  # TODO store this in memory db instead
+            dbs.memory["LAST_MODIFICATION_README.md"] = file_content
         else:
             dbs.workspace[file_name] = file_content
 
 
-def get_code_strings(input: DB) -> dict[str, str]:
+def get_code_strings(workspace_path: Path, metadata_db: DB) -> dict[str, str]:
     """
     Read file_list.txt and return file names and their content.
 
@@ -110,13 +109,13 @@ def get_code_strings(input: DB) -> dict[str, str]:
     dict[str, str]
         A dictionary mapping file names to their content.
     """
-    files_paths = input[FILE_LIST_NAME].strip().split("\n")
+    files_paths = metadata_db[FILE_LIST_NAME].strip().split("\n")
     files_dict = {}
     for full_file_path in files_paths:
         with open(full_file_path, "r") as file:
             file_data = file.read()
         if file_data:
-            file_name = os.path.relpath(full_file_path, input.path)
+            file_name = os.path.relpath(full_file_path, workspace_path)
             files_dict[file_name] = file_data
     return files_dict
 
@@ -146,7 +145,7 @@ def format_file_to_input(file_name: str, file_content: str) -> str:
     return file_str
 
 
-def overwrite_files_with_edits(chat, dbs: DBs):
+def overwrite_files_with_edits(chat: str, dbs: DBs):
     edits = parse_edits(chat)
     apply_edits(edits, dbs.workspace)
 
