@@ -158,7 +158,7 @@ def respec(ai: AI, dbs: DBs) -> List[Message]:
     return messages
 
 
-def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
+def gen_unit_tests(ai: AI, dbs: DBs) -> List[Message]:
     """
     Generate unit tests based on the specification, that should work.
     """
@@ -332,10 +332,10 @@ def get_improve_prompt(ai: AI, dbs: DBs):
             "-----------------------------",
             "The following files will be used in the improvement process:",
             f"{FILE_LIST_NAME}:",
-            str(dbs.project_metadata["file_list.txt"]),
+            colored(str(dbs.project_metadata[FILE_LIST_NAME]), "green"),
             "",
             "The inserted prompt is the following:",
-            f"'{dbs.input['prompt']}'",
+            colored(f"{dbs.input['prompt']}", "green"),
             "-----------------------------",
             "",
             "You can change these files in your project before proceeding.",
