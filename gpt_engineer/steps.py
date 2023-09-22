@@ -60,8 +60,17 @@ def curr_fn() -> str:
 # All steps below have the Step signature
 
 
+def lite_gen(ai: AI, dbs: DBs) -> List[Message]:
+    """Run the AI on only the main prompt and save the results"""
+    messages = ai.start(
+        dbs.input["prompt"], dbs.preprompts["file_format"], step_name=curr_fn()
+    )
+    to_files(messages[-1].content.strip(), dbs.workspace)
+    return messages
+
+
 def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
-    """Run the AI on the main prompt and save the results"""
+    """Run the AI on the default prompts and save the results"""
     messages = ai.start(setup_sys_prompt(dbs), dbs.input["prompt"], step_name=curr_fn())
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
@@ -393,6 +402,7 @@ class Config(str, Enum):
     DEFAULT = "default"
     BENCHMARK = "benchmark"
     SIMPLE = "simple"
+    LITE = "lite"
     TDD = "tdd"
     TDD_PLUS = "tdd+"
     CLARIFY = "clarify"
@@ -412,6 +422,9 @@ STEPS = {
         gen_entrypoint,
         execute_entrypoint,
         human_review,
+    ],
+    Config.LITE: [
+        lite_gen,
     ],
     Config.BENCHMARK: [
         simple_gen,
