@@ -141,4 +141,6 @@ def format_file_to_input(file_name: str, file_content: str) -> str:
     {file_content}
     ```
     """
+    # Remove workspace\ from the context to prevent nesting another workspace folder
+    file_str = file_str.replace("workspace\\", "")
     return file_str
