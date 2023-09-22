@@ -20,6 +20,11 @@ python scripts/benchmark.py
 | password_generator | ✅  | ✅    | ✅      |
 | todo_list          | ✅  | ✅    | ✅      |
 
+## Notes on errors
+
+Most errors was that it wasn't importing correctly or just executing. The code
+itself was usually not the problem.
+
 
 ## 2023-06-21
 
