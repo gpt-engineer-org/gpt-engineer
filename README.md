@@ -110,3 +110,14 @@ We are currently looking for more maintainers and community organizers. Email an
 ## Example
 
 https://github.com/AntonOsika/gpt-engineer/assets/4467025/6e362e45-4a94-4b0d-973d-393a31d92d9b
+
+## Star History
+
+<a href="https://star-history.com/#AntonOsika/gpt-engineer&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=AntonOsika/gpt-engineer&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=AntonOsika/gpt-engineer&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=AntonOsika/gpt-engineer&type=Date" />
+  </picture>
+</a>
+
