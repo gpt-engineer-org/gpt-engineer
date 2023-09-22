@@ -25,6 +25,7 @@ def main(
         folders = islice(folders, n_benchmarks)
 
     benchmarks = []
+    results = []
     for bench_folder in folders:
         if os.path.isdir(bench_folder):
             print(f"Running benchmark for {bench_folder}")
@@ -45,13 +46,14 @@ def main(
                 stderr=log_file,
                 bufsize=0,
             )
-            benchmarks.append((bench_folder, process, log_file))
+            benchmarks.append(bench_folder)
+            results.append((process, log_file))
 
             print("You can stream the log file by running:")
             print(f"tail -f {log_path}")
             print()
 
-    for bench_folder, process, file in benchmarks:
+    for bench_folder, (process, file) in zip(benchmarks, results):
         process.wait()
         file.close()
 
@@ -80,8 +82,8 @@ def main(
 def generate_report(benchmarks, benchmark_path):
     headers = ["Benchmark", "Ran", "Works", "Perfect", "Notes"]
     rows = []
-    for bench_folder, _, _ in benchmarks:
-        memory = bench_folder / "memory"
+    for bench_folder in benchmarks:
+        memory = bench_folder / ".gpteng" / "memory"
         with open(memory / "review") as f:
             review = json.loads(f.read())
             rows.append(

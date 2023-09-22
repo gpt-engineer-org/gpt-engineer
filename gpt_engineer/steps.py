@@ -135,29 +135,6 @@ def gen_spec(ai: AI, dbs: DBs) -> List[Message]:
     return messages
 
 
-def respec(ai: AI, dbs: DBs) -> List[Message]:
-    """Asks the LLM to review the specs so far and reiterate them if necessary"""
-    messages = AI.deserialize_messages(dbs.logs[gen_spec.__name__])
-    messages += [ai.fsystem(dbs.preprompts["respec"])]
-
-    messages = ai.next(messages, step_name=curr_fn())
-    messages = ai.next(
-        messages,
-        (
-            "Based on the conversation so far, please reiterate the specification for "
-            "the program. "
-            "If there are things that can be improved, please incorporate the "
-            "improvements. "
-            "If you are satisfied with the specification, just write out the "
-            "specification word by word again."
-        ),
-        step_name=curr_fn(),
-    )
-
-    dbs.memory["specification"] = messages[-1].content.strip()
-    return messages
-
-
 def gen_unit_tests(ai: AI, dbs: DBs) -> List[Message]:
     """
     Generate unit tests based on the specification, that should work.
@@ -426,6 +403,13 @@ STEPS = {
     Config.LITE: [
         lite_gen,
     ],
+    Config.CLARIFY: [
+        clarify,
+        gen_clarified_code,
+        gen_entrypoint,
+        execute_entrypoint,
+        human_review,
+    ],
     Config.BENCHMARK: [
         simple_gen,
         gen_entrypoint,
@@ -445,23 +429,6 @@ STEPS = {
     ],
     Config.TDD_PLUS: [
         gen_spec,
-        gen_unit_tests,
-        gen_code_after_unit_tests,
-        fix_code,
-        gen_entrypoint,
-        execute_entrypoint,
-        human_review,
-    ],
-    Config.CLARIFY: [
-        clarify,
-        gen_clarified_code,
-        gen_entrypoint,
-        execute_entrypoint,
-        human_review,
-    ],
-    Config.RESPEC: [
-        gen_spec,
-        respec,
         gen_unit_tests,
         gen_code_after_unit_tests,
         fix_code,

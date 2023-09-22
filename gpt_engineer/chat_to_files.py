@@ -114,8 +114,8 @@ def get_code_strings(workspace_path: Path, metadata_db: DB) -> dict[str, str]:
         with open(full_file_path, "r") as file:
             file_data = file.read()
         if file_data:
-            assert (
-                os.path.commonpath([full_file_path, workspace_path]) == workspace_path
+            assert os.path.commonpath([full_file_path, workspace_path]) == str(
+                workspace_path
             ), "Trying to edit files outside of the workspace"
             file_name = os.path.relpath(full_file_path, workspace_path)
             files_dict[file_name] = file_data
