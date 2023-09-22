@@ -34,7 +34,6 @@ def setup_sys_prompt(dbs: DBs) -> str:
         + dbs.preprompts["philosophy"]
     )
 
-
 def setup_sys_prompt_existing_code(dbs: DBs) -> str:
     """
     Similar to code generation, but using an existing code base.
@@ -58,9 +57,14 @@ def curr_fn() -> str:
 
 # All steps below have the Step signature
 
+def lite_gen(ai: AI, dbs: DBs) -> List[Message]:
+    """Run the AI on only the main prompt and save the results"""
+    messages = ai.start(dbs.input["prompt"], dbs.preprompts["file_format"], step_name=curr_fn())
+    to_files(messages[-1].content.strip(), dbs.workspace)
+    return messages
 
-def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
-    """Run the AI on the main prompt and save the results"""
+def basic_gen(ai: AI, dbs: DBs) -> List[Message]:
+    """Run the AI on the default prompts and save the results"""
     messages = ai.start(setup_sys_prompt(dbs), dbs.input["prompt"], step_name=curr_fn())
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
@@ -392,6 +396,7 @@ class Config(str, Enum):
     DEFAULT = "default"
     BENCHMARK = "benchmark"
     SIMPLE = "simple"
+    LITE = "lite"
     TDD = "tdd"
     TDD_PLUS = "tdd+"
     CLARIFY = "clarify"
@@ -413,12 +418,15 @@ STEPS = {
         execute_entrypoint,
         human_review,
     ],
+    Config.LITE: [
+        lite_gen,
+    ],
     Config.BENCHMARK: [
-        simple_gen,
+        basic_gen,
         gen_entrypoint,
     ],
     Config.SIMPLE: [
-        simple_gen,
+        basic_gen,
         gen_entrypoint,
         execute_entrypoint,
     ],
@@ -465,7 +473,7 @@ STEPS = {
         improve_existing_code,
     ],
     Config.EVAL_IMPROVE_CODE: [assert_files_ready, improve_existing_code],
-    Config.EVAL_NEW_CODE: [simple_gen],
+    Config.EVAL_NEW_CODE: [basic_gen],
 }
 
 # Future steps that can be added:
