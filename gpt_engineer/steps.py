@@ -34,6 +34,7 @@ def setup_sys_prompt(dbs: DBs) -> str:
         + dbs.preprompts["philosophy"]
     )
 
+
 def setup_sys_prompt_existing_code(dbs: DBs) -> str:
     """
     Similar to code generation, but using an existing code base.
@@ -57,11 +58,15 @@ def curr_fn() -> str:
 
 # All steps below have the Step signature
 
+
 def lite_gen(ai: AI, dbs: DBs) -> List[Message]:
     """Run the AI on only the main prompt and save the results"""
-    messages = ai.start(dbs.input["prompt"], dbs.preprompts["file_format"], step_name=curr_fn())
+    messages = ai.start(
+        dbs.input["prompt"], dbs.preprompts["file_format"], step_name=curr_fn()
+    )
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
+
 
 def basic_gen(ai: AI, dbs: DBs) -> List[Message]:
     """Run the AI on the default prompts and save the results"""
