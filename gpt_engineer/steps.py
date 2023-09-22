@@ -68,7 +68,7 @@ def lite_gen(ai: AI, dbs: DBs) -> List[Message]:
     return messages
 
 
-def basic_gen(ai: AI, dbs: DBs) -> List[Message]:
+def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
     """Run the AI on the default prompts and save the results"""
     messages = ai.start(setup_sys_prompt(dbs), dbs.input["prompt"], step_name=curr_fn())
     to_files(messages[-1].content.strip(), dbs.workspace)
@@ -427,11 +427,11 @@ STEPS = {
         lite_gen,
     ],
     Config.BENCHMARK: [
-        basic_gen,
+        simple_gen,
         gen_entrypoint,
     ],
     Config.SIMPLE: [
-        basic_gen,
+        simple_gen,
         gen_entrypoint,
         execute_entrypoint,
     ],
@@ -478,7 +478,7 @@ STEPS = {
         improve_existing_code,
     ],
     Config.EVAL_IMPROVE_CODE: [assert_files_ready, improve_existing_code],
-    Config.EVAL_NEW_CODE: [basic_gen],
+    Config.EVAL_NEW_CODE: [simple_gen],
 }
 
 # Future steps that can be added:

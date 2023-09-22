@@ -187,7 +187,6 @@ Functions
     :toctree: steps
 
     steps.assert_files_ready
-    steps.basic_gen
     steps.clarify
     steps.curr_fn
     steps.execute_entrypoint
@@ -205,4 +204,5 @@ Functions
     steps.set_improve_filelist
     steps.setup_sys_prompt
     steps.setup_sys_prompt_existing_code
+    steps.simple_gen
     steps.use_feedback
