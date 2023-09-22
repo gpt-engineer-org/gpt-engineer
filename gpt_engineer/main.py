@@ -37,6 +37,12 @@ def main(
         "-i",
         help="Improve code from existing project.",
     ),
+    lite_mode: bool = typer.Option(
+        False,
+        "--lite",
+        "-l",
+        help="Lite mode - run only the main prompt.",
+    ),
     azure_endpoint: str = typer.Option(
         "",
         "--azure",
@@ -47,6 +53,11 @@ def main(
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
+
+    if lite_mode:
+        assert not improve_option, "Lite mode cannot improve code"
+        if steps_config == StepsConfig.DEFAULT:
+            steps_config = StepsConfig.LITE
 
     # For the improve option take current project as path and add .gpteng folder
     if improve_option:
