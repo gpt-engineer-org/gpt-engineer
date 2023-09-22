@@ -60,8 +60,10 @@ def main(
             steps_config = StepsConfig.LITE
 
     if improve_mode:
-        if steps_config == StepsConfig.DEFAULT:
-            steps_config = StepsConfig.IMPROVE_CODE
+        assert (
+            steps_config == StepsConfig.DEFAULT
+        ), "Improve mode not compatible with other step configs"
+        steps_config = StepsConfig.IMPROVE_CODE
 
     load_env_if_needed()
 
