@@ -114,7 +114,7 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
     print()
     return messages
 
- 
+
 def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     """Takes clarification and generates code"""
     messages = AI.deserialize_messages(dbs.logs[clarify.__name__])
