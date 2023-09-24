@@ -310,7 +310,6 @@ class Config(str, Enum):
     SIMPLE = "simple"
     LITE = "lite"
     CLARIFY = "clarify"
-    RESPEC = "respec"
     EXECUTE_ONLY = "execute_only"
     EVALUATE = "evaluate"
     USE_FEEDBACK = "use_feedback"
