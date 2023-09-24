@@ -92,7 +92,7 @@ def main(
     preprompts_path = Path(__file__).parent / "preprompts"
 
     if use_project_preprompts:
-        project_preprompts_path = workspace_path / "preprompts"
+        project_preprompts_path = input_path / "preprompts"
         if not project_preprompts_path.exists():
             project_preprompts_path.mkdir()
 
