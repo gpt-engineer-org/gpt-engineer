@@ -26,7 +26,7 @@ you through the process.
 From sources
 ------------
 
-The sources for file-processor can be downloaded from the `Github repo`_.
+The sources for file-processor can be downloaded from the `GitHub repo`_.
 
 You can either clone the public repository:
 
