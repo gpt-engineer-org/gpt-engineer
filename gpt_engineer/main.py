@@ -20,6 +20,9 @@ app = typer.Typer()  # creates a CLI app
 def load_env_if_needed():
     if os.getenv("OPENAI_API_KEY") is None:
         load_dotenv()
+    if os.getenv("OPENAI_API_KEY") is None:
+        # if there is no .env file, try to load from the parent directory
+        load_dotenv(dotenv_path=os.getcwd() + "/.env")
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
