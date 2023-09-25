@@ -6,6 +6,7 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
+import backoff
 import openai
 import tiktoken
 
@@ -170,8 +171,8 @@ class AI:
 
         logger.debug(f"Creating a new chat completion: {messages}")
 
-        callsbacks = [StreamingStdOutCallbackHandler()]
-        response = self.llm(messages, callbacks=callsbacks)  # type: ignore
+        callbacks = [StreamingStdOutCallbackHandler()]
+        response = self.backoff_inference(messages, callbacks)
 
         self.update_token_usage_log(
             messages=messages, answer=response.content, step_name=step_name
@@ -180,6 +181,12 @@ class AI:
         logger.debug(f"Chat completion finished: {messages}")
 
         return messages
+
+    @backoff.on_exception(
+        backoff.expo, openai.error.RateLimitError, max_tries=7, max_time=45
+    )
+    def backoff_inference(self, messages, callbacks):
+        return self.llm(messages, callbacks=callbacks)  # type: ignore
 
     @staticmethod
     def serialize_messages(messages: List[Message]) -> str:
