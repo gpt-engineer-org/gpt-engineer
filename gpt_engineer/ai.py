@@ -182,7 +182,9 @@ class AI:
 
         return messages
 
-    @backoff.on_exception(backoff.expo, openai.error.RateLimitError, max_tries=7, max_time=45)
+    @backoff.on_exception(
+        backoff.expo, openai.error.RateLimitError, max_tries=7, max_time=45
+    )
     def backoff_inference(self, messages, callbacks):
         return self.llm(messages, callbacks=callbacks)  # type: ignore
 
