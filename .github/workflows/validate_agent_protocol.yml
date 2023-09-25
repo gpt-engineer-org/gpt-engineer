@@ -27,9 +27,9 @@ jobs:
           python-version: '3.10'
 
       - name: Install agent requirements
-        run: pip install agent-protocol
+        run: pip install .
 
       - name: Run agent and validate compliance
         run: |
-          <command to run your agent> & # Make sure to use the ampersand to detach your agent
+          python gpt_engineer/api.py & # Make sure to use the ampersand to detach your agent
           URL=http://127.0.0.1:8000 bash -c "$(curl -fsSL https://agentprotocol.ai/test.sh)"
