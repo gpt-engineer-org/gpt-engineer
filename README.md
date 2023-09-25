@@ -76,6 +76,7 @@ Check the generated files in `projects/my-new-project/workspace`
 For example:
 - To improve any existing project, use the flag: `-i`
 - To give feedback to/improve a gpt-engineer generated project, use: `--steps use_feedback`
+- To use or prepare project specific preprompt files, use `--use-project-preprompts`
 
 **Alternatives**
 
@@ -89,6 +90,8 @@ do everything in your browser:
 You can specify the "identity" of the AI agent by editing the files in the `preprompts` folder.
 
 Editing the `preprompts`, and evolving how you write the project prompt, is how you make the agent remember things between projects.
+
+You can also automatically copy all `preprompts` files into your project folder using the cli parameter `--use-project-prepompts`. This way you can have custom preprompts for all of your projects without the need to edit the main files. If you don't want to use the project specific prepromt files, simply delete them or run `gpt-engineer` without the cli param.
 
 Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
 
