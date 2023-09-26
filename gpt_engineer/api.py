@@ -108,4 +108,9 @@ async def step_handler(step: Step) -> Step:
     return step
 
 
-Agent.setup_agent(task_handler, step_handler).start()
+def run_agent(port: int = 8000):
+    Agent.setup_agent(task_handler, step_handler).start(port=port)
+
+
+if __name__ == "__main__":
+    run_agent()
