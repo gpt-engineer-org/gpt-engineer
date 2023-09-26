@@ -1,13 +1,17 @@
 name: Pip install and pytest
 on:
   pull_request:
-    branches: [main]
+    branches: [ main ]
     paths:
       - "**.py"
+      - "**.yaml"
+      - "**.yml"
   push:
-    branches: [main]
+    branches: [ main ]
     paths:
       - "**.py"
+      - "**.yaml"
+      - "**.yml"
 
 jobs:
   test:
