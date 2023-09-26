@@ -9,6 +9,8 @@ from gpt_engineer.main import main
 
 from openai.error import AuthenticationError
 
+import tempfile
+
 
 async def task_handler(task: Task) -> None:
     """task_handler should create initial steps based on the input.
@@ -23,7 +25,17 @@ async def task_handler(task: Task) -> None:
     if task.input is None:
         raise Exception("No input prompt in the 'input' field.")
 
-    workspace = DB(f"projects/{task.task_id}")
+    # pass options onto additional_properties
+    additional_input = dict()
+    if hasattr(task, "additional_input"):
+        if hasattr(task.additional_input, "__root__"):
+            additional_input = task.additional_input.__root__
+
+    # set up the root directory for the agent, default to temp
+    root_dir = additional_input.get("root_dir", tempfile.gettempdir())
+    additional_input["root_dir"] = root_dir
+
+    workspace = DB(os.path.join(root_dir, task.task_id))
 
     # write prompt to a file
     workspace["prompt"] = f"{task.input}\n"
@@ -34,15 +46,9 @@ async def task_handler(task: Task) -> None:
 
     await Agent.db.create_artifact(
         task_id=task.task_id,
-        relative_path="projects/",
-        file_name=f"projects/{task.task_id}",
+        relative_path=root_dir,
+        file_name=os.path.join(root_dir, task.task_id),
     )
-
-    # pass options onto additional_properties
-    additional_input = dict()
-    if hasattr(task, "additional_input"):
-        if hasattr(task.additional_input, "__root__"):
-            additional_input = task.additional_input.__root__
 
     await Agent.db.create_step(
         task_id=task.task_id,
@@ -62,7 +68,9 @@ async def step_handler(step: Step) -> Step:
     if not step.name == "Dummy step":
         try:
             main(
-                f"projects/{step.task_id}",  # we could also make this an option
+                os.path.join(
+                    step.additional_properties["root_dir"], step.task_id
+                ),  # we could also make this an option
                 step.additional_properties.get("model", "gpt-4"),
                 step.additional_properties.get("temperature", 0.1),
                 "benchmark",  # this needs to be headless mode
