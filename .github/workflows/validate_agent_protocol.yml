@@ -29,10 +29,19 @@ jobs:
       - name: Install agent requirements
         run: pip install .
 
-      - name: Run agent
-        run: python gpt_engineer/api.py &
+      - name: Check existence of OPENAI_API_KEY
+        run: |
+          if [[ -z "${OPENAI_API_KEY}" ]]; then
+            echo "OPENAI_API_KEY is empty"
+          else
+            echo "OPENAI_API_KEY has a length of ${#OPENAI_API_KEY}"
+          fi
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Run agent and validate compliance
-        run: URL=http://127.0.0.1:8000 bash -c "$(curl -fsSL https://agentprotocol.ai/test.sh)"
+        run: |
+          python gpt_engineer/api.py & # Make sure to use the ampersand to detach your agent
+          URL=http://127.0.0.1:8000 bash -c "$(curl -fsSL https://agentprotocol.ai/test.sh)"
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
