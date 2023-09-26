@@ -37,13 +37,16 @@ async def task_handler(task: Task) -> None:
     )
 
     # pass options onto additional_properties
+    additional_input = dict()
+    if hasattr(task, "additional_input"):
+        if hasattr(task.additional_input, "__root__"):
+            additional_input = task.additional_input.__root__
+
     await Agent.db.create_step(
         task_id=task.task_id,
         name="create_code",
         is_last=True,
-        additional_properties=task.additional_input.__root__
-        if task.additional_input is not None
-        else {},
+        additional_properties=additional_input,
     )
 
 
