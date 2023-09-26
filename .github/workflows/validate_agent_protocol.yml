@@ -29,9 +29,10 @@ jobs:
       - name: Install agent requirements
         run: pip install .
 
-      - name: Run agent and validate compliance
-        run: |
-          python gpt_engineer/api.py & # Make sure to use the ampersand to detach your agent
-          URL=http://127.0.0.1:8000 bash -c "$(curl -fsSL https://agentprotocol.ai/test.sh)"
+      - name: Run agent
+        run: python gpt_engineer/api.py &
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Run agent and validate compliance
+        run: URL=http://127.0.0.1:8000 bash -c "$(curl -fsSL https://agentprotocol.ai/test.sh)"
