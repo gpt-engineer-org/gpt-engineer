@@ -6,7 +6,7 @@
 ![Agent protocol](https://github.com/AntonOsika/gpt-engineer/actions/workflows/validate_agent_protocol.yml/badge.svg)
 
 
-**Specify what you want it to build, the AI asks for clarification, and then builds it.**
+**Specify what you want it to build, the AI asks for clarification and then builds it.**
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
 
@@ -51,7 +51,7 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
 ## Usage
 
-There are two ways to work with GPT-engineer: new code mode (the default), and improve existing code mode (the `-i` option).
+There are two ways to work with GPT-engineer: new code mode (the default) and improve existing code mode (the `-i` option).
 
 ### Creating new code
 - Create an empty folder for your project anywhere on your computer
@@ -94,11 +94,11 @@ Editing the `preprompts`, and evolving how you write the project prompt, is how 
 
 Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
 
-You can also run with open source models, like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
+You can also run with open-source models, like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
 
 
 ## Vision
-The gpt-engineer community is building the **open platform for devs to tinker with and build their personal code-generation toolbox**.
+The gpt-engineer community is building the **open platform for devs to tinker with and develop their personal code-generation toolbox**.
 
 If you are interested in contributing to this, we would be interested in having you.
 
