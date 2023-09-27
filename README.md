@@ -6,18 +6,18 @@
 ![Agent protocol](https://github.com/AntonOsika/gpt-engineer/actions/workflows/validate_agent_protocol.yml/badge.svg)
 
 
-**Specify what you want it to build, the AI asks for clarification, and then builds it.**
+**Specify what you want it to build, the AI asks for clarification and then builds it.**
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
 
 - [Demo](https://twitter.com/antonosika/status/1667641038104674306)
 
-## Project philosophy
+## Project Philosophy
 
 - Simple to get value
 - Flexible and easy to add new own "AI steps". See `steps.py`.
 - Incrementally build towards a user experience of:
-  1. high level prompting
+  1. high-level prompting
   2. giving feedback to the AI that it will remember over time
 - Fast handovers, back and forth, between AI and human
 - Simplicity, all computation is "resumable" and persisted to the filesystem
@@ -33,7 +33,7 @@ For **stable** release:
 For **development**:
 - `git clone https://github.com/AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
-- `python -m pip install -e .`
+- `python -m pip install -e`
   - (or: `make install && source venv/bin/activate` for a venv)
 
 **API Key**
@@ -51,7 +51,7 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
 ## Usage
 
-There are two ways to work with GPT-engineer: new code mode (the default), and improve existing code mode (the `-i` option).
+There are two ways to work with GPT-engineer: new code mode (the default) and improve existing code mode (the `-i` option).
 
 ### Creating new code
 - Create an empty folder for your project anywhere on your computer
@@ -60,7 +60,7 @@ There are two ways to work with GPT-engineer: new code mode (the default), and i
   - For example: `gpt-engineer projects/my-new-project` from the gpt-engineer directory root with your new folder in `projects/`
 
 ### Improving Existing Code
-- Locate a folder with code which you want to improve anywhere on your computer
+- Locate a folder with code that you want to improve anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions for how you want to improve the code
 - Run `gpt-engineer <project_dir> -i` with a relative path to your folder
   - For example: `gpt-engineer projects/my-old-project` from the gpt-engineer directory root with your folder in `projects/`
@@ -92,13 +92,13 @@ You can specify the "identity" of the AI agent by editing the files in the `prep
 
 Editing the `preprompts`, and evolving how you write the project prompt, is how you make the agent remember things between projects.
 
-Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
+Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder and can be rerun with `scripts/rerun_edited_message_logs.py`.
 
-You can also run with open source models, like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
+You can also run with open-source models, like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
 
 
 ## Vision
-The gpt-engineer community is building the **open platform for devs to tinker with and build their personal code-generation toolbox**.
+The gpt-engineer community is building an **open platform for devs to tinker with and develop their personal code-generation toolbox**.
 
 If you are interested in contributing to this, we would be interested in having you.
 
