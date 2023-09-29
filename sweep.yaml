@@ -13,3 +13,6 @@ sandbox:
     - pre-commit install
   check:
     - pre-commit run --files {file_path}
+
+rules:
+  - Ensure all new functions and classes have very clear, concise and up-to-date docstrings. Take gpt_engineer/ai.py as a good example.
