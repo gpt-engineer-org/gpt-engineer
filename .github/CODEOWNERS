@@ -1,4 +1,3 @@
-gpt_engineer/ai.py @lukaspetersson
 gpt_engineer/steps.py @pbharrin
 gpt_engineer/chat_to_files.py @RareMojo
 gpt_engineer/db.py @RareMojo
