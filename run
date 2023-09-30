@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Variable for the port
+BACKEND_PORT=8000
+
+# Check if 'venv' directory exists
+if [ ! -d "venv" ]; then
+    echo "Virtual environment 'venv' does not exist. Creating it now..."
+    python3 -m venv venv
+else
+    echo "'venv' already exists."
+fi
+
+# Activate the virtual environment
+source venv/bin/activate
+
+# Print the absolute path of the current working directory
+echo "Current Working Directory: $(pwd)"
+
+# Check if there's a process running on the desired port and kill it
+pid=$(lsof -t -i:$BACKEND_PORT)
+if [ $? -eq 0 ]; then
+    echo "Killing process running on port $BACKEND_PORT with PID: $pid"
+    kill -9 $pid
+else
+    echo "No process running on port $BACKEND_PORT"
+fi
+
+# Install the software in the current directory
+pip install .
+
+# Start the Python application
+python gpt_engineer/api.py
