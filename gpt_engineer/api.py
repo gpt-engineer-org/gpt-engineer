@@ -1,71 +1,116 @@
 import os
-
 from pathlib import Path
-
-from agent_protocol import Agent, Step, Task
-
+from agent_protocol import Agent, Step, Task, models
 from gpt_engineer.db import DB
 from gpt_engineer.main import main
+from openai.error import AuthenticationError
+import tempfile
 
 
 async def task_handler(task: Task) -> None:
-    """task_handler should create initial steps based on the input.
+    """
+    Process the given task to set up the initial steps based on the task input.
 
-    The project is set up here.
+    Parameters:
+    - task (Task): An object containing task details, including the input prompt.
 
-    The prompt will be sent as task.input.
-    We will create a working directory in projects/<task_id>.
+    Behavior:
+    - Checks if the task has valid input.
+    - Reads additional input properties and sets up a workspace directory.
+    - Writes the prompt to a file.
+    - Registers the workspace directory as an artifact.
+    - Creates an initial step named "create_code".
+
+    Exceptions:
+    - Raises an exception if no input prompt is provided in the 'input' field of the task.
+
+    Returns:
+    - None
     """
 
-    # make sure we have a prompt or bail.
+    # Validate that we have a prompt or terminate.
     if task.input is None:
         raise Exception("No input prompt in the 'input' field.")
 
-    workspace = DB(f"projects/{task.task_id}")
+    # Extract additional properties from the task if available.
+    additional_input = dict()
+    if hasattr(task, "additional_input"):
+        if hasattr(task.additional_input, "__root__"):
+            additional_input = task.additional_input.__root__
 
-    # write prompt to a file
+    # Set up the root directory for the agent, defaulting to a temporary directory.
+    root_dir = additional_input.get("root_dir", tempfile.gettempdir())
+    additional_input["root_dir"] = root_dir
+
+    workspace = DB(os.path.join(root_dir, task.task_id))
+
+    # Write prompt to a file in the workspace.
     workspace["prompt"] = f"{task.input}\n"
 
-    # write to consent file so we avoid hanging for a prompt
+    # Ensure no prompt hang by writing to the consent file.
     consent_file = Path(os.getcwd()) / ".gpte_consent"
     consent_file.write_text("false")
 
     await Agent.db.create_artifact(
         task_id=task.task_id,
-        relative_path="projects/",
-        file_name=f"projects/{task.task_id}",
+        relative_path=root_dir,
+        file_name=os.path.join(root_dir, task.task_id),
     )
 
-    # pass options onto additional_properties
     await Agent.db.create_step(
         task_id=task.task_id,
         name="create_code",
         is_last=True,
-        additional_properties=task.additional_input.__root__
-        if task.additional_input is not None
-        else {},
+        additional_properties=additional_input,
     )
 
 
 async def step_handler(step: Step) -> Step:
     """
-    The code generation is run here.  Any options are passed via task.additional_input.
+    Handle the provided step by triggering code generation or other operations.
 
-    Improve code mode is not yet supported, but it would not be much work to support it.
-    A list of 'focus' files would need to be submitted in: task.additional_input.
+    Parameters:
+    - step (Step): An object containing step details and properties.
+
+    Behavior:
+    - If not a dummy step, triggers the main code generation process.
+    - Handles potential authentication errors during code generation.
+    - Creates a dummy step if it's the last step to ensure continuity.
+
+    Returns:
+    - step (Step): Returns the processed step, potentially with modifications.
     """
 
-    main(
-        f"projects/{step.task_id}",  # we could also make this an option
-        step.additional_properties.get("model", "gpt-4"),
-        step.additional_properties.get("temperature", 0.1),
-        "benchmark",  # this needs to be headless mode
-        False,
-        step.additional_properties.get("azure_endpoint", ""),
-        step.additional_properties.get("verbose", False),
-    )
+    if not step.name == "Dummy step":
+        try:
+            main(
+                os.path.join(step.additional_properties["root_dir"], step.task_id),
+                step.additional_properties.get("model", "gpt-4"),
+                step.additional_properties.get("temperature", 0.1),
+                "benchmark",
+                False,
+                step.additional_properties.get("azure_endpoint", ""),
+                step.additional_properties.get("verbose", False),
+            )
+        except AuthenticationError:
+            print("The agent lacks a valid OPENAI_API_KEY to execute the requested step.")
+
+    if step.is_last:
+        await Agent.db.create_step(
+            step.task_id,
+            name=f"Dummy step",
+            input=f"Creating dummy step to not run out of steps after {step.name}",
+            is_last=True,
+            additional_properties={},
+        )
+        step.is_last = False
 
     return step
 
 
-Agent.setup_agent(task_handler, step_handler).start()
+def run_agent(port: int = 8000):
+    Agent.setup_agent(task_handler, step_handler).start(port=port)
+
+
+if __name__ == "__main__":
+    run_agent()

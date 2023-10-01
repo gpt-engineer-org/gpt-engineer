@@ -277,7 +277,7 @@ def improve_existing_code(ai: AI, dbs: DBs):
     """
 
     files_info = get_code_strings(
-        dbs.input.path, dbs.project_metadata
+        dbs.input, dbs.project_metadata
     )  # this has file names relative to the workspace path
 
     messages = [
@@ -310,7 +310,6 @@ class Config(str, Enum):
     SIMPLE = "simple"
     LITE = "lite"
     CLARIFY = "clarify"
-    RESPEC = "respec"
     EXECUTE_ONLY = "execute_only"
     EVALUATE = "evaluate"
     USE_FEEDBACK = "use_feedback"
