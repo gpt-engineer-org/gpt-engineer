@@ -62,14 +62,14 @@ def lite_gen(ai: AI, dbs: DBs) -> List[Message]:
     messages = ai.start(
         dbs.input["prompt"], dbs.preprompts["file_format"], step_name=curr_fn()
     )
-    to_files(messages[-1].content.strip(), dbs.workspace)
+    to_files(messages[-1].content.strip(), dbs)
     return messages
 
 
 def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
     """Run the AI on the default prompts and save the results"""
     messages = ai.start(setup_sys_prompt(dbs), dbs.input["prompt"], step_name=curr_fn())
-    to_files(messages[-1].content.strip(), dbs.workspace)
+    to_files(messages[-1].content.strip(), dbs)
     return messages
 
 
@@ -130,7 +130,7 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
         step_name=curr_fn(),
     )
 
-    to_files(messages[-1].content.strip(), dbs.workspace)
+    to_files(messages[-1].content.strip(), dbs)
     return messages
 
 
@@ -192,7 +192,7 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
             "Do not use placeholders, use example values (like . for a folder argument) "
             "if necessary.\n"
         ),
-        user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
+        user="Information about the codebase:\n\n" + dbs.memory["all_output.txt"],
         step_name=curr_fn(),
     )
     print()
@@ -208,12 +208,12 @@ def use_feedback(ai: AI, dbs: DBs):
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
         ai.fassistant(
-            dbs.workspace["all_output.txt"]
+            dbs.memory["all_output.txt"]
         ),  # reload previously generated code
     ]
     if dbs.input["feedback"]:
         messages = ai.next(messages, dbs.input["feedback"], step_name=curr_fn())
-        to_files(messages[-1].content.strip(), dbs.workspace)
+        to_files(messages[-1].content.strip(), dbs)
         return messages
     else:
         print(
@@ -225,7 +225,7 @@ def use_feedback(ai: AI, dbs: DBs):
 
 def set_improve_filelist(ai: AI, dbs: DBs):
     """Sets the file list for files to work with in existing code mode."""
-    ask_for_files(dbs.project_metadata, dbs.input)  # stores files as full paths.
+    ask_for_files(dbs.project_metadata, dbs.workspace)  # stores files as full paths.
     return []
 
 
@@ -277,7 +277,7 @@ def improve_existing_code(ai: AI, dbs: DBs):
     """
 
     files_info = get_code_strings(
-        dbs.input, dbs.project_metadata
+        dbs.workspace, dbs.project_metadata
     )  # this has file names relative to the workspace path
 
     messages = [

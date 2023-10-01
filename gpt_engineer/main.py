@@ -26,6 +26,20 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
+def load_prompt(dbs: DBs):
+    if dbs.input.get("prompt"):
+        return dbs.input.get("prompt")
+    
+    if dbs.workspace.get("prompt"):
+        dbs.input["prompt"] = dbs.workspace.get("prompt")
+        del dbs.workspace["prompt"]
+        return dbs.input.get("prompt")
+
+    dbs.input["prompt"] = input(
+        "\nWhat application do you want gpt-engineer to generate?\n"
+    )
+    return dbs.input.get("prompt")
+
 @app.command()
 def main(
     project_path: str = typer.Argument("projects/example", help="path"),
@@ -65,8 +79,6 @@ def main(
 
     if lite_mode:
         assert not improve_mode, "Lite mode cannot improve code"
-        if steps_config == StepsConfig.DEFAULT:
-            steps_config = StepsConfig.LITE
 
     if improve_mode:
         assert (
@@ -82,17 +94,20 @@ def main(
         azure_endpoint=azure_endpoint,
     )
 
-    input_path = Path(project_path).absolute()
-    print("Running gpt-engineer in", input_path, "\n")
 
-    workspace_path = input_path / "workspace"
-    project_metadata_path = input_path / ".gpteng"
+    project_path = os.path.abspath(project_path)  # resolve the string to a valid path (eg a/b/../c to a/c)
+    path = Path(project_path).absolute()
+    print("Running gpt-engineer in", path, "\n")
+
+    workspace_path = path
+    project_metadata_path = path / ".gpteng"
+    input_path = project_metadata_path
     memory_path = project_metadata_path / "memory"
     archive_path = project_metadata_path / "archive"
     preprompts_path = Path(__file__).parent / "preprompts"
 
     if use_project_preprompts:
-        project_preprompts_path = input_path / "preprompts"
+        project_preprompts_path = path / "preprompts"
         if not project_preprompts_path.exists():
             project_preprompts_path.mkdir()
 
@@ -118,11 +133,7 @@ def main(
         StepsConfig.IMPROVE_CODE,
     ]:
         archive(dbs)
-
-        if not dbs.input.get("prompt"):
-            dbs.input["prompt"] = input(
-                "\nWhat application do you want gpt-engineer to generate?\n"
-            )
+        load_prompt(dbs)
 
     steps = STEPS[steps_config]
     for step in steps:
