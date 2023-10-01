@@ -1,6 +1,18 @@
+from dataclasses import dataclass
 import textwrap
 
 from gpt_engineer.chat_to_files import to_files
+
+
+@dataclass
+class DummyDBs:
+    memory = {}
+    logs = {}
+    preprompts = {}
+    input = {}
+    dbs = DummyDBs()
+    archive = {}
+    project_metadata = {}
 
 
 def test_to_files():
@@ -21,10 +33,10 @@ def test_to_files():
     """
     )
 
-    workspace = {}
-    to_files(chat, workspace)
+    dbs = DummyDBs()
+    to_files(chat, dbs)
 
-    assert workspace["all_output.txt"] == chat
+    assert dbs.memory["all_output.txt"] == chat
 
     expected_files = {
         "file1.py": 'print("Hello, World!")\n',
@@ -33,7 +45,7 @@ def test_to_files():
     }
 
     for file_name, file_content in expected_files.items():
-        assert workspace[file_name] == file_content
+        assert dbs.workspace[file_name] == file_content
 
 
 def test_to_files_with_square_brackets():
@@ -53,10 +65,10 @@ def test_to_files_with_square_brackets():
     ```
     """
     )
-    workspace = {}
-    to_files(chat, workspace)
+    dbs = DummyDBs()
+    to_files(chat, dbs)
 
-    assert workspace["all_output.txt"] == chat
+    assert dbs.memory["all_output.txt"] == chat
 
     expected_files = {
         "file1.py": 'print("Hello, World!")\n',
@@ -65,7 +77,7 @@ def test_to_files_with_square_brackets():
     }
 
     for file_name, file_content in expected_files.items():
-        assert workspace[file_name] == file_content
+        assert dbs.workspace[file_name] == file_content
 
 
 def test_files_with_brackets_in_name():
@@ -80,10 +92,10 @@ def test_files_with_brackets_in_name():
     """
     )
 
-    workspace = {}
-    to_files(chat, workspace)
+    dbs = DummyDBs()
+    to_files(chat, dbs)
 
-    assert workspace["all_output.txt"] == chat
+    assert dbs.memory["all_output.txt"] == chat
 
     expected_files = {
         "[id].jsx": 'console.log("Hello, World!")\n',
@@ -91,7 +103,7 @@ def test_files_with_brackets_in_name():
     }
 
     for file_name, file_content in expected_files.items():
-        assert workspace[file_name] == file_content
+        assert dbs.workspace[file_name] == file_content
 
 
 def test_files_with_file_colon():
@@ -106,10 +118,10 @@ def test_files_with_file_colon():
     """
     )
 
-    workspace = {}
-    to_files(chat, workspace)
+    dbs = DummyDBs()
+    to_files(chat, dbs)
 
-    assert workspace["all_output.txt"] == chat
+    assert dbs.memory["all_output.txt"] == chat
 
     expected_files = {
         "file1.py": 'print("Hello, World!")\n',
@@ -117,7 +129,7 @@ def test_files_with_file_colon():
     }
 
     for file_name, file_content in expected_files.items():
-        assert workspace[file_name] == file_content
+        assert dbs.workspace[file_name] == file_content
 
 
 def test_files_with_back_tick():
@@ -132,10 +144,10 @@ def test_files_with_back_tick():
     """
     )
 
-    workspace = {}
-    to_files(chat, workspace)
+    dbs = DummyDBs()
+    to_files(chat, dbs)
 
-    assert workspace["all_output.txt"] == chat
+    assert dbs.memory["all_output.txt"] == chat
 
     expected_files = {
         "file1.py": 'print("Hello, World!")\n',
@@ -143,7 +155,7 @@ def test_files_with_back_tick():
     }
 
     for file_name, file_content in expected_files.items():
-        assert workspace[file_name] == file_content
+        assert dbs.workspace[file_name] == file_content
 
 
 def test_files_with_newline_between():
@@ -159,10 +171,10 @@ def test_files_with_newline_between():
     """
     )
 
-    workspace = {}
-    to_files(chat, workspace)
+    dbs = DummyDBs()
+    to_files(chat, dbs)
 
-    assert workspace["all_output.txt"] == chat
+    assert dbs.memory["all_output.txt"] == chat
 
     expected_files = {
         "file1.py": 'print("Hello, World!")\n',
@@ -170,7 +182,7 @@ def test_files_with_newline_between():
     }
 
     for file_name, file_content in expected_files.items():
-        assert workspace[file_name] == file_content
+        assert dbs.workspace[file_name] == file_content
 
 
 def test_files_with_newline_between_header():
@@ -186,10 +198,10 @@ def test_files_with_newline_between_header():
     """
     )
 
-    workspace = {}
-    to_files(chat, workspace)
+    dbs = DummyDBs()
+    to_files(chat, dbs)
 
-    assert workspace["all_output.txt"] == chat
+    assert dbs.memory["all_output.txt"] == chat
 
     expected_files = {
         "file1.py": 'print("Hello, World!")\n',
@@ -197,4 +209,4 @@ def test_files_with_newline_between_header():
     }
 
     for file_name, file_content in expected_files.items():
-        assert workspace[file_name] == file_content
+        assert dbs.workspace[file_name] == file_content

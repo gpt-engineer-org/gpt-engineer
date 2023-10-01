@@ -112,6 +112,29 @@ class DB:
 
         full_path.write_text(val, encoding="utf-8")
 
+    def __delitem__(self, key: Union[str, Path]) -> None:
+        """
+        Delete a file or directory in the database.
+
+        Parameters
+        ----------
+        key : Union[str, Path]
+            The name of the file or directory to delete.
+
+        Raises
+        ------
+        KeyError
+            If the file or directory does not exist in the database.
+        """
+        item_path = self.path / key
+        if not item_path.exists():
+            raise KeyError(f"Item '{key}' could not be found in '{self.path}'")
+
+        if item_path.is_file():
+            item_path.unlink()
+        elif item_path.is_dir():
+            shutil.rmtree(item_path)
+
 
 # dataclass for all dbs:
 @dataclass
@@ -138,8 +161,15 @@ def archive(dbs: DBs) -> None:
     shutil.move(
         str(dbs.memory.path), str(dbs.archive.path / timestamp / dbs.memory.path.name)
     )
-    shutil.move(
-        str(dbs.workspace.path),
-        str(dbs.archive.path / timestamp / dbs.workspace.path.name),
-    )
+
+    exclude_dir = ".gpteng"
+    items_to_copy = [f for f in dbs.workspace.path.iterdir() if not f.name == exclude_dir]
+
+    for item_path in items_to_copy:
+            destination_path = dbs.archive.path / timestamp / item_path.name
+            if item_path.is_file():
+                shutil.copy2(item_path, destination_path)
+            elif item_path.is_dir():
+                shutil.copytree(item_path, destination_path)
+
     return []

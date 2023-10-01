@@ -8,7 +8,7 @@ Here are the functions defined in the `chat_to_files.py` module:
 
 `parse_chat(chat)`: This function takes the chat as an argument and returns a list of tuples. Each tuple contains a filename and the corresponding file content. The function uses regular expressions to extract the filenames and the file contents from the chat. The filenames are cleaned up to remove any non-allowed characters.
 
-`to_files(chat, workspace)`: This function takes the chat and the workspace as arguments. It first saves the entire chat as a text file in the workspace. Then it calls the parse_chat function to parse the chat and get the files. Each file is then saved to the workspace.
+`to_files(chat, dbs)`: This function takes the chat and the DBs as arguments. DBs contains the workspace and memory path. The function first saves the entire chat as a text file in the memory path. Then it calls the parse_chat function to parse the chat and get the files. Each file is then saved to the workspace.
 
 <br>
 

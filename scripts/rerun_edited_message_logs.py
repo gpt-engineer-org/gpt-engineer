@@ -29,6 +29,7 @@ def main(
     messages = ai.next(messages, step_name="rerun")
 
     if out_path:
+        # ToDo: to_files expects a DBs as 2nd argument. But do we need this entire file?
         to_files(messages[-1]["content"], out_path)
         with open(pathlib.Path(out_path) / "all_output.txt", "w") as f:
             json.dump(messages[-1]["content"], f)
