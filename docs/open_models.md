@@ -1,7 +1,7 @@
 Using with open/local models
 ============================
 
-You can integrate `gpt-engineer` with open-source models by leveraging an OpenAI-compatible API. One such API is provided by the [text-generator-ui _extension_ openai](https://github.com/oobabooga/text-generation-webui/blob/main/extensions/openai/README.md>).
+You can integrate `gpt-engineer` with open-source models by leveraging an OpenAI-compatible API. One such API is provided by the [text-generator-ui _extension_ openai](https://github.com/oobabooga/text-generation-webui/blob/main/extensions/openai/README.md).
 
 Setup
 -----

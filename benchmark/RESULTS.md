@@ -2,30 +2,29 @@
 
 ```bash
 python scripts/benchmark.py
+
 ```
 
-## 2023-08-20 (8358b60e1c6dcfc517c47c15708422d9a7d1d83a)
-| Benchmark          | Version       | Ran | Works | Perfect |
-|--------------------|---------------|-----|-------|---------|
-| currency_converter | GPT3.5 default| ✅  | ❌    | ❌       |
-| image_resizer      | GPT3.5 default| ✅  | ✅    | ✅      |
-| pomodoro_timer     | GPT3.5 default| ✅  | ✅    | ❌      |
-| url_shortener      | GPT3.5 default| ❌  | ❌    | ❌      |
-| file_explorer      | GPT3.5 default| ✅  | ✅    | ❌      |
-| markdown_editor    | GPT3.5 default| ✅  | ❌    | ❌      |
-| timer_app          | GPT3.5 default| ✅  | ✅    | ✅      |
-| file_organizer     | GPT3.5 default| ✅  | ✅    | ❌      |
-| password_generator | GPT3.5 default| ✅  | ✅    | ✅      |
-| todo_list          | GPT3.5 default| ✅  | ✅    | ❌      |
+## 2023-06-21
 
-### Notes on the errors
+| Benchmark          | Ran | Works | Perfect |
+|--------------------|-----|-------|---------|
+| currency_converter | ✅  | ❌    | ❌      |
+| image_resizer      | ✅  | ✅    | ❌      |
+| pomodoro_timer     | ✅  | ✅    | ✅      |
+| url_shortener      | ✅  | ✅    | ❌      |
+| file_explorer      | ✅  | ✅    | ❌      |
+| markdown_editor    | ✅  | ✅    | ❌      |
+| timer_app          | ✅  | ✅    | ✅      |
+| file_organizer     | ✅  | ✅    | ✅      |
+| password_generator | ✅  | ✅    | ✅      |
+| todo_list          | ✅  | ✅    | ✅      |
 
-#### GPT3.5
-- `pomodoro_timer`: notifications didn't work.
-- `file_explorer`: deletion didn't work.
-- `file_organizer`: only handled a very small set of formats.
-- `todo_list`: tasks couldn't be marked as completed.
-- `url_shortener`: file names were wrong. Nothing could be run.
+## Notes on errors
+
+Most errors was that it wasn't importing correctly or just executing. The code
+itself was usually not the problem.
+
 
 ## 2023-06-21
 
@@ -53,6 +52,7 @@ All errors are very easy to fix.
 One error was trying to modify a constant.
 One error was that the html template was not fully filled in.
 One error is that a dependency was used incorrectly and easy to fix
+
 
 ## 2023-06-19
 
@@ -100,3 +100,29 @@ pomodoro: doesn't run it only tests
 currency_converter: backend doesn't return anything
 
 weather_app only runs test, no code existed
+
+# GPT 3.5 Benchmarks
+
+
+## 2023-08-20 (8358b60e1c6dcfc517c47c15708422d9a7d1d83a)
+| Benchmark          | Version       | Ran | Works | Perfect |
+|--------------------|---------------|-----|-------|---------|
+| currency_converter | GPT3.5 default| ✅  | ❌    | ❌       |
+| image_resizer      | GPT3.5 default| ✅  | ✅    | ✅      |
+| pomodoro_timer     | GPT3.5 default| ✅  | ✅    | ❌      |
+| url_shortener      | GPT3.5 default| ❌  | ❌    | ❌      |
+| file_explorer      | GPT3.5 default| ✅  | ✅    | ❌      |
+| markdown_editor    | GPT3.5 default| ✅  | ❌    | ❌      |
+| timer_app          | GPT3.5 default| ✅  | ✅    | ✅      |
+| file_organizer     | GPT3.5 default| ✅  | ✅    | ❌      |
+| password_generator | GPT3.5 default| ✅  | ✅    | ✅      |
+| todo_list          | GPT3.5 default| ✅  | ✅    | ❌      |
+
+### Notes on the errors
+
+#### GPT3.5
+- `pomodoro_timer`: notifications didn't work.
+- `file_explorer`: deletion didn't work.
+- `file_organizer`: only handled a very small set of formats.
+- `todo_list`: tasks couldn't be marked as completed.
+- `url_shortener`: file names were wrong. Nothing could be run.

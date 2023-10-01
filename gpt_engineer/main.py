@@ -20,6 +20,9 @@ app = typer.Typer()  # creates a CLI app
 def load_env_if_needed():
     if os.getenv("OPENAI_API_KEY") is None:
         load_dotenv()
+    if os.getenv("OPENAI_API_KEY") is None:
+        # if there is no .env file, try to load from the current working directory
+        load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
@@ -31,11 +34,17 @@ def main(
     steps_config: StepsConfig = typer.Option(
         StepsConfig.DEFAULT, "--steps", "-s", help="decide which steps to run"
     ),
-    improve_option: bool = typer.Option(
+    improve_mode: bool = typer.Option(
         False,
         "--improve",
         "-i",
         help="Improve code from existing project.",
+    ),
+    lite_mode: bool = typer.Option(
+        False,
+        "--lite",
+        "-l",
+        help="Lite mode - run only the main prompt.",
     ),
     azure_endpoint: str = typer.Option(
         "",
@@ -44,15 +53,26 @@ def main(
         help="""Endpoint for your Azure OpenAI Service (https://xx.openai.azure.com).
             In that case, the given model is the deployment name chosen in the Azure AI Studio.""",
     ),
+    use_project_preprompts: bool = typer.Option(
+        False,
+        "--use-project-preprompts",
+        help="""Use the project's preprompts instead of the default ones.
+          Copies all original preprompts to the project's workspace if they don't exist there.""",
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
-    # For the improve option take current project as path and add .gpteng folder
-    if improve_option:
-        # The default option for the --improve is the IMPROVE_CODE, not DEFAULT
+    if lite_mode:
+        assert not improve_mode, "Lite mode cannot improve code"
         if steps_config == StepsConfig.DEFAULT:
-            steps_config = StepsConfig.IMPROVE_CODE
+            steps_config = StepsConfig.LITE
+
+    if improve_mode:
+        assert (
+            steps_config == StepsConfig.DEFAULT
+        ), "Improve mode not compatible with other step configs"
+        steps_config = StepsConfig.IMPROVE_CODE
 
     load_env_if_needed()
 
@@ -63,19 +83,30 @@ def main(
     )
 
     input_path = Path(project_path).absolute()
+    print("Running gpt-engineer in", input_path, "\n")
+
     workspace_path = input_path / "workspace"
     project_metadata_path = input_path / ".gpteng"
     memory_path = project_metadata_path / "memory"
     archive_path = project_metadata_path / "archive"
+    preprompts_path = Path(__file__).parent / "preprompts"
+
+    if use_project_preprompts:
+        project_preprompts_path = input_path / "preprompts"
+        if not project_preprompts_path.exists():
+            project_preprompts_path.mkdir()
+
+        for file in preprompts_path.glob("*"):
+            if not (project_preprompts_path / file.name).exists():
+                (project_preprompts_path / file.name).write_text(file.read_text())
+        preprompts_path = project_preprompts_path
 
     dbs = DBs(
         memory=DB(memory_path),
         logs=DB(memory_path / "logs"),
         input=DB(input_path),
         workspace=DB(workspace_path),
-        preprompts=DB(
-            Path(__file__).parent / "preprompts"
-        ),  # Loads preprompts from the preprompts directory
+        preprompts=DB(preprompts_path),
         archive=DB(archive_path),
         project_metadata=DB(project_metadata_path),
     )

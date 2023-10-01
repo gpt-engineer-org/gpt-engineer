@@ -57,11 +57,17 @@ def curr_fn() -> str:
     return inspect.stack()[1].function
 
 
-# All steps below have the Step signature
+def lite_gen(ai: AI, dbs: DBs) -> List[Message]:
+    """Run the AI on only the main prompt and save the results"""
+    messages = ai.start(
+        dbs.input["prompt"], dbs.preprompts["file_format"], step_name=curr_fn()
+    )
+    to_files(messages[-1].content.strip(), dbs.workspace)
+    return messages
 
 
 def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
-    """Run the AI on the main prompt and save the results"""
+    """Run the AI on the default prompts and save the results"""
     messages = ai.start(setup_sys_prompt(dbs), dbs.input["prompt"], step_name=curr_fn())
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
@@ -77,11 +83,11 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
         messages = ai.next(messages, user_input, step_name=curr_fn())
         msg = messages[-1].content.strip()
 
-        if msg == "Nothing more to clarify.":
+        if "nothing to clarify" in msg.lower():
             break
 
         if msg.lower().startswith("no"):
-            print("Nothing more to clarify.")
+            print("Nothing to clarify.")
             break
 
         print()
@@ -99,73 +105,13 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
             print()
             return messages
 
-        user_input += (
-            "\n\n"
-            "Is anything else unclear? If yes, only answer in the form:\n"
-            "{remaining unclear areas} remaining questions.\n"
-            "{Next question}\n"
-            'If everything is sufficiently clear, only answer "Nothing more to clarify.".'
-        )
+        user_input += """
+            \n\n
+            Is anything else unclear? If yes, ask another question.\n
+            Otherwise state: "Nothing to clarify"
+            """
 
     print()
-    return messages
-
-
-def gen_spec(ai: AI, dbs: DBs) -> List[Message]:
-    """
-    Generate a spec from the main prompt + clarifications and save the results to
-    the workspace
-    """
-    messages = [
-        ai.fsystem(setup_sys_prompt(dbs)),
-        ai.fsystem(f"Instructions: {dbs.input['prompt']}"),
-    ]
-
-    messages = ai.next(messages, dbs.preprompts["spec"], step_name=curr_fn())
-
-    dbs.memory["specification"] = messages[-1].content.strip()
-
-    return messages
-
-
-def respec(ai: AI, dbs: DBs) -> List[Message]:
-    """Asks the LLM to review the specs so far and reiterate them if necessary"""
-    messages = AI.deserialize_messages(dbs.logs[gen_spec.__name__])
-    messages += [ai.fsystem(dbs.preprompts["respec"])]
-
-    messages = ai.next(messages, step_name=curr_fn())
-    messages = ai.next(
-        messages,
-        (
-            "Based on the conversation so far, please reiterate the specification for "
-            "the program. "
-            "If there are things that can be improved, please incorporate the "
-            "improvements. "
-            "If you are satisfied with the specification, just write out the "
-            "specification word by word again."
-        ),
-        step_name=curr_fn(),
-    )
-
-    dbs.memory["specification"] = messages[-1].content.strip()
-    return messages
-
-
-def gen_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
-    """
-    Generate unit tests based on the specification, that should work.
-    """
-    messages = [
-        ai.fsystem(setup_sys_prompt(dbs)),
-        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
-        ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
-    ]
-
-    messages = ai.next(messages, dbs.preprompts["unit_tests"], step_name=curr_fn())
-
-    dbs.memory["unit_tests"] = messages[-1].content.strip()
-    to_files(dbs.memory["unit_tests"], dbs.workspace)
-
     return messages
 
 
@@ -184,23 +130,6 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
         step_name=curr_fn(),
     )
 
-    to_files(messages[-1].content.strip(), dbs.workspace)
-    return messages
-
-
-def gen_code_after_unit_tests(ai: AI, dbs: DBs) -> List[dict]:
-    """Generates project code after unit tests have been produced"""
-    messages = [
-        ai.fsystem(setup_sys_prompt(dbs)),
-        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
-        ai.fuser(f"Specification:\n\n{dbs.memory['specification']}"),
-        ai.fuser(f"Unit tests:\n\n{dbs.memory['unit_tests']}"),
-    ]
-    messages = ai.next(
-        messages,
-        dbs.preprompts["generate"].replace("FILE_FORMAT", dbs.preprompts["file_format"]),
-        step_name=curr_fn(),
-    )
     to_files(messages[-1].content.strip(), dbs.workspace)
     return messages
 
@@ -325,10 +254,10 @@ def get_improve_prompt(ai: AI, dbs: DBs):
             "-----------------------------",
             "The following files will be used in the improvement process:",
             f"{FILE_LIST_NAME}:",
-            str(dbs.project_metadata["file_list.txt"]),
+            colored(str(dbs.project_metadata[FILE_LIST_NAME]), "green"),
             "",
             "The inserted prompt is the following:",
-            f"'{dbs.input['prompt']}'",
+            colored(f"{dbs.input['prompt']}", "green"),
             "-----------------------------",
             "",
             "You can change these files in your project before proceeding.",
@@ -348,7 +277,7 @@ def improve_existing_code(ai: AI, dbs: DBs):
     """
 
     files_info = get_code_strings(
-        dbs.input.path, dbs.project_metadata
+        dbs.input, dbs.project_metadata
     )  # this has file names relative to the workspace path
 
     messages = [
@@ -367,22 +296,6 @@ def improve_existing_code(ai: AI, dbs: DBs):
     return messages
 
 
-def fix_code(ai: AI, dbs: DBs):
-    messages = AI.deserialize_messages(dbs.logs[gen_code_after_unit_tests.__name__])
-    code_output = messages[-1].content.strip()
-    messages = [
-        ai.fsystem(setup_sys_prompt(dbs)),
-        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
-        ai.fuser(code_output),
-        ai.fsystem(dbs.preprompts["fix_code"]),
-    ]
-    messages = ai.next(
-        messages, "Please fix any errors in the code above.", step_name=curr_fn()
-    )
-    to_files(messages[-1].content.strip(), dbs.workspace)
-    return messages
-
-
 def human_review(ai: AI, dbs: DBs):
     """Collects and stores human review of the code"""
     review = human_review_input()
@@ -395,10 +308,8 @@ class Config(str, Enum):
     DEFAULT = "default"
     BENCHMARK = "benchmark"
     SIMPLE = "simple"
-    TDD = "tdd"
-    TDD_PLUS = "tdd+"
+    LITE = "lite"
     CLARIFY = "clarify"
-    RESPEC = "respec"
     EXECUTE_ONLY = "execute_only"
     EVALUATE = "evaluate"
     USE_FEEDBACK = "use_feedback"
@@ -407,10 +318,19 @@ class Config(str, Enum):
     EVAL_NEW_CODE = "eval_new_code"
 
 
-# Define the steps to run for different configs
 STEPS = {
     Config.DEFAULT: [
         simple_gen,
+        gen_entrypoint,
+        execute_entrypoint,
+        human_review,
+    ],
+    Config.LITE: [
+        lite_gen,
+    ],
+    Config.CLARIFY: [
+        clarify,
+        gen_clarified_code,
         gen_entrypoint,
         execute_entrypoint,
         human_review,
@@ -424,40 +344,6 @@ STEPS = {
         gen_entrypoint,
         execute_entrypoint,
     ],
-    Config.TDD: [
-        gen_spec,
-        gen_unit_tests,
-        gen_code_after_unit_tests,
-        gen_entrypoint,
-        execute_entrypoint,
-        human_review,
-    ],
-    Config.TDD_PLUS: [
-        gen_spec,
-        gen_unit_tests,
-        gen_code_after_unit_tests,
-        fix_code,
-        gen_entrypoint,
-        execute_entrypoint,
-        human_review,
-    ],
-    Config.CLARIFY: [
-        clarify,
-        gen_clarified_code,
-        gen_entrypoint,
-        execute_entrypoint,
-        human_review,
-    ],
-    Config.RESPEC: [
-        gen_spec,
-        respec,
-        gen_unit_tests,
-        gen_code_after_unit_tests,
-        fix_code,
-        gen_entrypoint,
-        execute_entrypoint,
-        human_review,
-    ],
     Config.USE_FEEDBACK: [use_feedback, gen_entrypoint, execute_entrypoint, human_review],
     Config.EXECUTE_ONLY: [execute_entrypoint],
     Config.EVALUATE: [execute_entrypoint, human_review],
@@ -469,6 +355,7 @@ STEPS = {
     Config.EVAL_IMPROVE_CODE: [assert_files_ready, improve_existing_code],
     Config.EVAL_NEW_CODE: [simple_gen],
 }
+
 
 # Future steps that can be added:
 # run_tests_and_fix_files
