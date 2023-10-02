@@ -19,4 +19,3 @@ Debug and trace the execution of the AI generated code to compare across differe
 
 Automatically capture and save terminal `stdout` to one easily accessible and shareable webpage
 ![](https://drive.google.com/uc?id=1gVva7ZfpwbTSBsnNvId6iq09Gw5ETOks)
-
