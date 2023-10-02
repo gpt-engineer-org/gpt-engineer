@@ -21,6 +21,7 @@ Welcome to GPT-ENGINEER's Documentation
    readme_link
    windows_readme_link
    open_models.md
+   tracing_debugging.md
 
 
 .. toctree::
