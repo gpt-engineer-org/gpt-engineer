@@ -207,9 +207,7 @@ def use_feedback(ai: AI, dbs: DBs):
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
-        ai.fassistant(
-            dbs.memory["all_output.txt"]
-        ),  # reload previously generated code
+        ai.fassistant(dbs.memory["all_output.txt"]),  # reload previously generated code
     ]
     if dbs.input["feedback"]:
         messages = ai.next(messages, dbs.input["feedback"], step_name=curr_fn())

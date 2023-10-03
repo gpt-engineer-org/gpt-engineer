@@ -10,6 +10,7 @@ class DummyDBs:
     logs = {}
     preprompts = {}
     input = {}
+    workspace = {}
     archive = {}
     project_metadata = {}
 

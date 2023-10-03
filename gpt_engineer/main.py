@@ -40,6 +40,7 @@ def load_prompt(dbs: DBs):
     )
     return dbs.input.get("prompt")
 
+
 @app.command()
 def main(
     project_path: str = typer.Argument("projects/example", help="path"),

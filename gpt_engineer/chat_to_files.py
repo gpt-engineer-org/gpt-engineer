@@ -65,7 +65,7 @@ def to_files(chat: str, dbs: DBs):
     chat : str
         The chat to parse.
     workspace : DB
-        The workspace to add the files to.
+        The database containing the workspace.
     """
     dbs.memory["all_output.txt"] = chat
 
