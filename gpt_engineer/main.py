@@ -29,7 +29,7 @@ def load_env_if_needed():
 def load_prompt(dbs: DBs):
     if dbs.input.get("prompt"):
         return dbs.input.get("prompt")
-    
+
     if dbs.workspace.get("prompt"):
         dbs.input["prompt"] = dbs.workspace.get("prompt")
         del dbs.workspace["prompt"]

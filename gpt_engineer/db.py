@@ -166,10 +166,10 @@ def archive(dbs: DBs) -> None:
     items_to_copy = [f for f in dbs.workspace.path.iterdir() if not f.name == exclude_dir]
 
     for item_path in items_to_copy:
-            destination_path = dbs.archive.path / timestamp / item_path.name
-            if item_path.is_file():
-                shutil.copy2(item_path, destination_path)
-            elif item_path.is_dir():
-                shutil.copytree(item_path, destination_path)
+        destination_path = dbs.archive.path / timestamp / item_path.name
+        if item_path.is_file():
+            shutil.copy2(item_path, destination_path)
+        elif item_path.is_dir():
+            shutil.copytree(item_path, destination_path)
 
     return []
