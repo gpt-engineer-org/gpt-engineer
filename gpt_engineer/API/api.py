@@ -94,7 +94,7 @@ async def task_handler(task: Task) -> None:
         task_id=task.task_id,
         name="create_code",
         is_last=True,
-        additional_properties=additional_input,
+        additional_input=additional_input,
     )
 
 
@@ -115,16 +115,16 @@ async def step_handler(step: Step) -> Step:
     """
 
     # if not step.name == "Dummy step":
-    project_dir = os.path.join(step.additional_properties["root_dir"], step.task_id)
+    project_dir = os.path.join(step.additional_input["root_dir"], step.task_id)
     try:
         main(
             project_dir,
-            step.additional_properties.get("model", "gpt-4"),
-            step.additional_properties.get("temperature", 0.1),
+            step.additional_input.get("model", "gpt-4"),
+            step.additional_input.get("temperature", 0.1),
             "benchmark",
             False,
-            step.additional_properties.get("azure_endpoint", ""),
-            step.additional_properties.get("verbose", False),
+            step.additional_input.get("azure_endpoint", ""),
+            step.additional_input.get("verbose", False),
         )
     except AuthenticationError:
         print("The agent lacks a valid OPENAI_API_KEY to execute the requested step.")
@@ -151,7 +151,7 @@ async def step_handler(step: Step) -> Step:
     #         name=f"Dummy step",
     #         input=f"Creating dummy step to not run out of steps after {step.name}",
     #         is_last=True,
-    #         additional_properties={},
+    #         additional_input={},
     #     )
     #     step.is_last = False
 
