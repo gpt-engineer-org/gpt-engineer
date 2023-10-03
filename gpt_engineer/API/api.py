@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from gpt_engineer.db import DB
 from gpt_engineer.main import main
 from openai.error import AuthenticationError
-import tempfile
+
 from fastapi import FastAPI, APIRouter
 from fastapi.responses import RedirectResponse
 
@@ -72,7 +72,7 @@ async def task_handler(task: Task) -> None:
             additional_input = task.additional_input.__root__
 
     # Set up the root directory for the agent, defaulting to a temporary directory.
-    root_dir = additional_input.get("root_dir", tempfile.gettempdir())
+    root_dir = additional_input.get("root_dir", Agent.workspace)
     additional_input["root_dir"] = root_dir
 
     workspace = DB(os.path.join(root_dir, task.task_id))
@@ -84,11 +84,11 @@ async def task_handler(task: Task) -> None:
     consent_file = Path(os.getcwd()) / ".gpte_consent"
     consent_file.write_text("false")
 
-    await Agent.db.create_artifact(
-        task_id=task.task_id,
-        relative_path=root_dir,
-        file_name=os.path.join(root_dir, task.task_id),
-    )
+    # await Agent.db.create_artifact(
+    #     task_id=task.task_id,
+    #     relative_path=root_dir,
+    #     file_name=os.path.join(root_dir, task.task_id),
+    # )
 
     await Agent.db.create_step(
         task_id=task.task_id,
@@ -130,21 +130,19 @@ async def step_handler(step: Step) -> Step:
         print("The agent lacks a valid OPENAI_API_KEY to execute the requested step.")
 
     # check if new files have been created and make artifacts for those
-    artifacts = await list_agent_task_artifacts(step.task_id)
+    artifacts = await Agent.db.list_artifacts(step.task_id)
     existing_artifacts = {artifact.file_name for artifact in artifacts}
 
     for dirpath, dirnames, filenames in os.walk(project_dir):
         for filename in filenames:
             full_path = os.path.join(dirpath, filename)
             if not full_path in existing_artifacts:
-                await Agent.db.create_artifact(
-                    task_id=step.task_id,
-                    relative_path=os.path.relpath(full_path, project_dir),
-                    file_name=full_path,
-                    )
-
-    task = await Agent.db.get_task(step.task_id)
-    artifacts = await list_agent_task_artifacts(step.task_id)
+                if os.path.isfile(full_path):
+                    await Agent.db.create_artifact(
+                        task_id=step.task_id,
+                        relative_path=os.path.relpath(full_path, Agent.workspace),
+                        file_name=filename,
+                        )
 
 
     return step
