@@ -10,7 +10,7 @@ Modules:
     - domain: Contains type annotations related to the steps workflow in GPT Engineer.
     - chat_to_files: Provides utilities for converting chat model outputs to files.
     - steps: Primary workflow definition & configuration for GPT Engineer.
-    - db: Manages database connections and CRUD operations.
+    - db: Provides file system operations for GPT Engineer projects.
 
 For more specific details, refer to the docstrings within each module.
 """

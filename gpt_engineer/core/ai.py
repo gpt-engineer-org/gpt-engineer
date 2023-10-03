@@ -6,7 +6,7 @@ This module provides an interface to interact with AI models.
 It leverages the OpenAI GPT models and allows for integration with Azure-based instances of the same.
 The AI class encapsulates the chat functionalities, allowing to start, advance, and manage a conversation with the model.
 
-Features:
+Key Features:
 - Integration with Azure-based OpenAI instances through the LangChain AzureChatOpenAI class.
 - Token usage logging to monitor the number of tokens consumed during a conversation.
 - Seamless fallback to default models in case the desired model is unavailable.
@@ -60,44 +60,6 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class TokenUsage:
-    """
-    Represents the token usage details for a specific step in a process.
-
-    This class encapsulates the token counts for prompts and completions
-    in a specific step, as well as the running totals for the entire process.
-
-    Attributes
-    ----------
-    step_name : str
-        The name or identifier of the step for which the token counts are being recorded.
-
-    in_step_prompt_tokens : int
-        The number of tokens used in the prompt for this specific step.
-
-    in_step_completion_tokens : int
-        The number of tokens used in the completion for this specific step.
-
-    in_step_total_tokens : int
-        The total number of tokens used in this step (sum of prompt and completion tokens).
-
-    total_prompt_tokens : int
-        The running total of prompt tokens up to and including this step.
-
-    total_completion_tokens : int
-        The running total of completion tokens up to and including this step.
-
-    total_tokens : int
-        The total number of tokens used up to and including this step (sum of all prompt and completion tokens).
-
-    Example
-    -------
-    >>> token_usage = TokenUsage("Step1", 50, 150, 200, 50, 150, 200)
-    >>> print(token_usage.step_name)
-    "Step1"
-    >>> print(token_usage.in_step_prompt_tokens)
-    50
-    """
-
     step_name: str
     in_step_prompt_tokens: int
     in_step_completion_tokens: int
