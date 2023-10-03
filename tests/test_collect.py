@@ -6,9 +6,9 @@ from unittest.mock import MagicMock
 import pytest
 import rudderstack.analytics as rudder_analytics
 
-from gpt_engineer.collect import collect_learnings, steps_file_hash
+from gpt_engineer.cli.collect import collect_learnings, steps_file_hash
 from gpt_engineer.core.db import DB, DBs
-from gpt_engineer.learning import collect_consent, extract_learning
+from gpt_engineer.cli.learning import collect_consent, extract_learning
 from gpt_engineer.core.steps import simple_gen
 
 

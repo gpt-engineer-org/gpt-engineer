@@ -5,7 +5,7 @@ from typing import List
 from gpt_engineer.core import steps
 from gpt_engineer.core.db import DBs
 from gpt_engineer.core.domain import Step
-from gpt_engineer.learning import Learning, extract_learning
+from gpt_engineer.cli.learning import Learning, extract_learning
 
 
 def send_learning(learning: Learning):

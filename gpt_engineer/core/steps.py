@@ -63,8 +63,8 @@ from gpt_engineer.core.chat_to_files import (
     to_files,
 )
 from gpt_engineer.core.db import DBs
-from gpt_engineer.file_selector import FILE_LIST_NAME, ask_for_files
-from gpt_engineer.learning import human_review_input
+from gpt_engineer.cli.file_selector import FILE_LIST_NAME, ask_for_files
+from gpt_engineer.cli.learning import human_review_input
 
 # Type hint for chat messages
 Message = Union[AIMessage, HumanMessage, SystemMessage]

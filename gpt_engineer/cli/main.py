@@ -9,9 +9,9 @@ import typer
 from dotenv import load_dotenv
 
 from gpt_engineer.core.ai import AI
-from gpt_engineer.collect import collect_learnings
+from gpt_engineer.cli.collect import collect_learnings
 from gpt_engineer.core.db import DB, DBs, archive
-from gpt_engineer.learning import collect_consent
+from gpt_engineer.cli.learning import collect_consent
 from gpt_engineer.core.steps import STEPS, Config as StepsConfig
 
 app = typer.Typer()  # creates a CLI app
