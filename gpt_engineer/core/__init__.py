@@ -8,7 +8,7 @@ and functionalities that form the foundation of the application.
 Modules:
     - ai: Contains interfaces to the OpenAI GPT models.
     - domain: Contains type annotations related to the steps workflow in GPT Engineer.
-    - chat_to_files: Provides utilities for converting chat logs to file formats.
+    - chat_to_files: Provides utilities for converting chat model outputs to files.
     - steps: Includes step definitions and workflows for the application.
     - db: Manages database connections and CRUD operations.
 
