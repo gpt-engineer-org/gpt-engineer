@@ -30,16 +30,15 @@ def preprompts_path(use_custom_preprompts: bool, input_path: Path = None) -> Pat
     original_preprompts_path = Path(__file__).parent / "preprompts"
     if not use_custom_preprompts:
         return original_preprompts_path
-    
-    project_preprompts_path = input_path / "preprompts"
-    if not project_preprompts_path.exists():
-        project_preprompts_path.mkdir()
 
-    for file in preprompts_path.glob("*"):
-        if not (project_preprompts_path / file.name).exists():
-            (project_preprompts_path / file.name).write_text(file.read_text())
-    return preprompts_path
-    
+    custom_preprompts_path = input_path / "preprompts"
+    if not custom_preprompts_path.exists():
+        custom_preprompts_path.mkdir()
+
+    for file in original_preprompts_path.glob("*"):
+        if not (custom_preprompts_path / file.name).exists():
+            (custom_preprompts_path / file.name).write_text(file.read_text())
+    return custom_preprompts_path
 
 
 @app.command()
