@@ -19,8 +19,10 @@ class NotFoundResponse(BaseModel):
         example="Unable to find entity with the provided id",
     )
 
-class Status(Enum):
-    created = "created"
-    running = "running"
-    completed = "completed"
+Status = {
+    "created": "created",
+    "running": "running",
+    "completed": "completed",
+}
+
 

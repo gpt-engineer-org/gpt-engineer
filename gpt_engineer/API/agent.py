@@ -9,7 +9,7 @@ from hypercorn.asyncio import serve
 from hypercorn.config import Config
 from typing import Callable, List, Optional, Annotated, Coroutine, Any
 
-from .db import InMemoryTaskDB, Task, TaskDB, Step
+from .db import InMemorySeparatedDB, Task, AbstractDB, Step
 # from agent_protocol.server import app
 from .models.task_request_body import TaskRequestBody
 from .models.step_request_body import StepRequestBody
@@ -89,24 +89,24 @@ async def get_agent_task(task_id: str) -> Task:
     response_model=TaskStepsListResponse,
     tags=["agent"],
 )
-async def list_agent_task_steps(
-    task_id: str, page_size: int = 10, current_page: int = 1
-) -> List[str]:
-    """
-    List all steps for the specified task.
-    """
-    task = await Agent.db.get_task(task_id)
-    start_index = (current_page - 1) * page_size
-    end_index = start_index + page_size
-    return TaskStepsListResponse(
-        steps=task.steps[start_index:end_index],
-        pagination=Pagination(
-            total_items=len(task.steps),
-            total_pages=len(task.steps) // page_size,
-            current_page=current_page,
-            page_size=page_size,
-        ),
-    )
+# async def list_agent_task_steps(
+#     task_id: str, page_size: int = 10, current_page: int = 1
+# ) -> List[str]:
+#     """
+#     List all steps for the specified task.
+#     """
+#     task = await Agent.db.get_task(task_id)
+#     start_index = (current_page - 1) * page_size
+#     end_index = start_index + page_size
+#     return TaskStepsListResponse(
+#         steps=task.steps[start_index:end_index],
+#         pagination=Pagination(
+#             total_items=len(task.steps),
+#             total_pages=len(task.steps) // page_size,
+#             current_page=current_page,
+#             page_size=page_size,
+#         ),
+#     )
 
 
 @base_router.post(
@@ -125,19 +125,20 @@ async def execute_agent_task_step(
         raise Exception("Step handler not defined")
 
     task = await Agent.db.get_task(task_id)
-    step = next(filter(lambda x: x.status == Status.created, task.steps), None)
+    step_list = await Agent.db.list_steps(task_id)
+    step = next(filter(lambda x: x.status == Status['created'], step_list), None)
 
     if not step:
         raise Exception("No steps to execute")
 
-    step.status = Status.running
+    # step.status = Status["running"]
 
     step.input = body.input if body else None
-    step.additional_input = body.additional_input if body else None
+    step.additional_input = body.additional_input.update(step.additional_input) if body else step.additional_input
 
     step = await _step_handler(step)
 
-    step.status = Status.completed
+    step.status = Status["completed"]
     return step
 
 
@@ -215,7 +216,7 @@ async def download_agent_task_artifacts(task_id: str, artifact_id: str) -> FileR
 
 
 class Agent:
-    db: TaskDB = InMemoryTaskDB()
+    db: AbstractDB = InMemorySeparatedDB()
     workspace: str = os.getenv("AGENT_WORKSPACE", "workspace")
 
     @staticmethod
