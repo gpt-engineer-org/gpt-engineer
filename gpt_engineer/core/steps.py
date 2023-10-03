@@ -8,14 +8,14 @@ from typing import List, Union
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from termcolor import colored
 
-from gpt_engineer.ai import AI
-from gpt_engineer.chat_to_files import (
+from gpt_engineer.core.ai import AI
+from gpt_engineer.core.chat_to_files import (
     format_file_to_input,
     get_code_strings,
     overwrite_files,
     to_files,
 )
-from gpt_engineer.db import DBs
+from gpt_engineer.core.db import DBs
 from gpt_engineer.file_selector import FILE_LIST_NAME, ask_for_files
 from gpt_engineer.learning import human_review_input
 

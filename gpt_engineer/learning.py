@@ -10,8 +10,8 @@ from typing import List, Optional
 from dataclasses_json import dataclass_json
 from termcolor import colored
 
-from gpt_engineer.db import DB, DBs
-from gpt_engineer.domain import Step
+from gpt_engineer.core.db import DB, DBs
+from gpt_engineer.core.domain import Step
 
 
 @dataclass_json

@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from agent_protocol import Agent, Step, Task, models
-from gpt_engineer.db import DB
+from gpt_engineer.core.db import DB
 from gpt_engineer.main import main
 from openai.error import AuthenticationError
 import tempfile

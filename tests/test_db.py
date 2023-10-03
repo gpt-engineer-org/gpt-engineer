@@ -1,6 +1,6 @@
 import pytest
 
-from gpt_engineer.db import DB, DBs
+from gpt_engineer.core.db import DB, DBs
 
 
 def test_DB_operations(tmp_path):

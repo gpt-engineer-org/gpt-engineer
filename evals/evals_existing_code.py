@@ -11,8 +11,8 @@ from eval_tools import (
     load_evaluations_from_file,
 )
 
-from gpt_engineer.chat_to_files import parse_chat
-from gpt_engineer.db import DB
+from gpt_engineer.core.chat_to_files import parse_chat
+from gpt_engineer.core.db import DB
 
 app = typer.Typer()  # creates a CLI app
 

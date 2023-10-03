@@ -2,9 +2,9 @@ import hashlib
 
 from typing import List
 
-from gpt_engineer import steps
-from gpt_engineer.db import DBs
-from gpt_engineer.domain import Step
+from gpt_engineer.core import steps
+from gpt_engineer.core.db import DBs
+from gpt_engineer.core.domain import Step
 from gpt_engineer.learning import Learning, extract_learning
 
 

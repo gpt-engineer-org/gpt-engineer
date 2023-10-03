@@ -4,7 +4,7 @@ import re
 
 from typing import List, Tuple
 
-from gpt_engineer.db import DB, DBs
+from gpt_engineer.core.db import DB, DBs
 from gpt_engineer.file_selector import FILE_LIST_NAME
 
 

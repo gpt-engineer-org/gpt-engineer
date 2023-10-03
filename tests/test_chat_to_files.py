@@ -1,6 +1,6 @@
 import textwrap
 
-from gpt_engineer.chat_to_files import to_files
+from gpt_engineer.core.chat_to_files import to_files
 
 
 def test_to_files():
