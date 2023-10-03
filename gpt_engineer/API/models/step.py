@@ -41,7 +41,7 @@ class Step(BaseModel):
     status: StrictStr = Field(..., description="The status of the task step.")
     output: Optional[StrictStr] = Field(None, description="Output of the task step.")
     additional_output: Optional[Any] = Field(
-        None,
+        dict(),
         description="Output that the task step has produced. Any value is allowed.",
     )
     artifacts: conlist(Artifact) = Field(

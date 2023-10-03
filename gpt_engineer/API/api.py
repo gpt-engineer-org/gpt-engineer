@@ -18,7 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
-from gpt_engineer.API.agent import base_router, Agent
+from gpt_engineer.API.agent import base_router, Agent, list_agent_task_artifacts
 from gpt_engineer.API.db import NotFoundException, not_found_exception_handler
 from typing import Callable, Optional, Coroutine, Any
 
@@ -130,30 +130,22 @@ async def step_handler(step: Step) -> Step:
         print("The agent lacks a valid OPENAI_API_KEY to execute the requested step.")
 
     # check if new files have been created and make artifacts for those
-    # artifacts = await list_agent_task_artifacts(step.task_id)
-    # existing_artifacts = {artifact.file_name for artifact in artifacts}
-    #
-    # for dirpath, dirnames, filenames in os.walk(project_dir):
-    #     for filename in filenames:
-    #         full_path = os.path.join(dirpath, filename)
-    #         if not full_path in existing_artifacts:
-    #             await Agent.db.create_artifact(
-    #                 task_id=step.task_id,
-    #                 relative_path=os.path.relpath(full_path, project_dir),
-    #                 file_name=full_path,
-    #                 )
-    #
-    # task = await Agent.db.get_task(step.task_id)
-    # artifacts = await list_agent_task_artifacts(step.task_id)
-    # if step.is_last:
-    #     await Agent.db.create_step(
-    #         step.task_id,
-    #         name=f"Dummy step",
-    #         input=f"Creating dummy step to not run out of steps after {step.name}",
-    #         is_last=True,
-    #         additional_input={},
-    #     )
-    #     step.is_last = False
+    artifacts = await list_agent_task_artifacts(step.task_id)
+    existing_artifacts = {artifact.file_name for artifact in artifacts}
+
+    for dirpath, dirnames, filenames in os.walk(project_dir):
+        for filename in filenames:
+            full_path = os.path.join(dirpath, filename)
+            if not full_path in existing_artifacts:
+                await Agent.db.create_artifact(
+                    task_id=step.task_id,
+                    relative_path=os.path.relpath(full_path, project_dir),
+                    file_name=full_path,
+                    )
+
+    task = await Agent.db.get_task(step.task_id)
+    artifacts = await list_agent_task_artifacts(step.task_id)
+
 
     return step
 
