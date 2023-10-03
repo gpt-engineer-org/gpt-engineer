@@ -1,7 +1,7 @@
 import asyncio
 import os
 from uuid import uuid4
-
+import tempfile
 import aiofiles
 from fastapi import APIRouter, UploadFile, Form, File
 from fastapi.responses import FileResponse
@@ -59,7 +59,7 @@ async def create_agent_task(body: TaskRequestBody | None = None) -> Task:
 
 
 @base_router.get("/ap/v1/agent/tasks", response_model=TaskListResponse, tags=["agent"])
-async def list_agent_tasks_ids(page_size: int = 10, current_page: int = 1) -> List[str]:
+async def list_agent_tasks_ids(page_size: int = 10, current_page: int = 1) -> TaskListResponse:
     """
     List all tasks that have been created for the agent.
     """
@@ -92,7 +92,7 @@ async def get_agent_task(task_id: str) -> Task:
 )
 async def list_agent_task_steps(
     task_id: str, page_size: int = 10, current_page: int = 1
-) -> List[str]:
+) -> TaskStepsListResponse:
     """
     List all steps for the specified task.
     """
@@ -162,14 +162,23 @@ async def get_agent_task_step(task_id: str, step_id: str) -> Step:
 
 @base_router.get(
     "/ap/v1/agent/tasks/{task_id}/artifacts",
-    response_model=List[Artifact],
+    response_model=Artifacts,
     tags=["agent"],
 )
-async def list_agent_task_artifacts(task_id: str) -> List[Artifact]:
+async def list_agent_task_artifacts(task_id: str) -> Artifacts:
     """
     List all artifacts for the specified task.
     """
     artifacts = await Agent.db.list_artifacts(task_id)
+    artifacts = Artifacts(
+        artifacts=artifacts,
+        pagination=Pagination(
+            total_items=0,
+            total_pages=0,
+            current_page=0,
+            page_size=0,
+        )
+    )
     return artifacts
 
 
@@ -216,14 +225,18 @@ async def download_agent_task_artifacts(task_id: str, artifact_id: str) -> FileR
     """
     artifact = await Agent.db.get_artifact(task_id, artifact_id)
     path = Agent.get_artifact_path(task_id, artifact)
-    return FileResponse(
+    with open(path, 'r') as file:
+        content = file.read()
+        print(content)
+    response = FileResponse(
         path=path, media_type="application/octet-stream", filename=artifact.file_name
     )
+    return response
 
 
 class Agent:
     db: AbstractDB = InMemorySeparatedDB()
-    workspace: str = os.getenv("AGENT_WORKSPACE", "workspace")
+    workspace: str = tempfile.gettempdir()
 
     @staticmethod
     def setup_agent(task_handler: TaskHandler, step_handler: StepHandler):
