@@ -94,7 +94,7 @@ def overwrite_files(chat: str, dbs: DBs) -> None:
             dbs.workspace[file_name] = file_content
 
 
-def get_code_strings(workspace_path: Path, metadata_db: DB) -> dict[str, str]:
+def get_code_strings(workspace: DB, metadata_db: DB) -> dict[str, str]:
     """
     Read file_list.txt and return file names and their content.
 
@@ -108,17 +108,32 @@ def get_code_strings(workspace_path: Path, metadata_db: DB) -> dict[str, str]:
     dict[str, str]
         A dictionary mapping file names to their content.
     """
+
+    def get_all_files_in_dir(directory):
+        for root, dirs, files in os.walk(directory):
+            for file in files:
+                yield os.path.join(root, file)
+        for dir in dirs:
+            yield from get_all_files_in_dir(os.path.join(root, dir))
+
     files_paths = metadata_db[FILE_LIST_NAME].strip().split("\n")
-    files_dict = {}
+    files = []
+
     for full_file_path in files_paths:
-        with open(full_file_path, "r") as file:
-            file_data = file.read()
-        if file_data:
-            assert os.path.commonpath([full_file_path, workspace_path]) == str(
-                workspace_path
-            ), "Trying to edit files outside of the workspace"
-            file_name = os.path.relpath(full_file_path, workspace_path)
-            files_dict[file_name] = file_data
+        if os.path.isdir(full_file_path):
+            for file_path in get_all_files_in_dir(full_file_path):
+                files.append(file_path)
+        else:
+            files.append(full_file_path)
+
+    files_dict = {}
+    for path in files:
+        assert os.path.commonpath([full_file_path, workspace.path]) == str(
+            workspace.path
+        ), "Trying to edit files outside of the workspace"
+        file_name = os.path.relpath(path, workspace.path)
+        if file_name in workspace:
+            files_dict[file_name] = workspace[file_name]
     return files_dict
 
 

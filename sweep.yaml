@@ -9,7 +9,10 @@ description: 'Python project for AI code generation with next token prediction L
 
 # Default Values: https://github.com/sweepai/sweep/blob/main/sweep.yaml
 sandbox:
-  enabled: true
-  image: "Python3"
-  install: "python -m venv venv; . venv/bin/activate; pip install black"
-  formatter: ". venv/bin/activate; black {files}"
+  install:
+    - pre-commit install
+  check:
+    - pre-commit run --files {file_path}
+
+rules:
+  - Ensure all new functions and classes have very clear, concise and up-to-date docstrings. Take gpt_engineer/ai.py as a good example.
