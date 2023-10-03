@@ -1,7 +1,4 @@
 """
-AI Chat Module
-------------------------
-
 This module provides an interface to interact with AI models.
 It leverages the OpenAI GPT models and allows for integration with Azure-based instances of the same.
 The AI class encapsulates the chat functionalities, allowing to start, advance, and manage a conversation with the model.

@@ -1,3 +1,39 @@
+"""
+This module provides functionalities to handle and send learning data to RudderStack
+for the purpose of analysis and to improve the gpt-engineer system. The data is sent
+only when the user gives consent to share.
+
+The module provides the following main functions:
+
+- `send_learning`: Directly send a learning data to RudderStack.
+- `collect_learnings`: Extract, possibly adjust, and send the learning data based on
+  provided input parameters.
+- `steps_file_hash`: Computes the SHA-256 hash of the steps file, which might be used
+  for identifying the exact version or changes in the steps.
+
+Dependencies:
+- hashlib: For generating SHA-256 hash.
+- typing: For type annotations.
+- gpt_engineer.core: Core functionalities of gpt-engineer.
+- gpt_engineer.cli.learning: Handles the extraction of learning data.
+
+Note:
+    Data sent to RudderStack is not shared with third parties and is used solely to
+    improve gpt-engineer and allow it to handle a broader range of use cases.
+    Consent logic is in gpt_engineer/learning.py.
+
+"""
+import hashlib
+
+from typing import List
+
+from gpt_engineer.core import steps
+from gpt_engineer.core.db import DBs
+from gpt_engineer.core.domain import Step
+from gpt_engineer.cli.learning import Learning, extract_learning
+
+...
+
 import hashlib
 
 from typing import List
