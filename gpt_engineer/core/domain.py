@@ -1,5 +1,5 @@
 """
-This module provides utilities and type annotations related to the steps workflow in GPT Engineer.
+This module provides annotations related to the steps workflow in GPT Engineer.
 
 Imports:
     - `Callable`, `List`, and `TypeVar` from `typing` module, which are used for type hinting.
