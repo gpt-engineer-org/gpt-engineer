@@ -4,6 +4,7 @@ from pathlib import Path
 import pathlib
 from fastapi.staticfiles import StaticFiles
 from agent_protocol import Agent, Step, Task, models
+from agent_protocol.agent import list_agent_task_artifacts
 from gpt_engineer.db import DB
 from gpt_engineer.main import main
 from openai.error import AuthenticationError
@@ -108,109 +109,48 @@ async def step_handler(step: Step) -> Step:
     - step (Step): Returns the processed step, potentially with modifications.
     """
 
-    if not step.name == "Dummy step":
-        try:
-            main(
-                os.path.join(step.additional_properties["root_dir"], step.task_id),
-                step.additional_properties.get("model", "gpt-4"),
-                step.additional_properties.get("temperature", 0.1),
-                "benchmark",
-                False,
-                step.additional_properties.get("azure_endpoint", ""),
-                step.additional_properties.get("verbose", False),
-            )
-        except AuthenticationError:
-            print("The agent lacks a valid OPENAI_API_KEY to execute the requested step.")
-
-    if step.is_last:
-        await Agent.db.create_step(
-            step.task_id,
-            name=f"Dummy step",
-            input=f"Creating dummy step to not run out of steps after {step.name}",
-            is_last=True,
-            additional_properties={},
+    # if not step.name == "Dummy step":
+    project_dir = os.path.join(step.additional_properties["root_dir"], step.task_id)
+    try:
+        main(
+            project_dir,
+            step.additional_properties.get("model", "gpt-4"),
+            step.additional_properties.get("temperature", 0.1),
+            "benchmark",
+            False,
+            step.additional_properties.get("azure_endpoint", ""),
+            step.additional_properties.get("verbose", False),
         )
-        step.is_last = False
+    except AuthenticationError:
+        print("The agent lacks a valid OPENAI_API_KEY to execute the requested step.")
+
+    # check if new files have been created and make artifacts for those
+    artifacts = await list_agent_task_artifacts(step.task_id)
+    existing_artifacts = {artifact.file_name for artifact in artifacts}
+
+    for dirpath, dirnames, filenames in os.walk(project_dir):
+        for filename in filenames:
+            full_path = os.path.join(dirpath, filename)
+            if not full_path in existing_artifacts:
+                await Agent.db.create_artifact(
+                    task_id=step.task_id,
+                    relative_path=os.path.relpath(full_path, project_dir),
+                    file_name=full_path,
+                    )
+
+    task = await Agent.db.get_task(step.task_id)
+    artifacts = await list_agent_task_artifacts(step.task_id)
+    # if step.is_last:
+    #     await Agent.db.create_step(
+    #         step.task_id,
+    #         name=f"Dummy step",
+    #         input=f"Creating dummy step to not run out of steps after {step.name}",
+    #         is_last=True,
+    #         additional_properties={},
+    #     )
+    #     step.is_last = False
 
     return step
-class AgentMiddleware:
-    """
-    Middleware that injects the agent instance into the request scope.
-    """
-
-    def __init__(self, app: FastAPI, agent: "Agent"):
-        """
-
-        Args:
-            app: The FastAPI app - automatically injected by FastAPI.
-            agent: The agent instance to inject into the request scope.
-        """
-        self.app = app
-        self.agent = agent
-
-    async def __call__(self, scope, receive, send):
-        scope["agent"] = self.agent
-        await self.app(scope, receive, send)
-
-def run_fast_API_app(port):
-    global _task_handler
-    _task_handler = task_handler
-
-    global _step_handler
-    _step_handler = step_handler
-
-    app = FastAPI(
-        title="Agent Communication Protocol",
-        description="Specification of the API protocol for communication with an agent.",
-        version="v1",
-    )
-
-    app.add_exception_handler(NotFoundException, not_found_exception_handler)
-
-    router = APIRouter()
-
-    # Add CORS middleware
-    origins = [
-        "http://localhost:5000",
-        "http://127.0.0.1:5000",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-        "http://localhost:8080",
-        "http://127.0.0.1:8080",
-        # Add any other origins you want to whitelist
-    ]
-
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    app.include_router(router, prefix="/ap/v1")
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    frontend_path = pathlib.Path(
-        os.path.join(script_dir, "/home/axel/Software/AutoGPTArenaHack/frontend/build/web")
-    ).resolve()
-
-    if os.path.exists(frontend_path):
-        app.mount("/app", StaticFiles(directory=frontend_path), name="app")
-
-        @app.get("/", include_in_schema=False)
-        async def root():
-            return RedirectResponse(url="/app/index.html", status_code=307)
-
-    else:
-        print(f"Frontend not found. {frontend_path} does not exist. The frontend will not be served")
-    app.add_middleware(AgentMiddleware, agent=Agent)
-    config = Config()
-    config.loglevel = "ERROR"
-    config.bind = [f"localhost:{port}"]
-
-    print(f"Agent server starting on http://localhost:{port}")
-    asyncio.run(serve(app, config))
-    return app
-
 
 class AgentMiddleware:
     """
@@ -230,6 +170,7 @@ class AgentMiddleware:
     async def __call__(self, scope, receive, send):
         scope["agent"] = self.agent
         await self.app(scope, receive, send)
+
 
 def simplified_fast_API(port):
     Agent.setup_agent(task_handler, step_handler)
