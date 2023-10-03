@@ -14,6 +14,7 @@ from .db import InMemorySeparatedDB, Task, AbstractDB, Step
 from .models.task_request_body import TaskRequestBody
 from .models.step_request_body import StepRequestBody
 from .models.artifact import Artifact
+from .models.artifacts import Artifacts
 from .models.pagination import Pagination
 from .legacy_models import Status
 from pydantic import BaseModel
@@ -89,24 +90,24 @@ async def get_agent_task(task_id: str) -> Task:
     response_model=TaskStepsListResponse,
     tags=["agent"],
 )
-# async def list_agent_task_steps(
-#     task_id: str, page_size: int = 10, current_page: int = 1
-# ) -> List[str]:
-#     """
-#     List all steps for the specified task.
-#     """
-#     task = await Agent.db.get_task(task_id)
-#     start_index = (current_page - 1) * page_size
-#     end_index = start_index + page_size
-#     return TaskStepsListResponse(
-#         steps=task.steps[start_index:end_index],
-#         pagination=Pagination(
-#             total_items=len(task.steps),
-#             total_pages=len(task.steps) // page_size,
-#             current_page=current_page,
-#             page_size=page_size,
-#         ),
-#     )
+async def list_agent_task_steps(
+    task_id: str, page_size: int = 10, current_page: int = 1
+) -> List[str]:
+    """
+    List all steps for the specified task.
+    """
+    task = await Agent.db.get_task(task_id)
+    start_index = (current_page - 1) * page_size
+    end_index = start_index + page_size
+    return TaskStepsListResponse(
+        steps=task.steps[start_index:end_index],
+        pagination=Pagination(
+            total_items=len(task.steps),
+            total_pages=len(task.steps) // page_size,
+            current_page=current_page,
+            page_size=page_size,
+        ),
+    )
 
 
 @base_router.post(
@@ -126,15 +127,20 @@ async def execute_agent_task_step(
 
     task = await Agent.db.get_task(task_id)
     step_list = await Agent.db.list_steps(task_id)
+    if len(step_list) == 0:
+        raise Exception("No steps exist")
     step = next(filter(lambda x: x.status == Status['created'], step_list), None)
 
     if not step:
-        raise Exception("No steps to execute")
+        print("Last step already executed")
+        return next(filter(lambda x: x.is_last, step_list), None)
 
     # step.status = Status["running"]
 
     step.input = body.input if body else None
-    step.additional_input = body.additional_input.update(step.additional_input) if body else step.additional_input
+    if body:
+        if body.additional_input:
+            step.additional_input = body.additional_input.update(step.additional_input)
 
     step = await _step_handler(step)
 
@@ -163,8 +169,8 @@ async def list_agent_task_artifacts(task_id: str) -> List[Artifact]:
     """
     List all artifacts for the specified task.
     """
-    task = await Agent.db.get_task(task_id)
-    return task.artifacts
+    artifacts = await Agent.db.list_artifacts(task_id)
+    return artifacts
 
 
 @base_router.post(

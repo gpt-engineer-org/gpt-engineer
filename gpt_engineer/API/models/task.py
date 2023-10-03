@@ -31,7 +31,7 @@ class Task(BaseModel):
 
     input: Optional[StrictStr] = Field(None, description="Input prompt for the task.")
     additional_input: Optional[Any] = Field(
-        None, description="Input parameters for the task. Any value is allowed."
+        dict(), description="Input parameters for the task. Any value is allowed."
     )
     task_id: StrictStr = Field(..., description="The ID of the task.")
     artifacts: conlist(Artifact) = Field(
