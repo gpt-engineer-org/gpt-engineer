@@ -1,29 +1,31 @@
-# import sys
+import sys
 import os
-# sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "client/"))
-# print(sys.path)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+print(sys.path)
 import asyncio
 from pathlib import Path
 import pathlib
-from fastapi.staticfiles import StaticFiles
+
+from typing import Callable, Optional, Coroutine, Any
 
 from gpt_engineer.db import DB
 from gpt_engineer.main import main
+from gpt_engineer.API.agent import base_router, Agent
+from gpt_engineer.API.db import NotFoundException, not_found_exception_handler
+
+from models.step import Step
+from models.task import Task
+
 from openai.error import AuthenticationError
 
 from fastapi import FastAPI, APIRouter
 from fastapi.responses import RedirectResponse
-
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
-from gpt_engineer.API.agent import base_router, Agent, list_agent_task_artifacts
-from gpt_engineer.API.db import NotFoundException, not_found_exception_handler
-from typing import Callable, Optional, Coroutine, Any
 
-from models.step import Step
-from models.task import Task
 
 StepHandler = Callable[[Step], Coroutine[Any, Any, Step]]
 TaskHandler = Callable[[Task], Coroutine[Any, Any, None]]
@@ -226,7 +228,7 @@ def run_fast_API_app(port):
     app.include_router(base_router)
     script_dir = os.path.dirname(os.path.realpath(__file__))
     frontend_path = pathlib.Path(
-        os.path.join(script_dir, "/home/axel/Software/AutoGPTArenaHack/frontend/build/web")
+        os.path.join(script_dir, "../../../frontend/build/web")
     ).resolve()
 
     if os.path.exists(frontend_path):

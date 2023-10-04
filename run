@@ -28,6 +28,8 @@ fi
 
 # Install the software in the current directory
 pip install .
+# so that it runs the files in the repo
+pip uninstall gpt-engineer --yes
 
 # Start the Python application
-python gpt_engineer/api.py
+python3 gpt_engineer/API/api.py
