@@ -292,7 +292,9 @@ def ask_for_files(metadata_db: DB, workspace_db: DB) -> None:
         sys.exit(1)
 
     if not selection_number == 3:
-        metadata_db[FILE_LIST_NAME] = "\n".join(file_path_list)
+        metadata_db[FILE_LIST_NAME] = "\n".join(
+            str(file_path) for file_path in file_path_list
+        )
 
 
 def gui_file_selector(input_path: str) -> List[str]:
