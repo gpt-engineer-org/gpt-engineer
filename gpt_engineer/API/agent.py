@@ -256,7 +256,7 @@ class Agent:
         """
         Get the workspace path for the specified task.
         """
-        return os.path.join(os.getcwd(), Agent.workspace, task_id)
+        return os.path.join(Agent.workspace, task_id)
 
     @staticmethod
     def get_artifact_folder(task_id: str, artifact: Artifact) -> str:
