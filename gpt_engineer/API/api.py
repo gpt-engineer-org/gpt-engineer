@@ -231,7 +231,7 @@ def run_fast_API_app(port):
     app.include_router(base_router)
     script_dir = os.path.dirname(os.path.realpath(__file__))
     frontend_path = pathlib.Path(
-        os.path.join(script_dir, "../../../frontend/build/web")
+        os.path.join(script_dir, "../../../../frontend/build/web")
     ).resolve()
 
     if os.path.exists(frontend_path):
