@@ -106,10 +106,7 @@ class Step(BaseModel):
 
         # set to None if additional_output (nullable) is None
         # and __fields_set__ contains the field
-        if (
-            self.additional_output is None
-            and "additional_output" in self.__fields_set__
-        ):
+        if self.additional_output is None and "additional_output" in self.__fields_set__:
             _dict["additional_output"] = None
 
         return _dict
@@ -133,9 +130,7 @@ class Step(BaseModel):
                 "status": obj.get("status"),
                 "output": obj.get("output"),
                 "additional_output": obj.get("additional_output"),
-                "artifacts": [
-                    Artifact.from_dict(_item) for _item in obj.get("artifacts")
-                ]
+                "artifacts": [Artifact.from_dict(_item) for _item in obj.get("artifacts")]
                 if obj.get("artifacts") is not None
                 else None,
                 "is_last": obj.get("is_last")
