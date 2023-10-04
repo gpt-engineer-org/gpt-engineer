@@ -25,7 +25,7 @@ def load_env_if_needed():
         load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    
+
 def load_prompt(dbs: DBs):
     if dbs.input.get("prompt"):
         return dbs.input.get("prompt")
@@ -39,9 +39,9 @@ def load_prompt(dbs: DBs):
         "\nWhat application do you want gpt-engineer to generate?\n"
     )
     return dbs.input.get("prompt")
- 
 
- def preprompts_path(use_custom_preprompts: bool, input_path: Path = None) -> Path:
+
+def preprompts_path(use_custom_preprompts: bool, input_path: Path = None) -> Path:
     original_preprompts_path = Path(__file__).parent / "preprompts"
     if not use_custom_preprompts:
         return original_preprompts_path
