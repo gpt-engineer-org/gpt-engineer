@@ -1,6 +1,9 @@
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 print(sys.path)
 import asyncio
 from pathlib import Path
@@ -239,7 +242,9 @@ def run_fast_API_app(port):
             return RedirectResponse(url="/app/index.html", status_code=307)
 
     else:
-        print(f"Frontend not found. {frontend_path} does not exist. The frontend will not be served")
+        print(
+            f"Frontend not found. {frontend_path} does not exist. The frontend will not be served"
+        )
     app.add_middleware(AgentMiddleware, agent=Agent)
     config = Config()
     config.loglevel = "ERROR"

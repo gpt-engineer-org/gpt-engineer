@@ -10,6 +10,7 @@ from hypercorn.config import Config
 from typing import Callable, List, Optional, Annotated, Coroutine, Any
 
 from .db import InMemorySeparatedDB, Task, AbstractDB, Step
+
 # from agent_protocol.server import app
 from .models.task_request_body import TaskRequestBody
 from .models.step_request_body import StepRequestBody
@@ -19,6 +20,7 @@ from .models.pagination import Pagination
 from .legacy_models import Status
 from pydantic import BaseModel
 
+
 class TaskListResponse(BaseModel):
     tasks: List[Task]
     pagination: Pagination
@@ -27,7 +29,6 @@ class TaskListResponse(BaseModel):
 class TaskStepsListResponse(BaseModel):
     steps: List[Step]
     pagination: Pagination
-
 
 
 StepHandler = Callable[[Step], Coroutine[Any, Any, Step]]
@@ -59,7 +60,9 @@ async def create_agent_task(body: TaskRequestBody | None = None) -> Task:
 
 
 @base_router.get("/ap/v1/agent/tasks", response_model=TaskListResponse, tags=["agent"])
-async def list_agent_tasks_ids(page_size: int = 10, current_page: int = 1) -> TaskListResponse:
+async def list_agent_tasks_ids(
+    page_size: int = 10, current_page: int = 1
+) -> TaskListResponse:
     """
     List all tasks that have been created for the agent.
     """
@@ -130,7 +133,7 @@ async def execute_agent_task_step(
     step_list = await Agent.db.list_steps(task_id)
     if len(step_list) == 0:
         raise Exception("No steps exist")
-    step = next(filter(lambda x: x.status == Status['created'], step_list), None)
+    step = next(filter(lambda x: x.status == Status["created"], step_list), None)
 
     if not step:
         print("Last step already executed")
@@ -166,7 +169,9 @@ async def get_agent_task_step(task_id: str, step_id: str) -> Step:
     response_model=Artifacts,
     tags=["agent"],
 )
-async def list_agent_task_artifacts(task_id: str, page_size: int = 1000, current_page: int = 1) -> Artifacts:
+async def list_agent_task_artifacts(
+    task_id: str, page_size: int = 1000, current_page: int = 1
+) -> Artifacts:
     """
     List all artifacts for the specified task.
     """
@@ -180,7 +185,7 @@ async def list_agent_task_artifacts(task_id: str, page_size: int = 1000, current
             total_pages=len(artifacts),
             current_page=current_page,
             page_size=page_size,
-        )
+        ),
     )
     return artifacts
 
@@ -228,7 +233,7 @@ async def download_agent_task_artifacts(task_id: str, artifact_id: str) -> FileR
     """
     artifact = await Agent.db.get_artifact(task_id, artifact_id)
     path = Agent.get_artifact_path(task_id, artifact)
-    with open(path, 'r') as file:
+    with open(path, "r") as file:
         content = file.read()
         print(content)
     response = FileResponse(

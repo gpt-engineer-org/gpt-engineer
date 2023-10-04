@@ -77,9 +77,7 @@ class TaskAllOf(BaseModel):
         _obj = TaskAllOf.parse_obj(
             {
                 "task_id": obj.get("task_id"),
-                "artifacts": [
-                    Artifact.from_dict(_item) for _item in obj.get("artifacts")
-                ]
+                "artifacts": [Artifact.from_dict(_item) for _item in obj.get("artifacts")]
                 if obj.get("artifacts") is not None
                 else None,
             }

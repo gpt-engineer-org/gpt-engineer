@@ -19,10 +19,9 @@ class NotFoundResponse(BaseModel):
         example="Unable to find entity with the provided id",
     )
 
+
 Status = {
     "created": "created",
     "running": "running",
     "completed": "completed",
 }
-
-

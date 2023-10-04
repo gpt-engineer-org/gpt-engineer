@@ -26,9 +26,10 @@ class NotFoundException(Exception):
     def __init__(self, item_name: str, item_id: str):
         self.item_name = item_name
         self.item_id = item_id
-        super().__init__(NotFoundResponse(
-            message=f"{item_name} with {item_id} not found."
-        ))
+        super().__init__(
+            NotFoundResponse(message=f"{item_name} with {item_id} not found.")
+        )
+
 
 async def not_found_exception_handler(
     request: Request, exc: NotFoundException
@@ -37,6 +38,7 @@ async def not_found_exception_handler(
         content={"message": f"{exc.item_name} with {exc.item_id} not found."},
         status_code=404,
     )
+
 
 class AbstractDB(ABC):
     async def create_task(
@@ -80,12 +82,12 @@ class AbstractDB(ABC):
     async def list_tasks(self) -> List[Task]:
         raise NotImplementedError
 
-    async def list_steps(
-        self, task_id: str, status: Optional[str] = None
-    ) -> List[Step]:
+    async def list_steps(self, task_id: str, status: Optional[str] = None) -> List[Step]:
         raise NotImplementedError
+
     async def list_artifacts(
-        self, task_id: str,
+        self,
+        task_id: str,
     ) -> List[Artifact]:
         raise NotImplementedError
 
