@@ -13,7 +13,7 @@ from gpt_engineer.chat_to_files import (
     format_file_to_input,
     get_code_strings,
     overwrite_files_with_edits,
-    to_files,
+    to_files_and_memory,
 )
 from gpt_engineer.db import DBs
 from gpt_engineer.file_selector import FILE_LIST_NAME, ask_for_files
@@ -62,14 +62,14 @@ def lite_gen(ai: AI, dbs: DBs) -> List[Message]:
     messages = ai.start(
         dbs.input["prompt"], dbs.preprompts["file_format"], step_name=curr_fn()
     )
-    to_files(messages[-1].content.strip(), dbs)
+    to_files_and_memory(messages[-1].content.strip(), dbs)
     return messages
 
 
 def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
     """Run the AI on the default prompts and save the results"""
     messages = ai.start(setup_sys_prompt(dbs), dbs.input["prompt"], step_name=curr_fn())
-    to_files(messages[-1].content.strip(), dbs)
+    to_files_and_memory(messages[-1].content.strip(), dbs)
     return messages
 
 
@@ -130,7 +130,7 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
         step_name=curr_fn(),
     )
 
-    to_files(messages[-1].content.strip(), dbs)
+    to_files_and_memory(messages[-1].content.strip(), dbs)
     return messages
 
 
@@ -211,7 +211,7 @@ def use_feedback(ai: AI, dbs: DBs):
     ]
     if dbs.input["feedback"]:
         messages = ai.next(messages, dbs.input["feedback"], step_name=curr_fn())
-        to_files(messages[-1].content.strip(), dbs)
+        to_files_and_memory(messages[-1].content.strip(), dbs)
         return messages
     else:
         print(

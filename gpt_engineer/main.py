@@ -80,6 +80,8 @@ def main(
 
     if lite_mode:
         assert not improve_mode, "Lite mode cannot improve code"
+        if steps_config == StepsConfig.DEFAULT:
+            steps_config = StepsConfig.LITE
 
     if improve_mode:
         assert (
@@ -97,7 +99,7 @@ def main(
 
     project_path = os.path.abspath(
         project_path
-    )  # resolve the string to a valid path (eg a/b/../c to a/c)
+    )  # resolve the string to a valid path (eg "a/b/../c" to "a/c")
     path = Path(project_path).absolute()
     print("Running gpt-engineer in", path, "\n")
 

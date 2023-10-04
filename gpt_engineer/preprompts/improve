@@ -25,7 +25,7 @@ Here is an example reponse:
 ---
 PLANNING:
 We need to change ... because ..., therefore I will add the line `a=a+1` to the function `add_one`.
-Also, in the class `DB`, we need to update the ... 
+Also, in the class `DB`, we need to update the ...
 
 OUTPUT:
 ```python

@@ -1,12 +1,15 @@
 import os
-from pathlib import Path
 import re
+import logging
 
 from dataclasses import dataclass
 from typing import List, Tuple
 
 from gpt_engineer.db import DB, DBs
 from gpt_engineer.file_selector import FILE_LIST_NAME
+
+
+logger = logging.getLogger(__name__)
 
 
 def parse_chat(chat) -> List[Tuple[str, str]]:
@@ -56,7 +59,22 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
     return files
 
 
-def to_files(chat: str, dbs: DBs):
+def to_files_and_memory(chat: str, dbs: DBs):
+    """
+    Save chat to memory, and parse chat to extracted file and save them to the workspace.
+
+    Parameters
+    ----------
+    chat : str
+        The chat to parse.
+    dbs : DBs
+        The databases that include the memory and workspace database
+    """
+    dbs.memory["all_output.txt"] = chat
+    to_files(chat, dbs.workspace)
+
+
+def to_files(chat: str, workspace: DB):
     """
     Parse the chat and add all extracted files to the workspace.
 
@@ -67,11 +85,9 @@ def to_files(chat: str, dbs: DBs):
     workspace : DB
         The database containing the workspace.
     """
-    dbs.memory["all_output.txt"] = chat
-
     files = parse_chat(chat)
     for file_name, file_content in files:
-        dbs.workspace[file_name] = file_content
+        workspace[file_name] = file_content
 
 
 def overwrite_files(chat: str, dbs: DBs) -> None:
@@ -218,10 +234,18 @@ def parse_edits(llm_response):
 
 def apply_edits(edits: List[Edit], workspace: DB):
     for edit in edits:
-        filename = edit.filename.replace("workspace/", "")
+        filename = edit.filename
         if edit.before == "":
+            if workspace.get(filename) is not None:
+                logger.warn(
+                    f"The edit to be applied wants to create a new file `{filename}`, but that already exists. The file will be overwritten. See `.gpteng/memory` for previous version."
+                )
             workspace[filename] = edit.after  # new file
         else:
+            if workspace[filename].count(edit.before) > 1:
+                logger.warn(
+                    f"While applying an edit to `{filename}`, the code block to be replaced was found multiple times. All instances will be replaced."
+                )
             workspace[filename] = workspace[filename].replace(
                 edit.before, edit.after
             )  # existing file

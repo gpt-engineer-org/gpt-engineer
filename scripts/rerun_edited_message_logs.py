@@ -6,7 +6,7 @@ from typing import Union
 import typer
 
 from gpt_engineer.ai import AI
-from gpt_engineer.chat_to_files import to_files
+from gpt_engineer.chat_to_files import to_files_and_memory
 
 app = typer.Typer()
 
@@ -30,7 +30,7 @@ def main(
 
     if out_path:
         # ToDo: to_files expects a DBs as 2nd argument. But do we need this entire file?
-        to_files(messages[-1]["content"], out_path)
+        to_files_and_memory(messages[-1]["content"], out_path)
         with open(pathlib.Path(out_path) / "all_output.txt", "w") as f:
             json.dump(messages[-1]["content"], f)
 
