@@ -40,6 +40,21 @@ def load_prompt(dbs: DBs):
     )
     return dbs.input.get("prompt")
 
+ 
+def preprompts_path(use_custom_preprompts: bool, input_path: Path = None) -> Path:
+    original_preprompts_path = Path(__file__).parent / "preprompts"
+    if not use_custom_preprompts:
+        return original_preprompts_path
+
+    custom_preprompts_path = input_path / "preprompts"
+    if not custom_preprompts_path.exists():
+        custom_preprompts_path.mkdir()
+
+    for file in original_preprompts_path.glob("*"):
+        if not (custom_preprompts_path / file.name).exists():
+            (custom_preprompts_path / file.name).write_text(file.read_text())
+    return custom_preprompts_path
+
 
 @app.command()
 def main(
@@ -68,10 +83,10 @@ def main(
         help="""Endpoint for your Azure OpenAI Service (https://xx.openai.azure.com).
             In that case, the given model is the deployment name chosen in the Azure AI Studio.""",
     ),
-    use_project_preprompts: bool = typer.Option(
+    use_custom_preprompts: bool = typer.Option(
         False,
-        "--use-project-preprompts",
-        help="""Use the project's preprompts instead of the default ones.
+        "--use-custom-preprompts",
+        help="""Use your project's custom preprompts instead of the default ones.
           Copies all original preprompts to the project's workspace if they don't exist there.""",
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
@@ -125,7 +140,7 @@ def main(
         logs=DB(memory_path / "logs"),
         input=DB(input_path),
         workspace=DB(workspace_path),
-        preprompts=DB(preprompts_path),
+        preprompts=DB(preprompts_path(use_custom_preprompts, input_path)),
         archive=DB(archive_path),
         project_metadata=DB(project_metadata_path),
     )
