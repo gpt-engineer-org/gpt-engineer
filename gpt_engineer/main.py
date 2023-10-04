@@ -40,7 +40,7 @@ def load_prompt(dbs: DBs):
     )
     return dbs.input.get("prompt")
 
- 
+
 def preprompts_path(use_custom_preprompts: bool, input_path: Path = None) -> Path:
     original_preprompts_path = Path(__file__).parent / "preprompts"
     if not use_custom_preprompts:
