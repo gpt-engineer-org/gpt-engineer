@@ -96,14 +96,15 @@ async def list_agent_task_steps(
     """
     List all steps for the specified task.
     """
-    task = await Agent.db.get_task(task_id)
+    # task = await Agent.db.get_task(task_id)
+    steps = await Agent.db.list_steps(task_id)
     start_index = (current_page - 1) * page_size
     end_index = start_index + page_size
     return TaskStepsListResponse(
-        steps=task.steps[start_index:end_index],
+        steps=steps[start_index:end_index],
         pagination=Pagination(
-            total_items=len(task.steps),
-            total_pages=len(task.steps) // page_size,
+            total_items=len(steps),
+            total_pages=len(steps) // page_size,
             current_page=current_page,
             page_size=page_size,
         ),
@@ -165,18 +166,20 @@ async def get_agent_task_step(task_id: str, step_id: str) -> Step:
     response_model=Artifacts,
     tags=["agent"],
 )
-async def list_agent_task_artifacts(task_id: str) -> Artifacts:
+async def list_agent_task_artifacts(task_id: str, page_size: int = 1000, current_page: int = 1) -> Artifacts:
     """
     List all artifacts for the specified task.
     """
-    artifacts = await Agent.db.list_artifacts(task_id)
+    start_index = (current_page - 1) * page_size
+    end_index = start_index + page_size
+    artifacts = (await Agent.db.list_artifacts(task_id))[start_index:end_index]
     artifacts = Artifacts(
         artifacts=artifacts,
         pagination=Pagination(
-            total_items=0,
-            total_pages=0,
-            current_page=0,
-            page_size=0,
+            total_items=len(artifacts),
+            total_pages=len(artifacts),
+            current_page=current_page,
+            page_size=page_size,
         )
     )
     return artifacts

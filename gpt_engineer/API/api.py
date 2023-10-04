@@ -79,7 +79,7 @@ async def task_handler(task: Task) -> None:
     # Write prompt to a file in the workspace.
     workspace["prompt"] = f"{task.input}\n"
 
-    # only for the test
+    # only for the test=WriteFile This should acutally
     workspace["random_file.txt"] = f"Washington D.C"
 
     # Ensure no prompt hang by writing to the consent file.
