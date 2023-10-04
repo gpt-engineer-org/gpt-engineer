@@ -28,7 +28,6 @@ from models.task import Task
 StepHandler = Callable[[Step], Coroutine[Any, Any, Step]]
 TaskHandler = Callable[[Task], Coroutine[Any, Any, None]]
 
-
 _task_handler: Optional[TaskHandler]
 _step_handler: Optional[StepHandler]
 
@@ -39,6 +38,7 @@ app = FastAPI(
 )
 
 app.add_exception_handler(NotFoundException, not_found_exception_handler)
+
 
 async def task_handler(task: Task) -> None:
     """
@@ -71,14 +71,16 @@ async def task_handler(task: Task) -> None:
         if hasattr(task.additional_input, "__root__"):
             additional_input = task.additional_input.__root__
 
-    # Set up the root directory for the agent, defaulting to a temporary directory.
-    root_dir = additional_input.get("root_dir", Agent.workspace)
-    additional_input["root_dir"] = root_dir
+    # Set up the root directory for the agent, defaulting to tempdir. Setting the workspace of the global Agent is POTENTIALLY PROBLEMATIC
+    Agent.workspace = additional_input.get("root_dir", Agent.workspace)
 
-    workspace = DB(os.path.join(root_dir, task.task_id))
+    workspace = DB(Agent.get_workspace(task.task_id))
 
     # Write prompt to a file in the workspace.
     workspace["prompt"] = f"{task.input}\n"
+
+    # only for the test
+    workspace["random_file.txt"] = f"Washington D.C"
 
     # Ensure no prompt hang by writing to the consent file.
     consent_file = Path(os.getcwd()) / ".gpte_consent"
@@ -115,10 +117,10 @@ async def step_handler(step: Step) -> Step:
     """
 
     # if not step.name == "Dummy step":
-    project_dir = os.path.join(step.additional_input["root_dir"], step.task_id)
+    workspace_dir = Agent.get_workspace(step.task_id)
     try:
         main(
-            project_dir,
+            workspace_dir,
             step.additional_input.get("model", "gpt-4"),
             step.additional_input.get("temperature", 0.1),
             "benchmark",
@@ -129,23 +131,37 @@ async def step_handler(step: Step) -> Step:
     except AuthenticationError:
         print("The agent lacks a valid OPENAI_API_KEY to execute the requested step.")
 
-    # check if new files have been created and make artifacts for those
+    # check if new files have been created and make artifacts for those (CURRENTLY ONLY CONSIDERS TOP LEVEL DIRECTORY AND WILL MAKE FALSE OVERWRITES IF THERE ARE MULTIPLE FILES WITH THE SAME NAME IN THE TREE).
     artifacts = await Agent.db.list_artifacts(step.task_id)
     existing_artifacts = {artifact.file_name for artifact in artifacts}
 
-    for dirpath, dirnames, filenames in os.walk(project_dir):
-        for filename in filenames:
-            full_path = os.path.join(dirpath, filename)
-            if not full_path in existing_artifacts:
-                if os.path.isfile(full_path):
-                    await Agent.db.create_artifact(
-                        task_id=step.task_id,
-                        relative_path=os.path.relpath(full_path, Agent.workspace),
-                        file_name=filename,
-                        )
+    for item in os.listdir(workspace_dir):
+        full_path = os.path.join(workspace_dir, item)
+        if os.path.isfile(full_path):
+            if item not in existing_artifacts:
+                existing_artifacts.add(item)
+                await Agent.db.create_artifact(
+                    task_id=step.task_id,
+                    relative_path="",
+                    file_name=item,
+                )
 
+    # for dirpath, dirnames, filenames in os.walk(project_dir):
+    #     for filename in filenames:
+    #         full_path = os.path.join(dirpath, filename)
+    #         if not full_path in existing_artifacts:
+    #             if os.path.isfile(full_path):
+    #                 rel_path = os.path.dirname(os.path.relpath(full_path, Agent.workspace))
+    #                 # BENCHMARK_TEMP = "/home/axel/Software/Auto-GPT/benchmark/agbenchmark_config/temp_folder/"
+    #                 # Path(os.path.join(BENCHMARK_TEMP, rel_path)).mkdir(exist_ok=True, parents=True)
+    #                 await Agent.db.create_artifact(
+    #                     task_id=step.task_id,
+    #                     relative_path=os.path.dirname(os.path.relpath(full_path, Agent.workspace)),
+    #                     file_name=filename,
+    #                     )
 
     return step
+
 
 class AgentMiddleware:
     """
@@ -174,6 +190,7 @@ def simplified_fast_API(port):
     config.bind = [f"localhost:{port}"]  # As an example configuration setting
     app.include_router(base_router)
     asyncio.run(serve(app, config))
+
 
 def run_fast_API_app(port):
     Agent.setup_agent(task_handler, step_handler)
@@ -205,7 +222,7 @@ def run_fast_API_app(port):
         allow_headers=["*"],
     )
 
-    #app.include_router(router, prefix="/ap/v1")
+    # app.include_router(router, prefix="/ap/v1")
     app.include_router(base_router)
     script_dir = os.path.dirname(os.path.realpath(__file__))
     frontend_path = pathlib.Path(
@@ -229,7 +246,6 @@ def run_fast_API_app(port):
     print(f"Agent server starting on http://localhost:{port}")
     asyncio.run(serve(app, config))
     return app
-
 
 
 if __name__ == "__main__":
