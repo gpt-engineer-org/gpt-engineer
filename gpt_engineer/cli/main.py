@@ -1,18 +1,43 @@
+"""
+This module provides a CLI tool to interact with the GPT Engineer application,
+enabling users to use OpenAI's models and define various parameters for the
+project they want to generate, improve or interact with.
+
+Main Functionality:
+---------------------
+- Load environment variables needed to work with OpenAI.
+- Allow users to specify parameters such as:
+  - Project path
+  - Model type (default to GPT-4)
+  - Temperature
+  - Step configurations
+  - Code improvement mode
+  - Lite mode for lighter operations
+  - Azure endpoint for Azure OpenAI services
+  - Using project's preprompts or default ones
+  - Verbosity level for logging
+- Interact with AI, databases, and archive processes based on the user-defined parameters.
+
+Notes:
+- Ensure the .env file has the `OPENAI_API_KEY` or provide it in the working directory.
+- The default project path is set to `projects/example`.
+- For azure_endpoint, provide the endpoint for Azure OpenAI service.
+
+"""
+
 import logging
 import os
-
 from pathlib import Path
 
 import openai
 import typer
-
 from dotenv import load_dotenv
 
-from gpt_engineer.ai import AI
-from gpt_engineer.collect import collect_learnings
-from gpt_engineer.db import DB, DBs, archive
-from gpt_engineer.learning import collect_consent
-from gpt_engineer.steps import STEPS, Config as StepsConfig
+from gpt_engineer.core.ai import AI
+from gpt_engineer.core.db import DB, DBs, archive
+from gpt_engineer.core.steps import STEPS, Config as StepsConfig
+from gpt_engineer.cli.collect import collect_learnings
+from gpt_engineer.cli.learning import collect_consent
 
 app = typer.Typer()  # creates a CLI app
 

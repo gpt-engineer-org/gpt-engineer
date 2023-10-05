@@ -1,8 +1,30 @@
+"""
+This module provides asynchronous functions to handle tasks and steps related to code generation. It ensures the proper setup, validation, and handling of tasks and steps by utilizing the agent protocol. This module also contains logic to handle potential authentication errors that may arise during code generation.
+
+Functions:
+- async task_handler(task: Task) -> None:
+    Processes a given task to set up the initial steps based on its input.
+
+- async step_handler(step: Step) -> Step:
+    Handles a provided step by potentially triggering code generation or other operations.
+
+- run_agent(port: int = 8000):
+    Initiates the agent by setting up the task and step handlers and then starts the agent on the specified port.
+
+Usage:
+    This module can be executed as a script to run the agent with a default or specified port.
+
+
+Note:
+    Ensure that you have a valid OPENAI_API_KEY when attempting to run tasks requiring authentication.
+"""
+
+
 import os
 from pathlib import Path
 from agent_protocol import Agent, Step, Task, models
-from gpt_engineer.db import DB
-from gpt_engineer.main import main
+from gpt_engineer.core.db import DB
+from gpt_engineer.cli.main import main
 from openai.error import AuthenticationError
 import tempfile
 
