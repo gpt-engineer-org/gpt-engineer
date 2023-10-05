@@ -340,6 +340,11 @@ class AI:
         List[Message]
             The deserialized list of messages.
         """
+        data = json.loads(jsondictstr)
+        # Modify implicit is_chunk property to ALWAYS false
+        # since Langchain's Message schema is more strict
+        modified_data = [{**item, 'data': {**item['data'], 'is_chunk': False}} for item in data]
+        jsondictstr = json.dumps(modified_data)
         return list(messages_from_dict(json.loads(jsondictstr)))  # type: ignore
 
     def update_token_usage_log(
