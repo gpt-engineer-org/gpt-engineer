@@ -19,9 +19,10 @@ This is the preferred method to install file-processor, as it will always instal
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
 
+If you don't have the latest version of Python then `click here`_.
+
 .. _pip: https://pip.pypa.io
 .. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
-
 
 From sources
 ------------
@@ -49,6 +50,18 @@ Troubleshooting
 
 For mac and linux system, there are sometimes slim python installations that do not include the gpt-engineer requirement tkinter, which is a standard library and thus not pip installable.
 
+Check what version of python you have installed by running: 
+
+.. code-block:: console
+
+    $ python3 --version
+
+If you don't have the latest version of Python then `click here`_.
+
+If you are still stuck then `this`_ website can help you.
+
+.. _click here: https://www.python.org/downloads/
+.. _this: https://www.freecodecamp.org/news/pip-upgrade-and-how-to-update-pip-and-python/#:~:text=One%20of%20the%20easiest%20ways,with%20it%20is%20also%20updated.&text=For%20me%2C%20I%20picked%203.11%20because%20it%27s%20now%20stable.&text=Run%20the%20installer%20and%20follow%20every%20prompt%20you%20see.
 To install tkinter on mac, you can for example use brew:
 
 .. code-block:: console
