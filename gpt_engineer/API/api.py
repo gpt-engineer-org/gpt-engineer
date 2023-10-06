@@ -151,7 +151,6 @@ async def step_handler(step: Step) -> Step:
         else:
             shutil.copy2(item, workspace_dir)
 
-
     # create artifacts, enabling agbenchmark to know about the existence of the files. LAST TIME I CHECKED, ANY NON-EMPTY RELATIVE PATHS GAVE RUNTIME ERRORS IN agbenchmark
     for item in os.listdir(workspace_dir):
         full_path = os.path.join(workspace_dir, item)
