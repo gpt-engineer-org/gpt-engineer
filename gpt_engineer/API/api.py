@@ -140,7 +140,7 @@ async def step_handler(step: Step) -> Step:
     artifacts = await Agent.db.list_artifacts(step.task_id)
     existing_artifacts = {artifact.file_name for artifact in artifacts}
 
-    #HACK SOLVING A TEMPORARY PROBLEM: CURRENTLY GPT-ENGINEER WRITES AND EXECUTES CODE IN A SUBDIR CALLED WORKSPACE BY DEFAULT, WHICH NOW IS A DIRECTORY INSIDE 'workspace_dir'. FOR CORRECT REPORTING, WE MUST COPY ALL FILES TO 'workspace_dir
+    # HACK SOLVING A TEMPORARY PROBLEM: CURRENTLY GPT-ENGINEER WRITES AND EXECUTES CODE IN A SUBDIR CALLED WORKSPACE BY DEFAULT, WHICH NOW IS A DIRECTORY INSIDE 'workspace_dir'. FOR CORRECT REPORTING, WE MUST COPY ALL FILES TO 'workspace_dir
 
     gpte_workspace_path = Path(os.path.join(workspace_dir, "workspace"))
 
