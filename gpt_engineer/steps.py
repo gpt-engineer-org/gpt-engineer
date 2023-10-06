@@ -147,11 +147,11 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     print()
     print(command)
     print()
-    print("To execute, you can also press enter.")
-    print()
-    if input() not in ["", "y", "yes"]:
-        print("Ok, not executing the code.")
-        return []
+    # print("To execute, you can also press enter.")
+    # print()
+    # if input() not in ["", "y", "yes"]:
+    #     print("Ok, not executing the code.")
+    #     return []
     print("Executing the code...")
     print()
     print(
@@ -185,8 +185,9 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
             "the current folder.\n"
             "From this you will answer with code blocks that includes all the necessary "
             "unix terminal commands to "
-            "a) install dependencies "
-            "b) run all necessary parts of the codebase (in parallel if necessary).\n"
+            "a) Create and activate an appropriate virtual environment if possible. \n"
+            "b) install dependencies. \n"
+            "c) run all necessary parts of the codebase (in parallel if necessary).\n"
             "Do not install globally. Do not use sudo.\n"
             "Do not explain the code, just give the commands.\n"
             "Do not use placeholders, use example values (like . for a folder argument) "
