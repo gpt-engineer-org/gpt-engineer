@@ -8,7 +8,7 @@ print(sys.path)
 import asyncio
 from pathlib import Path
 import pathlib
-
+import shutil
 from typing import Callable, Optional, Coroutine, Any
 
 from gpt_engineer.db import DB
@@ -85,7 +85,7 @@ async def task_handler(task: Task) -> None:
     workspace["prompt"] = f"{task.input}\n"
 
     # only for the test=WriteFile This should acutally
-    workspace["random_file.txt"] = f"Washington D.C"
+    # workspace["random_file.txt"] = f"Washington D.C"
 
     # Ensure no prompt hang by writing to the consent file.
     consent_file = Path(os.getcwd()) / ".gpte_consent"
@@ -128,7 +128,7 @@ async def step_handler(step: Step) -> Step:
             workspace_dir,
             step.additional_input.get("model", "gpt-4"),
             step.additional_input.get("temperature", 0.1),
-            "benchmark",
+            "simple",
             False,
             step.additional_input.get("azure_endpoint", ""),
             step.additional_input.get("verbose", False),
@@ -140,6 +140,19 @@ async def step_handler(step: Step) -> Step:
     artifacts = await Agent.db.list_artifacts(step.task_id)
     existing_artifacts = {artifact.file_name for artifact in artifacts}
 
+    #HACK SOLVING A TEMPORARY PROBLEM: CURRENTLY GPT-ENGINEER WRITES AND EXECUTES CODE IN A SUBDIR CALLED WORKSPACE BY DEFAULT, WHICH NOW IS A DIRECTORY INSIDE 'workspace_dir'. FOR CORRECT REPORTING, WE MUST COPY ALL FILES TO 'workspace_dir
+
+    gpte_workspace_path = Path(os.path.join(workspace_dir, "workspace"))
+
+    for item in gpte_workspace_path.iterdir():
+        if item.is_dir():
+            (Path(workspace_dir) / item.name).mkdir(parents=True, exist_ok=True)
+            shutil.copytree(item, Path(workspace_dir) / item.name, dirs_exist_ok=True)
+        else:
+            shutil.copy2(item, workspace_dir)
+
+
+    # create artifacts, enabling agbenchmark to know about the existence of the files. LAST TIME I CHECKED, ANY NON-EMPTY RELATIVE PATHS GAVE RUNTIME ERRORS IN agbenchmark
     for item in os.listdir(workspace_dir):
         full_path = os.path.join(workspace_dir, item)
         if os.path.isfile(full_path):
@@ -150,20 +163,6 @@ async def step_handler(step: Step) -> Step:
                     relative_path="",
                     file_name=item,
                 )
-
-    # for dirpath, dirnames, filenames in os.walk(project_dir):
-    #     for filename in filenames:
-    #         full_path = os.path.join(dirpath, filename)
-    #         if not full_path in existing_artifacts:
-    #             if os.path.isfile(full_path):
-    #                 rel_path = os.path.dirname(os.path.relpath(full_path, Agent.workspace))
-    #                 # BENCHMARK_TEMP = "/home/axel/Software/Auto-GPT/benchmark/agbenchmark_config/temp_folder/"
-    #                 # Path(os.path.join(BENCHMARK_TEMP, rel_path)).mkdir(exist_ok=True, parents=True)
-    #                 await Agent.db.create_artifact(
-    #                     task_id=step.task_id,
-    #                     relative_path=os.path.dirname(os.path.relpath(full_path, Agent.workspace)),
-    #                     file_name=filename,
-    #                     )
 
     return step
 
