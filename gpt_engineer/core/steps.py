@@ -317,16 +317,14 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     print()
     print(
         colored(
-            "Do you want to execute this code? (y/n)",
+            "Do you want to execute this code? (Y/n)",
             "red",
         )
     )
     print()
     print(command)
     print()
-    print("To execute, you can also press enter.")
-    print()
-    if input() not in ["", "y", "yes"]:
+    if input().lower() not in ["", "y", "yes"]:
         print("Ok, not executing the code.")
         return []
     print("Executing the code...")
