@@ -52,7 +52,7 @@ def load_env_if_needed():
 
 
 def preprompts_path(use_custom_preprompts: bool, input_path: Path = None) -> Path:
-    original_preprompts_path = Path(__file__).parent / "preprompts"
+    original_preprompts_path = Path(__file__).parent.parent / "preprompts"
     if not use_custom_preprompts:
         return original_preprompts_path
 
