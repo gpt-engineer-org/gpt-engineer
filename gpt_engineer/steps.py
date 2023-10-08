@@ -1,7 +1,8 @@
 import inspect
 import re
 import subprocess
-
+import os
+from pathlib import Path
 from enum import Enum
 from typing import List, Union
 
@@ -136,6 +137,16 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
 
 def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     command = dbs.workspace["run.sh"]
+    print(
+        "Before executing, writing the relative paths of all pre-execution files to: pre-execution-files.txt"
+    )
+    with open(os.path.join(dbs.workspace.path, "pre-execution-files.txt"), "w") as f:
+        for dirpath, dirnames, filenames in os.walk(dbs.workspace.path):
+            for file in filenames:
+                full_path = Path(dirpath) / file
+                if os.path.isfile(full_path):
+                    relative_path = full_path.relative_to(dbs.workspace.path)
+                    f.write(str(relative_path) + "\n")
 
     print()
     print(
