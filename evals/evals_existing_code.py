@@ -54,7 +54,7 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
             "python",
             "-u",  # Unbuffered output
             "-m",
-            "gpt_engineer.main",
+            "gpt_engineer.cli.main",
             eval_ob["project_root"],
             "--steps",
             "eval_improve_code",

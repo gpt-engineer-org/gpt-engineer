@@ -14,7 +14,7 @@ Dependencies:
 - `os` and `pathlib`: For handling OS-level operations and path manipulations.
 - `re`: For regex-based parsing of chat content.
 - `gpt_engineer.core.db`: Database handling functionalities for the workspace.
-- `gpt_engineer.file_selector`: Constants related to file selection.
+- `gpt_engineer.cli.file_selector`: Constants related to file selection.
 
 Functions:
 - parse_chat: Extracts code blocks from chat messages.

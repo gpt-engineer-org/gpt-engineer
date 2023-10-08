@@ -8,7 +8,7 @@ workflow execution, and interaction with AI, allowing for various configurations
 Imports:
 - Standard libraries: inspect, re, subprocess
 - Additional libraries/packages: termcolor, typing, enum
-- Internal modules/packages: langchain.schema, gpt_engineer.core, gpt_engineer.file_selector, gpt_engineer.learning
+- Internal modules/packages: langchain.schema, gpt_engineer.core, gpt_engineer.cli
 
 Key Features:
 - Dynamic system prompt creation for both new code generation and improving existing code.
