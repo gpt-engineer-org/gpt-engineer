@@ -27,6 +27,7 @@ Functions:
 import os
 from pathlib import Path
 import re
+import codecs
 
 from typing import List, Tuple
 
@@ -159,7 +160,9 @@ def get_code_strings(workspace: DB, metadata_db: DB) -> dict[str, str]:
         ), "Trying to edit files outside of the workspace"
         file_name = os.path.relpath(path, workspace.path)
         if file_name in workspace:
-            files_dict[file_name] = workspace[file_name]
+            with codecs.open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
+                file_data = file.read()
+            files_dict[file_name] = file_data
     return files_dict
 
 
