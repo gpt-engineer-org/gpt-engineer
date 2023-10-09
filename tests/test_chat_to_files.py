@@ -23,7 +23,13 @@ def test_to_files():
     )
 
     dbs = DBs(
-        DB("/tmp1"), DB("/tmp2"), DB("/tmp3"), DB("/tmp4"), DB("/tmp5"), DB("/tmp6"), DB("/tmp7")
+        DB("/tmp1"),
+        DB("/tmp2"),
+        DB("/tmp3"),
+        DB("/tmp4"),
+        DB("/tmp5"),
+        DB("/tmp6"),
+        DB("/tmp7"),
     )
     to_files(chat, dbs)
 
@@ -58,7 +64,13 @@ def test_to_files_with_square_brackets():
     )
 
     dbs = DBs(
-        DB("/tmp1"), DB("/tmp2"), DB("/tmp3"), DB("/tmp4"), DB("/tmp5"), DB("/tmp6"), DB("/tmp7")
+        DB("/tmp1"),
+        DB("/tmp2"),
+        DB("/tmp3"),
+        DB("/tmp4"),
+        DB("/tmp5"),
+        DB("/tmp6"),
+        DB("/tmp7"),
     )
     to_files(chat, dbs)
 
@@ -87,7 +99,13 @@ def test_files_with_brackets_in_name():
     )
 
     dbs = DBs(
-        DB("/tmp1"), DB("/tmp2"), DB("/tmp3"), DB("/tmp4"), DB("/tmp5"), DB("/tmp6"), DB("/tmp7")
+        DB("/tmp1"),
+        DB("/tmp2"),
+        DB("/tmp3"),
+        DB("/tmp4"),
+        DB("/tmp5"),
+        DB("/tmp6"),
+        DB("/tmp7"),
     )
     to_files(chat, dbs)
 
@@ -115,7 +133,13 @@ def test_files_with_file_colon():
     )
 
     dbs = DBs(
-        DB("/tmp1"), DB("/tmp2"), DB("/tmp3"), DB("/tmp4"), DB("/tmp5"), DB("/tmp6"), DB("/tmp7")
+        DB("/tmp1"),
+        DB("/tmp2"),
+        DB("/tmp3"),
+        DB("/tmp4"),
+        DB("/tmp5"),
+        DB("/tmp6"),
+        DB("/tmp7"),
     )
     to_files(chat, dbs)
 
@@ -143,7 +167,13 @@ def test_files_with_back_tick():
     )
 
     dbs = DBs(
-        DB("/tmp1"), DB("/tmp2"), DB("/tmp3"), DB("/tmp4"), DB("/tmp5"), DB("/tmp6"), DB("/tmp7")
+        DB("/tmp1"),
+        DB("/tmp2"),
+        DB("/tmp3"),
+        DB("/tmp4"),
+        DB("/tmp5"),
+        DB("/tmp6"),
+        DB("/tmp7"),
     )
     to_files(chat, dbs)
 
@@ -172,7 +202,13 @@ def test_files_with_newline_between():
     )
 
     dbs = DBs(
-        DB("/tmp1"), DB("/tmp2"), DB("/tmp3"), DB("/tmp4"), DB("/tmp5"), DB("/tmp6"), DB("/tmp7")
+        DB("/tmp1"),
+        DB("/tmp2"),
+        DB("/tmp3"),
+        DB("/tmp4"),
+        DB("/tmp5"),
+        DB("/tmp6"),
+        DB("/tmp7"),
     )
     to_files(chat, dbs)
 
@@ -201,7 +237,13 @@ def test_files_with_newline_between_header():
     )
 
     dbs = DBs(
-        DB("/tmp1"), DB("/tmp2"), DB("/tmp3"), DB("/tmp4"), DB("/tmp5"), DB("/tmp6"), DB("/tmp7")
+        DB("/tmp1"),
+        DB("/tmp2"),
+        DB("/tmp3"),
+        DB("/tmp4"),
+        DB("/tmp5"),
+        DB("/tmp6"),
+        DB("/tmp7"),
     )
     to_files(chat, dbs)
 
