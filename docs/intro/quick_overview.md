@@ -15,7 +15,7 @@ This module contains two main functions:
 
 `parse_chat(chat)`: This function takes a chat conversation and extracts all the code blocks and preceding filenames. It returns a list of tuples, where each tuple contains a filename and the corresponding code block.
 
-`to_files(chat, workspace)`: This function takes a chat conversation and a workspace (a dictionary where keys are filenames and values are file contents). It parses the chat conversation and updates the workspace with the extracted files.
+`to_files(chat, dbs)`: This function takes a chat conversation and the databases (a collection of dictionary where keys are filenames and values are file contents). It parses the chat conversation and updates the workspace with the extracted files.
 
 <br>
 
