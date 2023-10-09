@@ -3,6 +3,18 @@ import textwrap
 from gpt_engineer.core.chat_to_files import to_files
 from gpt_engineer.core.db import DB, DBs
 
+from typing import Union
+from pathlib import Path
+
+class StubDB(DB):
+    def __init__(self, path: Union[str, Path]):
+        self.data = {}
+
+    def __setitem__(self, key, value):
+        self.data[key] = value
+
+    def __getitem__(self, key):
+        return self.data[key]
 
 def test_to_files():
     chat = textwrap.dedent(
@@ -23,13 +35,13 @@ def test_to_files():
     )
 
     dbs = DBs(
-        DB("/tmp1"),
-        DB("/tmp2"),
-        DB("/tmp3"),
-        DB("/tmp4"),
-        DB("/tmp5"),
-        DB("/tmp6"),
-        DB("/tmp7"),
+        StubDB("/tmp1"),
+        StubDB("/tmp2"),
+        StubDB("/tmp3"),
+        StubDB("/tmp4"),
+        StubDB("/tmp5"),
+        StubDB("/tmp6"),
+        StubDB("/tmp7"),
     )
     to_files(chat, dbs)
 
@@ -64,13 +76,13 @@ def test_to_files_with_square_brackets():
     )
 
     dbs = DBs(
-        DB("/tmp1"),
-        DB("/tmp2"),
-        DB("/tmp3"),
-        DB("/tmp4"),
-        DB("/tmp5"),
-        DB("/tmp6"),
-        DB("/tmp7"),
+        StubDB("/tmp1"),
+        StubDB("/tmp2"),
+        StubDB("/tmp3"),
+        StubDB("/tmp4"),
+        StubDB("/tmp5"),
+        StubDB("/tmp6"),
+        StubDB("/tmp7"),
     )
     to_files(chat, dbs)
 
@@ -99,13 +111,13 @@ def test_files_with_brackets_in_name():
     )
 
     dbs = DBs(
-        DB("/tmp1"),
-        DB("/tmp2"),
-        DB("/tmp3"),
-        DB("/tmp4"),
-        DB("/tmp5"),
-        DB("/tmp6"),
-        DB("/tmp7"),
+        StubDB("/tmp1"),
+        StubDB("/tmp2"),
+        StubDB("/tmp3"),
+        StubDB("/tmp4"),
+        StubDB("/tmp5"),
+        StubDB("/tmp6"),
+        StubDB("/tmp7"),
     )
     to_files(chat, dbs)
 
@@ -133,13 +145,13 @@ def test_files_with_file_colon():
     )
 
     dbs = DBs(
-        DB("/tmp1"),
-        DB("/tmp2"),
-        DB("/tmp3"),
-        DB("/tmp4"),
-        DB("/tmp5"),
-        DB("/tmp6"),
-        DB("/tmp7"),
+        StubDB("/tmp1"),
+        StubDB("/tmp2"),
+        StubDB("/tmp3"),
+        StubDB("/tmp4"),
+        StubDB("/tmp5"),
+        StubDB("/tmp6"),
+        StubDB("/tmp7"),
     )
     to_files(chat, dbs)
 
@@ -167,13 +179,13 @@ def test_files_with_back_tick():
     )
 
     dbs = DBs(
-        DB("/tmp1"),
-        DB("/tmp2"),
-        DB("/tmp3"),
-        DB("/tmp4"),
-        DB("/tmp5"),
-        DB("/tmp6"),
-        DB("/tmp7"),
+        StubDB("/tmp1"),
+        StubDB("/tmp2"),
+        StubDB("/tmp3"),
+        StubDB("/tmp4"),
+        StubDB("/tmp5"),
+        StubDB("/tmp6"),
+        StubDB("/tmp7"),
     )
     to_files(chat, dbs)
 
@@ -202,13 +214,13 @@ def test_files_with_newline_between():
     )
 
     dbs = DBs(
-        DB("/tmp1"),
-        DB("/tmp2"),
-        DB("/tmp3"),
-        DB("/tmp4"),
-        DB("/tmp5"),
-        DB("/tmp6"),
-        DB("/tmp7"),
+        StubDB("/tmp1"),
+        StubDB("/tmp2"),
+        StubDB("/tmp3"),
+        StubDB("/tmp4"),
+        StubDB("/tmp5"),
+        StubDB("/tmp6"),
+        StubDB("/tmp7"),
     )
     to_files(chat, dbs)
 
@@ -237,13 +249,13 @@ def test_files_with_newline_between_header():
     )
 
     dbs = DBs(
-        DB("/tmp1"),
-        DB("/tmp2"),
-        DB("/tmp3"),
-        DB("/tmp4"),
-        DB("/tmp5"),
-        DB("/tmp6"),
-        DB("/tmp7"),
+        StubDB("/tmp1"),
+        StubDB("/tmp2"),
+        StubDB("/tmp3"),
+        StubDB("/tmp4"),
+        StubDB("/tmp5"),
+        StubDB("/tmp6"),
+        StubDB("/tmp7"),
     )
     to_files(chat, dbs)
 
