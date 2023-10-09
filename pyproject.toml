@@ -65,7 +65,7 @@ gpt-engineer = 'gpt_engineer.cli.main:app'
 ge = 'gpt_engineer.cli.main:app'
 
 [tool.setuptools]
-packages = ["gpt_engineer"]
+packages = ["gpt_engineer", "gpt_engineer.cli"]
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
