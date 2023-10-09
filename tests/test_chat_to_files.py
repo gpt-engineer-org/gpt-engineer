@@ -6,6 +6,7 @@ from gpt_engineer.core.db import DB, DBs
 from typing import Union
 from pathlib import Path
 
+
 class StubDB(DB):
     def __init__(self, path: Union[str, Path]):
         self.data = {}
@@ -15,6 +16,7 @@ class StubDB(DB):
 
     def __getitem__(self, key):
         return self.data[key]
+
 
 def test_to_files():
     chat = textwrap.dedent(
