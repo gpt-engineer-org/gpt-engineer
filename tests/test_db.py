@@ -4,6 +4,9 @@ from gpt_engineer.core.db import DB, DBs
 
 
 def test_DB_operations(tmp_path):
+    """
+    Test the initialization, __setitem__, and __getitem__ operations of the DB class.
+    """
     # Test initialization
     db = DB(tmp_path)
 
@@ -19,6 +22,9 @@ def test_DB_operations(tmp_path):
 
 
 def test_DBs_initialization(tmp_path):
+    """
+    Test the initialization of the DBs class and check if all attributes are instances of the DB class.
+    """
     dir_names = [
         "memory",
         "logs",
@@ -46,12 +52,18 @@ def test_DBs_initialization(tmp_path):
 
 
 def test_invalid_path():
+    """
+    Test the initialization of the DB class with an invalid path that should raise a PermissionError or OSError.
+    """
     with pytest.raises((PermissionError, OSError)):
         # Test with a path that will raise a permission error
         DB("/root/test")
 
 
 def test_large_files(tmp_path):
+    """
+    Test the writing and reading of large files in the DB class.
+    """
     db = DB(tmp_path)
     large_content = "a" * (10**6)  # 1MB of data
 
@@ -63,6 +75,9 @@ def test_large_files(tmp_path):
 
 
 def test_concurrent_access(tmp_path):
+    """
+    Test the concurrent access to the DB class by multiple threads.
+    """
     import threading
 
     db = DB(tmp_path)
@@ -93,6 +108,9 @@ def test_concurrent_access(tmp_path):
 
 
 def test_error_messages(tmp_path):
+    """
+    Test the error messages when getting a non-existent key and setting a key with an invalid value in the DB class.
+    """
     db = DB(tmp_path)
 
     # Test error on getting non-existent key
@@ -106,6 +124,9 @@ def test_error_messages(tmp_path):
 
 
 def test_DBs_dataclass_attributes(tmp_path):
+    """
+    Test the dataclass attributes of the DBs class.
+    """
     dir_names = [
         "memory",
         "logs",
