@@ -4,6 +4,10 @@ from gpt_engineer.core.chat_to_files import to_files
 
 
 def test_to_files():
+    """
+    Test the function to_files with a simple chat input.
+    The chat input contains two files: file1.py and file2.py.
+    """
     chat = textwrap.dedent(
         """
     This is a sample program.
@@ -37,6 +41,10 @@ def test_to_files():
 
 
 def test_to_files_with_square_brackets():
+    """
+    Test the function to_files with a chat input where the file names are enclosed in square brackets.
+    The chat input contains two files: file1.py and file2.py.
+    """
     chat = textwrap.dedent(
         """
     This is a sample program.
@@ -69,6 +77,10 @@ def test_to_files_with_square_brackets():
 
 
 def test_files_with_brackets_in_name():
+    """
+    Test the function to_files with a chat input where the file name contains brackets.
+    The chat input contains one file: [id].jsx.
+    """
     chat = textwrap.dedent(
         """
     This is a sample program.
@@ -95,6 +107,10 @@ def test_files_with_brackets_in_name():
 
 
 def test_files_with_file_colon():
+    """
+    Test the function to_files with a chat input where the file name is preceded by 'FILE:'.
+    The chat input contains one file: file1.py.
+    """
     chat = textwrap.dedent(
         """
     This is a sample program.
@@ -121,6 +137,10 @@ def test_files_with_file_colon():
 
 
 def test_files_with_back_tick():
+    """
+    Test the function to_files with a chat input where the file name is enclosed in back ticks.
+    The chat input contains one file: file1.py.
+    """
     chat = textwrap.dedent(
         """
     This is a sample program.
@@ -147,6 +167,10 @@ def test_files_with_back_tick():
 
 
 def test_files_with_newline_between():
+    """
+    Test the function to_files with a chat input where there is a newline between the file name and the file content.
+    The chat input contains one file: file1.py.
+    """
     chat = textwrap.dedent(
         """
     This is a sample program.
@@ -174,6 +198,10 @@ def test_files_with_newline_between():
 
 
 def test_files_with_newline_between_header():
+    """
+    Test the function to_files with a chat input where there is a newline between the file name (which is a header) and the file content.
+    The chat input contains one file: file1.py.
+    """
     chat = textwrap.dedent(
         """
     This is a sample program.
