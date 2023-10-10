@@ -7,12 +7,32 @@ from gpt_engineer.core.db import DB, DBs, archive
 
 
 def freeze_at(monkeypatch, time):
+    """
+    Mocks the current time.
+
+    Parameters:
+    monkeypatch: pytest's monkeypatch fixture
+    time: datetime object representing the time to be mocked
+
+    Returns:
+    None
+    """
     datetime_mock = MagicMock(wraps=datetime.datetime)
     datetime_mock.now.return_value = time
     monkeypatch.setattr(datetime, "datetime", datetime_mock)
 
 
 def setup_dbs(tmp_path, dir_names):
+    """
+    Sets up DBs instance with given directory names.
+
+    Parameters:
+    tmp_path: pytest's tmp_path fixture, provides a temporary directory path
+    dir_names: list of directory names to be created
+
+    Returns:
+    DBs instance
+    """
     directories = [tmp_path / name for name in dir_names]
 
     # Create DB objects
@@ -23,6 +43,20 @@ def setup_dbs(tmp_path, dir_names):
 
 
 def test_archive(tmp_path, monkeypatch):
+    """
+    Tests the archive function.
+
+    This test checks if the archive function correctly moves the contents of the memory and workspace directories to the archive directory.
+    It also checks if the memory and workspace directories are deleted after the archive operation.
+    The test is run twice with different timestamps to check if the function can handle multiple archives.
+
+    Parameters:
+    tmp_path: pytest's tmp_path fixture, provides a temporary directory path
+    monkeypatch: pytest's monkeypatch fixture
+
+    Returns:
+    None
+    """
     dbs = setup_dbs(
         tmp_path,
         [
