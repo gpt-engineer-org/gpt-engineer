@@ -13,6 +13,9 @@ venv.create(VENV_DIR, with_pip=True)
 
 # Test that the package can be installed via pip
 def test_installation():
+    """
+    Test if the package can be installed via pip in a virtual environment.
+    """
     # Use pip from the virtual environment directly
     pip_executable = f"{VENV_DIR}/bin/pip"
     if sys.platform == "win32":
@@ -24,6 +27,9 @@ def test_installation():
 
 # Test that the package can be imported
 def test_import():
+    """
+    Test if the main modules of the package can be imported.
+    """
     try:
         from gpt_engineer import (
             ai,
@@ -38,6 +44,9 @@ def test_import():
 
 # Test that the CLI command works
 def test_cli_execution():
+    """
+    Test if the CLI command works after the package installation.
+    """
     # This assumes that after installation, `gpt-engineer` command should work.
     result = subprocess.run(
         args=["gpt-engineer", "--help"], capture_output=True, text=True
@@ -49,6 +58,9 @@ def test_cli_execution():
 
 # Cleanup the test environment
 def test_cleanup():
+    """
+    Clean up the test environment by removing the virtual environment directory.
+    """
     shutil.rmtree(VENV_DIR)
 
 
