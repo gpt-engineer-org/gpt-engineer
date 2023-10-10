@@ -139,7 +139,10 @@ async def step_handler(step: Step) -> Step:
     # check if new files have been created and make artifacts for those (CURRENTLY ONLY CONSIDERS TOP LEVEL DIRECTORY AND WILL MAKE FALSE OVERWRITES IF THERE ARE MULTIPLE FILES WITH THE SAME NAME IN THE TREE).
     artifacts = await Agent.db.list_artifacts(step.task_id)
     existing_artifacts = {
-        os.path.join(artifact.relative_path, artifact.file_name) for artifact in artifacts
+        os.path.join(artifact.relative_path, artifact.file_name)
+        if artifact.agent_created
+        else artifact.file_name
+        for artifact in artifacts
     }
 
     # HACK SOLVING A TEMPORARY PROBLEM: CURRENTLY GPT-ENGINEER WRITES AND EXECUTES CODE IN A SUBDIR CALLED WORKSPACE BY DEFAULT, WHICH NOW IS A DIRECTORY INSIDE 'workspace_dir'. FOR CORRECT REPORTING, WE MUST COPY ALL FILES TO 'workspace_dir
