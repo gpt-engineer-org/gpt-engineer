@@ -44,8 +44,8 @@ app = typer.Typer()  # creates a CLI app
 
 def load_env_if_needed(openai_api_base: str):
     if openai_api_base:
-        #os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
         openai.api_key = os.getenv("OPENAI_API_KEY")
+        # Should set to Empty key would work but its not working, Finding the solution.
         return
     elif os.getenv("OPENAI_API_KEY") is None:
         load_dotenv()

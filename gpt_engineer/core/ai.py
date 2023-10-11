@@ -139,6 +139,7 @@ class AI:
         """
         self.temperature = temperature
         self.azure_endpoint = azure_endpoint
+        self.openai_api_base = openai_api_base
         self.model_name = (
             fallback_model(model_name) if azure_endpoint == "" else model_name
         )
@@ -151,7 +152,6 @@ class AI:
         self.cumulative_completion_tokens = 0
         self.cumulative_total_tokens = 0
         self.token_usage_log = []
-        self.openai_api_base = openai_api_base
         
         
 
@@ -529,6 +529,7 @@ def create_chat_model(self, model: str, temperature) -> BaseChatModel:
         temperature=temperature,
         streaming=False,
         client=openai.ChatCompletion,
+        openai_api_base=self.openai_api_base
     )
 
 
