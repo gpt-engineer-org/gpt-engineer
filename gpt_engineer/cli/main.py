@@ -30,9 +30,9 @@ import os
 from pathlib import Path
 
 import openai
+from parea import init, RedisCache
 import typer
 from dotenv import load_dotenv
-from parea import init, RedisCache
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.db import DB, DBs, archive
