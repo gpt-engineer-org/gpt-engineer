@@ -42,12 +42,16 @@ from gpt_engineer.cli.learning import collect_consent
 app = typer.Typer()  # creates a CLI app
 
 
-def load_env_if_needed():
-    if os.getenv("OPENAI_API_KEY") is None:
+def load_env_if_needed(openai_api_base: str):
+    if openai_api_base:
+        #os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        return
+    elif os.getenv("OPENAI_API_KEY") is None:
         load_dotenv()
-    if os.getenv("OPENAI_API_KEY") is None:
-        # if there is no .env file, try to load from the current working directory
-        load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
+        if os.getenv("OPENAI_API_KEY") is None:
+            # if there is no .env file, try to load from the current working directory
+            load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
@@ -99,6 +103,11 @@ def main(
         help="""Use your project's custom preprompts instead of the default ones.
           Copies all original preprompts to the project's workspace if they don't exist there.""",
     ),
+    openai_api_base: str = typer.Option(
+    "",
+    "--openai-api-base",
+    help="Base URL for the OpenAI API.",
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
@@ -114,12 +123,13 @@ def main(
         ), "Improve mode not compatible with other step configs"
         steps_config = StepsConfig.IMPROVE_CODE
 
-    load_env_if_needed()
+    load_env_if_needed(openai_api_base)
 
     ai = AI(
         model_name=model,
         temperature=temperature,
         azure_endpoint=azure_endpoint,
+        openai_api_base=openai_api_base or None,
     )
 
     input_path = Path(project_path).absolute()

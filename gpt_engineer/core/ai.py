@@ -126,7 +126,7 @@ class AI:
         Count the total number of tokens in a list of messages.
     """
 
-    def __init__(self, model_name="gpt-4", temperature=0.1, azure_endpoint=""):
+    def __init__(self, model_name: str, temperature: float,azure_endpoint: Optional[str] = None,openai_api_base: Optional[str] = None):
         """
         Initialize the AI class.
 
@@ -151,6 +151,9 @@ class AI:
         self.cumulative_completion_tokens = 0
         self.cumulative_total_tokens = 0
         self.token_usage_log = []
+        self.openai_api_base = openai_api_base
+        
+        
 
     def start(self, system: str, user: str, step_name: str) -> List[Message]:
         """
@@ -170,6 +173,7 @@ class AI:
         List[Message]
             The list of messages in the conversation.
         """
+        openai.api_base = self.openai_api_base or openai.api_base
         messages: List[Message] = [
             SystemMessage(content=system),
             HumanMessage(content=user),
@@ -523,7 +527,7 @@ def create_chat_model(self, model: str, temperature) -> BaseChatModel:
     return ChatOpenAI(
         model=model,
         temperature=temperature,
-        streaming=True,
+        streaming=False,
         client=openai.ChatCompletion,
     )
 
