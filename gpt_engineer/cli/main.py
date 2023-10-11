@@ -32,6 +32,7 @@ from pathlib import Path
 import openai
 import typer
 from dotenv import load_dotenv
+from parea import init, RedisCache
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.db import DB, DBs, archive
@@ -40,6 +41,12 @@ from gpt_engineer.cli.collect import collect_learnings
 from gpt_engineer.cli.learning import collect_consent
 
 app = typer.Typer()  # creates a CLI app
+
+
+# set this to True to use caching of LLM calls and being able to benchmark function across many inputs in parallel
+IS_DEV = True
+if IS_DEV:
+    init(cache=RedisCache())
 
 
 def load_env_if_needed():
