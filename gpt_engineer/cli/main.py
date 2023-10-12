@@ -45,11 +45,11 @@ app = typer.Typer()  # creates a CLI app
 def load_env_if_needed(openai_api_base: str):
     
     if openai_api_base:
-        openai.api_key = ""
+        #openai.api_key = None
         # API Key is optional in case of Proxy servers (https://docs.litellm.ai/docs/proxy_server#replace-openai-base), 
         # But in current situation its not working with empty key
         # Finding another solutions here.
-        return
+        pass
     
     if os.getenv("OPENAI_API_KEY") is None:
         load_dotenv()
