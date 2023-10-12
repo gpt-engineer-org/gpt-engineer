@@ -144,17 +144,6 @@ def main(
     project_metadata_path = path / ".gpteng"
     memory_path = project_metadata_path / "memory"
     archive_path = project_metadata_path / "archive"
-    preprompts_path = Path(__file__).parent / "preprompts"
-
-    if use_project_preprompts:
-        project_preprompts_path = path / "preprompts"
-        if not project_preprompts_path.exists():
-            project_preprompts_path.mkdir()
-
-        for file in preprompts_path.glob("*"):
-            if not (project_preprompts_path / file.name).exists():
-                (project_preprompts_path / file.name).write_text(file.read_text())
-        preprompts_path = project_preprompts_path
 
     dbs = DBs(
         memory=DB(memory_path),
