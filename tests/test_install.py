@@ -1,14 +1,25 @@
 """
 Tests for successful import and installation of the package.
 """
+import pytest
 import subprocess
 import sys
 import venv
 import shutil
 
-# Setup the test environment
+
 VENV_DIR = "./venv_test_installation"
-venv.create(VENV_DIR, with_pip=True)
+
+
+@pytest.fixture(scope="module", autouse=True)
+def venv_setup_teardown():
+    try:
+        venv.create(VENV_DIR, with_pip=True)
+        yield
+    except Exception:
+        pytest.skip("Could not create venv")
+    finally:
+        shutil.rmtree(VENV_DIR)
 
 
 # Test that the package can be installed via pip
@@ -45,16 +56,3 @@ def test_cli_execution():
     assert (
         result.returncode == 0
     ), f"gpt-engineer command failed with message: {result.stderr}"
-
-
-# Cleanup the test environment
-def test_cleanup():
-    shutil.rmtree(VENV_DIR)
-
-
-# Run the tests using pytest
-if __name__ == "__main__":
-    test_installation()
-    test_import()
-    test_cli_execution()
-    test_cleanup()
