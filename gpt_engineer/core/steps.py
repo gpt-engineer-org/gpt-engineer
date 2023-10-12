@@ -48,7 +48,8 @@ Note:
 import inspect
 import re
 import subprocess
-
+import os
+from pathlib import Path
 from enum import Enum
 from typing import List, Union
 
@@ -310,6 +311,16 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     (e.g., executable) before invoking this function.
     """
     command = dbs.workspace["run.sh"]
+    print(
+        "Before executing, writing the relative paths of all pre-execution files to: pre-execution-files.txt"
+    )
+    with open(os.path.join(dbs.workspace.path, "pre-execution-files.txt"), "w") as f:
+        for dirpath, dirnames, filenames in os.walk(dbs.workspace.path):
+            for file in filenames:
+                full_path = Path(dirpath) / file
+                if os.path.isfile(full_path):
+                    relative_path = full_path.relative_to(dbs.workspace.path)
+                    f.write(str(relative_path) + "\n")
 
     print()
     print(
@@ -320,10 +331,10 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     )
     print()
     print(command)
-    print()
-    if input().lower() not in ["", "y", "yes"]:
-        print("Ok, not executing the code.")
-        return []
+    # print()
+    # if input().lower() not in ["", "y", "yes"]:
+    #     print("Ok, not executing the code.")
+    #     return []
     print("Executing the code...")
     print()
     print(
@@ -337,7 +348,7 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     print("You can press ctrl+c *once* to stop the execution.")
     print()
 
-    p = subprocess.Popen("bash run.sh", shell=True, cwd=dbs.workspace.path)
+    p = subprocess.Popen("bash run.sh", shell=True, cwd=dbs.workspace.path, stdin=subprocess.DEVNULL)
     try:
         p.wait()
     except KeyboardInterrupt:
@@ -383,8 +394,9 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
             "the current folder.\n"
             "From this you will answer with code blocks that includes all the necessary "
             "unix terminal commands to "
-            "a) install dependencies "
-            "b) run all necessary parts of the codebase (in parallel if necessary).\n"
+            "a) Create and activate an appropriate virtual environment if possible. \n"
+            "b) install dependencies. \n"
+            "c) run all necessary parts of the codebase (in parallel if necessary).\n"
             "Do not install globally. Do not use sudo.\n"
             "Do not explain the code, just give the commands.\n"
             "Do not use placeholders, use example values (like . for a folder argument) "

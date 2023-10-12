@@ -11,8 +11,8 @@ import pathlib
 import shutil
 from typing import Callable, Optional, Coroutine, Any
 
-from gpt_engineer.db import DB
-from gpt_engineer.main import main
+from gpt_engineer.core.db import DB
+from gpt_engineer.cli.main import main
 from gpt_engineer.API.agent import base_router, Agent
 from gpt_engineer.API.db import NotFoundException, not_found_exception_handler
 
@@ -147,15 +147,15 @@ async def step_handler(step: Step) -> Step:
 
     # HACK SOLVING A TEMPORARY PROBLEM: CURRENTLY GPT-ENGINEER WRITES AND EXECUTES CODE IN A SUBDIR CALLED WORKSPACE BY DEFAULT, WHICH NOW IS A DIRECTORY INSIDE 'workspace_dir'. FOR CORRECT REPORTING, WE MUST COPY ALL FILES TO 'workspace_dir
 
-    gpte_workspace_path = Path(os.path.join(workspace_dir, "workspace"))
-    if os.path.exists(gpte_workspace_path):
-        for item in gpte_workspace_path.iterdir():
-            if item.is_dir():
-                (Path(workspace_dir) / item.name).mkdir(parents=True, exist_ok=True)
-                shutil.copytree(item, Path(workspace_dir) / item.name, dirs_exist_ok=True)
-            else:
-                shutil.copy2(item, workspace_dir)
-        shutil.rmtree(gpte_workspace_path)
+    # gpte_workspace_path = Path(os.path.join(workspace_dir, "workspace"))
+    # if os.path.exists(gpte_workspace_path):
+    #     for item in gpte_workspace_path.iterdir():
+    #         if item.is_dir():
+    #             (Path(workspace_dir) / item.name).mkdir(parents=True, exist_ok=True)
+    #             shutil.copytree(item, Path(workspace_dir) / item.name, dirs_exist_ok=True)
+    #         else:
+    #             shutil.copy2(item, workspace_dir)
+    #     shutil.rmtree(gpte_workspace_path)
 
     # create artifacts, enabling agbenchmark to know about the existence of the files. LAST TIME I CHECKED, ANY NON-EMPTY RELATIVE PATHS GAVE RUNTIME ERRORS IN agbenchmark
     for item in os.listdir(workspace_dir):
