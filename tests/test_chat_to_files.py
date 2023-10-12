@@ -1,10 +1,8 @@
-from dataclasses import dataclass
 import textwrap
 
-from gpt_engineer.chat_to_files import to_files_and_memory
+from gpt_engineer.core.chat_to_files import to_files_and_memory
 
 
-@dataclass
 class DummyDBs:
     memory = {}
     logs = {}

@@ -1,6 +1,6 @@
 import pytest
 
-from gpt_engineer.ai import AI
+from gpt_engineer.core.ai import AI
 
 
 @pytest.mark.xfail(reason="Constructor assumes API access")
