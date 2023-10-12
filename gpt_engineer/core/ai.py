@@ -126,7 +126,7 @@ class AI:
         Count the total number of tokens in a list of messages.
     """
 
-    def __init__(self, model_name: str, temperature: float,azure_endpoint: Optional[str] = None,openai_api_base: Optional[str] = None):
+    def __init__(self, model_name: str="gpt-4", temperature: float = 0.1,azure_endpoint: Optional[str] = "",openai_api_base: Optional[str] = ""):
         """
         Initialize the AI class.
 
