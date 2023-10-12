@@ -8,7 +8,6 @@ print(sys.path)
 import asyncio
 from pathlib import Path
 import pathlib
-import shutil
 from typing import Callable, Optional, Coroutine, Any
 
 from gpt_engineer.core.db import DB
