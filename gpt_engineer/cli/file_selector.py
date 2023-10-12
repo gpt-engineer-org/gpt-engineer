@@ -219,6 +219,7 @@ class TerminalFileSelector:
         self.db_paths = DisplayablePath.make_tree(
             root_folder_path, parent=None, criteria=is_in_ignoring_extensions
         )
+        self.root_folder_path = root_folder_path
 
     def display(self):
         """
@@ -391,14 +392,13 @@ def gui_file_selector(input_path: str) -> List[str]:
     root = tk.Tk()
     root.withdraw()
     root.call("wm", "attributes", ".", "-topmost", True)
-    file_list = list(
+    return list(
         fd.askopenfilenames(
             parent=root,
             initialdir=input_path,
             title="Select files to improve (or give context):",
         )
     )
-    return file_list
 
 
 def terminal_file_selector(input_path: str) -> List[str]:
@@ -407,5 +407,4 @@ def terminal_file_selector(input_path: str) -> List[str]:
     """
     file_selector = TerminalFileSelector(Path(input_path))
     file_selector.display()
-    selected_list = file_selector.ask_for_selection()
-    return selected_list
+    return file_selector.ask_for_selection()

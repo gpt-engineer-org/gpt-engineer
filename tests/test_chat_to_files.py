@@ -13,7 +13,7 @@ class DummyDBs:
     project_metadata = {}
 
 
-def test_to_files():
+def test_to_files_and_memory():
     chat = textwrap.dedent(
         """
     This is a sample program.

@@ -59,7 +59,7 @@ from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import (
     format_file_to_input,
     get_code_strings,
-    overwrite_files,
+    overwrite_files_with_edits,
     to_files_and_memory,
 )
 from gpt_engineer.core.db import DBs
@@ -466,7 +466,7 @@ def set_improve_filelist(ai: AI, dbs: DBs):
       and they aren't directly returned by this function.
     """
     """Sets the file list for files to work with in existing code mode."""
-    ask_for_files(dbs.project_metadata, dbs.input)  # stores files as full paths.
+    ask_for_files(dbs.project_metadata, dbs.workspace)  # stores files as full paths.
     return []
 
 
@@ -570,7 +570,7 @@ def improve_existing_code(ai: AI, dbs: DBs):
     """
 
     files_info = get_code_strings(
-        dbs.input, dbs.project_metadata
+        dbs.workspace, dbs.project_metadata
     )  # this has file names relative to the workspace path
 
     messages = [
@@ -585,7 +585,7 @@ def improve_existing_code(ai: AI, dbs: DBs):
 
     messages = ai.next(messages, step_name=curr_fn())
 
-    overwrite_files(messages[-1].content.strip(), dbs)
+    overwrite_files_with_edits(messages[-1].content.strip(), dbs)
     return messages
 
 
