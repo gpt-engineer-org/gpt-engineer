@@ -11,7 +11,7 @@ from eval_tools import (
     load_evaluations_from_file,
 )
 
-from gpt_engineer.db import DB
+from gpt_engineer.core.db import DB
 
 app = typer.Typer()  # creates a CLI app
 
@@ -43,7 +43,7 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
             "python",
             "-u",  # Unbuffered output
             "-m",
-            "gpt_engineer.main",
+            "gpt_engineer.cli.main",
             eval_ob["project_root"],
             "--steps",
             "eval_new_code",

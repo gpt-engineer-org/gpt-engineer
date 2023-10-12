@@ -1,3 +1,45 @@
+"""
+This module provides tools and data structures for supporting a feedback loop in the GPT Engineer application.
+
+The primary intent of this module is to gather feedback from the user on the output of the gpt-engineer tool,
+with their consent, and to store this feedback for further analysis and improvement of the tool.
+
+Classes:
+----------
+Review:
+    Represents user's review of the generated code.
+Learning:
+    Represents the metadata and feedback collected for a session in which gpt-engineer was used.
+
+Functions:
+----------
+human_review_input() -> Review:
+    Interactively gathers feedback from the user regarding the performance of generated code.
+
+check_consent() -> bool:
+    Checks if the user has previously given consent to store their data and if not, asks for it.
+
+collect_consent() -> bool:
+    Verifies if the user has given consent to store their data or prompts for it.
+
+ask_if_can_store() -> bool:
+    Asks the user if it's permissible to store their data for gpt-engineer improvement.
+
+logs_to_string(steps: List[Step], logs: DB) -> str:
+    Converts logs of steps into a readable string format.
+
+extract_learning(model: str, temperature: float, steps: List[Step], dbs: DBs, steps_file_hash) -> Learning:
+    Extracts feedback and session details to create a Learning instance.
+
+get_session() -> str:
+    Retrieves a unique identifier for the current user session.
+
+Constants:
+----------
+TERM_CHOICES:
+    Terminal color choices for user interactive prompts.
+"""
+
 import json
 import random
 import tempfile
@@ -10,8 +52,8 @@ from typing import List, Optional
 from dataclasses_json import dataclass_json
 from termcolor import colored
 
-from gpt_engineer.db import DB, DBs
-from gpt_engineer.domain import Step
+from gpt_engineer.core.db import DB, DBs
+from gpt_engineer.core.domain import Step
 
 
 @dataclass_json
