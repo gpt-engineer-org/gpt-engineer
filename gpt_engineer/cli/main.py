@@ -51,6 +51,16 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
+def load_prompt(dbs: DBs):
+    if dbs.input.get("prompt"):
+        return dbs.input.get("prompt")
+
+    dbs.input["prompt"] = input(
+        "\nWhat application do you want gpt-engineer to generate?\n"
+    )
+    return dbs.input.get("prompt")
+
+
 def preprompts_path(use_custom_preprompts: bool, input_path: Path = None) -> Path:
     original_preprompts_path = Path(__file__).parent.parent / "preprompts"
     if not use_custom_preprompts:
@@ -122,11 +132,13 @@ def main(
         azure_endpoint=azure_endpoint,
     )
 
-    input_path = Path(project_path).absolute()
-    print("Running gpt-engineer in", input_path, "\n")
+    path = Path(project_path).absolute()
+    print("Running gpt-engineer in", path, "\n")
 
-    workspace_path = input_path / "workspace"
-    project_metadata_path = input_path / ".gpteng"
+    workspace_path = path
+    input_path = path
+
+    project_metadata_path = path / ".gpteng"
     memory_path = project_metadata_path / "memory"
     archive_path = project_metadata_path / "archive"
 
@@ -147,11 +159,7 @@ def main(
         StepsConfig.IMPROVE_CODE,
     ]:
         archive(dbs)
-
-        if not dbs.input.get("prompt"):
-            dbs.input["prompt"] = input(
-                "\nWhat application do you want gpt-engineer to generate?\n"
-            )
+        load_prompt(dbs)
 
     steps = STEPS[steps_config]
     for step in steps:

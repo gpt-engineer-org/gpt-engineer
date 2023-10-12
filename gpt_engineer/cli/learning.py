@@ -277,7 +277,7 @@ def extract_learning(
         feedback=dbs.input.get("feedback"),
         session=get_session(),
         logs=logs_to_string(steps, dbs.logs),
-        workspace=dbs.workspace["all_output.txt"],
+        workspace=dbs.memory.get("all_output.txt"),
         review=review,
     )
     return learning
