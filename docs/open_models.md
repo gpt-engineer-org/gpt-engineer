@@ -6,7 +6,7 @@ You can integrate `gpt-engineer` with open-source models by leveraging an OpenAI
 Setup
 -----
 
-To get started, first set up the API with the Runpod template, as per the [instructions](https://github.com/oobabooga/text-generation-webui/blob/main/extensions/openai/README.md>).
+To get started, first set up the API with the Runpod template, as per the [instructions](https://github.com/oobabooga/text-generation-webui/blob/main/extensions/openai/README.md).
 
 Running the Example
 -------------------
