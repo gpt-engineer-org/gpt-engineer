@@ -30,11 +30,6 @@ def load_prompt(dbs: DBs):
     if dbs.input.get("prompt"):
         return dbs.input.get("prompt")
 
-    if dbs.workspace.get("prompt"):
-        dbs.input["prompt"] = dbs.workspace.get("prompt")
-        del dbs.workspace["prompt"]
-        return dbs.input.get("prompt")
-
     dbs.input["prompt"] = input(
         "\nWhat application do you want gpt-engineer to generate?\n"
     )
@@ -116,9 +111,9 @@ def main(
     print("Running gpt-engineer in", path, "\n")
 
     workspace_path = path
+    input_path = path
 
     project_metadata_path = path / ".gpteng"
-    input_path = project_metadata_path
     memory_path = project_metadata_path / "memory"
     archive_path = project_metadata_path / "archive"
 
