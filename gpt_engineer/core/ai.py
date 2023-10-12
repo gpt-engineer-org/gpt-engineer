@@ -527,9 +527,9 @@ def create_chat_model(self, model: str, temperature) -> BaseChatModel:
     return ChatOpenAI(
         model=model,
         temperature=temperature,
-        streaming=False,
+        streaming=True,
         client=openai.ChatCompletion,
-        openai_api_base=self.openai_api_base
+        openai_api_base=self.openai_api_base,
     )
 
 
