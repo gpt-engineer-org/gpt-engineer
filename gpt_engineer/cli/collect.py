@@ -94,17 +94,24 @@ def collect_learnings(model: str, temperature: float, steps: List[Step], dbs: DB
     except RuntimeError as e:
         # try to remove some parts of learning that might be too big
         # rudderstack max event size is 32kb
-        overflow = len(learnings.to_json()) - (32 << 10)  # type: ignore
-        assert overflow > 0, f"encountered error {e} but overflow is {overflow}"
+        max_size = 32 << 10  # 32KB in bytes
+        current_size = len(learnings.to_json().encode('utf-8'))  # get size in bytes
 
-        learnings.logs = (
-            learnings.logs[: -overflow - 200] + f"\n\n[REMOVED {overflow} CHARACTERS]"
-        )
+        overflow = current_size - max_size
+
+        # Add some extra characters for the "[REMOVED...]" string and for safety margin
+        remove_length = overflow + len(f"[REMOVED {overflow} CHARACTERS]") + 100
+
+        learnings.logs = learnings.logs[:-remove_length] + f"\n\n[REMOVED {remove_length} CHARACTERS]"
+
         print(
             "WARNING: learning too big, removing some parts. "
             "Please report if this results in a crash."
         )
-        send_learning(learnings)
+        try:
+            send_learning(learnings)
+        except RuntimeError as e:
+            print("Sending learnings crashed despite truncation. Progressing without saving learnings.")
 
 
 def steps_file_hash():
