@@ -321,6 +321,7 @@ def is_in_ignoring_extensions(path: Path) -> bool:
     is_pycache = "__pycache__" not in path.name
     return is_hidden and is_pycache
 
+
 def scan_for_reference_files(metadata_db: DB, workspace_db: DB) -> List[str]:
     """
     Scans the root directory for reference files and updates the file list in project metadata.
@@ -344,16 +345,22 @@ def scan_for_reference_files(metadata_db: DB, workspace_db: DB) -> List[str]:
     ignore_files = ["run.sh", "README.md", "pre-execution-files.txt", "prompt"]
 
     # Directories to ignore
-    ignore_directories = ['env', 'venv', 'preprompts']
+    ignore_directories = ["env", "venv", "preprompts"]
 
     # Walk through the root directory and find files referenced in the code
     for dirpath, dirnames, filenames in os.walk(root_directory):
         # Ignore directories starting with "." and specified directories
-        dirnames[:] = [d for d in dirnames if not d.startswith('.') and not d.startswith('__') and d not in ignore_directories]
-        
+        dirnames[:] = [
+            d
+            for d in dirnames
+            if not d.startswith(".")
+            and not d.startswith("__")
+            and d not in ignore_directories
+        ]
+
         for filename in filenames:
             file_path = os.path.join(dirpath, filename)
-            
+
             # Check if the file should be ignored
             if filename not in ignore_files:
                 if file_path not in existing_files:
