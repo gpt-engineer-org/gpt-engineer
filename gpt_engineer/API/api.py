@@ -10,8 +10,8 @@ from pathlib import Path
 import pathlib
 from typing import Callable, Optional, Coroutine, Any
 
-from gpt_engineer.db import DB
-from gpt_engineer.main import main
+from gpt_engineer.core.db import DB
+from gpt_engineer.cli.main import main
 from gpt_engineer.API.agent import base_router, Agent
 from gpt_engineer.API.db import NotFoundException, not_found_exception_handler
 

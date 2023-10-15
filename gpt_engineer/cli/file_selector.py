@@ -50,6 +50,7 @@ from typing import List, Union
 from gpt_engineer.core.db import DB, DBs
 
 IGNORE_FOLDERS = {"site-packages", "node_modules", "venv"}
+REFERENCE_FILE_LIST_NAME = "file_to_reference_list.txt"
 FILE_LIST_NAME = "file_list.txt"
 
 
@@ -319,6 +320,50 @@ def is_in_ignoring_extensions(path: Path) -> bool:
     is_hidden = not path.name.startswith(".")
     is_pycache = "__pycache__" not in path.name
     return is_hidden and is_pycache
+
+def scan_for_reference_files(metadata_db: DB, workspace_db: DB) -> List[str]:
+    """
+    Scans the root directory for reference files and updates the file list in project metadata.
+
+    This function scans the root directory of the workspace for files referenced in the code
+    and updates the file list in the project metadata database. It ensures that the list of
+    reference files is up to date.
+
+    Parameters:
+    - metadata_db (DB): The project metadata database where the reference file list is stored.
+    - workspace_db (DB): The workspace database representing the root directory.
+
+    Returns:
+    - List[str]: A list of file paths found in the workspace.
+    """
+
+    root_directory = workspace_db.path
+    existing_files = []
+
+    # Files to ignore
+    ignore_files = ["run.sh", "README.md", "pre-execution-files.txt", "prompt"]
+
+    # Directories to ignore
+    ignore_directories = ['env', 'venv', 'preprompts']
+
+    # Walk through the root directory and find files referenced in the code
+    for dirpath, dirnames, filenames in os.walk(root_directory):
+        # Ignore directories starting with "." and specified directories
+        dirnames[:] = [d for d in dirnames if not d.startswith('.') and not d.startswith('__') and d not in ignore_directories]
+        
+        for filename in filenames:
+            file_path = os.path.join(dirpath, filename)
+            
+            # Check if the file should be ignored
+            if filename not in ignore_files:
+                if file_path not in existing_files:
+                    existing_files.append(file_path)
+
+    # Update the referenced file list in the project metadata
+    metadata_db[REFERENCE_FILE_LIST_NAME] = "\n".join(
+        str(file_path) for file_path in existing_files
+    )
+    return existing_files
 
 
 def ask_for_files(metadata_db: DB, workspace_db: DB) -> None:

@@ -137,7 +137,7 @@ def overwrite_files(chat: str, dbs: DBs) -> None:
             dbs.workspace[file_name] = file_content
 
 
-def get_code_strings(workspace: DB, metadata_db: DB) -> dict[str, str]:
+def get_code_strings(workspace: DB, metadata_db: DB, file_list_name: str = FILE_LIST_NAME) -> dict[str, str]:
     """
     Read file_list.txt and return file names and their content.
 
@@ -159,7 +159,7 @@ def get_code_strings(workspace: DB, metadata_db: DB) -> dict[str, str]:
         for dir in dirs:
             yield from get_all_files_in_dir(os.path.join(root, dir))
 
-    files_paths = metadata_db[FILE_LIST_NAME].strip().split("\n")
+    files_paths = metadata_db[file_list_name].strip().split("\n")
     files = []
 
     for full_file_path in files_paths:

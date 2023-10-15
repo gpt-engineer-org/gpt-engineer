@@ -64,7 +64,7 @@ from gpt_engineer.core.chat_to_files import (
     to_files_and_memory,
 )
 from gpt_engineer.core.db import DBs
-from gpt_engineer.cli.file_selector import FILE_LIST_NAME, ask_for_files
+from gpt_engineer.cli.file_selector import REFERENCE_FILE_LIST_NAME, FILE_LIST_NAME, ask_for_files, scan_for_reference_files
 from gpt_engineer.cli.learning import human_review_input
 
 # Type hint for chat messages
@@ -179,8 +179,15 @@ def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
     Note:
     The function assumes the `ai.start` method and the `to_files` utility are correctly
     set up and functional. Ensure these prerequisites are in place before invoking `simple_gen`.
-    """
-    messages = ai.start(setup_sys_prompt(dbs), dbs.input["prompt"], step_name=curr_fn())
+    """    
+
+    # use an enhanced prompt 
+    if "enhanced_prompt" in dbs.memory:
+       input_prompt = dbs.memory["enhanced_prompt"]
+    else:
+      input_prompt = dbs.input["prompt"]
+
+    messages = ai.start(setup_sys_prompt(dbs), input_prompt, step_name=curr_fn())
     to_files_and_memory(messages[-1].content.strip(), dbs)
     return messages
 
@@ -633,6 +640,73 @@ def human_review(ai: AI, dbs: DBs):
         dbs.memory["review"] = review.to_json()  # type: ignore
     return []
 
+def enhance_prompt_add_reference_files(ai: AI, dbs: DBs):
+    """
+    Scans the root directory for existing files referenced in the generated code.
+
+    This function scans the root directory for any files that may already exist and
+    are referenced in the code generated for the input prompt. It then updates the
+    file list in the database to include these files.
+
+    Parameters:
+    - dbs (DBs): An instance containing the database configurations and project metadata.
+      The function will update the file list in the project metadata.
+
+    Returns:
+    - list: Returns an empty list, indicating that there's no subsequent interaction with the LLM.
+    """
+    reference_files = scan_for_reference_files(dbs.project_metadata, dbs.workspace) 
+
+    files_info = get_code_strings(
+        dbs.workspace, dbs.project_metadata, REFERENCE_FILE_LIST_NAME
+    )  # this has file names relative to the workspace path
+
+    enhanced_prompt = dbs.input["prompt"] + "\n Here is a list of all the existing files present in the root directory your code will be added to: \n"
+
+    # Add files as input
+    for file_name, file_str in files_info.items():
+        enhanced_prompt += format_file_to_input(file_name, file_str)
+
+    dbs.memory["enhanced_prompt"] = enhanced_prompt
+
+    return []
+
+def enhance_prompt_add_strict_requirements(ai: AI, dbs: DBs) -> List[Message]:
+    """
+    Enhances the promp by adding a set of strict functional requirements aimed 
+    at helping it pass tests written against the outputted code.
+
+    This function takes a user-provided prompt and asks the AI model to generate
+    a set of strict functional requirements for the described scenario or system.
+    The AI's response is appended to the original prompt. 
+
+    Parameters:
+    - ai (AI): An instance of the AI model.
+    - dbs (DBs): An instance containing the database configurations and user prompts.
+
+    Returns:
+    - List[Message]: A list of message objects encapsulating the AI's generated output.
+
+    Note:
+    - The function assumes the `ai.start` method is correctly set up and functional.
+      Ensure these prerequisites before invoking `convert_to_strict_requirements`.
+    """
+    system_prompt = (
+        "Your being shown a prompt which will be passed to an LLM to make it generate code. \
+        The LLMs response to the prompt is being tested to see how it performs. \
+        Every aspect of the prompt will have a corresponding test applied to the LLMs output. \
+        With this in mind, generate a set of strict functional requirements which can be appended to the prompt to improve the LLMs performance. \
+        If some aspect of the prompt seems vague and colloquial e.g. the program 'should' do this or that - Interpret these vague requirements as strict requirements e.g. the program 'must' do this or that. \
+        Output requirements which ensure no reasonable test written against this prompt would fail."
+    )
+
+    user_prompt = dbs.input["prompt"]
+    messages = ai.start(system_prompt, user_prompt, step_name=curr_fn())
+
+    dbs.memory["enhanced_prompt"] = dbs.input["prompt"] + "\n Here are a set of strict functional requirements to consider when completing this task: \n" +  messages[-1].content.strip()
+    
+    return messages
+
 
 class Config(str, Enum):
     """
@@ -669,6 +743,8 @@ class Config(str, Enum):
 
 STEPS = {
     Config.DEFAULT: [
+        #enhance_prompt_add_strict_requirements,
+        #enhance_prompt_add_reference_files,
         simple_gen,
         gen_entrypoint,
         execute_entrypoint,
@@ -689,6 +765,8 @@ STEPS = {
         gen_entrypoint,
     ],
     Config.SIMPLE: [
+        #enhance_prompt_add_strict_requirements, This seems to add some minor improvements for the password generator but given the exta call the the LLM adds a lot of time  its not worth it.
+        #enhance_prompt_add_reference_files, This seems to add a fairly major improvement to the battleships test - but it breaks every other test
         simple_gen,
         gen_entrypoint,
         execute_entrypoint,

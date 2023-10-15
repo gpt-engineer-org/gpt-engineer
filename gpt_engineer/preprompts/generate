@@ -12,4 +12,4 @@ Ensure to implement all code, if you are unsure, write a plausible implementatio
 Include module dependency or package manager dependency definition file.
 Before you finish, double check that all parts of the architecture is present in the files.
 
-When you are done, write finish with "this concludes a fully working implementation".
+When you are done, finish by writing "this concludes a fully working implementation".
