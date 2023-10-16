@@ -37,7 +37,7 @@ def main(
                     "python",
                     "-u",  # Unbuffered output
                     "-m",
-                    "gpt_engineer.main",
+                    "gpt_engineer.cli.main",
                     bench_folder,
                     "--steps",
                     "benchmark",
@@ -69,7 +69,7 @@ def main(
                 [
                     "python",
                     "-m",
-                    "gpt_engineer.main",
+                    "gpt_engineer.cli.main",
                     bench_folder,
                     "--steps",
                     "evaluate",

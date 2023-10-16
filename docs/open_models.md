@@ -6,7 +6,7 @@ You can integrate `gpt-engineer` with open-source models by leveraging an OpenAI
 Setup
 -----
 
-To get started, first set up the API with the Runpod template, as per the [instructions](https://github.com/oobabooga/text-generation-webui/blob/main/extensions/openai/README.md>).
+To get started, first set up the API with the Runpod template, as per the [instructions](https://github.com/oobabooga/text-generation-webui/blob/main/extensions/openai/README.md).
 
 Running the Example
 -------------------
@@ -16,7 +16,7 @@ Once the API is set up, you can find the host and the exposed TCP port by checki
 Then, you can use the port and host to run the following example using WizardCoder-Python-34B hosted on Runpod:
 
 ```
-  OPENAI_API_BASE=http://<host>:<port>/v1 python -m gpt_engineer.main benchmark/pomodoro_timer --steps benchmark TheBloke_WizardCoder-Python-34B-V1.0-GPTQ
+  OPENAI_API_BASE=http://<host>:<port>/v1 python -m gpt_engineer.cli.main benchmark/pomodoro_timer --steps benchmark TheBloke_WizardCoder-Python-34B-V1.0-GPTQ
 ```
 
 Using Azure models

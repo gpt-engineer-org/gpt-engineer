@@ -14,7 +14,7 @@ Dependencies:
 - `os` and `pathlib`: For handling OS-level operations and path manipulations.
 - `re`: For regex-based parsing of chat content.
 - `gpt_engineer.core.db`: Database handling functionalities for the workspace.
-- `gpt_engineer.file_selector`: Constants related to file selection.
+- `gpt_engineer.cli.file_selector`: Constants related to file selection.
 
 Functions:
 - parse_chat: Extracts code blocks from chat messages.
@@ -25,14 +25,18 @@ Functions:
 """
 
 import os
-from pathlib import Path
 import re
+import logging
 import codecs
 
+from dataclasses import dataclass
 from typing import List, Tuple
 
 from gpt_engineer.core.db import DB, DBs
 from gpt_engineer.cli.file_selector import FILE_LIST_NAME
+
+
+logger = logging.getLogger(__name__)
 
 
 def parse_chat(chat) -> List[Tuple[str, str]]:
@@ -82,6 +86,21 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
     return files
 
 
+def to_files_and_memory(chat: str, dbs: DBs):
+    """
+    Save chat to memory, and parse chat to extracted file and save them to the workspace.
+
+    Parameters
+    ----------
+    chat : str
+        The chat to parse.
+    dbs : DBs
+        The databases that include the memory and workspace database
+    """
+    dbs.memory["all_output.txt"] = chat
+    to_files(chat, dbs.workspace)
+
+
 def to_files(chat: str, workspace: DB):
     """
     Parse the chat and add all extracted files to the workspace.
@@ -91,10 +110,8 @@ def to_files(chat: str, workspace: DB):
     chat : str
         The chat to parse.
     workspace : DB
-        The workspace to add the files to.
+        The database containing the workspace.
     """
-    workspace["all_output.txt"] = chat  # TODO store this in memory db instead
-
     files = parse_chat(chat)
     for file_name, file_content in files:
         workspace[file_name] = file_content
@@ -189,3 +206,75 @@ def format_file_to_input(file_name: str, file_content: str) -> str:
     ```
     """
     return file_str
+
+
+def overwrite_files_with_edits(chat: str, dbs: DBs):
+    edits = parse_edits(chat)
+    apply_edits(edits, dbs.workspace)
+
+
+@dataclass
+class Edit:
+    filename: str
+    before: str
+    after: str
+
+
+def parse_edits(llm_response):
+    def parse_one_edit(lines):
+        HEAD = "<<<<<<< HEAD"
+        DIVIDER = "======="
+        UPDATE = ">>>>>>> updated"
+
+        filename = lines.pop(0)
+        text = "\n".join(lines)
+        splits = text.split(DIVIDER)
+        if len(splits) != 2:
+            raise ValueError(f"Could not parse following text as code edit: \n{text}")
+        before, after = splits
+
+        before = before.replace(HEAD, "").strip()
+        after = after.replace(UPDATE, "").strip()
+
+        return Edit(filename, before, after)
+
+    def parse_all_edits(txt):
+        edits = []
+        current_edit = []
+        in_fence = False
+
+        for line in txt.split("\n"):
+            if line.startswith("```") and in_fence:
+                edits.append(parse_one_edit(current_edit))
+                current_edit = []
+                in_fence = False
+                continue
+            elif line.startswith("```") and not in_fence:
+                in_fence = True
+                continue
+
+            if in_fence:
+                current_edit.append(line)
+
+        return edits
+
+    return parse_all_edits(llm_response)
+
+
+def apply_edits(edits: List[Edit], workspace: DB):
+    for edit in edits:
+        filename = edit.filename
+        if edit.before == "":
+            if workspace.get(filename) is not None:
+                logger.warn(
+                    f"The edit to be applied wants to create a new file `{filename}`, but that already exists. The file will be overwritten. See `.gpteng/memory` for previous version."
+                )
+            workspace[filename] = edit.after  # new file
+        else:
+            if workspace[filename].count(edit.before) > 1:
+                logger.warn(
+                    f"While applying an edit to `{filename}`, the code block to be replaced was found multiple times. All instances will be replaced."
+                )
+            workspace[filename] = workspace[filename].replace(
+                edit.before, edit.after
+            )  # existing file

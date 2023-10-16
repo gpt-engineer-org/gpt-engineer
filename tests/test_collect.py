@@ -28,7 +28,7 @@ def test_collect_learnings(monkeypatch):
     }
     code = "this is output\n\nit contains code"
     dbs.logs = {steps[0].__name__: json.dumps([{"role": "system", "content": code}])}
-    dbs.workspace = {"all_output.txt": "test workspace\n" + code}
+    dbs.memory = {"all_output.txt": "test workspace\n" + code}
 
     collect_learnings(model, temperature, steps, dbs)
 

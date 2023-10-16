@@ -23,39 +23,39 @@ def setup_dbs(tmp_path, dir_names):
 
 
 def test_archive(tmp_path, monkeypatch):
-    dbs = setup_dbs(
-        tmp_path,
-        [
-            "memory",
-            "logs",
-            "preprompts",
-            "input",
-            "workspace",
-            "archive",
-            "project_metadata",
-        ],
-    )
-    freeze_at(monkeypatch, datetime.datetime(2020, 12, 25, 17, 5, 55))
-    archive(dbs)
-    assert not os.path.exists(tmp_path / "memory")
-    assert not os.path.exists(tmp_path / "workspace")
-    assert os.path.isdir(tmp_path / "archive" / "20201225_170555")
+    gpteng_dir = ".gpteng"
 
     dbs = setup_dbs(
         tmp_path,
         [
-            "memory",
-            "logs",
-            "preprompts",
-            "input",
-            "workspace",
-            "archive",
-            "project_metadata",
+            gpteng_dir + "/memory",
+            gpteng_dir + "/logs",
+            gpteng_dir + "/preprompts",
+            gpteng_dir + "/input",
+            "",  # workspace is top-level folder
+            gpteng_dir + "/archive",
+            gpteng_dir + "/project_metadata",
+        ],
+    )
+    freeze_at(monkeypatch, datetime.datetime(2020, 12, 25, 17, 5, 55))
+    archive(dbs)
+    assert not os.path.exists(tmp_path / gpteng_dir / "memory")
+    assert os.path.isdir(tmp_path / gpteng_dir / "archive" / "20201225_170555")
+
+    dbs = setup_dbs(
+        tmp_path,
+        [
+            gpteng_dir + "/memory",
+            gpteng_dir + "/logs",
+            gpteng_dir + "/preprompts",
+            gpteng_dir + "/input",
+            "",  # workspace is top-level folder
+            gpteng_dir + "/archive",
+            gpteng_dir + "/project_metadata",
         ],
     )
     freeze_at(monkeypatch, datetime.datetime(2022, 8, 14, 8, 5, 12))
     archive(dbs)
     assert not os.path.exists(tmp_path / "memory")
-    assert not os.path.exists(tmp_path / "workspace")
-    assert os.path.isdir(tmp_path / "archive" / "20201225_170555")
-    assert os.path.isdir(tmp_path / "archive" / "20220814_080512")
+    assert os.path.isdir(tmp_path / gpteng_dir / "archive" / "20201225_170555")
+    assert os.path.isdir(tmp_path / gpteng_dir / "archive" / "20220814_080512")

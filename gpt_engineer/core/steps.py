@@ -8,7 +8,7 @@ workflow execution, and interaction with AI, allowing for various configurations
 Imports:
 - Standard libraries: inspect, re, subprocess
 - Additional libraries/packages: termcolor, typing, enum
-- Internal modules/packages: langchain.schema, gpt_engineer.core, gpt_engineer.file_selector, gpt_engineer.learning
+- Internal modules/packages: langchain.schema, gpt_engineer.core, gpt_engineer.cli
 
 Key Features:
 - Dynamic system prompt creation for both new code generation and improving existing code.
@@ -59,8 +59,8 @@ from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import (
     format_file_to_input,
     get_code_strings,
-    overwrite_files,
-    to_files,
+    overwrite_files_with_edits,
+    to_files_and_memory,
 )
 from gpt_engineer.core.db import DBs
 from gpt_engineer.cli.file_selector import FILE_LIST_NAME, ask_for_files
@@ -154,7 +154,7 @@ def lite_gen(ai: AI, dbs: DBs) -> List[Message]:
     messages = ai.start(
         dbs.input["prompt"], dbs.preprompts["file_format"], step_name=curr_fn()
     )
-    to_files(messages[-1].content.strip(), dbs.workspace)
+    to_files_and_memory(messages[-1].content.strip(), dbs)
     return messages
 
 
@@ -180,7 +180,7 @@ def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
     set up and functional. Ensure these prerequisites are in place before invoking `simple_gen`.
     """
     messages = ai.start(setup_sys_prompt(dbs), dbs.input["prompt"], step_name=curr_fn())
-    to_files(messages[-1].content.strip(), dbs.workspace)
+    to_files_and_memory(messages[-1].content.strip(), dbs)
     return messages
 
 
@@ -207,7 +207,6 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
     The function assumes the `ai.fsystem`, `ai.next`, and `curr_fn` utilities are correctly
     set up and functional. Ensure these prerequisites are in place before invoking `clarify`.
     """
-
     messages: List[Message] = [ai.fsystem(dbs.preprompts["clarify"])]
     user_input = dbs.input["prompt"]
     while True:
@@ -268,7 +267,6 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     and `to_files` utilities are correctly set up and functional. Ensure these prerequisites
     are in place before invoking `gen_clarified_code`.
     """
-
     messages = AI.deserialize_messages(dbs.logs[clarify.__name__])
 
     messages = [
@@ -282,7 +280,7 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
         step_name=curr_fn(),
     )
 
-    to_files(messages[-1].content.strip(), dbs.workspace)
+    to_files_and_memory(messages[-1].content.strip(), dbs)
     return messages
 
 
@@ -311,7 +309,6 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     Ensure the script is available and that it has the appropriate permissions
     (e.g., executable) before invoking this function.
     """
-
     command = dbs.workspace["run.sh"]
 
     print()
@@ -380,7 +377,6 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     - It assumes the presence of an 'all_output.txt' file in the specified workspace
       that contains information about the codebase.
     """
-
     messages = ai.start(
         system=(
             "You will get information about a codebase that is currently on disk in "
@@ -394,7 +390,7 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
             "Do not use placeholders, use example values (like . for a folder argument) "
             "if necessary.\n"
         ),
-        user="Information about the codebase:\n\n" + dbs.workspace["all_output.txt"],
+        user="Information about the codebase:\n\n" + dbs.memory["all_output.txt"],
         step_name=curr_fn(),
     )
     print()
@@ -428,17 +424,14 @@ def use_feedback(ai: AI, dbs: DBs):
     - If feedback is absent, an instruction is printed to the console, and the program
       terminates.
     """
-
     messages = [
         ai.fsystem(setup_sys_prompt(dbs)),
         ai.fuser(f"Instructions: {dbs.input['prompt']}"),
-        ai.fassistant(
-            dbs.workspace["all_output.txt"]
-        ),  # reload previously generated code
+        ai.fassistant(dbs.memory["all_output.txt"]),  # reload previously generated code
     ]
     if dbs.input["feedback"]:
         messages = ai.next(messages, dbs.input["feedback"], step_name=curr_fn())
-        to_files(messages[-1].content.strip(), dbs.workspace)
+        to_files_and_memory(messages[-1].content.strip(), dbs)
         return messages
     else:
         print(
@@ -472,9 +465,8 @@ def set_improve_filelist(ai: AI, dbs: DBs):
     - The selected file paths are stored as a side-effect of calling `ask_for_files()`,
       and they aren't directly returned by this function.
     """
-
     """Sets the file list for files to work with in existing code mode."""
-    ask_for_files(dbs.project_metadata, dbs.input)  # stores files as full paths.
+    ask_for_files(dbs.project_metadata, dbs.workspace)  # stores files as full paths.
     return []
 
 
@@ -506,7 +498,6 @@ def assert_files_ready(ai: AI, dbs: DBs):
       necessary files are set up correctly before proceeding with the 'improve code'
       operation.
     """
-
     """Checks that the required files are present for headless
     improve code execution."""
     assert (
@@ -517,32 +508,6 @@ def assert_files_ready(ai: AI, dbs: DBs):
 
 
 def get_improve_prompt(ai: AI, dbs: DBs):
-    """
-    Prompt the user to specify what they'd like to improve within the selected files.
-
-    The function first checks if a prompt already exists in the input database (`dbs.input`).
-    If no prompt is provided, the user is asked interactively. After the prompt is set,
-    a confirmation string, listing the files selected for improvement and the provided
-    prompt, is displayed to the user. The user is then prompted to press enter to proceed
-    with the modifications.
-
-    Parameters:
-    - ai (AI): An instance of the AI model. While it's passed to this function,
-      it is not utilized within the function's scope. This might be for consistency
-      with other function signatures.
-    - dbs (DBs): An instance containing the database configurations and project metadata.
-      This is used to fetch the selected files for improvement and to set or get the
-      improvement prompt.
-
-    Returns:
-    - list: Returns an empty list, presumably for consistency in return types across
-      related functions.
-
-    Notes:
-    - The purpose of this function is mainly to prepare and confirm the setup before
-      proceeding with actual code improvements based on user input.
-    """
-
     """
     Asks the user what they would like to fix.
     """
@@ -605,7 +570,7 @@ def improve_existing_code(ai: AI, dbs: DBs):
     """
 
     files_info = get_code_strings(
-        dbs.input, dbs.project_metadata
+        dbs.workspace, dbs.project_metadata
     )  # this has file names relative to the workspace path
 
     messages = [
@@ -620,7 +585,7 @@ def improve_existing_code(ai: AI, dbs: DBs):
 
     messages = ai.next(messages, step_name=curr_fn())
 
-    overwrite_files(messages[-1].content.strip(), dbs)
+    overwrite_files_with_edits(messages[-1].content.strip(), dbs)
     return messages
 
 
@@ -741,7 +706,6 @@ Examples:
 
 This setup allows for modularity and flexibility in handling different user requirements and scenarios.
 """
-
 
 # Future steps that can be added:
 # run_tests_and_fix_files
