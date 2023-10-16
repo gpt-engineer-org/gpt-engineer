@@ -159,34 +159,36 @@ def get_code_strings(workspace: DB, metadata_db: DB) -> dict[str, str]:
                 yield os.path.join(root, file)
         for dir in dirs:
             yield from get_all_files_in_dir(os.path.join(root, dir))
-    
+
     files_paths = metadata_db[FILE_LIST_NAME].strip().split("\n")
     files = []
-    
+
     for full_file_path in files_paths:
         if os.path.isdir(full_file_path):
             for file_path in get_all_files_in_dir(full_file_path):
                 files.append(file_path)
         else:
             files.append(full_file_path)
-    
+
     files_dict = {}
-    
+
     for path in files:
         assert os.path.commonpath([full_file_path, workspace.path]) == str(
             workspace.path
         ), "Trying to edit files outside of the workspace"
-        
+
         file_name = os.path.relpath(path, workspace.path)
         file_content = workspace[file_name]
-        
+
         try:
-            file_content.decode('utf-8')  # Check if file is UTF-8 encoded
+            file_content.decode("utf-8")  # Check if file is UTF-8 encoded
         except UnicodeDecodeError:
-            raise ValueError(f"Non-text file detected: {file_name}, gpt-engineer currently only supports utf-8 decodable text files.")
-        
+            raise ValueError(
+                f"Non-text file detected: {file_name}, gpt-engineer currently only supports utf-8 decodable text files."
+            )
+
         files_dict[file_name] = file_content
-    
+
     return files_dict
 
 
