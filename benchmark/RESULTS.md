@@ -5,6 +5,21 @@ python scripts/benchmark.py
 
 ```
 
+## 2023-10-16
+
+| Benchmark          | Ran | Works | Perfect |
+|--------------------|----|------|--------|
+| currency_converter | ❌  | ❌    | ❌     |
+| image_resizer      | ✅  | ✅    | ✅     |
+| pomodoro_timer     | ✅  | ✅    | ✅     |
+| url_shortener      |  ❌ |  ❌   | ❌     |
+| file_explorer      | ✅  | ✅    | ❌     |
+| markdown_editor    | ❌  | ❌    | ❌     |
+| timer_app          | ✅  | ✅    | ✅     |
+| file_organizer     | ✅  | ✅    | ❌     |
+| password_generator | ✅  | ✅    | ✅     |
+| todo_list          | ✅  | ✅    | ✅     |
+
 ## 2023-06-21
 
 | Benchmark          | Ran | Works | Perfect |
