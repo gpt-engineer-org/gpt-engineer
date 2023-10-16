@@ -17,6 +17,7 @@ build/
 .env.sh
 venv/
 ENV/
+venv_test_installation/
 
 # IDE-specific files
 .vscode/
@@ -80,3 +81,5 @@ docs/db/
 poetry.lock
 .aider*
 .gpteng
+
+#test artifacts

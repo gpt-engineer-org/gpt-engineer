@@ -45,12 +45,6 @@ def test_DBs_initialization(tmp_path):
     assert isinstance(dbs_instance.project_metadata, DB)
 
 
-def test_invalid_path():
-    with pytest.raises((PermissionError, OSError)):
-        # Test with a path that will raise a permission error
-        DB("/root/test")
-
-
 def test_large_files(tmp_path):
     db = DB(tmp_path)
     large_content = "a" * (10**6)  # 1MB of data

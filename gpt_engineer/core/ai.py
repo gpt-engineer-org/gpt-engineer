@@ -139,11 +139,10 @@ class AI:
         """
         self.temperature = temperature
         self.azure_endpoint = azure_endpoint
-        self.model_name = (
-            fallback_model(model_name) if azure_endpoint == "" else model_name
-        )
-        self.llm = create_chat_model(self, self.model_name, self.temperature)
-        self.tokenizer = get_tokenizer(self.model_name)
+        self.model_name = model_name
+
+        self.llm = self._create_chat_model()
+        self.tokenizer = self._get_tokenizer()
         logger.debug(f"Using model {self.model_name} with llm {self.llm}")
 
         # initialize token usage log
@@ -170,6 +169,7 @@ class AI:
         List[Message]
             The list of messages in the conversation.
         """
+
         messages: List[Message] = [
             SystemMessage(content=system),
             HumanMessage(content=user),
@@ -463,94 +463,87 @@ class AI:
         n_tokens += 2  # every reply is primed with <im_start>assistant
         return n_tokens
 
+    def _check_model_acess_and_fallback(self) -> str:
+        """
+        Retrieve the specified model, or fallback to "gpt-3.5-turbo" if the model is not available.
 
-def fallback_model(model: str) -> str:
-    """
-    Retrieve the specified model, or fallback to "gpt-3.5-turbo" if the model is not available.
+        Parameters
+        ----------
+        model : str
+            The name of the model to retrieve.
 
-    Parameters
-    ----------
-    model : str
-        The name of the model to retrieve.
+        Returns
+        -------
+        str
+            The name of the retrieved model, or "gpt-3.5-turbo" if the specified model is not available.
+        """
+        try:
+            openai.Model.retrieve(self.model_name)
+        except openai.InvalidRequestError:
+            print(
+                f"Model {self.model_name} not available for provided API key. Reverting "
+                "to gpt-3.5-turbo. Sign up for the GPT-4 wait list here: "
+                "https://openai.com/waitlist/gpt-4-api\n"
+            )
+            self.model_name = "gpt-3.5-turbo"
 
-    Returns
-    -------
-    str
-        The name of the retrieved model, or "gpt-3.5-turbo" if the specified model is not available.
-    """
-    try:
-        openai.Model.retrieve(model)
-        return model
-    except openai.InvalidRequestError:
-        print(
-            f"Model {model} not available for provided API key. Reverting "
-            "to gpt-3.5-turbo. Sign up for the GPT-4 wait list here: "
-            "https://openai.com/waitlist/gpt-4-api\n"
-        )
-        return "gpt-3.5-turbo"
+    def _create_chat_model(self) -> BaseChatModel:
+        """
+        Create a chat model with the specified model name and temperature.
 
+        Parameters
+        ----------
+        model : str
+            The name of the model to create.
+        temperature : float
+            The temperature to use for the model.
 
-def create_chat_model(self, model: str, temperature) -> BaseChatModel:
-    """
-    Create a chat model with the specified model name and temperature.
+        Returns
+        -------
+        BaseChatModel
+            The created chat model.
+        """
+        if self.azure_endpoint:
+            return AzureChatOpenAI(
+                openai_api_base=self.azure_endpoint,
+                openai_api_version="2023-05-15",  # might need to be flexible in the future
+                deployment_name=self.model_name,
+                openai_api_type="azure",
+                streaming=True,
+            )
 
-    Parameters
-    ----------
-    model : str
-        The name of the model to create.
-    temperature : float
-        The temperature to use for the model.
+        self._check_model_acess_and_fallback()
 
-    Returns
-    -------
-    BaseChatModel
-        The created chat model.
-    """
-    if self.azure_endpoint:
-        return AzureChatOpenAI(
-            openai_api_base=self.azure_endpoint,
-            openai_api_version="2023-05-15",  # might need to be flexible in the future
-            deployment_name=model,
-            openai_api_type="azure",
+        return ChatOpenAI(
+            model=self.model_name,
+            temperature=self.temperature,
             streaming=True,
+            client=openai.ChatCompletion,
         )
-    # Fetch available models from OpenAI API
-    supported = [model["id"] for model in openai.Model.list()["data"]]
-    if model not in supported:
-        raise ValueError(
-            f"Model {model} is not supported, supported models are: {supported}"
+
+    def _get_tokenizer(self):
+        """
+        Get the tokenizer for the specified model.
+
+        Parameters
+        ----------
+        model : str
+            The name of the model to get the tokenizer for.
+
+        Returns
+        -------
+        Tokenizer
+            The tokenizer for the specified model.
+        """
+        if "gpt-4" in self.model_name or "gpt-3.5" in self.model_name:
+            return tiktoken.encoding_for_model(self.model_name)
+
+        logger.debug(
+            f"No encoder implemented for model {self.model_name}."
+            "Defaulting to tiktoken cl100k_base encoder."
+            "Use results only as estimates."
         )
-    return ChatOpenAI(
-        model=model,
-        temperature=temperature,
-        streaming=True,
-        client=openai.ChatCompletion,
-    )
-
-
-def get_tokenizer(model: str):
-    """
-    Get the tokenizer for the specified model.
-
-    Parameters
-    ----------
-    model : str
-        The name of the model to get the tokenizer for.
-
-    Returns
-    -------
-    Tokenizer
-        The tokenizer for the specified model.
-    """
-    if "gpt-4" in model or "gpt-3.5" in model:
-        return tiktoken.encoding_for_model(model)
-
-    logger.debug(
-        f"No encoder implemented for model {model}."
-        "Defaulting to tiktoken cl100k_base encoder."
-        "Use results only as estimates."
-    )
-    return tiktoken.get_encoding("cl100k_base")
+        return tiktoken.get_encoding("cl100k_base")
 
 
 def serialize_messages(messages: List[Message]) -> str:
