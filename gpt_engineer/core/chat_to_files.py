@@ -140,12 +140,10 @@ def overwrite_files(chat: str, dbs: DBs) -> None:
 def get_code_strings(workspace: DB, metadata_db: DB) -> dict[str, str]:
     """
     Read file_list.txt and return file names and their content.
-
     Parameters
     ----------
     input : dict
         A dictionary containing the file_list.txt.
-
     Returns
     -------
     dict[str, str]
@@ -170,13 +168,25 @@ def get_code_strings(workspace: DB, metadata_db: DB) -> dict[str, str]:
             files.append(full_file_path)
 
     files_dict = {}
+
     for path in files:
         assert os.path.commonpath([full_file_path, workspace.path]) == str(
             workspace.path
         ), "Trying to edit files outside of the workspace"
+
         file_name = os.path.relpath(path, workspace.path)
+
         if file_name in workspace:
-            files_dict[file_name] = workspace[file_name]
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    file_content = f.read()
+            except UnicodeDecodeError:
+                raise ValueError(
+                    f"Non-text file detected: {file_name}, gpt-engineer currently only supports utf-8 decodable text files."
+                )
+
+            files_dict[file_name] = file_content
+
     return files_dict
 
 
