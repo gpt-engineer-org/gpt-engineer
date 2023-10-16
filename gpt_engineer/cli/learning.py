@@ -103,7 +103,7 @@ def human_review_input() -> Review:
         The user's review of the generated code.
     """
     print()
-    if not check_consent():
+    if not check_collection_consent():
         return None
     print()
     print(
@@ -146,7 +146,7 @@ def human_review_input() -> Review:
     )
 
 
-def check_consent() -> bool:
+def check_collection_consent() -> bool:
     """
     Check if the user has given consent to store their data.
     If not, ask for their consent.
