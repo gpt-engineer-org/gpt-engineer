@@ -142,7 +142,7 @@ class AI:
         self.model_name = model_name
 
         self.llm = self._create_chat_model()
-        self.tokenizer = self._get_tokenizer()
+        self.tokenizer = get_tokenizer(self.model_name)
         logger.debug(f"Using model {self.model_name} with llm {self.llm}")
 
         # initialize token usage log
@@ -463,7 +463,7 @@ class AI:
         n_tokens += 2  # every reply is primed with <im_start>assistant
         return n_tokens
 
-    def _check_model_acess_and_fallback(self) -> str:
+    def _check_model_acess_and_fallback(self):
         """
         Retrieve the specified model, or fallback to "gpt-3.5-turbo" if the model is not available.
 
@@ -521,29 +521,30 @@ class AI:
             client=openai.ChatCompletion,
         )
 
-    def _get_tokenizer(self):
-        """
-        Get the tokenizer for the specified model.
 
-        Parameters
-        ----------
-        model : str
-            The name of the model to get the tokenizer for.
+def get_tokenizer(model: str):
+    """
+    Get the tokenizer for the specified model.
 
-        Returns
-        -------
-        Tokenizer
-            The tokenizer for the specified model.
-        """
-        if "gpt-4" in self.model_name or "gpt-3.5" in self.model_name:
-            return tiktoken.encoding_for_model(self.model_name)
+    Parameters
+    ----------
+    model : str
+        The name of the model to get the tokenizer for.
 
-        logger.debug(
-            f"No encoder implemented for model {self.model_name}."
-            "Defaulting to tiktoken cl100k_base encoder."
-            "Use results only as estimates."
-        )
-        return tiktoken.get_encoding("cl100k_base")
+    Returns
+    -------
+    Tokenizer
+        The tokenizer for the specified model.
+    """
+    if "gpt-4" in model or "gpt-3.5" in model:
+        return tiktoken.encoding_for_model(model)
+
+    logger.debug(
+        f"No encoder implemented for model {model}."
+        "Defaulting to tiktoken cl100k_base encoder."
+        "Use results only as estimates."
+    )
+    return tiktoken.get_encoding("cl100k_base")
 
 
 def serialize_messages(messages: List[Message]) -> str:
