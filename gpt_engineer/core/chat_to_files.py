@@ -27,7 +27,6 @@ Functions:
 import os
 import re
 import logging
-import codecs
 
 from dataclasses import dataclass
 from typing import List, Tuple
