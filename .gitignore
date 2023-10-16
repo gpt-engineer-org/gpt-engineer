@@ -81,5 +81,3 @@ docs/db/
 poetry.lock
 .aider*
 .gpteng
-
-#test artifacts
