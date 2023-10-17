@@ -1,3 +1,7 @@
+"""
+Tests the collect_learnings function in the cli/collect module.
+"""
+
 import json
 import os
 
@@ -8,13 +12,11 @@ import rudderstack.analytics as rudder_analytics
 
 from gpt_engineer.cli.collect import collect_learnings, steps_file_hash
 from gpt_engineer.core.db import DB, DBs
-from gpt_engineer.cli.learning import collect_consent, extract_learning
+from gpt_engineer.cli.learning import extract_learning
 from gpt_engineer.core.steps import simple_gen
 
 
 def test_collect_learnings(monkeypatch):
-    # TODO: revise this to use the new consent mechanisms in cli/learning module
-    monkeypatch.setattr(os, "environ", {"COLLECT_LEARNINGS_OPT_IN": "true"})
     monkeypatch.setattr(rudder_analytics, "track", MagicMock())
 
     model = "test_model"
