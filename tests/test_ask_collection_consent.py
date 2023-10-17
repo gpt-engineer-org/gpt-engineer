@@ -1,3 +1,6 @@
+"""
+Tests for the ask_collection_consent function in the learning module.
+"""
 import pytest
 from unittest.mock import patch
 from pathlib import Path
