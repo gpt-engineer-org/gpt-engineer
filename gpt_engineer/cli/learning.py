@@ -200,27 +200,27 @@ def ask_collection_consent() -> bool:
         return False
 
 # No longer needed with refactoring of check_collection_consent() and ask_collection_consent()
-# Removed in issue #786
-# def collect_consent() -> bool:
-#     """
-#     Check if the user has given consent to store their data.
-#     If not, ask for their consent.
+# Removed usage in issue #786
+def collect_consent() -> bool:
+    """
+    Check if the user has given consent to store their data.
+    If not, ask for their consent.
 
-#     Returns
-#     -------
-#     bool
-#         True if the user has given consent, False otherwise.
-#     """
-#     consent_flag = Path(".gpte_consent")
-#     if consent_flag.exists():
-#         return consent_flag.read_text() == "true"
+    Returns
+    -------
+    bool
+        True if the user has given consent, False otherwise.
+    """
+    consent_flag = Path(".gpte_consent")
+    if consent_flag.exists():
+        return consent_flag.read_text() == "true"
 
-#     if ask_if_can_store():
-#         consent_flag.write_text("true")
-#         print()
-#         print("(If you change your mind, delete the file .gpte_consent)")
-#         return True
-#     return False
+    if ask_if_can_store():
+        consent_flag.write_text("true")
+        print()
+        print("(If you change your mind, delete the file .gpte_consent)")
+        return True
+    return False
 
 # No longer needed with refactoring of check_collection_consent() and ask_collection_consent()
 # Removed in issue #786
