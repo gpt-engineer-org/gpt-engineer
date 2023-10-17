@@ -146,29 +146,6 @@ def human_review_input() -> Review:
     )
 
 
-# def check_collection_consent() -> bool:
-#     """
-#     Check if the user has given consent to store their data.
-#     If not, ask for their consent.
-#     """
-#     path = Path(".gpte_consent")
-#     if path.exists() and path.read_text() == "true":
-#         return True
-#     answer = input("Is it ok if we store your prompts to learn? (y/n)")
-#     while answer.lower() not in ("y", "n"):
-#         answer = input("Invalid input. Please enter y or n: ")
-
-#     if answer.lower() == "y":
-#         path.write_text("true")
-#         print(colored("Thank you️", "light_green"))
-#         print()
-#         print("(If you change your mind, delete the file .gpte_consent)")
-#         return True
-#     else:
-#         print(colored("We understand ❤️", "light_green"))
-#         return False
-
-
 def check_collection_consent() -> bool:
     """
     Check if the user has given consent to store their data.
@@ -208,59 +185,6 @@ def ask_collection_consent() -> bool:
             )
         )
         return False
-
-
-# No longer needed with refactoring of check_collection_consent() and ask_collection_consent()
-# Removed usage in issue #786
-# def collect_consent() -> bool:
-#     """
-#     Check if the user has given consent to store their data.
-#     If not, ask for their consent.
-
-#     Returns
-#     -------
-#     bool
-#         True if the user has given consent, False otherwise.
-#     """
-#     consent_flag = Path(".gpte_consent")
-#     if consent_flag.exists():
-#         return consent_flag.read_text() == "true"
-
-#     if ask_if_can_store():
-#         consent_flag.write_text("true")
-#         print()
-#         print("(If you change your mind, delete the file .gpte_consent)")
-#         return True
-#     return False
-
-
-# No longer needed with refactoring of check_collection_consent() and ask_collection_consent()
-# Removed in issue #786
-# def ask_if_can_store() -> bool:
-#     """
-#     Ask the user if their data can be stored.
-
-#     Returns
-#     -------
-#     bool
-#         True if the user agrees to have their data stored, False otherwise.
-#     """
-#     print()
-#     can_store = input(
-#         "Have you understood and agree to that "
-#         + colored("OpenAI ", "light_green")
-#         + "and "
-#         + colored("gpt-engineer ", "light_green")
-#         + "store anonymous learnings about how gpt-engineer is used "
-#         + "(with the sole purpose of improving it)?\n(y/n)"
-#     ).lower()
-#     while can_store not in ("y", "n"):
-#         can_store = input("Invalid input. Please enter y or n: ").lower()
-
-#     if can_store == "n":
-#         print(colored("Ok we understand", "light_green"))
-
-#     return can_store == "y"
 
 
 def logs_to_string(steps: List[Step], logs: DB) -> str:
