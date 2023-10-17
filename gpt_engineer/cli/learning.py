@@ -185,7 +185,9 @@ def ask_collection_consent() -> bool:
     """
     Ask the user for consent to store their data.
     """
-    answer = input("Is it ok if we store your prompts to learn? (y/n)")
+    answer = input(
+        "Is it ok if we store your prompts to help improve GPT Engineer? (y/n)"
+    )
     while answer.lower() not in ("y", "n"):
         answer = input("Invalid input. Please enter y or n: ")
 
@@ -194,35 +196,42 @@ def ask_collection_consent() -> bool:
         path.write_text("true")
         print(colored("Thank you️", "light_green"))
         print()
-        print("(If you change your mind, delete the file .gpte_consent)")
+        print(
+            "(If you no longer wish to participate in data collection, delete the file .gpte_consent)"
+        )
         return True
     else:
-        print(colored("We understand ❤️", "light_green"))
+        print(
+            colored(
+                "No worries! GPT Engineer will not collect your prompts. ❤️",
+                "light_green",
+            )
+        )
         return False
 
 
 # No longer needed with refactoring of check_collection_consent() and ask_collection_consent()
 # Removed usage in issue #786
-def collect_consent() -> bool:
-    """
-    Check if the user has given consent to store their data.
-    If not, ask for their consent.
+# def collect_consent() -> bool:
+#     """
+#     Check if the user has given consent to store their data.
+#     If not, ask for their consent.
 
-    Returns
-    -------
-    bool
-        True if the user has given consent, False otherwise.
-    """
-    consent_flag = Path(".gpte_consent")
-    if consent_flag.exists():
-        return consent_flag.read_text() == "true"
+#     Returns
+#     -------
+#     bool
+#         True if the user has given consent, False otherwise.
+#     """
+#     consent_flag = Path(".gpte_consent")
+#     if consent_flag.exists():
+#         return consent_flag.read_text() == "true"
 
-    if ask_if_can_store():
-        consent_flag.write_text("true")
-        print()
-        print("(If you change your mind, delete the file .gpte_consent)")
-        return True
-    return False
+#     if ask_if_can_store():
+#         consent_flag.write_text("true")
+#         print()
+#         print("(If you change your mind, delete the file .gpte_consent)")
+#         return True
+#     return False
 
 
 # No longer needed with refactoring of check_collection_consent() and ask_collection_consent()
