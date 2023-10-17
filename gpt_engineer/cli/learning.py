@@ -168,6 +168,36 @@ def check_collection_consent() -> bool:
         print(colored("We understand ❤️", "light_green"))
         return False
 
+def check_collection_consent2() -> bool:
+    """
+    Check if the user has given consent to store their data.
+    If not, ask for their consent.
+    """
+    path = Path(".gpte_consent")
+    if path.exists() and path.read_text() == "true":
+        return True
+    else:
+        return ask_collection_consent()
+
+
+def ask_collection_consent() -> bool:
+    """
+    Ask the user for consent to store their data.
+    """
+    answer = input("Is it ok if we store your prompts to learn? (y/n)")
+    while answer.lower() not in ("y", "n"):
+        answer = input("Invalid input. Please enter y or n: ")
+
+    if answer.lower() == "y":
+        path = Path(".gpte_consent")
+        path.write_text("true")
+        print(colored("Thank you️", "light_green"))
+        print()
+        print("(If you change your mind, delete the file .gpte_consent)")
+        return True
+    else:
+        print(colored("We understand ❤️", "light_green"))
+        return False
 
 def collect_consent() -> bool:
     """
