@@ -13,6 +13,7 @@ from gpt_engineer.core.steps import simple_gen
 
 
 def test_collect_learnings(monkeypatch):
+    # TODO: revise this to use the new consent mechanisms in gpt_engineer/cli/learning.py
     monkeypatch.setattr(os, "environ", {"COLLECT_LEARNINGS_OPT_IN": "true"})
     monkeypatch.setattr(rudder_analytics, "track", MagicMock())
 
