@@ -168,6 +168,7 @@ def human_review_input() -> Review:
 #         print(colored("We understand ❤️", "light_green"))
 #         return False
 
+
 def check_collection_consent() -> bool:
     """
     Check if the user has given consent to store their data.
@@ -199,6 +200,7 @@ def ask_collection_consent() -> bool:
         print(colored("We understand ❤️", "light_green"))
         return False
 
+
 # No longer needed with refactoring of check_collection_consent() and ask_collection_consent()
 # Removed usage in issue #786
 def collect_consent() -> bool:
@@ -221,6 +223,7 @@ def collect_consent() -> bool:
         print("(If you change your mind, delete the file .gpte_consent)")
         return True
     return False
+
 
 # No longer needed with refactoring of check_collection_consent() and ask_collection_consent()
 # Removed in issue #786
