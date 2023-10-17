@@ -14,7 +14,14 @@ def cleanup():
     if Path(".gpte_consent").exists():
         Path(".gpte_consent").unlink()
 
-# Test check_collection_consent()
+"""
+Test the following 4 scenarios for check_collection_consent():
+    * The .gpte_consent file exists and its content is "true".
+    * The .gpte_consent file exists but its content is not "true".
+    * The .gpte_consent file does not exist and the user gives consent when asked.
+    * The .gpte_consent file does not exist and the user does not give consent when asked.
+"""
+
 def test_check_consent_file_exists_and_true(cleanup):
     Path(".gpte_consent").write_text("true")
     assert check_collection_consent() == True
@@ -35,7 +42,24 @@ def test_check_consent_file_not_exists_and_user_says_no(cleanup):
         assert check_collection_consent() == False
     assert not Path(".gpte_consent").exists()
 
-# Test ask_collection_consent()
+"""
+Test the following 4 scenarios for ask_collection_consent():
+    1. The user immediately gives consent with "y":
+        * The .gpte_consent file is created with content "true".
+        * The function returns True.
+    2. The user immediately denies consent with "n":
+        * The .gpte_consent file is not created.
+        * The function returns False.
+    3. The user first provides an invalid response, then gives consent with "y":
+        * The user is re-prompted after the invalid input.
+        * The .gpte_consent file is created with content "true".
+        * The function returns True.
+    4. The user first provides an invalid response, then denies consent with "n":
+        * The user is re-prompted after the invalid input.
+        * The .gpte_consent file is not created.
+        * The function returns False.
+"""
+
 def test_ask_collection_consent_yes(cleanup):
     with patch("builtins.input", side_effect=["y"]):
         result = ask_collection_consent()
