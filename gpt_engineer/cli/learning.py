@@ -146,29 +146,29 @@ def human_review_input() -> Review:
     )
 
 
+# def check_collection_consent() -> bool:
+#     """
+#     Check if the user has given consent to store their data.
+#     If not, ask for their consent.
+#     """
+#     path = Path(".gpte_consent")
+#     if path.exists() and path.read_text() == "true":
+#         return True
+#     answer = input("Is it ok if we store your prompts to learn? (y/n)")
+#     while answer.lower() not in ("y", "n"):
+#         answer = input("Invalid input. Please enter y or n: ")
+
+#     if answer.lower() == "y":
+#         path.write_text("true")
+#         print(colored("Thank you️", "light_green"))
+#         print()
+#         print("(If you change your mind, delete the file .gpte_consent)")
+#         return True
+#     else:
+#         print(colored("We understand ❤️", "light_green"))
+#         return False
+
 def check_collection_consent() -> bool:
-    """
-    Check if the user has given consent to store their data.
-    If not, ask for their consent.
-    """
-    path = Path(".gpte_consent")
-    if path.exists() and path.read_text() == "true":
-        return True
-    answer = input("Is it ok if we store your prompts to learn? (y/n)")
-    while answer.lower() not in ("y", "n"):
-        answer = input("Invalid input. Please enter y or n: ")
-
-    if answer.lower() == "y":
-        path.write_text("true")
-        print(colored("Thank you️", "light_green"))
-        print()
-        print("(If you change your mind, delete the file .gpte_consent)")
-        return True
-    else:
-        print(colored("We understand ❤️", "light_green"))
-        return False
-
-def check_collection_consent2() -> bool:
     """
     Check if the user has given consent to store their data.
     If not, ask for their consent.
