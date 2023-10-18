@@ -1,6 +1,7 @@
 """Script for auto-generating api_reference.rst"""
 import glob
 import re
+
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).parents[1].absolute()
