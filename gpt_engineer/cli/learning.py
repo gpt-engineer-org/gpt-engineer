@@ -47,7 +47,6 @@ import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
 
 from dataclasses_json import dataclass_json
 from termcolor import colored
@@ -59,9 +58,9 @@ from gpt_engineer.core.domain import Step
 @dataclass_json
 @dataclass
 class Review:
-    ran: Optional[bool]
-    perfect: Optional[bool]
-    works: Optional[bool]
+    ran: bool | None
+    perfect: bool | None
+    works: bool | None
     comments: str
     raw: str
 
@@ -76,9 +75,9 @@ class Learning:
     prompt: str
     logs: str
     workspace: str
-    feedback: Optional[str]
+    feedback: str | None
     session: str
-    review: Optional[Review]
+    review: Review | None
     timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
     version: str = "0.3"
 
@@ -187,7 +186,7 @@ def ask_collection_consent() -> bool:
         return False
 
 
-def logs_to_string(steps: List[Step], logs: DB) -> str:
+def logs_to_string(steps: list[Step], logs: DB) -> str:
     """
     Convert the logs of the steps to a string.
 
@@ -211,7 +210,7 @@ def logs_to_string(steps: List[Step], logs: DB) -> str:
 
 
 def extract_learning(
-    model: str, temperature: float, steps: List[Step], dbs: DBs, steps_file_hash
+    model: str, temperature: float, steps: list[Step], dbs: DBs, steps_file_hash
 ) -> Learning:
     """
     Extract the learning data from the steps and databases.

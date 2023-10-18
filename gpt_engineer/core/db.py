@@ -32,7 +32,7 @@ import shutil
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 
 # This class represents a simple database that stores its data as files in a directory.
@@ -127,7 +127,7 @@ class DB:
         with full_path.open("r", encoding="utf-8") as f:
             return f.read()
 
-    def get(self, key: str, default: Optional[Any] = None) -> Any:
+    def get(self, key: str, default: Any | None = None) -> Any:
         """
         Get the content of a file in the database, or a default value if the file does not exist.
 

@@ -30,7 +30,7 @@ import json
 import logging
 
 from dataclasses import dataclass
-from typing import List, Optional, Union
+from typing import Union
 
 import backoff
 import openai
@@ -152,7 +152,7 @@ class AI:
         self.cumulative_total_tokens = 0
         self.token_usage_log = []
 
-    def start(self, system: str, user: str, step_name: str) -> List[Message]:
+    def start(self, system: str, user: str, step_name: str) -> list[Message]:
         """
         Start the conversation with a system message and a user message.
 
@@ -170,7 +170,7 @@ class AI:
         List[Message]
             The list of messages in the conversation.
         """
-        messages: List[Message] = [
+        messages: list[Message] = [
             SystemMessage(content=system),
             HumanMessage(content=user),
         ]
@@ -226,11 +226,11 @@ class AI:
 
     def next(
         self,
-        messages: List[Message],
-        prompt: Optional[str] = None,
+        messages: list[Message],
+        prompt: str | None = None,
         *,
         step_name: str,
-    ) -> List[Message]:
+    ) -> list[Message]:
         """
         Advances the conversation by sending message history
         to LLM and updating with the response.
@@ -309,7 +309,7 @@ class AI:
         return self.llm(messages, callbacks=callbacks)  # type: ignore
 
     @staticmethod
-    def serialize_messages(messages: List[Message]) -> str:
+    def serialize_messages(messages: list[Message]) -> str:
         """
         Serialize a list of messages to a JSON string.
 
@@ -326,7 +326,7 @@ class AI:
         return json.dumps(messages_to_dict(messages))
 
     @staticmethod
-    def deserialize_messages(jsondictstr: str) -> List[Message]:
+    def deserialize_messages(jsondictstr: str) -> list[Message]:
         """
         Deserialize a JSON string to a list of messages.
 
@@ -349,7 +349,7 @@ class AI:
         return list(messages_from_dict(prevalidated_data))  # type: ignore
 
     def update_token_usage_log(
-        self, messages: List[Message], answer: str, step_name: str
+        self, messages: list[Message], answer: str, step_name: str
     ) -> None:
         """
         Update the token usage log with the number of tokens used in the current step.
@@ -439,7 +439,7 @@ class AI:
         """
         return len(self.tokenizer.encode(txt))
 
-    def num_tokens_from_messages(self, messages: List[Message]) -> int:
+    def num_tokens_from_messages(self, messages: list[Message]) -> int:
         """
         Get the total number of tokens used by a list of messages.
 
@@ -553,7 +553,7 @@ def get_tokenizer(model: str):
     return tiktoken.get_encoding("cl100k_base")
 
 
-def serialize_messages(messages: List[Message]) -> str:
+def serialize_messages(messages: list[Message]) -> str:
     """
     Serialize a list of chat messages into a JSON-formatted string.
 

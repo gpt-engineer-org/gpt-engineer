@@ -1,5 +1,8 @@
-# list all folders in benchmark folder
-# for each folder, run the benchmark
+"""
+list all folders in benchmark folder
+for each folder, run the benchmark.
+"""
+
 import contextlib
 import json
 import os

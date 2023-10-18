@@ -24,21 +24,19 @@ Functions:
 - format_file_to_input: Formats a file's content for input to an AI agent.
 """
 
+import logging
 import os
 import re
-import logging
 
 from dataclasses import dataclass
-from typing import List, Tuple
 
-from gpt_engineer.core.db import DB, DBs
 from gpt_engineer.cli.file_selector import FILE_LIST_NAME
-
+from gpt_engineer.core.db import DB, DBs
 
 logger = logging.getLogger(__name__)
 
 
-def parse_chat(chat) -> List[Tuple[str, str]]:
+def parse_chat(chat) -> list[tuple[str, str]]:
     """
     Extracts all code blocks from a chat and returns them
     as a list of (filename, codeblock) tuples.
@@ -268,7 +266,7 @@ def parse_edits(llm_response):
     return parse_all_edits(llm_response)
 
 
-def apply_edits(edits: List[Edit], workspace: DB):
+def apply_edits(edits: list[Edit], workspace: DB):
     for edit in edits:
         filename = edit.filename
         if edit.before == "":

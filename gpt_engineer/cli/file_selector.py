@@ -45,7 +45,7 @@ import tkinter as tk
 import tkinter.filedialog as fd
 
 from pathlib import Path
-from typing import List, Union
+from typing import Union
 
 from gpt_engineer.core.db import DB, DBs
 
@@ -252,7 +252,7 @@ class TerminalFileSelector:
         self.file_path_list = file_path_list
         self.selectable_file_paths = file_path_enumeration
 
-    def ask_for_selection(self) -> List[str]:
+    def ask_for_selection(self) -> list[str]:
         """
         Prompts the user to select files by providing a series of index numbers, ranges, or 'all' to select everything.
 
@@ -385,7 +385,7 @@ def ask_for_files(metadata_db: DB, workspace_db: DB) -> None:
         )
 
 
-def gui_file_selector(input_path: str) -> List[str]:
+def gui_file_selector(input_path: str) -> list[str]:
     """
     Display a tkinter file selection window to select context files.
     """
@@ -401,7 +401,7 @@ def gui_file_selector(input_path: str) -> List[str]:
     )
 
 
-def terminal_file_selector(input_path: str) -> List[str]:
+def terminal_file_selector(input_path: str) -> list[str]:
     """
     Display a terminal file selection to select context files.
     """

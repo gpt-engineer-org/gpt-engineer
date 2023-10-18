@@ -1,12 +1,12 @@
 """
 Tests for successful import and installation of the package.
 """
-import pytest
+import shutil
 import subprocess
 import sys
 import venv
-import shutil
 
+import pytest
 
 VENV_DIR = "./venv_test_installation"
 
@@ -36,13 +36,7 @@ def test_installation():
 # Test that the package can be imported
 def test_import():
     try:
-        from gpt_engineer import (
-            ai,
-            domain,
-            chat_to_files,
-            steps,
-            db,
-        )
+        from gpt_engineer import ai, chat_to_files, db, domain, steps
     except ImportError as e:
         assert False, f"Failed to import {e.name}"
 

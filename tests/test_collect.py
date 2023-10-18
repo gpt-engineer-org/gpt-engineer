@@ -11,8 +11,8 @@ import pytest
 import rudderstack.analytics as rudder_analytics
 
 from gpt_engineer.cli.collect import collect_learnings, steps_file_hash
-from gpt_engineer.core.db import DB, DBs
 from gpt_engineer.cli.learning import extract_learning
+from gpt_engineer.core.db import DB, DBs
 from gpt_engineer.core.steps import simple_gen
 
 

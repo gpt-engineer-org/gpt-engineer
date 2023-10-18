@@ -50,11 +50,13 @@ import re
 import subprocess
 
 from enum import Enum
-from typing import List, Union
+from typing import Union
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from termcolor import colored
 
+from gpt_engineer.cli.file_selector import FILE_LIST_NAME, ask_for_files
+from gpt_engineer.cli.learning import human_review_input
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import (
     format_file_to_input,
@@ -63,8 +65,6 @@ from gpt_engineer.core.chat_to_files import (
     to_files_and_memory,
 )
 from gpt_engineer.core.db import DBs
-from gpt_engineer.cli.file_selector import FILE_LIST_NAME, ask_for_files
-from gpt_engineer.cli.learning import human_review_input
 
 # Type hint for chat messages
 Message = Union[AIMessage, HumanMessage, SystemMessage]
@@ -130,7 +130,7 @@ def curr_fn() -> str:
     return inspect.stack()[1].function
 
 
-def lite_gen(ai: AI, dbs: DBs) -> List[Message]:
+def lite_gen(ai: AI, dbs: DBs) -> list[Message]:
     """
     Executes the AI model using the main prompt and saves the generated results.
 
@@ -158,7 +158,7 @@ def lite_gen(ai: AI, dbs: DBs) -> List[Message]:
     return messages
 
 
-def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
+def simple_gen(ai: AI, dbs: DBs) -> list[Message]:
     """
     Executes the AI model using the default system prompts and saves the output.
 
@@ -184,7 +184,7 @@ def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
     return messages
 
 
-def clarify(ai: AI, dbs: DBs) -> List[Message]:
+def clarify(ai: AI, dbs: DBs) -> list[Message]:
     """
     Interactively queries the user for clarifications on the prompt and saves the AI's responses.
 
@@ -207,7 +207,7 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
     The function assumes the `ai.fsystem`, `ai.next`, and `curr_fn` utilities are correctly
     set up and functional. Ensure these prerequisites are in place before invoking `clarify`.
     """
-    messages: List[Message] = [ai.fsystem(dbs.preprompts["clarify"])]
+    messages: list[Message] = [ai.fsystem(dbs.preprompts["clarify"])]
     user_input = dbs.input["prompt"]
     while True:
         messages = ai.next(messages, user_input, step_name=curr_fn())
@@ -245,7 +245,7 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
     return messages
 
 
-def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
+def gen_clarified_code(ai: AI, dbs: DBs) -> list[dict]:
     """
     Generates code based on clarifications obtained from the user.
 
@@ -284,7 +284,7 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     return messages
 
 
-def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
+def execute_entrypoint(ai: AI, dbs: DBs) -> list[dict]:
     """
     Executes the specified entry point script (`run.sh`) from a workspace.
 
@@ -350,7 +350,7 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     return []
 
 
-def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
+def gen_entrypoint(ai: AI, dbs: DBs) -> list[dict]:
     """
     Generates an entry point script based on a given codebase's information.
 
