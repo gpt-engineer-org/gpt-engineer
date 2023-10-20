@@ -101,4 +101,3 @@ We are currently looking for more maintainers and community organizers. Email an
 
 
 https://github.com/AntonOsika/gpt-engineer/assets/4467025/40d0a9a8-82d0-4432-9376-136df0d57c99
-
