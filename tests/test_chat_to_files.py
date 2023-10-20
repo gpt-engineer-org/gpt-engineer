@@ -214,33 +214,26 @@ def test_files_with_newline_between_header():
 
 
 def test_get_code_strings(monkeypatch):
-
-    # arrange   
+    # arrange
     mock_db = MagicMock()
     mock_db.path = "path/to"
-    data = {
-        "file1.txt": "This is file 1 content",
-        "file2.txt": "This is file 2 content"
-    }
+    data = {"file1.txt": "This is file 1 content", "file2.txt": "This is file 2 content"}
     mock_db.__getitem__ = lambda self, x: data.get(x)
     mock_db.__contains__ = lambda self, x: x in data
 
-    mock_metadata_db = {
-        FILE_LIST_NAME: "path/to/file1.txt\npath/to/file2.txt"
-    }
+    mock_metadata_db = {FILE_LIST_NAME: "path/to/file1.txt\npath/to/file2.txt"}
 
     def mock_get_all_files_in_dir(directory):
-        return [
-            "path/to/file1.txt",
-            "path/to/file2.txt"
-        ]
-    
+        return ["path/to/file1.txt", "path/to/file2.txt"]
+
     def mock_open_file(path):
         return f"File Data for file: {path}"
 
-    monkeypatch.setattr('gpt_engineer.core.chat_to_files._get_all_files_in_dir', mock_get_all_files_in_dir)
+    monkeypatch.setattr(
+        "gpt_engineer.core.chat_to_files._get_all_files_in_dir", mock_get_all_files_in_dir
+    )
 
-    monkeypatch.setattr('gpt_engineer.core.chat_to_files._open_file', mock_open_file)
+    monkeypatch.setattr("gpt_engineer.core.chat_to_files._open_file", mock_open_file)
 
     # act
     result = get_code_strings(mock_db, mock_metadata_db)
