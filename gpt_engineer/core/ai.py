@@ -463,7 +463,7 @@ class AI:
         n_tokens += 2  # every reply is primed with <im_start>assistant
         return n_tokens
 
-    def _check_model_acess_and_fallback(self):
+    def _check_model_access_and_fallback(self):
         """
         Retrieve the specified model, or fallback to "gpt-3.5-turbo" if the model is not available.
 
@@ -512,7 +512,7 @@ class AI:
                 streaming=True,
             )
 
-        self._check_model_acess_and_fallback()
+        self._check_model_access_and_fallback()
 
         return ChatOpenAI(
             model=self.model_name,
