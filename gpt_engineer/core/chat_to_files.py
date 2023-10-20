@@ -1,27 +1,27 @@
 """
 This module provides utilities to handle and process chat content, especially for extracting code blocks
-and managing them within a specified GPT Engineer project ("workspace"). It offers functionalities like parsing chat messages to
-retrieve code blocks, storing these blocks into a workspace, and overwriting workspace content based on
-new chat messages. Moreover, it aids in formatting and reading file content for an AI agent's input.
+and managing them within a specified GPT Engineer project ("workspace"). 
 
 Key Features:
 - Parse and extract code blocks from chat messages.
-- Store and overwrite files within a workspace based on chat content.
-- Format files to be used as inputs for AI agents.
-- Retrieve files and their content based on a provided list.
+- Save chat content to memory.
+- Add extracted files to a workspace.
+- Overwrite workspace files based on edits.
+- Retrieve and format file content.
 
 Dependencies:
-- `os` and `pathlib`: For handling OS-level operations and path manipulations.
-- `re`: For regex-based parsing of chat content.
+- `os` and `re`: For handling OS-level operations and regex-based parsing of chat content.
 - `gpt_engineer.core.db`: Database handling functionalities for the workspace.
 - `gpt_engineer.cli.file_selector`: Constants related to file selection.
 
 Functions:
 - parse_chat: Extracts code blocks from chat messages.
-- to_files: Parses a chat and adds the extracted files to a workspace.
-- overwrite_files: Parses a chat and overwrites files in the workspace.
-- get_code_strings: Reads a file list and returns filenames and their content.
-- format_file_to_input: Formats a file's content for input to an AI agent.
+- to_files_and_memory: Saves chat content to memory and adds extracted files to a workspace.
+- to_files: Adds extracted files to a workspace.
+- get_code_strings: Retrieves file names and their content.
+- format_file_to_input: Formats file content for AI input.
+- overwrite_files_with_edits: Overwrites workspace files based on parsed edits from chat.
+- apply_edits: Applies file edits to a workspace.
 """
 
 import os
@@ -115,28 +115,6 @@ def to_files(chat: str, workspace: DB):
     for file_name, file_content in files:
         workspace[file_name] = file_content
 
-
-def overwrite_files(chat: str, dbs: DBs) -> None:
-    """
-    Parse the chat and overwrite all files in the workspace.
-
-    Parameters
-    ----------
-    chat : str
-        The chat containing the AI files.
-    dbs : DBs
-        The database containing the workspace.
-    """
-    dbs.memory["all_output_overwrite.txt"] = chat
-
-    files = parse_chat(chat)
-    for file_name, file_content in files:
-        if file_name == "README.md":
-            dbs.memory["LAST_MODIFICATION_README.md"] = file_content
-        else:
-            dbs.workspace[file_name] = file_content
-
-
 def get_code_strings(workspace: DB, metadata_db: DB) -> dict[str, str]:
     """
     Read file_list.txt and return file names and their content.
@@ -150,19 +128,12 @@ def get_code_strings(workspace: DB, metadata_db: DB) -> dict[str, str]:
         A dictionary mapping file names to their content.
     """
 
-    def get_all_files_in_dir(directory):
-        for root, dirs, files in os.walk(directory):
-            for file in files:
-                yield os.path.join(root, file)
-        for dir in dirs:
-            yield from get_all_files_in_dir(os.path.join(root, dir))
-
     files_paths = metadata_db[FILE_LIST_NAME].strip().split("\n")
     files = []
 
     for full_file_path in files_paths:
         if os.path.isdir(full_file_path):
-            for file_path in get_all_files_in_dir(full_file_path):
+            for file_path in _get_all_files_in_dir(full_file_path):
                 files.append(file_path)
         else:
             files.append(full_file_path)
@@ -177,15 +148,7 @@ def get_code_strings(workspace: DB, metadata_db: DB) -> dict[str, str]:
         file_name = os.path.relpath(path, workspace.path)
 
         if file_name in workspace:
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    file_content = f.read()
-            except UnicodeDecodeError:
-                raise ValueError(
-                    f"Non-text file detected: {file_name}, gpt-engineer currently only supports utf-8 decodable text files."
-                )
-
-            files_dict[file_name] = file_content
+            files_dict[file_name] = _open_file(path)
 
     return files_dict
 
@@ -285,3 +248,19 @@ def apply_edits(edits: List[Edit], workspace: DB):
             workspace[filename] = workspace[filename].replace(
                 edit.before, edit.after
             )  # existing file
+
+def _get_all_files_in_dir(directory):
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            yield os.path.join(root, file)
+    for dir in dirs:
+        yield from _get_all_files_in_dir(os.path.join(root, dir))
+
+def _open_file(file_path) -> str:
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return f.read()
+    except UnicodeDecodeError:
+        raise ValueError(
+            f"Non-text file detected: {file_path}, gpt-engineer currently only supports utf-8 decodable text files."
+        )
