@@ -49,7 +49,8 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
 **Other ways to run:**
 - Use Docker ([instructions](docker/README.md))
-- Do everything in your browser: [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
+- Do everything in your browser:
+    - [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
 
 ## Usage
 
