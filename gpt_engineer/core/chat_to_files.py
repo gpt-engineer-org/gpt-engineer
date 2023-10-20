@@ -1,6 +1,6 @@
 """
 This module provides utilities to handle and process chat content, especially for extracting code blocks
-and managing them within a specified GPT Engineer project ("workspace"). 
+and managing them within a specified GPT Engineer project ("workspace").
 
 Key Features:
 - Parse and extract code blocks from chat messages.
@@ -114,6 +114,7 @@ def to_files(chat: str, workspace: DB):
     files = parse_chat(chat)
     for file_name, file_content in files:
         workspace[file_name] = file_content
+
 
 def get_code_strings(workspace: DB, metadata_db: DB) -> dict[str, str]:
     """
@@ -249,12 +250,14 @@ def apply_edits(edits: List[Edit], workspace: DB):
                 edit.before, edit.after
             )  # existing file
 
+
 def _get_all_files_in_dir(directory):
     for root, dirs, files in os.walk(directory):
         for file in files:
             yield os.path.join(root, file)
     for dir in dirs:
         yield from _get_all_files_in_dir(os.path.join(root, dir))
+
 
 def _open_file(file_path) -> str:
     try:
