@@ -37,7 +37,7 @@ Using Anthropic,Huggingface,Palm,Ollama, etc. [Full List](https://docs.litellm.a
 We'll use [LiteLLM](https://docs.litellm.ai/docs/) to create an OpenAI-compatible endpoint, that translates OpenAI calls to any of the [supported providers](https://docs.litellm.ai/docs/providers).
 
 
-Example to use a local CodeLLama model from Ollama.ai with GPT-Engineer: 
+Example to use a local CodeLLama model from Ollama.ai with GPT-Engineer:
 
 Let's spin up a proxy server to route any OpenAI call from GPT-Engineer to Ollama/CodeLlama
 
