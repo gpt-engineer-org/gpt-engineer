@@ -65,10 +65,6 @@ There are two ways to work with GPT-engineer: new code mode (the default), and i
 
 By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
-**Results**
-
-Check the generated files in `projects/my-new-project/workspace`
-
 **Workflow**
 
 `gpt-engineer --help` lets you see all available options.
@@ -76,7 +72,6 @@ Check the generated files in `projects/my-new-project/workspace`
 For example:
 
 - To improve any existing project, use the flag: `-i`
-- To give feedback to/improve a gpt-engineer generated project, use: `--steps use_feedback`
 - To use or prepare project specific preprompt files, use `--use-custom-preprompts`
 
 **Alternatives**
