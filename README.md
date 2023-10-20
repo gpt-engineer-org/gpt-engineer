@@ -48,10 +48,8 @@ Choose **one** of:
 Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
 You can also:
-- Use Docker, [instructions](docker/README.md)
-- Do everything in your browser (click below)
-
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
+- Use Docker ([instructions](docker/README.md))
+- Do everything in your browser: [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
 
 ## Usage
 
