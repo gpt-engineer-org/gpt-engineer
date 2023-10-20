@@ -5,11 +5,6 @@ import copy
 
 
 def test_start(monkeypatch):
-    """
-    Test function for the AI system.
-    This test sets up a fake LLM and tests that the start method successfully returns a response
-    """
-
     # arrange
     def mock_create_chat_model(self) -> BaseChatModel:
         return FakeListChatModel(responses=["response1", "response2", "response3"])
@@ -26,11 +21,6 @@ def test_start(monkeypatch):
 
 
 def test_next(monkeypatch):
-    """
-    Test function for the AI system.
-    This test sets up a fake LLM and tests that the start method successfully returns a response
-    """
-
     # arrange
     def mock_create_chat_model(self) -> BaseChatModel:
         return FakeListChatModel(responses=["response1", "response2", "response3"])
@@ -50,11 +40,6 @@ def test_next(monkeypatch):
 
 
 def test_token_logging(monkeypatch):
-    """
-    Test function for the AI system.
-    This test sets up a fake LLM and tests that the start method successfully returns a response
-    """
-
     # arrange
     def mock_create_chat_model(self) -> BaseChatModel:
         return FakeListChatModel(responses=["response1", "response2", "response3"])
