@@ -47,6 +47,11 @@ Choose **one** of:
 
 Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
+**Other ways to run:**
+- Use Docker ([instructions](docker/README.md))
+- Do everything in your browser:
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
+
 ## Usage
 
 There are two ways to work with GPT-engineer: new code mode (the default), and improve existing code mode (the `-i` option).
@@ -65,26 +70,6 @@ There are two ways to work with GPT-engineer: new code mode (the default), and i
 
 By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
-**Results**
-
-Check the generated files in `projects/my-new-project/workspace`
-
-**Workflow**
-
-`gpt-engineer --help` lets you see all available options.
-
-For example:
-
-- To improve any existing project, use the flag: `-i`
-- To give feedback to/improve a gpt-engineer generated project, use: `--steps use_feedback`
-- To use or prepare project specific preprompt files, use `--use-custom-preprompts`
-
-**Alternatives**
-
-You can check [Docker instructions](docker/README.md) to use Docker, or simply
-do everything in your browser:
-
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
 
 ## Features
 
@@ -113,5 +98,7 @@ We are currently looking for more maintainers and community organizers. Email an
 
 ## Example
 
-https://github.com/AntonOsika/gpt-engineer/assets/4467025/6e362e45-4a94-4b0d-973d-393a31d92d9b
-˛
+
+
+https://github.com/AntonOsika/gpt-engineer/assets/4467025/40d0a9a8-82d0-4432-9376-136df0d57c99
+

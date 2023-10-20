@@ -37,7 +37,7 @@ from gpt_engineer.core.ai import AI
 from gpt_engineer.core.db import DB, DBs, archive
 from gpt_engineer.core.steps import STEPS, Config as StepsConfig
 from gpt_engineer.cli.collect import collect_learnings
-from gpt_engineer.cli.learning import collect_consent
+from gpt_engineer.cli.learning import check_collection_consent
 
 app = typer.Typer()  # creates a CLI app
 
@@ -171,7 +171,7 @@ def main(
 
     print("Total api cost: $ ", ai.usage_cost())
 
-    if collect_consent():
+    if check_collection_consent():
         collect_learnings(model, temperature, steps, dbs)
 
     dbs.logs["token_usage"] = ai.format_token_usage_log()
