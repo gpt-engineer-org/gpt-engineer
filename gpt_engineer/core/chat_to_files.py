@@ -1,16 +1,18 @@
 """
 This module provides utilities to handle and process chat content, especially for extracting code blocks
-and managing them within a specified GPT Engineer project ("workspace").
+and managing them within a specified GPT Engineer project ("workspace"). It offers functionalities like parsing chat messages to
+retrieve code blocks, storing these blocks into a workspace, and overwriting workspace content based on
+new chat messages. Moreover, it aids in formatting and reading file content for an AI agent's input.
 
 Key Features:
 - Parse and extract code blocks from chat messages.
-- Save chat content to memory.
-- Add extracted files to a workspace.
-- Overwrite workspace files based on edits.
-- Retrieve and format file content.
+- Store and overwrite files within a workspace based on chat content.
+- Format files to be used as inputs for AI agents.
+- Retrieve files and their content based on a provided list.
 
 Dependencies:
-- `os` and `re`: For handling OS-level operations and regex-based parsing of chat content.
+- `os` and `pathlib`: For handling OS-level operations and path manipulations.
+- `re`: For regex-based parsing of chat content.
 - `gpt_engineer.core.db`: Database handling functionalities for the workspace.
 - `gpt_engineer.cli.file_selector`: Constants related to file selection.
 
