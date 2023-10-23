@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 
 from dataclasses import dataclass
 from typing import List, Optional, Union
@@ -506,7 +507,7 @@ class AI:
         if self.azure_endpoint:
             return AzureChatOpenAI(
                 openai_api_base=self.azure_endpoint,
-                openai_api_version="2023-05-15",  # might need to be flexible in the future
+                openai_api_version=os.getenv("OPENAI_API_VERSION", "2023-05-15"),
                 deployment_name=self.model_name,
                 openai_api_type="azure",
                 streaming=True,
