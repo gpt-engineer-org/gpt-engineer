@@ -203,11 +203,8 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
     - List[Message]: A list of message objects encapsulating the AI's generated output and
       interactions.
 
-    Note:
-    The function assumes the `ai.fsystem`, `ai.next`, and `curr_fn` utilities are correctly
-    set up and functional. Ensure these prerequisites are in place before invoking `clarify`.
     """
-    messages: List[Message] = [ai.fsystem(dbs.preprompts["clarify"])]
+    messages: List[Message] = [SystemMessage(content=dbs.preprompts["clarify"])]
     user_input = dbs.input["prompt"]
     while True:
         messages = ai.next(messages, user_input, step_name=curr_fn())
@@ -261,16 +258,11 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     Returns:
     - List[dict]: A list of message dictionaries capturing the AI's interactions and generated
       outputs during the code generation process.
-
-    Note:
-    The function assumes the `ai.fsystem`, `ai.next`, `AI.deserialize_messages`, `curr_fn`,
-    and `to_files` utilities are correctly set up and functional. Ensure these prerequisites
-    are in place before invoking `gen_clarified_code`.
     """
     messages = AI.deserialize_messages(dbs.logs[clarify.__name__])
 
     messages = [
-        ai.fsystem(setup_sys_prompt(dbs)),
+        SystemMessage(content=setup_sys_prompt(dbs)),
     ] + messages[
         1:
     ]  # skip the first clarify message, which was the original clarify priming prompt
@@ -425,9 +417,9 @@ def use_feedback(ai: AI, dbs: DBs):
       terminates.
     """
     messages = [
-        ai.fsystem(setup_sys_prompt(dbs)),
-        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
-        ai.fassistant(dbs.memory["all_output.txt"]),  # reload previously generated code
+        SystemMessage(content=setup_sys_prompt(dbs)),
+        HumanMessage(content=f"Instructions: {dbs.input['prompt']}"),
+        AIMessage(content=dbs.memory["all_output.txt"]),  # reload previously generated code
     ]
     if dbs.input["feedback"]:
         messages = ai.next(messages, dbs.input["feedback"], step_name=curr_fn())
@@ -574,14 +566,14 @@ def improve_existing_code(ai: AI, dbs: DBs):
     )  # this has file names relative to the workspace path
 
     messages = [
-        ai.fsystem(setup_sys_prompt_existing_code(dbs)),
+        SystemMessage(content=setup_sys_prompt_existing_code(dbs)),
     ]
     # Add files as input
     for file_name, file_str in files_info.items():
         code_input = format_file_to_input(file_name, file_str)
-        messages.append(ai.fuser(f"{code_input}"))
+        messages.append(HumanMessage(content=f"{code_input}"))
 
-    messages.append(ai.fuser(f"Request: {dbs.input['prompt']}"))
+    messages.append(HumanMessage(content=f"Request: {dbs.input['prompt']}"))
 
     messages = ai.next(messages, step_name=curr_fn())
 
