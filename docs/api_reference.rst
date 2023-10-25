@@ -35,14 +35,14 @@ Functions
     cli.file_selector.gui_file_selector
     cli.file_selector.is_in_ignoring_extensions
     cli.file_selector.terminal_file_selector
-    cli.learning.ask_if_can_store
-    cli.learning.check_consent
-    cli.learning.collect_consent
+    cli.learning.ask_collection_consent
+    cli.learning.check_collection_consent
     cli.learning.extract_learning
     cli.learning.get_session
     cli.learning.human_review_input
     cli.learning.logs_to_string
     cli.main.load_env_if_needed
+    cli.main.load_prompt
     cli.main.main
     cli.main.preprompts_path
 
@@ -70,15 +70,15 @@ Functions
 .. autosummary::
     :toctree: core
 
-    core.ai.create_chat_model
-    core.ai.fallback_model
-    core.ai.get_tokenizer
     core.ai.serialize_messages
+    core.chat_to_files.apply_edits
     core.chat_to_files.format_file_to_input
     core.chat_to_files.get_code_strings
-    core.chat_to_files.overwrite_files
+    core.chat_to_files.overwrite_files_with_edits
     core.chat_to_files.parse_chat
+    core.chat_to_files.parse_edits
     core.chat_to_files.to_files
+    core.chat_to_files.to_files_and_memory
     core.db.archive
     core.steps.assert_files_ready
     core.steps.clarify
@@ -95,3 +95,4 @@ Functions
     core.steps.setup_sys_prompt_existing_code
     core.steps.simple_gen
     core.steps.use_feedback
+
