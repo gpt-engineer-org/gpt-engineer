@@ -11,14 +11,11 @@ Key Features:
 
 Classes:
 - AI: Main class providing chat functionalities.
-- TokenUsage: Data class for logging token usage details.
 
 Dependencies:
 - langchain: For chat models and message schemas.
 - openai: For the core GPT models interaction.
-- tiktoken: For token counting.
 - backoff: For handling rate limits and retries.
-- dataclasses, json, and logging for internal functionalities.
 - typing: For type hints.
 
 For more specific details, refer to the docstrings within each class and function.
@@ -30,14 +27,13 @@ import json
 import logging
 import os
 
-from dataclasses import dataclass
 from typing import List, Optional, Union
 
 import backoff
-import openai
-import tiktoken
+import openai 
 
-from langchain.callbacks.openai_info import MODEL_COST_PER_1K_TOKENS
+from gpt_engineer.core.token_usage import TokenUsageLog
+
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
@@ -54,17 +50,6 @@ Message = Union[AIMessage, HumanMessage, SystemMessage]
 
 # Set up logging
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class TokenUsage:
-    step_name: str
-    in_step_prompt_tokens: int
-    in_step_completion_tokens: int
-    in_step_total_tokens: int
-    total_prompt_tokens: int
-    total_completion_tokens: int
-    total_tokens: int
 
 
 class AI:
@@ -86,27 +71,13 @@ class AI:
         The name of the model being used.
     llm : Any
         The chat model instance.
-    tokenizer : Any
-        The tokenizer associated with the model.
-    cumulative_prompt_tokens : int
-        The running count of prompt tokens used.
-    cumulative_completion_tokens : int
-        The running count of completion tokens used.
-    cumulative_total_tokens : int
-        The running total of tokens used.
-    token_usage_log : List[TokenUsage]
-        A log of token usage details per step in the conversation.
-
+    token_usage_log : Any
+        The token usage log used to store cumulitive tokens used during the lifetime of the ai class
+    
     Methods
     -------
     start(system, user, step_name) -> List[Message]:
         Start the conversation with a system and user message.
-    fsystem(msg) -> SystemMessage:
-        Create a system message.
-    fuser(msg) -> HumanMessage:
-        Create a user message.
-    fassistant(msg) -> AIMessage:
-        Create an AI message.
     next(messages, prompt, step_name) -> List[Message]:
         Advance the conversation by interacting with the language model.
     backoff_inference(messages, callbacks) -> Any:
@@ -115,16 +86,7 @@ class AI:
         Serialize a list of messages to a JSON string.
     deserialize_messages(jsondictstr) -> List[Message]:
         Deserialize a JSON string into a list of messages.
-    update_token_usage_log(messages, answer, step_name) -> None:
-        Log the token usage details for the current step.
-    format_token_usage_log() -> str:
-        Format the token usage log as a CSV string.
-    usage_cost() -> float:
-        Calculate the total cost based on token usage and model pricing.
-    num_tokens(txt) -> int:
-        Count the number of tokens in a given text.
-    num_tokens_from_messages(messages) -> int:
-        Count the total number of tokens in a list of messages.
+
     """
 
     def __init__(self, model_name="gpt-4", temperature=0.1, azure_endpoint=""):
@@ -140,17 +102,13 @@ class AI:
         """
         self.temperature = temperature
         self.azure_endpoint = azure_endpoint
-        self.model_name = model_name
+        self.model_name = self._check_model_access_and_fallback(model_name)
 
         self.llm = self._create_chat_model()
-        self.tokenizer = get_tokenizer(self.model_name)
-        logger.debug(f"Using model {self.model_name} with llm {self.llm}")
+        self.token_usage_log = TokenUsageLog(model_name)
 
-        # initialize token usage log
-        self.cumulative_prompt_tokens = 0
-        self.cumulative_completion_tokens = 0
-        self.cumulative_total_tokens = 0
-        self.token_usage_log = []
+        
+        logger.debug(f"Using model {self.model_name} with llm {self.llm}")
 
     def start(self, system: str, user: str, step_name: str) -> List[Message]:
         """
@@ -176,54 +134,6 @@ class AI:
             HumanMessage(content=user),
         ]
         return self.next(messages, step_name=step_name)
-
-    def fsystem(self, msg: str) -> SystemMessage:
-        """
-        Create a system message.
-
-        Parameters
-        ----------
-        msg : str
-            The content of the message.
-
-        Returns
-        -------
-        SystemMessage
-            The created system message.
-        """
-        return SystemMessage(content=msg)
-
-    def fuser(self, msg: str) -> HumanMessage:
-        """
-        Create a user message.
-
-        Parameters
-        ----------
-        msg : str
-            The content of the message.
-
-        Returns
-        -------
-        HumanMessage
-            The created user message.
-        """
-        return HumanMessage(content=msg)
-
-    def fassistant(self, msg: str) -> AIMessage:
-        """
-        Create an AI message.
-
-        Parameters
-        ----------
-        msg : str
-            The content of the message.
-
-        Returns
-        -------
-        AIMessage
-            The created AI message.
-        """
-        return AIMessage(content=msg)
 
     def next(
         self,
@@ -255,14 +165,14 @@ class AI:
         to LLM and updating with the response.
         """
         if prompt:
-            messages.append(self.fuser(prompt))
+            messages.append(HumanMessage(content=prompt))
 
         logger.debug(f"Creating a new chat completion: {messages}")
 
         callbacks = [StreamingStdOutCallbackHandler()]
         response = self.backoff_inference(messages, callbacks)
 
-        self.update_token_usage_log(
+        self.token_usage_log.update_log(
             messages=messages, answer=response.content, step_name=step_name
         )
         messages.append(response)
@@ -348,123 +258,8 @@ class AI:
             {**item, "data": {**item["data"], "is_chunk": False}} for item in data
         ]
         return list(messages_from_dict(prevalidated_data))  # type: ignore
-
-    def update_token_usage_log(
-        self, messages: List[Message], answer: str, step_name: str
-    ) -> None:
-        """
-        Update the token usage log with the number of tokens used in the current step.
-
-        Parameters
-        ----------
-        messages : List[Message]
-            The list of messages in the conversation.
-        answer : str
-            The answer from the AI.
-        step_name : str
-            The name of the step.
-        """
-        prompt_tokens = self.num_tokens_from_messages(messages)
-        completion_tokens = self.num_tokens(answer)
-        total_tokens = prompt_tokens + completion_tokens
-
-        self.cumulative_prompt_tokens += prompt_tokens
-        self.cumulative_completion_tokens += completion_tokens
-        self.cumulative_total_tokens += total_tokens
-
-        self.token_usage_log.append(
-            TokenUsage(
-                step_name=step_name,
-                in_step_prompt_tokens=prompt_tokens,
-                in_step_completion_tokens=completion_tokens,
-                in_step_total_tokens=total_tokens,
-                total_prompt_tokens=self.cumulative_prompt_tokens,
-                total_completion_tokens=self.cumulative_completion_tokens,
-                total_tokens=self.cumulative_total_tokens,
-            )
-        )
-
-    def format_token_usage_log(self) -> str:
-        """
-        Format the token usage log as a CSV string.
-
-        Returns
-        -------
-        str
-            The token usage log formatted as a CSV string.
-        """
-        result = "step_name,"
-        result += "prompt_tokens_in_step,completion_tokens_in_step,total_tokens_in_step"
-        result += ",total_prompt_tokens,total_completion_tokens,total_tokens\n"
-        for log in self.token_usage_log:
-            result += log.step_name + ","
-            result += str(log.in_step_prompt_tokens) + ","
-            result += str(log.in_step_completion_tokens) + ","
-            result += str(log.in_step_total_tokens) + ","
-            result += str(log.total_prompt_tokens) + ","
-            result += str(log.total_completion_tokens) + ","
-            result += str(log.total_tokens) + "\n"
-        return result
-
-    def usage_cost(self) -> float:
-        """
-        Return the total cost in USD of the api usage.
-
-        Returns
-        -------
-        float
-            Cost in USD.
-        """
-        prompt_price = MODEL_COST_PER_1K_TOKENS[self.model_name]
-        completion_price = MODEL_COST_PER_1K_TOKENS[self.model_name + "-completion"]
-
-        result = 0
-        for log in self.token_usage_log:
-            result += log.total_prompt_tokens / 1000 * prompt_price
-            result += log.total_completion_tokens / 1000 * completion_price
-        return result
-
-    def num_tokens(self, txt: str) -> int:
-        """
-        Get the number of tokens in a text.
-
-        Parameters
-        ----------
-        txt : str
-            The text to count the tokens in.
-
-        Returns
-        -------
-        int
-            The number of tokens in the text.
-        """
-        return len(self.tokenizer.encode(txt))
-
-    def num_tokens_from_messages(self, messages: List[Message]) -> int:
-        """
-        Get the total number of tokens used by a list of messages.
-
-        Parameters
-        ----------
-        messages : List[Message]
-            The list of messages to count the tokens in.
-
-        Returns
-        -------
-        int
-            The total number of tokens used by the messages.
-        """
-        """Returns the number of tokens used by a list of messages."""
-        n_tokens = 0
-        for message in messages:
-            n_tokens += (
-                4  # every message follows <im_start>{role/name}\n{content}<im_end>\n
-            )
-            n_tokens += self.num_tokens(message.content)
-        n_tokens += 2  # every reply is primed with <im_start>assistant
-        return n_tokens
-
-    def _check_model_access_and_fallback(self):
+    
+    def _check_model_access_and_fallback(self, model_name) -> str:
         """
         Retrieve the specified model, or fallback to "gpt-3.5-turbo" if the model is not available.
 
@@ -479,14 +274,16 @@ class AI:
             The name of the retrieved model, or "gpt-3.5-turbo" if the specified model is not available.
         """
         try:
-            openai.Model.retrieve(self.model_name)
+            openai.Model.retrieve(model_name)
         except openai.InvalidRequestError:
             print(
-                f"Model {self.model_name} not available for provided API key. Reverting "
+                f"Model {model_name} not available for provided API key. Reverting "
                 "to gpt-3.5-turbo. Sign up for the GPT-4 wait list here: "
                 "https://openai.com/waitlist/gpt-4-api\n"
             )
-            self.model_name = "gpt-3.5-turbo"
+            return "gpt-3.5-turbo"
+        
+        return model_name
 
     def _create_chat_model(self) -> BaseChatModel:
         """
@@ -512,40 +309,13 @@ class AI:
                 openai_api_type="azure",
                 streaming=True,
             )
-
-        self._check_model_access_and_fallback()
-
+        
         return ChatOpenAI(
             model=self.model_name,
             temperature=self.temperature,
             streaming=True,
             client=openai.ChatCompletion,
         )
-
-
-def get_tokenizer(model: str):
-    """
-    Get the tokenizer for the specified model.
-
-    Parameters
-    ----------
-    model : str
-        The name of the model to get the tokenizer for.
-
-    Returns
-    -------
-    Tokenizer
-        The tokenizer for the specified model.
-    """
-    if "gpt-4" in model or "gpt-3.5" in model:
-        return tiktoken.encoding_for_model(model)
-
-    logger.debug(
-        f"No encoder implemented for model {model}."
-        "Defaulting to tiktoken cl100k_base encoder."
-        "Use results only as estimates."
-    )
-    return tiktoken.get_encoding("cl100k_base")
 
 
 def serialize_messages(messages: List[Message]) -> str:
