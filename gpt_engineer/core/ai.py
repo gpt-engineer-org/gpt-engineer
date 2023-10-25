@@ -30,7 +30,7 @@ import os
 from typing import List, Optional, Union
 
 import backoff
-import openai 
+import openai
 
 from gpt_engineer.core.token_usage import TokenUsageLog
 
@@ -73,7 +73,7 @@ class AI:
         The chat model instance.
     token_usage_log : Any
         The token usage log used to store cumulitive tokens used during the lifetime of the ai class
-    
+
     Methods
     -------
     start(system, user, step_name) -> List[Message]:
@@ -107,7 +107,6 @@ class AI:
         self.llm = self._create_chat_model()
         self.token_usage_log = TokenUsageLog(model_name)
 
-        
         logger.debug(f"Using model {self.model_name} with llm {self.llm}")
 
     def start(self, system: str, user: str, step_name: str) -> List[Message]:
@@ -258,7 +257,7 @@ class AI:
             {**item, "data": {**item["data"], "is_chunk": False}} for item in data
         ]
         return list(messages_from_dict(prevalidated_data))  # type: ignore
-    
+
     def _check_model_access_and_fallback(self, model_name) -> str:
         """
         Retrieve the specified model, or fallback to "gpt-3.5-turbo" if the model is not available.
@@ -282,7 +281,7 @@ class AI:
                 "https://openai.com/waitlist/gpt-4-api\n"
             )
             return "gpt-3.5-turbo"
-        
+
         return model_name
 
     def _create_chat_model(self) -> BaseChatModel:
@@ -309,7 +308,7 @@ class AI:
                 openai_api_type="azure",
                 streaming=True,
             )
-        
+
         return ChatOpenAI(
             model=self.model_name,
             temperature=self.temperature,

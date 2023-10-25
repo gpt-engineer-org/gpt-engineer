@@ -3,14 +3,20 @@ from gpt_engineer.core.token_usage import TokenUsage
 from langchain.chat_models.fake import FakeListChatModel
 from langchain.chat_models.base import BaseChatModel
 
+
 def mock_create_chat_model(self) -> BaseChatModel:
     return FakeListChatModel(responses=["response1", "response2", "response3"])
+
+
 def mock_check_model_access_and_fallback(self, model_name):
     return model_name
 
+
 def test_start(monkeypatch):
     # arrange
-    monkeypatch.setattr(AI, "_check_model_access_and_fallback", mock_check_model_access_and_fallback)
+    monkeypatch.setattr(
+        AI, "_check_model_access_and_fallback", mock_check_model_access_and_fallback
+    )
     monkeypatch.setattr(AI, "_create_chat_model", mock_create_chat_model)
 
     ai = AI("gpt-4")
@@ -24,7 +30,9 @@ def test_start(monkeypatch):
 
 def test_next(monkeypatch):
     # arrange
-    monkeypatch.setattr(AI, "_check_model_access_and_fallback", mock_check_model_access_and_fallback)
+    monkeypatch.setattr(
+        AI, "_check_model_access_and_fallback", mock_check_model_access_and_fallback
+    )
     monkeypatch.setattr(AI, "_create_chat_model", mock_create_chat_model)
 
     ai = AI("gpt-4")
@@ -38,9 +46,12 @@ def test_next(monkeypatch):
     # assert
     assert response_messages[-1].content == "response2"
 
+
 def test_token_logging(monkeypatch):
     # arrange
-    monkeypatch.setattr(AI, "_check_model_access_and_fallback", mock_check_model_access_and_fallback)
+    monkeypatch.setattr(
+        AI, "_check_model_access_and_fallback", mock_check_model_access_and_fallback
+    )
     monkeypatch.setattr(AI, "_create_chat_model", mock_create_chat_model)
 
     ai = AI("gpt-4")
@@ -50,5 +61,4 @@ def test_token_logging(monkeypatch):
     ai.next(response_messages, "next user prompt", step_name="step name")
 
     # assert
-    assert ai.token_usage_log.usage_cost() > 0 
-
+    assert ai.token_usage_log.usage_cost() > 0

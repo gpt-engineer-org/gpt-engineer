@@ -419,7 +419,9 @@ def use_feedback(ai: AI, dbs: DBs):
     messages = [
         SystemMessage(content=setup_sys_prompt(dbs)),
         HumanMessage(content=f"Instructions: {dbs.input['prompt']}"),
-        AIMessage(content=dbs.memory["all_output.txt"]),  # reload previously generated code
+        AIMessage(
+            content=dbs.memory["all_output.txt"]
+        ),  # reload previously generated code
     ]
     if dbs.input["feedback"]:
         messages = ai.next(messages, dbs.input["feedback"], step_name=curr_fn())
