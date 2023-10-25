@@ -9,11 +9,13 @@ Message = Union[AIMessage, HumanMessage, SystemMessage]
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class TokenUsage:
     """
     Represents token usage statistics for a conversation step.
     """
+
     step_name: str
     in_step_prompt_tokens: int
     in_step_completion_tokens: int
@@ -22,13 +24,19 @@ class TokenUsage:
     total_completion_tokens: int
     total_tokens: int
 
+
 class Tokenizer:
     """
     Tokenizer for counting tokens in text.
     """
+
     def __init__(self, model_name):
         self.model_name = model_name
-        self._tiktoken_tokenizer = tiktoken.encoding_for_model(model_name) if "gpt-4" in model_name or "gpt-3.5" in model_name else tiktoken.get_encoding("cl100k_base")
+        self._tiktoken_tokenizer = (
+            tiktoken.encoding_for_model(model_name)
+            if "gpt-4" in model_name or "gpt-3.5" in model_name
+            else tiktoken.get_encoding("cl100k_base")
+        )
 
     def num_tokens(self, txt: str) -> int:
         """
@@ -62,15 +70,19 @@ class Tokenizer:
         """
         n_tokens = 0
         for message in messages:
-            n_tokens += 4  # Every message follows <im_start>{role/name}\n{content}<im_end>\n
+            n_tokens += (
+                4  # Every message follows <im_start>{role/name}\n{content}<im_end>\n
+            )
             n_tokens += self.num_tokens(message.content)
         n_tokens += 2  # Every reply is primed with <im_start>assistant
         return n_tokens
+
 
 class TokenUsageLog:
     """
     Represents a log of token usage statistics for a conversation.
     """
+
     def __init__(self, model_name):
         self.model_name = model_name
         self._cumulative_prompt_tokens = 0
@@ -79,9 +91,7 @@ class TokenUsageLog:
         self._log = []
         self._tokenizer = Tokenizer(model_name)
 
-    def update_log(
-        self, messages: List[Message], answer: str, step_name: str
-    ) -> None:
+    def update_log(self, messages: List[Message], answer: str, step_name: str) -> None:
         """
         Update the token usage log with the number of tokens used in the current step.
 
@@ -150,6 +160,10 @@ class TokenUsageLog:
         """
         result = 0
         for log in self.log():
-            result += get_openai_token_cost_for_model(self.model_name, log.total_prompt_tokens, is_completion=False)
-            result += get_openai_token_cost_for_model(self.model_name, log.total_completion_tokens, is_completion=True)
+            result += get_openai_token_cost_for_model(
+                self.model_name, log.total_prompt_tokens, is_completion=False
+            )
+            result += get_openai_token_cost_for_model(
+                self.model_name, log.total_completion_tokens, is_completion=True
+            )
         return result
