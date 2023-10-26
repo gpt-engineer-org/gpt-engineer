@@ -8,9 +8,10 @@ Key Features:
 - Token usage logging to monitor the number of tokens consumed during a conversation.
 - Seamless fallback to default models in case the desired model is unavailable.
 - Serialization and deserialization of chat messages for easier transmission and storage.
+- Token usage calculation and logging for monitoring and optimization purposes.
 
 Classes:
-- AI: Main class providing chat functionalities.
+- AI: Main class providing chat functionalities. It provides methods to start and advance a conversation, serialize and deserialize messages, and calculate and log token usage.
 
 Dependencies:
 - langchain: For chat models and message schemas.
@@ -59,7 +60,9 @@ class AI:
     This class provides methods to initiate and maintain conversations using
     a specified language model. It handles token counting, message creation,
     serialization and deserialization of chat messages, and interfaces with
-    the language model to get AI-generated responses.
+    the language model to get AI-generated responses. It also provides methods
+    to calculate and log the number of tokens used in a conversation, which can
+    be useful for monitoring and optimization purposes.
 
     Attributes
     ----------
@@ -77,15 +80,25 @@ class AI:
     Methods
     -------
     start(system, user, step_name) -> List[Message]:
-        Start the conversation with a system and user message.
+        Start the conversation with a system and user message. This method initializes the conversation and prepares it for interaction with the language model.
     next(messages, prompt, step_name) -> List[Message]:
-        Advance the conversation by interacting with the language model.
+        Advance the conversation by interacting with the language model. This method takes the current conversation, adds a new user message (if provided), and gets a response from the language model.
     backoff_inference(messages, callbacks) -> Any:
-        Interact with the model using an exponential backoff strategy in case of rate limits.
+        Interact with the model using an exponential backoff strategy in case of rate limits. This method handles potential rate limit errors from the OpenAI API by implementing an exponential backoff strategy.
     serialize_messages(messages) -> str:
-        Serialize a list of messages to a JSON string.
+        Serialize a list of messages to a JSON string. This method is useful for storing or transmitting the conversation in a compact format.
     deserialize_messages(jsondictstr) -> List[Message]:
-        Deserialize a JSON string into a list of messages.
+        Deserialize a JSON string into a list of messages. This method is useful for loading a conversation from a stored or transmitted format.
+    update_token_usage_log(messages, answer, step_name) -> None:
+        Update the token usage log with the number of tokens used in the latest interaction. This method is useful for monitoring and optimizing token usage.
+    format_token_usage_log() -> str:
+        Format the token usage log as a string for easy viewing. This method is useful for displaying the token usage log in a human-readable format.
+    usage_cost(messages) -> int:
+        Calculate the cost in tokens of a list of messages. This method is useful for estimating the token usage of a conversation without making an API call.
+    num_tokens(message) -> int:
+        Calculate the number of tokens in a message. This method is useful for estimating the token usage of a single message.
+    num_tokens_from_messages(messages) -> int:
+        Calculate the total number of tokens in a list of messages. This method is useful for estimating the token usage of a conversation.
 
     """
 
@@ -111,7 +124,7 @@ class AI:
 
     def start(self, system: str, user: str, step_name: str) -> List[Message]:
         """
-        Start the conversation with a system message and a user message.
+        Start the conversation with a system message and a user message. This method initializes the conversation and prepares it for interaction with the language model. It takes a system message and a user message as input, and returns a list of messages ready for interaction with the language model.
 
         Parameters
         ----------
@@ -142,8 +155,7 @@ class AI:
         step_name: str,
     ) -> List[Message]:
         """
-        Advances the conversation by sending message history
-        to LLM and updating with the response.
+        Advance the conversation by interacting with the language model. This method takes the current conversation, adds a new user message (if provided), and gets a response from the language model. It returns the updated conversation with the new AI message.
 
         Parameters
         ----------
@@ -238,7 +250,7 @@ class AI:
     @staticmethod
     def deserialize_messages(jsondictstr: str) -> List[Message]:
         """
-        Deserialize a JSON string to a list of messages.
+        Deserialize a JSON string into a list of messages. This method takes a JSON string representing a list of messages, and returns the corresponding list of Message objects. It is useful for loading a conversation from a stored or transmitted format.
 
         Parameters
         ----------
