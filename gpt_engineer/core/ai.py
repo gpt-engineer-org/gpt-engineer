@@ -11,7 +11,7 @@ Key Features:
 - Token usage calculation and logging for monitoring and optimization purposes.
 
 Classes:
-- AI: Main class providing chat functionalities. It provides methods to start and advance a conversation, serialize and deserialize messages, and calculate and log token usage.
+- AI: Main class providing chat functionalities. It provides methods to start and advance a conversation, serialize and deserialize messages, and calculate and log token usage. The start method in particular is used to initiate a conversation with a system and user message, preparing it for interaction with the language model.
 
 Dependencies:
 - langchain: For chat models and message schemas.
@@ -124,21 +124,21 @@ class AI:
 
     def start(self, system: str, user: str, step_name: str) -> List[Message]:
         """
-        Start the conversation with a system message and a user message. This method initializes the conversation and prepares it for interaction with the language model. It takes a system message and a user message as input, and returns a list of messages ready for interaction with the language model.
+        Start the conversation with a system message and a user message. This method initializes the conversation and prepares it for interaction with the language model. It takes a system message and a user message as input, and returns a list of messages ready for interaction with the language model. The system message typically sets the behavior of the assistant, while the user message is the user's input to the assistant. The step_name parameter is used for logging purposes to identify the step in the conversation.
 
         Parameters
         ----------
         system : str
-            The content of the system message.
+            The content of the system message, which typically sets the behavior of the assistant.
         user : str
-            The content of the user message.
+            The content of the user message, which is the user's input to the assistant.
         step_name : str
-            The name of the step.
+            The name of the step, used for logging purposes to identify the step in the conversation.
 
         Returns
         -------
         List[Message]
-            The list of messages in the conversation.
+            The list of messages in the conversation, ready for interaction with the language model.
         """
 
         messages: List[Message] = [
