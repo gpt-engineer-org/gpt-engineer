@@ -169,12 +169,12 @@ def main(
         messages = step(ai, dbs)
         dbs.logs[step.__name__] = AI.serialize_messages(messages)
 
-    print("Total api cost: $ ", ai.usage_cost())
+    print("Total api cost: $ ", ai.token_usage_log.usage_cost())
 
     if check_collection_consent():
         collect_learnings(model, temperature, steps, dbs)
 
-    dbs.logs["token_usage"] = ai.format_token_usage_log()
+    dbs.logs["token_usage"] = ai.token_usage_log.format_log()
 
 
 if __name__ == "__main__":
