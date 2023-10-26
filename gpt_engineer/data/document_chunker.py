@@ -1,13 +1,8 @@
-
-from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional
-
-from llama_index import VectorStoreIndex, SimpleDirectoryReader
-from llama_index import Document
-from langchain.text_splitter import CharacterTextSplitter
+from typing import Any, List
+from pathlib import Path
+from collections import defaultdict
 from langchain.text_splitter import TextSplitter
-
-
+from langchain.docstore.document import Document
 import tree_sitter_languages
 
 
@@ -79,43 +74,68 @@ class CodeSplitter(TextSplitter):
             return chunks
         else:
             raise ValueError(f"Could not parse code with language {self.language}.")
+        
+class CodeSplitterFactory:
+    def __init__(self):
+        self._splitters = {}
+    
+    _extension_to_language = {
+        '.py': 'Python',
+        '.js': 'JavaScript',
+        '.html': 'HTML',
+        '.css': 'CSS',
+        '.java': 'Java',
+        '.cpp': 'C++',
+        '.c': 'C',
+        '.cs': 'C#',
+        '.ts': 'TypeScript',
+        '.rb': 'Ruby',
+        '.php': 'PHP',
+        '.swift': 'Swift',
+        '.go': 'Go',
+        '.rs': 'Rust',
+        '.kt': 'Kotlin'
+    }
+        
+    def get_splitter(self, extension: str) -> CodeSplitter:
+        if extension not in self._splitters:
+            language = self._extension_to_language.get(extension)
+            if language:
+                self._splitters[extension] = CodeSplitter(
+                    language=language.lower(),
+                    chunk_lines=40,
+                    chunk_lines_overlap=15,
+                    max_chars=1500,
+                )
+            else:
+                self._splitters[extension] = None
+        return self._splitters[extension]     
+
+class DocumentChunker: 
+    def chunk_documents(documents: List[Document]) -> List[Document]:
+        code_splitter_factory = CodeSplitterFactory()
+        split_documents = []
+
+        docs_to_split = defaultdict(list)
+        other_docs = []
+        
+        for doc in documents:           
+            filename = str(doc.metadata.get("filename"))
+            extension = Path(filename).suffix
             
+            if extension in code_splitter_factory._extension_to_language:
+                doc.metadata["isCode"] = True
+                doc.metadata["language"]= code_splitter_factory._extension_to_language[extension]
+                docs_to_split[extension].append(doc)
+            else:
+                other_docs.append(doc)
 
-code_splitter = CodeSplitter(
-    language="python",
-    chunk_lines=40,
-    chunk_lines_overlap=15,
-    max_chars=1500,
-)
+        for extension, docs in docs_to_split.items():
+            code_splitter = code_splitter_factory.get_splitter(extension)
+            if code_splitter:
+                split_documents.extend(code_splitter.split_documents(docs))
+        
+        
+        split_documents.extend(other_docs)
 
-character_splitter = CharacterTextSplitter()
-
-# nodes = code_splitter.split_documents(docs)
-
-            
-# for doc in docs:
-#     print("Page Content:\n", doc.page_content)
-#     print("\nMetadata:\n", doc.metadata)
-#     print("-------------------------------\n")
-
-def name_metadata_storer(filename: str) -> Dict: 
-    return {"filename": filename}
-
-# Load documents and build index
-documents = SimpleDirectoryReader('./projects/example-big',recursive=True, file_metadata=name_metadata_storer).load_data()
-
-langchain_docs = [doc.to_langchain_format() for doc in documents]
-python_documents = list(filter(lambda x: str(x.metadata["filename"]).endswith('.py'), langchain_docs))
-non_python_documents = list(filter(lambda x: not str(x.metadata["filename"]).endswith('.py'), langchain_docs))
-
-split_python_documents_lc = code_splitter.split_documents(python_documents)
-split_python_documents = [Document.from_langchain_format(doc) for doc in split_python_documents_lc] 
-
-
-index = VectorStoreIndex.from_documents(split_python_documents)
-
-query_engine = index.as_query_engine(response_mode="tree_summarize")
-response = query_engine.query("What file would i edit to add new default steps to run?")
-
-print(response)
-
+        return split_documents
