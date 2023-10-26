@@ -7,8 +7,12 @@ def main():
     vector_repository = CodeVectorRepository()
 
     vector_repository.load_from_directory("../example-big")
-    response = vector_repository.query("What file would i change to add new steps to the code generation process?")
-    print(response)
+    chunks = vector_repository.relevent_code_chunks("I would like to add additional steps to the code development process")
+
+    print(f'chunks recieved: {chunks.__len__()}')
+    for chunk in chunks:
+        print(chunk.get_text)
+
 
 if __name__ == "__main__":
     main()
