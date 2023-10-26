@@ -58,7 +58,10 @@ def test_token_logging(monkeypatch):
 
     # act
     response_messages = ai.start("system prompt", "user prompt", "step name")
+    usageCostAfterStart = ai.token_usage_log.usage_cost()
     ai.next(response_messages, "next user prompt", step_name="step name")
+    usageCostAfterNext = ai.token_usage_log.usage_cost()
 
     # assert
-    assert ai.token_usage_log.usage_cost() > 0
+    assert usageCostAfterStart > 0
+    assert usageCostAfterNext > usageCostAfterStart
