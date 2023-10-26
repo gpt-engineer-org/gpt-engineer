@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Dict, NamedTuple
 from pathlib import Path
 from collections import defaultdict
 from langchain.text_splitter import TextSplitter
@@ -74,11 +74,36 @@ class CodeSplitter(TextSplitter):
             return chunks
         else:
             raise ValueError(f"Could not parse code with language {self.language}.")
+
+class SortedDocuments(NamedTuple):
+    by_language: Dict[str, List[Document]]
+    other: List[Document]
+
+class DocumentChunker: 
+    def chunk_documents(documents: List[Document]) -> List[Document]:
         
-class CodeSplitterFactory:
-    def __init__(self):
-        self._splitters = {}
+        chunked_documents = []
+
+        sorted_documents = _sort_documents_by_programming_language_or_other(documents)
+        
+        for language, language_documents in sorted_documents.by_language.items():
+            code_splitter = CodeSplitter(
+                    language=language.lower(),
+                    chunk_lines=40,
+                    chunk_lines_overlap=15,
+                    max_chars=1500,
+                )
+            
+            chunked_documents.extend(code_splitter.split_documents(language_documents))
+        
+        # chunked_documents.extend(sorted_documents.other) for now only include code files!
+
+        return chunked_documents
     
+
+@staticmethod
+def _sort_documents_by_programming_language_or_other(documents: List[Document]) -> SortedDocuments:
+        
     _extension_to_language = {
         '.py': 'Python',
         '.js': 'JavaScript',
@@ -96,46 +121,20 @@ class CodeSplitterFactory:
         '.rs': 'Rust',
         '.kt': 'Kotlin'
     }
-        
-    def get_splitter(self, extension: str) -> CodeSplitter:
-        if extension not in self._splitters:
-            language = self._extension_to_language.get(extension)
-            if language:
-                self._splitters[extension] = CodeSplitter(
-                    language=language.lower(),
-                    chunk_lines=40,
-                    chunk_lines_overlap=15,
-                    max_chars=1500,
-                )
-            else:
-                self._splitters[extension] = None
-        return self._splitters[extension]     
 
-class DocumentChunker: 
-    def chunk_documents(documents: List[Document]) -> List[Document]:
-        code_splitter_factory = CodeSplitterFactory()
-        split_documents = []
-
-        docs_to_split = defaultdict(list)
-        other_docs = []
+    docs_to_split = defaultdict(list)
+    other_docs = []
+    
+    for doc in documents:           
+        filename = str(doc.metadata.get("filename"))
+        extension = Path(filename).suffix
         
-        for doc in documents:           
-            filename = str(doc.metadata.get("filename"))
-            extension = Path(filename).suffix
-            
-            if extension in code_splitter_factory._extension_to_language:
-                doc.metadata["isCode"] = True
-                doc.metadata["language"]= code_splitter_factory._extension_to_language[extension]
-                docs_to_split[extension].append(doc)
-            else:
-                other_docs.append(doc)
+        if extension in _extension_to_language:
+            doc.metadata["isCode"] = True
+            doc.metadata["codingLanguage"]= _extension_to_language[extension]
+            docs_to_split[_extension_to_language[extension]].append(doc)
+        else:
+            doc.metadata["isCode"] = False
+            other_docs.append(doc)
 
-        for extension, docs in docs_to_split.items():
-            code_splitter = code_splitter_factory.get_splitter(extension)
-            if code_splitter:
-                split_documents.extend(code_splitter.split_documents(docs))
-        
-        
-        split_documents.extend(other_docs)
-
-        return split_documents
+    return SortedDocuments(by_language=dict(docs_to_split), other=other_docs)

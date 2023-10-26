@@ -1,7 +1,11 @@
-from typing import Dict
+from typing import Dict, List
 
 from llama_index import VectorStoreIndex, SimpleDirectoryReader
 from llama_index import Document
+from llama_index.schema import NodeWithScore
+from llama_index.retrievers import (
+    BM25Retriever
+)
 
 from document_chunker import DocumentChunker
 
@@ -10,6 +14,7 @@ class CodeVectorRepository:
     def __init__(self):
         self._index = None
         self._query_engine = None
+        self._retriever = None
 
     def load_from_directory(self, directory_path: str):
         def name_metadata_storer(filename: str) -> Dict: 
@@ -22,15 +27,33 @@ class CodeVectorRepository:
         split_documents = [Document.from_langchain_format(doc) for doc in split_langchain_documents] 
 
         self._index = VectorStoreIndex.from_documents(split_documents)
-        self._query_engine = self._index.as_query_engine(response_mode="tree_summarize")
+        
     
     def query(self,query_string: str):
+        """
+        Ask a plain english question about the code base and retrieve a plain english answer
+        """
 
         if self._index is None: 
             raise ValueError("Index has not been loaded yet.")
         
-        
         if self._query_engine is None: 
-            raise ValueError("Query engine has not been loaded yet.")
+            self._query_engine = self._index.as_query_engine(response_mode="tree_summarize")
 
         return self._query_engine.query(query_string)
+    
+    def relevent_code_chunks(self, query_string: str) -> List[NodeWithScore]:
+        """
+        Retrieve code chunks relevent to a prompt
+        """
+
+        if self._index is None: 
+            raise ValueError("Index has not been loaded yet.")
+        
+        if self._retriever is None: 
+            self._retriever = BM25Retriever.from_defaults(self._index, similarity_top_k=2)
+
+        return self._retriever.retrieve(query_string)
+
+
+
