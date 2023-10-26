@@ -107,7 +107,7 @@ class AI:
         self.llm = self._create_chat_model()
         self.token_usage_log = TokenUsageLog(model_name)
 
-        logger.debug(f"Using model {self.model_name} with llm {self.llm}")
+        logger.debug(f"Using model {self.model_name}")
 
     def start(self, system: str, user: str, step_name: str) -> List[Message]:
         """
