@@ -19,6 +19,7 @@ Building the image:
 - `cd gpt-engineer`
 - `docker-compose -f docker-compose.yml build`
 - `docker-compose run --rm gpt-engineer`
+- Hello
 
 
 Set the OPENAI_API_KEY in docker/docker-compose.yml using .env file or environment variable, and mount your project folder into the container using volumes. for example "./projects/example:/project" ./projects/example is the path to your project folder.
