@@ -22,11 +22,11 @@ class CodeVectorRepository:
 
         documents = SimpleDirectoryReader(directory_path,recursive=True, file_metadata=name_metadata_storer).load_data()
 
-        split_langchain_documents = DocumentChunker.chunk_documents([doc.to_langchain_format() for doc in documents])
+        chunked_langchain_documents = DocumentChunker.chunk_documents([doc.to_langchain_format() for doc in documents])
 
-        split_documents = [Document.from_langchain_format(doc) for doc in split_langchain_documents] 
+        chunked_documents = [Document.from_langchain_format(doc) for doc in chunked_langchain_documents] 
 
-        self._index = VectorStoreIndex.from_documents(split_documents)
+        self._index = VectorStoreIndex.from_documents(chunked_documents)
         
     
     def query(self,query_string: str):
