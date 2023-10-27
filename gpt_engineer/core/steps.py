@@ -64,7 +64,7 @@ from gpt_engineer.core.chat_to_files import (
     overwrite_files_with_edits,
     to_files_and_memory,
 )
-from gpt_engineer.core.db import DBs
+from gpt_engineer.data.file_repository import FileRepositories
 from gpt_engineer.cli.file_selector import FILE_LIST_NAME, ask_for_files
 from gpt_engineer.cli.learning import human_review_input
 
@@ -87,7 +87,19 @@ def get_platform_info():
     return a + b
 
 
-def setup_sys_prompt(dbs: DBs) -> str:
+def get_platform_info():
+    """Returns the Platform: OS, and the Python version.
+    This is used for self healing.  There are some possible areas of conflict here if
+    you use a different version of Python in your virtualenv.  A better solution would
+    be to have this info printed from the virtualenv.
+    """
+    v = version_info
+    a = f"Python Version: {v.major}.{v.minor}.{v.micro}"
+    b = f"\nOS: {platform()}\n"
+    return a + b
+
+
+def setup_sys_prompt(dbs: FileRepositories) -> str:
     """
     Constructs a system prompt for the AI based on predefined instructions and philosophies.
 
@@ -110,7 +122,7 @@ def setup_sys_prompt(dbs: DBs) -> str:
     )
 
 
-def setup_sys_prompt_existing_code(dbs: DBs) -> str:
+def setup_sys_prompt_existing_code(dbs: FileRepositories) -> str:
     """
     Constructs a system prompt for the AI focused on improving an existing codebase.
 
@@ -147,7 +159,7 @@ def curr_fn() -> str:
     return inspect.stack()[1].function
 
 
-def lite_gen(ai: AI, dbs: DBs) -> List[Message]:
+def lite_gen(ai: AI, dbs: FileRepositories) -> List[Message]:
     """
     Executes the AI model using the main prompt and saves the generated results.
 
@@ -175,7 +187,7 @@ def lite_gen(ai: AI, dbs: DBs) -> List[Message]:
     return messages
 
 
-def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
+def simple_gen(ai: AI, dbs: FileRepositories) -> List[Message]:
     """
     Executes the AI model using the default system prompts and saves the output.
 
@@ -201,7 +213,7 @@ def simple_gen(ai: AI, dbs: DBs) -> List[Message]:
     return messages
 
 
-def clarify(ai: AI, dbs: DBs) -> List[Message]:
+def clarify(ai: AI, dbs: FileRepositories) -> List[Message]:
     """
     Interactively queries the user for clarifications on the prompt and saves the AI's responses.
 
@@ -259,7 +271,7 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
     return messages
 
 
-def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
+def gen_clarified_code(ai: AI, dbs: FileRepositories) -> List[dict]:
     """
     Generates code based on clarifications obtained from the user.
 
@@ -293,7 +305,7 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     return messages
 
 
-def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
+def execute_entrypoint(ai: AI, dbs: FileRepositories) -> List[dict]:
     """
     Executes the specified entry point script (`run.sh`) from a workspace.
 
@@ -359,7 +371,7 @@ def execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     return []
 
 
-def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
+def gen_entrypoint(ai: AI, dbs: FileRepositories) -> List[dict]:
     """
     Generates an entry point script based on a given codebase's information.
 
@@ -410,7 +422,7 @@ def gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]:
     return messages
 
 
-def use_feedback(ai: AI, dbs: DBs):
+def use_feedback(ai: AI, dbs: FileRepositories):
     """
     Uses the provided feedback to improve the generated code.
 
@@ -452,7 +464,7 @@ def use_feedback(ai: AI, dbs: DBs):
         exit(1)
 
 
-def set_improve_filelist(ai: AI, dbs: DBs):
+def set_improve_filelist(ai: AI, dbs: FileRepositories):
     """
     Set the list of files for the AI to work with in the 'existing code mode'.
 
@@ -481,7 +493,7 @@ def set_improve_filelist(ai: AI, dbs: DBs):
     return []
 
 
-def assert_files_ready(ai: AI, dbs: DBs):
+def assert_files_ready(ai: AI, dbs: FileRepositories):
     """
     Verify the presence of required files for headless 'improve code' execution.
 
@@ -518,7 +530,7 @@ def assert_files_ready(ai: AI, dbs: DBs):
     return []
 
 
-def get_improve_prompt(ai: AI, dbs: DBs):
+def get_improve_prompt(ai: AI, dbs: FileRepositories):
     """
     Asks the user what they would like to fix.
     """
@@ -549,7 +561,7 @@ def get_improve_prompt(ai: AI, dbs: DBs):
     return []
 
 
-def improve_existing_code(ai: AI, dbs: DBs):
+def improve_existing_code(ai: AI, dbs: FileRepositories):
     """
     Process and improve the code from a specified set of existing files based on a user prompt.
 
@@ -600,7 +612,7 @@ def improve_existing_code(ai: AI, dbs: DBs):
     return messages
 
 
-def human_review(ai: AI, dbs: DBs):
+def human_review(ai: AI, dbs: FileRepositories):
     """
     Collects human feedback on the code and stores it in memory.
 

@@ -36,7 +36,7 @@ from typing import Any, Optional, Union
 
 
 # This class represents a simple database that stores its data as files in a directory.
-class DB:
+class FileRepository:
     """
     A file-based key-value store where keys correspond to filenames and values to file contents.
 
@@ -200,17 +200,17 @@ class DB:
 
 # dataclass for all dbs:
 @dataclass
-class DBs:
-    memory: DB
-    logs: DB
-    preprompts: DB
-    input: DB
-    workspace: DB
-    archive: DB
-    project_metadata: DB
+class FileRepositories:
+    memory: FileRepository
+    logs: FileRepository
+    preprompts: FileRepository
+    input: FileRepository
+    workspace: FileRepository
+    archive: FileRepository
+    project_metadata: FileRepository
 
 
-def archive(dbs: DBs) -> None:
+def archive(dbs: FileRepositories) -> None:
     """
     Archive the memory and workspace databases.
 
