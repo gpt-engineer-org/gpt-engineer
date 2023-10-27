@@ -15,6 +15,6 @@ Variables:
 from typing import Callable, List, TypeVar
 
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.db import DBs
+from gpt_engineer.data.file_repository import FileRepositories
 
-Step = TypeVar("Step", bound=Callable[[AI, DBs], List[dict]])
+Step = TypeVar("Step", bound=Callable[[AI, FileRepositories], List[dict]])

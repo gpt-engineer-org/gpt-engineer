@@ -41,7 +41,7 @@ def test_import():
             domain,
             chat_to_files,
             steps,
-            db,
+            file_repository,
         )
     except ImportError as e:
         assert False, f"Failed to import {e.name}"

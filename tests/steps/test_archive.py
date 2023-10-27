@@ -3,7 +3,7 @@ import os
 
 from unittest.mock import MagicMock
 
-from gpt_engineer.core.db import DB, DBs, archive
+from gpt_engineer.data.file_repository import FileRepository, FileRepositories, archive
 
 
 def freeze_at(monkeypatch, time):
@@ -16,10 +16,10 @@ def setup_dbs(tmp_path, dir_names):
     directories = [tmp_path / name for name in dir_names]
 
     # Create DB objects
-    dbs = [DB(dir) for dir in directories]
+    dbs = [FileRepository(dir) for dir in directories]
 
     # Create DBs instance
-    return DBs(*dbs)
+    return FileRepositories(*dbs)
 
 
 def test_archive(tmp_path, monkeypatch):

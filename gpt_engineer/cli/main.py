@@ -34,7 +34,7 @@ import typer
 from dotenv import load_dotenv
 
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.db import DB, DBs, archive
+from gpt_engineer.data.file_repository import FileRepository, FileRepositories, archive
 from gpt_engineer.core.steps import STEPS, Config as StepsConfig
 from gpt_engineer.cli.collect import collect_learnings
 from gpt_engineer.cli.learning import check_collection_consent
@@ -51,7 +51,7 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def load_prompt(dbs: DBs):
+def load_prompt(dbs: FileRepositories):
     if dbs.input.get("prompt"):
         return dbs.input.get("prompt")
 
@@ -145,14 +145,14 @@ def main(
     memory_path = project_metadata_path / "memory"
     archive_path = project_metadata_path / "archive"
 
-    dbs = DBs(
-        memory=DB(memory_path),
-        logs=DB(memory_path / "logs"),
-        input=DB(input_path),
-        workspace=DB(workspace_path),
-        preprompts=DB(preprompts_path(use_custom_preprompts, input_path)),
-        archive=DB(archive_path),
-        project_metadata=DB(project_metadata_path),
+    dbs = FileRepositories(
+        memory=FileRepository(memory_path),
+        logs=FileRepository(memory_path / "logs"),
+        input=FileRepository(input_path),
+        workspace=FileRepository(workspace_path),
+        preprompts=FileRepository(preprompts_path(use_custom_preprompts, input_path)),
+        archive=FileRepository(archive_path),
+        project_metadata=FileRepository(project_metadata_path),
     )
 
     if steps_config not in [
