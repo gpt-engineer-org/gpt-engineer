@@ -16,18 +16,23 @@ class CodeVectorRepository:
         self._query_engine = None
         self._retriever = None
 
-    def load_from_directory(self, directory_path: str):
+    def _load_documents_from_directory(directory_path) -> List[Document]:
         def name_metadata_storer(filename: str) -> Dict: 
             return {"filename": filename}
+        
+        excluded_file_globs = ["*/.gpteng/*"]
 
-        documents = SimpleDirectoryReader(directory_path,recursive=True, exclude=["*/.gpteng/*"], file_metadata=name_metadata_storer).load_data()
+        return SimpleDirectoryReader(directory_path,recursive=True, exclude=excluded_file_globs, file_metadata=name_metadata_storer).load_data()
+
+    def load_from_directory(self, directory_path: str):
+        
+        documents = self._load_documents_from_directory(directory_path)
 
         chunked_langchain_documents = DocumentChunker.chunk_documents([doc.to_langchain_format() for doc in documents])
 
         chunked_documents = [Document.from_langchain_format(doc) for doc in chunked_langchain_documents] 
 
         self._index = VectorStoreIndex.from_documents(chunked_documents)
-        
     
     def query(self,query_string: str):
         """
