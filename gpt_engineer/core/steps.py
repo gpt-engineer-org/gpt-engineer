@@ -67,6 +67,7 @@ from gpt_engineer.core.chat_to_files import (
 from gpt_engineer.data.file_repository import FileRepositories
 from gpt_engineer.cli.file_selector import FILE_LIST_NAME, ask_for_files
 from gpt_engineer.cli.learning import human_review_input
+from gpt_engineer.data.code_vector_repository import CodeVectorRepository
 
 MAX_SELF_HEAL_ATTEMPTS = 2  # constants for self healing code
 ASSUME_WORKING_TIMEOUT = 30
@@ -492,6 +493,16 @@ def set_improve_filelist(ai: AI, dbs: FileRepositories):
     ask_for_files(dbs.project_metadata, dbs.workspace)  # stores files as full paths.
     return []
 
+def set_vector_improve_prompt(ai: AI, fileRepositories: FileRepositories, codeVectorRepository: CodeVectorRepository):
+  codeVectorRepository.load_from_directory(fileRepositories.workspace.path)
+  releventDocuments = codeVectorRepository.relevent_code_chunks(fileRepositories.input["prompt"])
+  
+  for doc in releventDocuments:
+    # read full file and add to prompt 
+    x = 1
+
+  path_list_string = fileRepositories.workspace.to_path_list_string()
+  # add to prompt 
 
 def assert_files_ready(ai: AI, dbs: FileRepositories):
     """
@@ -738,6 +749,7 @@ class Config(str, Enum):
     IMPROVE_CODE = "improve_code"
     EVAL_IMPROVE_CODE = "eval_improve_code"
     EVAL_NEW_CODE = "eval_new_code"
+    VECTOR_IMPROVE = 'vector_improve'
     SELF_HEAL = "self_heal"
 
 
@@ -772,6 +784,11 @@ STEPS = {
     Config.EVALUATE: [execute_entrypoint, human_review],
     Config.IMPROVE_CODE: [
         set_improve_filelist,
+        get_improve_prompt,
+        improve_existing_code,
+    ],
+    Config.VECTOR_IMPROVE: [
+        set_vector_improve_prompt,
         get_improve_prompt,
         improve_existing_code,
     ],

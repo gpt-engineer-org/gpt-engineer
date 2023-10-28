@@ -3,6 +3,7 @@ from pathlib import Path
 from collections import defaultdict
 from langchain.text_splitter import TextSplitter
 from langchain.docstore.document import Document
+from file_repository import FileRepository
 import tree_sitter_languages
 
 
@@ -103,37 +104,24 @@ class DocumentChunker:
 
 @staticmethod
 def _sort_documents_by_programming_language_or_other(documents: List[Document]) -> SortedDocuments:
-        
-    _extension_to_language = {
-        '.py': 'Python',
-        '.js': 'JavaScript',
-        '.html': 'HTML',
-        '.css': 'CSS',
-        '.java': 'Java',
-        '.cpp': 'C++',
-        '.c': 'C',
-        '.cs': 'C#',
-        '.ts': 'TypeScript',
-        '.rb': 'Ruby',
-        '.php': 'PHP',
-        '.swift': 'Swift',
-        '.go': 'Go',
-        '.rs': 'Rust',
-        '.kt': 'Kotlin'
-    }
-
     docs_to_split = defaultdict(list)
     other_docs = []
-    
-    for doc in documents:           
+
+    for doc in documents:
         filename = str(doc.metadata.get("filename"))
         extension = Path(filename).suffix
-        
-        if extension in _extension_to_language:
-            doc.metadata["isCode"] = True
-            doc.metadata["codingLanguage"]= _extension_to_language[extension]
-            docs_to_split[_extension_to_language[extension]].append(doc)
-        else:
+        language_found = False
+
+        for lang in FileRepository.supported_languages:
+            if extension in lang["extensions"]:
+                doc.metadata["is_code"] = True
+                doc.metadata["code_language"] = lang["name"]
+                doc.metadata["code_language_tree_sitter_name"] = lang["tree_sitter_name"]
+                docs_to_split[lang["tree_sitter_name"]].append(doc)
+                language_found = True
+                break
+
+        if not language_found:
             doc.metadata["isCode"] = False
             other_docs.append(doc)
 

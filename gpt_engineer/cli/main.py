@@ -38,6 +38,7 @@ from gpt_engineer.data.file_repository import FileRepository, FileRepositories, 
 from gpt_engineer.core.steps import STEPS, Config as StepsConfig
 from gpt_engineer.cli.collect import collect_learnings
 from gpt_engineer.cli.learning import check_collection_consent
+from gpt_engineer.data.code_vector_repository import CodeVectorRepository
 
 app = typer.Typer()  # creates a CLI app
 
@@ -145,7 +146,7 @@ def main(
     memory_path = project_metadata_path / "memory"
     archive_path = project_metadata_path / "archive"
 
-    dbs = FileRepositories(
+    fileRepositories = FileRepositories(
         memory=FileRepository(memory_path),
         logs=FileRepository(memory_path / "logs"),
         input=FileRepository(input_path),
@@ -155,6 +156,8 @@ def main(
         project_metadata=FileRepository(project_metadata_path),
     )
 
+    codeVectorRepository = CodeVectorRepository()
+
     if steps_config not in [
         StepsConfig.EXECUTE_ONLY,
         StepsConfig.USE_FEEDBACK,
@@ -162,20 +165,20 @@ def main(
         StepsConfig.IMPROVE_CODE,
         StepsConfig.SELF_HEAL,
     ]:
-        archive(dbs)
-        load_prompt(dbs)
+        archive(fileRepositories)
+        load_prompt(fileRepositories)
 
     steps = STEPS[steps_config]
     for step in steps:
-        messages = step(ai, dbs)
-        dbs.logs[step.__name__] = AI.serialize_messages(messages)
+        messages = step(ai, fileRepositories, codeVectorRepository)
+        fileRepositories.logs[step.__name__] = AI.serialize_messages(messages)
 
     print("Total api cost: $ ", ai.token_usage_log.usage_cost())
 
     if check_collection_consent():
-        collect_learnings(model, temperature, steps, dbs)
+        collect_learnings(model, temperature, steps, fileRepositories)
 
-    dbs.logs["token_usage"] = ai.token_usage_log.format_log()
+    fileRepositories.logs["token_usage"] = ai.token_usage_log.format_log()
 
 
 if __name__ == "__main__":

@@ -33,6 +33,27 @@ import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional, Union
+import xml.etree.ElementTree as ET
+
+
+supported_languages = [
+    {"name": "Python", "extensions": [".py"], "tree_sitter_name": "python"},
+    {"name": "JavaScript", "extensions": [".js", ".mjs"], "tree_sitter_name": "javascript"},
+    {"name": "HTML", "extensions": [".html", ".htm"], "tree_sitter_name": "html"},
+    {"name": "CSS", "extensions": [".css"], "tree_sitter_name": "css"},
+    {"name": "Java", "extensions": [".java"], "tree_sitter_name": "java"},
+    {"name": "C++", "extensions": [".cpp", ".cc", ".cxx", ".h", ".hpp", ".hxx"], "tree_sitter_name": "cpp"},
+    {"name": "C", "extensions": [".c", ".h"], "tree_sitter_name": "c"},
+    {"name": "C#", "extensions": [".cs"], "tree_sitter_name": "c_sharp"},
+    {"name": "TypeScript", "extensions": [".ts", ".tsx"], "tree_sitter_name": "typescript"},
+    {"name": "Ruby", "extensions": [".rb", ".erb"], "tree_sitter_name": "ruby"},
+    {"name": "PHP", "extensions": [".php", ".phtml", ".php3", ".php4", ".php5", ".php7", ".phps", ".php-s", ".pht", ".phar"], "tree_sitter_name": "php"},
+    {"name": "Swift", "extensions": [".swift"], "tree_sitter_name": "swift"},
+    {"name": "Go", "extensions": [".go"], "tree_sitter_name": "go"},
+    {"name": "Rust", "extensions": [".rs"], "tree_sitter_name": "rust"},
+    {"name": "Kotlin", "extensions": [".kt", ".kts"], "tree_sitter_name": "kotlin"},
+]
+
 
 
 # This class represents a simple database that stores its data as files in a directory.
@@ -197,6 +218,69 @@ class FileRepository:
         elif item_path.is_dir():
             shutil.rmtree(item_path)
 
+
+    def _xml_tree_supported_files(self, directory: Path, parent: ET.Element) -> bool:
+        valid_extensions = {ext for lang in supported_languages for ext in lang['extensions']}
+        
+        has_supported_files = False
+        subdir_element = ET.Element('directory', {'name': directory.name})
+        
+        for item in sorted(directory.iterdir()):
+            if item.is_dir():
+                if self._xml_tree_supported_files(item, subdir_element):
+                    has_supported_files = True
+            elif item.suffix in valid_extensions:
+                ET.SubElement(subdir_element, 'file', {'name': item.name})
+                has_supported_files = True
+
+        if has_supported_files:
+            parent.append(subdir_element)
+            return True
+        
+        return False
+
+    def _xml_tree_all_files(self, directory: Path, parent: ET.Element):
+        subdir_element = ET.SubElement(parent, 'directory', {'name': directory.name})
+        
+        for item in sorted(directory.iterdir()):
+            if item.is_dir():
+                self._xml_tree_all_files(item, subdir_element)
+            else:
+                ET.SubElement(subdir_element, 'file', {'name': item.name})
+
+    def _supported_files(self, directory: Path) -> str:
+        valid_extensions = {ext for lang in supported_languages for ext in lang['extensions']}
+        file_paths = [str(item) for item in sorted(directory.rglob('*')) if item.is_file() and item.suffix in valid_extensions]
+        return '\n'.join(file_paths)
+
+    def _all_files(self, directory: Path) -> str:
+        file_paths = [str(item) for item in sorted(directory.rglob('*')) if item.is_file()]
+        return '\n'.join(file_paths)
+    
+    def to_path_xml_string(self, supported_code_files_only: bool = False) -> str:
+        """
+        Returns directory structure represented as an indented XML strin. May be useful for passing to the LLM in instances where the directory structure needs to be reorganised.
+        """
+        root = ET.Element('directory', {'name': str(self.path.name)})
+        if supported_code_files_only:
+            self._xml_tree_supported_files(self.path, root)
+        else:
+            self._xml_tree_all_files(self.path, root)
+        
+        xml_str = ET.tostring(root, encoding='utf-8').decode('utf-8')
+        if hasattr(ET, 'indent'):
+            ET.indent(root)
+            xml_str = ET.tostring(root, encoding='utf-8').decode('utf-8')
+        return xml_str
+
+    def to_path_list_string(self, supported_code_files_only: bool = False) -> str:
+        """
+        Returns directory as a list of file paths. May be useful for passing to the LLM where it needs to understand the wider context of files available for reference.
+        """
+        if supported_code_files_only:
+            return self._supported_files(self.path)
+        else:
+            return self._all_files(self.path)
 
 # dataclass for all dbs:
 @dataclass
