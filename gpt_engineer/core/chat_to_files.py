@@ -118,7 +118,9 @@ def to_files(chat: str, workspace: FileRepository):
         workspace[file_name] = file_content
 
 
-def get_code_strings(workspace: FileRepository, metadata_db: FileRepository) -> dict[str, str]:
+def get_code_strings(
+    workspace: FileRepository, metadata_db: FileRepository
+) -> dict[str, str]:
     """
     Read file_list.txt and return file names and their content.
     Parameters

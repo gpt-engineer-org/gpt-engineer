@@ -494,33 +494,36 @@ def set_improve_filelist(ai: AI, dbs: FileRepositories):
     ask_for_files(dbs.project_metadata, dbs.workspace)  # stores files as full paths.
     return []
 
+
 def vector_improve(ai: AI, dbs: FileRepositories):
-  code_vector_repository = CodeVectorRepository()
-  code_vector_repository.load_from_directory(dbs.workspace.path)
-  releventDocuments = code_vector_repository.relevent_code_chunks(dbs.input["prompt"])
+    code_vector_repository = CodeVectorRepository()
+    code_vector_repository.load_from_directory(dbs.workspace.path)
+    releventDocuments = code_vector_repository.relevent_code_chunks(dbs.input["prompt"])
 
-  code_file_list = f"Here is a list of all the existing code files present in the root directory your code will be added to:"
-  code_file_list += "\n {fileRepositories.workspace.to_path_list_string()}"
-  
-  relevent_file_contents = f"Here are files relevent to the query which you may like to change, reference or add to \n"
+    code_file_list = f"Here is a list of all the existing code files present in the root directory your code will be added to:"
+    code_file_list += "\n {fileRepositories.workspace.to_path_list_string()}"
 
-  for doc in releventDocuments:
-    filename_without_path = Path(doc.metadata["filename"]).name
-    file_content = dbs.workspace[filename_without_path]
-    relevent_file_contents += format_file_to_input(filename_without_path, file_content)
-  
-  messages = [
+    relevent_file_contents = f"Here are files relevent to the query which you may like to change, reference or add to \n"
+
+    for doc in releventDocuments:
+        filename_without_path = Path(doc.metadata["filename"]).name
+        file_content = dbs.workspace[filename_without_path]
+        relevent_file_contents += format_file_to_input(
+            filename_without_path, file_content
+        )
+
+    messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(dbs)),
     ]
-  
-  messages.append(HumanMessage(content=f"{code_file_list}"))
-  messages.append(HumanMessage(content=f"{relevent_file_contents}"))
-  messages.append(HumanMessage(content=f"Request: {dbs.input['prompt']}"))
 
-  messages = ai.next(messages, step_name=curr_fn())
+    messages.append(HumanMessage(content=f"{code_file_list}"))
+    messages.append(HumanMessage(content=f"{relevent_file_contents}"))
+    messages.append(HumanMessage(content=f"Request: {dbs.input['prompt']}"))
 
-  overwrite_files_with_edits(messages[-1].content.strip(), dbs)
-  return messages
+    messages = ai.next(messages, step_name=curr_fn())
+
+    overwrite_files_with_edits(messages[-1].content.strip(), dbs)
+    return messages
 
 
 def assert_files_ready(ai: AI, dbs: FileRepositories):
@@ -768,7 +771,7 @@ class Config(str, Enum):
     IMPROVE_CODE = "improve_code"
     EVAL_IMPROVE_CODE = "eval_improve_code"
     EVAL_NEW_CODE = "eval_new_code"
-    VECTOR_IMPROVE = 'vector_improve'
+    VECTOR_IMPROVE = "vector_improve"
     SELF_HEAL = "self_heal"
 
 
@@ -806,9 +809,7 @@ STEPS = {
         get_improve_prompt,
         improve_existing_code,
     ],
-    Config.VECTOR_IMPROVE: [
-        vector_improve
-    ],
+    Config.VECTOR_IMPROVE: [vector_improve],
     Config.EVAL_IMPROVE_CODE: [assert_files_ready, improve_existing_code],
     Config.EVAL_NEW_CODE: [simple_gen],
     Config.SELF_HEAL: [self_heal],

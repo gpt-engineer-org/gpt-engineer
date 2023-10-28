@@ -211,7 +211,11 @@ def logs_to_string(steps: List[Step], logs: FileRepository) -> str:
 
 
 def extract_learning(
-    model: str, temperature: float, steps: List[Step], dbs: FileRepositories, steps_file_hash
+    model: str,
+    temperature: float,
+    steps: List[Step],
+    dbs: FileRepositories,
+    steps_file_hash,
 ) -> Learning:
     """
     Extract the learning data from the steps and databases.

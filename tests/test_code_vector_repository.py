@@ -83,47 +83,63 @@ if __name__ == "__main__":
     main()
 """
 
+
 def mock_load_documents_from_directory(self, directory_name):
     doc1 = Document()
     doc1.set_content(example_python_file)
     doc1.metadata["filename"] = "src/snake_game.py"
 
     doc2 = Document()
-    doc2.set_content("example non code file which currently isnt loaded into the vector store")
+    doc2.set_content(
+        "example non code file which currently isnt loaded into the vector store"
+    )
     doc2.metadata["filename"] = "README.md"
 
     return [doc1, doc2]
 
 
-@pytest.mark.skip(reason="this test makes queries to an LLM so requires an open ai api key")
+@pytest.mark.skip(
+    reason="this test makes queries to an LLM so requires an open ai api key"
+)
 def test_load_and_retrieve(monkeypatch):
     # arrange
     monkeypatch.setattr(
-        CodeVectorRepository, "_load_documents_from_directory", mock_load_documents_from_directory
+        CodeVectorRepository,
+        "_load_documents_from_directory",
+        mock_load_documents_from_directory,
     )
 
     repository = CodeVectorRepository()
     repository.load_from_directory("tmp")
 
     # act
-    document_chunks = repository.relevent_code_chunks("Invert the direction arrows so up moves the snake down, and down moves the snake up.")
-    
-    # assert
-    assert document_chunks.__len__() == 2           #set to return 2 documents 
-    assert "Controller" in document_chunks[0].text  #top result should be class to change
+    document_chunks = repository.relevent_code_chunks(
+        "Invert the direction arrows so up moves the snake down, and down moves the snake up."
+    )
 
-@pytest.mark.skip(reason="this test makes queries to an LLM so requires an open ai api key")
+    # assert
+    assert document_chunks.__len__() == 2  # set to return 2 documents
+    assert "Controller" in document_chunks[0].text  # top result should be class to change
+
+
+@pytest.mark.skip(
+    reason="this test makes queries to an LLM so requires an open ai api key"
+)
 def test_load_and_query(monkeypatch):
     # arrange
     monkeypatch.setattr(
-        CodeVectorRepository, "_load_documents_from_directory", mock_load_documents_from_directory
+        CodeVectorRepository,
+        "_load_documents_from_directory",
+        mock_load_documents_from_directory,
     )
 
     repository = CodeVectorRepository()
     repository.load_from_directory("tmp")
 
     # act
-    response = repository.query("How would I invert the direction arrows so up moves the snake down, and down moves the snake up? ")
-    
+    response = repository.query(
+        "How would I invert the direction arrows so up moves the snake down, and down moves the snake up? "
+    )
+
     # assert
-    assert "Controller" in str(response) 
+    assert "Controller" in str(response)

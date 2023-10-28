@@ -23,7 +23,13 @@ def test_collect_learnings(monkeypatch):
     temperature = 0.5
     steps = [simple_gen]
     dbs = FileRepositories(
-        FileRepository("/tmp"), FileRepository("/tmp"), FileRepository("/tmp"), FileRepository("/tmp"), FileRepository("/tmp"), FileRepository("/tmp"), FileRepository("/tmp")
+        FileRepository("/tmp"),
+        FileRepository("/tmp"),
+        FileRepository("/tmp"),
+        FileRepository("/tmp"),
+        FileRepository("/tmp"),
+        FileRepository("/tmp"),
+        FileRepository("/tmp"),
     )
     dbs.input = {
         "prompt": "test prompt\n with newlines",

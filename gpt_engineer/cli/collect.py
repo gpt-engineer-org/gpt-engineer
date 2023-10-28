@@ -71,7 +71,9 @@ def send_learning(learning: Learning):
     )
 
 
-def collect_learnings(model: str, temperature: float, steps: List[Step], dbs: FileRepositories):
+def collect_learnings(
+    model: str, temperature: float, steps: List[Step], dbs: FileRepositories
+):
     """
     Collect the learning data and send it to RudderStack for analysis.
 
