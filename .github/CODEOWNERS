@@ -1,5 +1,4 @@
 gpt_engineer/core/steps.py @pbharrin
-gpt_engineer/core/chat_to_files.py @RareMojo
 gpt_engineer/data @TheoMcCabe
 evals/ @UmerHA
 .github/workflows/ @ATheorell
