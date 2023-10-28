@@ -33,8 +33,8 @@ import openai
 import typer
 from dotenv import load_dotenv
 
-from gpt_engineer.core.ai import AI
 from gpt_engineer.data.file_repository import FileRepository, FileRepositories, archive
+from gpt_engineer.core.ai import AI
 from gpt_engineer.core.steps import STEPS, Config as StepsConfig
 from gpt_engineer.cli.collect import collect_learnings
 from gpt_engineer.cli.learning import check_collection_consent
@@ -91,6 +91,12 @@ def main(
         "-i",
         help="Improve code from existing project.",
     ),
+    vector_improve_mode: bool = typer.Option(
+        False,
+        "--vector-improve",
+        "-vi",
+        help="Improve code from existing project using vector store.",
+    ),
     lite_mode: bool = typer.Option(
         False,
         "--lite",
@@ -124,6 +130,13 @@ def main(
             steps_config == StepsConfig.DEFAULT
         ), "Improve mode not compatible with other step configs"
         steps_config = StepsConfig.IMPROVE_CODE
+
+    if vector_improve_mode: 
+        assert (
+            steps_config == StepsConfig.DEFAULT
+        ), "Vector improve mode not compatible with other step configs"
+        steps_config = StepsConfig.VECTOR_IMPROVE
+
 
     load_env_if_needed()
 
@@ -163,6 +176,7 @@ def main(
         StepsConfig.USE_FEEDBACK,
         StepsConfig.EVALUATE,
         StepsConfig.IMPROVE_CODE,
+        StepsConfig.VECTOR_IMPROVE,
         StepsConfig.SELF_HEAL,
     ]:
         archive(fileRepositories)
@@ -170,7 +184,7 @@ def main(
 
     steps = STEPS[steps_config]
     for step in steps:
-        messages = step(ai, fileRepositories, codeVectorRepository)
+        messages = step(ai, fileRepositories)
         fileRepositories.logs[step.__name__] = AI.serialize_messages(messages)
 
     print("Total api cost: $ ", ai.token_usage_log.usage_cost())

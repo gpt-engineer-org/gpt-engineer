@@ -7,7 +7,7 @@ from llama_index.retrievers import (
     BM25Retriever
 )
 
-from document_chunker import DocumentChunker
+from gpt_engineer.data.document_chunker import DocumentChunker
 
 
 class CodeVectorRepository:
@@ -20,7 +20,7 @@ class CodeVectorRepository:
         def name_metadata_storer(filename: str) -> Dict: 
             return {"filename": filename}
 
-        documents = SimpleDirectoryReader(directory_path,recursive=True, file_metadata=name_metadata_storer).load_data()
+        documents = SimpleDirectoryReader(directory_path,recursive=True, exclude=["*/.gpteng/*"], file_metadata=name_metadata_storer).load_data()
 
         chunked_langchain_documents = DocumentChunker.chunk_documents([doc.to_langchain_format() for doc in documents])
 

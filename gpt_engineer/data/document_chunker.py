@@ -3,7 +3,7 @@ from pathlib import Path
 from collections import defaultdict
 from langchain.text_splitter import TextSplitter
 from langchain.docstore.document import Document
-from file_repository import FileRepository
+from gpt_engineer.data.file_repository import supported_languages
 import tree_sitter_languages
 
 
@@ -112,7 +112,7 @@ def _sort_documents_by_programming_language_or_other(documents: List[Document]) 
         extension = Path(filename).suffix
         language_found = False
 
-        for lang in FileRepository.supported_languages:
+        for lang in supported_languages:
             if extension in lang["extensions"]:
                 doc.metadata["is_code"] = True
                 doc.metadata["code_language"] = lang["name"]

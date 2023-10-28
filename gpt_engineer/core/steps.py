@@ -56,6 +56,7 @@ from typing import List, Union
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from termcolor import colored
+from pathlib import Path
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import (
@@ -493,16 +494,34 @@ def set_improve_filelist(ai: AI, dbs: FileRepositories):
     ask_for_files(dbs.project_metadata, dbs.workspace)  # stores files as full paths.
     return []
 
-def set_vector_improve_prompt(ai: AI, fileRepositories: FileRepositories, codeVectorRepository: CodeVectorRepository):
-  codeVectorRepository.load_from_directory(fileRepositories.workspace.path)
-  releventDocuments = codeVectorRepository.relevent_code_chunks(fileRepositories.input["prompt"])
-  
-  for doc in releventDocuments:
-    # read full file and add to prompt 
-    x = 1
+def vector_improve(ai: AI, dbs: FileRepositories):
+  code_vector_repository = CodeVectorRepository()
+  code_vector_repository.load_from_directory(dbs.workspace.path)
+  releventDocuments = code_vector_repository.relevent_code_chunks(dbs.input["prompt"])
 
-  path_list_string = fileRepositories.workspace.to_path_list_string()
-  # add to prompt 
+  code_file_list = f"Here is a list of all the existing code files present in the root directory your code will be added to:"
+  code_file_list += "\n {fileRepositories.workspace.to_path_list_string()}"
+  
+  relevent_file_contents = f"Here are files relevent to the query which you may like to change, reference or add to \n"
+
+  for doc in releventDocuments:
+    filename_without_path = Path(doc.metadata["filename"]).name
+    file_content = dbs.workspace[filename_without_path]
+    relevent_file_contents += format_file_to_input(filename_without_path, file_content)
+  
+  messages = [
+        SystemMessage(content=setup_sys_prompt_existing_code(dbs)),
+    ]
+  
+  messages.append(HumanMessage(content=f"{code_file_list}"))
+  messages.append(HumanMessage(content=f"{relevent_file_contents}"))
+  messages.append(HumanMessage(content=f"Request: {dbs.input['prompt']}"))
+
+  messages = ai.next(messages, step_name=curr_fn())
+
+  overwrite_files_with_edits(messages[-1].content.strip(), dbs)
+  return messages
+
 
 def assert_files_ready(ai: AI, dbs: FileRepositories):
     """
@@ -788,9 +807,7 @@ STEPS = {
         improve_existing_code,
     ],
     Config.VECTOR_IMPROVE: [
-        set_vector_improve_prompt,
-        get_improve_prompt,
-        improve_existing_code,
+        vector_improve
     ],
     Config.EVAL_IMPROVE_CODE: [assert_files_ready, improve_existing_code],
     Config.EVAL_NEW_CODE: [simple_gen],
