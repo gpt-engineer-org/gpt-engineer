@@ -131,12 +131,11 @@ def main(
         ), "Improve mode not compatible with other step configs"
         steps_config = StepsConfig.IMPROVE_CODE
 
-    if vector_improve_mode: 
+    if vector_improve_mode:
         assert (
             steps_config == StepsConfig.DEFAULT
         ), "Vector improve mode not compatible with other step configs"
         steps_config = StepsConfig.VECTOR_IMPROVE
-
 
     load_env_if_needed()
 

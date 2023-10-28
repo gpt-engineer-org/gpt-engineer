@@ -8,8 +8,7 @@ import tree_sitter_languages
 
 
 class CodeSplitter(TextSplitter):
-    """Split code using a AST parser.
-    """
+    """Split code using a AST parser."""
 
     def __init__(
         self,
@@ -17,9 +16,9 @@ class CodeSplitter(TextSplitter):
         chunk_lines: int = 40,
         chunk_lines_overlap: int = 15,
         max_chars: int = 1500,
-        **kwargs
+        **kwargs,
     ):
-        super().__init__(**kwargs)  
+        super().__init__(**kwargs)
 
         self.language = language
         self.chunk_lines = chunk_lines
@@ -36,9 +35,7 @@ class CodeSplitter(TextSplitter):
                     new_chunks.append(current_chunk)
                 current_chunk = ""
                 new_chunks.extend(self._chunk_node(child, text, last_end))
-            elif (
-                len(current_chunk) + child.end_byte - child.start_byte > self.max_chars
-            ):
+            elif len(current_chunk) + child.end_byte - child.start_byte > self.max_chars:
                 # Child would make the current chunk too big, so start a new chunk
                 new_chunks.append(current_chunk)
                 current_chunk = text[last_end : child.end_byte]
@@ -64,46 +61,44 @@ class CodeSplitter(TextSplitter):
 
         tree = parser.parse(bytes(text, "utf-8"))
 
-        if (
-            not tree.root_node.children
-            or tree.root_node.children[0].type != "ERROR"
-        ):
-            chunks = [
-                chunk.strip() for chunk in self._chunk_node(tree.root_node, text)
-            ]
+        if not tree.root_node.children or tree.root_node.children[0].type != "ERROR":
+            chunks = [chunk.strip() for chunk in self._chunk_node(tree.root_node, text)]
 
             return chunks
         else:
             raise ValueError(f"Could not parse code with language {self.language}.")
 
+
 class SortedDocuments(NamedTuple):
     by_language: Dict[str, List[Document]]
     other: List[Document]
 
-class DocumentChunker: 
+
+class DocumentChunker:
     def chunk_documents(documents: List[Document]) -> List[Document]:
-        
         chunked_documents = []
 
         sorted_documents = _sort_documents_by_programming_language_or_other(documents)
-        
+
         for language, language_documents in sorted_documents.by_language.items():
             code_splitter = CodeSplitter(
-                    language=language.lower(),
-                    chunk_lines=40,
-                    chunk_lines_overlap=15,
-                    max_chars=1500,
-                )
-            
+                language=language.lower(),
+                chunk_lines=40,
+                chunk_lines_overlap=15,
+                max_chars=1500,
+            )
+
             chunked_documents.extend(code_splitter.split_documents(language_documents))
-        
+
         # chunked_documents.extend(sorted_documents.other) for now only include code files!
 
         return chunked_documents
-    
+
 
 @staticmethod
-def _sort_documents_by_programming_language_or_other(documents: List[Document]) -> SortedDocuments:
+def _sort_documents_by_programming_language_or_other(
+    documents: List[Document],
+) -> SortedDocuments:
     docs_to_split = defaultdict(list)
     other_docs = []
 
