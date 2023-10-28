@@ -1,4 +1,4 @@
-To implement the game Snake in Python using the Model-View-Controller (MVC) design pattern, we will need several classes and files. The game will be controlled using the keyboard. 
+To implement the game Snake in Python using the Model-View-Controller (MVC) design pattern, we will need several classes and files. The game will be controlled using the keyboard.
 
 Here are the core classes and their purposes:
 
