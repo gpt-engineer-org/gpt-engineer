@@ -55,7 +55,7 @@ Now you can use `%OPENAI_API_KEY%` when prompted to input your key.
 ### Run
 
 - Create an empty folder. If inside the repo, you can:
-  - Run `xcopy /E projects\example projects\my-new-project` in the command line
+  - Run `xcopy /E /I "projects\example" "projects\my-new-project"` in the command line
   - Or hold CTRL and drag the folder down to create a copy, then rename to fit your project
 - Fill in the `prompt` file in your new folder
 - `gpt-engineer projects/my-new-project`
