@@ -25,7 +25,8 @@ dependencies = [
   'langchain >=0.0.240',
   'agent-protocol==1.0.1',
   'llama-index >= 0.8.49',
-  'rank-bm25 >= 0.2.2'
+  'rank-bm25 >= 0.2.2',
+  'tree_sitter_languages >= 1.8.0'
 ]
 
 classifiers = [
