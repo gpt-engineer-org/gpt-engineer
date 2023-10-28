@@ -1,0 +1,22 @@
+Please fix any errors in the code above.
+
+You will output the content of each new or changed.
+Represent files like so:
+
+FILENAME
+```
+CODE
+```
+
+The following tokens must be replaced like so:
+FILENAME is the lowercase combined path and file name including the file extension
+CODE is the code in the file
+
+Example representation of a file:
+
+src/hello_world.py
+```
+print("Hello World")
+```
+
+Do not comment on what every file does. Please note that the code should be fully functional. No placeholders.

@@ -175,6 +175,7 @@ def main(
         StepsConfig.USE_FEEDBACK,
         StepsConfig.EVALUATE,
         StepsConfig.IMPROVE_CODE,
+        StepsConfig.SELF_HEAL,
         StepsConfig.VECTOR_IMPROVE,
     ]:
         archive(fileRepositories)
