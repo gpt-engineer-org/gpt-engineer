@@ -4,20 +4,20 @@ from llama_index import Document
 from gpt_engineer.data.code_vector_repository import CodeVectorRepository
 import example_snake_files
 
-def mock_load_documents_from_directory(self, directory_name):
 
+def mock_load_documents_from_directory(self, directory_name):
     nonCodeDoc = Document()
     nonCodeDoc.set_content(
         "example non code file which currently isnt loaded into the vector store"
     )
     nonCodeDoc.metadata["filename"] = "README.md"
 
-    if directory_name == "python" : 
+    if directory_name == "python":
         doc1 = Document()
         doc1.set_content(example_snake_files.python)
         doc1.metadata["filename"] = "src/snake_game.py"
 
-    if directory_name == "web" : 
+    if directory_name == "web":
         doc1 = Document()
         doc1.set_content(example_snake_files.html)
         doc1.metadata["filename"] = "src/index.html"
@@ -31,13 +31,13 @@ def mock_load_documents_from_directory(self, directory_name):
         doc3.metadata["filename"] = "src/script.js"
 
         return [doc1, doc2, doc3, nonCodeDoc]
-    
-    if directory_name == "java" : 
+
+    if directory_name == "java":
         doc1 = Document()
         doc1.set_content(example_snake_files.java)
         doc1.metadata["filename"] = "src/snake_game.java"
 
-    if directory_name == "c_sharp" : 
+    if directory_name == "c_sharp":
         doc1 = Document()
         doc1.set_content(example_snake_files.c_sharp)
         doc1.metadata["filename"] = "src/snake_game.cs"
@@ -48,12 +48,7 @@ def mock_load_documents_from_directory(self, directory_name):
 @pytest.mark.skip(
     reason="this test makes queries to an LLM so requires an open ai api key"
 )
-@pytest.mark.parametrize("language", [
-    ("python"),
-    ("web"),
-    ("java"), 
-    ("c_sharp")
-])
+@pytest.mark.parametrize("language", [("python"), ("web"), ("java"), ("c_sharp")])
 def test_load_and_retrieve_python(monkeypatch, language):
     # arrange
     monkeypatch.setattr(
@@ -72,9 +67,10 @@ def test_load_and_retrieve_python(monkeypatch, language):
 
     # assert
     assert document_chunks.__len__() == 2  # set to return 2 documents
-    assert "up" in document_chunks[0].text.lower() # code should include section that sets directions
-    assert "down" in document_chunks[0].text.lower() 
-
+    assert (
+        "up" in document_chunks[0].text.lower()
+    )  # code should include section that sets directions
+    assert "down" in document_chunks[0].text.lower()
 
 
 @pytest.mark.skip(

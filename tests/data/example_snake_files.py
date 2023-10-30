@@ -244,10 +244,10 @@ public class SnakeGame extends JPanel implements ActionListener {
     private Image head;
 
     public SnakeGame() {
-        
+
         initBoard();
     }
-    
+
     private void initBoard() {
 
         addKeyListener(new TAdapter());
@@ -279,7 +279,7 @@ public class SnakeGame extends JPanel implements ActionListener {
             x[z] = 50 - z * 10;
             y[z] = 50;
         }
-        
+
         locateApple();
 
         timer = new Timer(DELAY, this);
@@ -292,9 +292,9 @@ public class SnakeGame extends JPanel implements ActionListener {
 
         doDrawing(g);
     }
-    
+
     private void doDrawing(Graphics g) {
-        
+
         if (inGame) {
 
             g.drawImage(apple, apple_x, apple_y, this);
@@ -312,11 +312,11 @@ public class SnakeGame extends JPanel implements ActionListener {
         } else {
 
             gameOver(g);
-        }        
+        }
     }
 
     private void gameOver(Graphics g) {
-        
+
         String msg = "Game Over";
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics metr = getFontMetrics(small);
@@ -383,7 +383,7 @@ public class SnakeGame extends JPanel implements ActionListener {
         if (x[0] < 0) {
             inGame = false;
         }
-        
+
         if (!inGame) {
             timer.stop();
         }
