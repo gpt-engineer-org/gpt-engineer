@@ -21,21 +21,21 @@ Classes:
 - Config: An enumeration representing different configurations or operation modes for the workflow.
 
 Functions:
-- setup_sys_prompt(dbs: DBs) -> str: Creates a system prompt for the AI.
-- setup_sys_prompt_existing_code(dbs: DBs) -> str: System prompt creation using existing code base.
+- setup_sys_prompt(dbs: FileRepositories) -> str: Creates a system prompt for the AI.
+- setup_sys_prompt_existing_code(dbs: FileRepositories) -> str: System prompt creation using existing code base.
 - curr_fn() -> str: Returns the name of the current function.
-- lite_gen(ai: AI, dbs: DBs) -> List[Message]: Runs the AI on the main prompt and saves results.
-- simple_gen(ai: AI, dbs: DBs) -> List[Message]: Runs the AI on default prompts and saves results.
-- clarify(ai: AI, dbs: DBs) -> List[Message]: Interacts with the user for clarification.
-- gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]: Generates code after clarification.
-- execute_entrypoint(ai: AI, dbs: DBs) -> List[dict]: Executes code entry point and asks user for confirmation.
-- gen_entrypoint(ai: AI, dbs: DBs) -> List[dict]: Generates entry point based on information about a codebase.
-- use_feedback(ai: AI, dbs: DBs): Uses feedback from users to improve code.
-- set_improve_filelist(ai: AI, dbs: DBs): Sets the file list for existing code improvements.
-- assert_files_ready(ai: AI, dbs: DBs): Checks for the required files for code improvement.
-- get_improve_prompt(ai: AI, dbs: DBs): Interacts with the user to know what they want to fix in existing code.
-- improve_existing_code(ai: AI, dbs: DBs): Generates improved code after getting the file list and user prompt.
-- human_review(ai: AI, dbs: DBs): Collects and stores human review of the generated code.
+- lite_gen(ai: AI, dbs: FileRepositories) -> List[Message]: Runs the AI on the main prompt and saves results.
+- simple_gen(ai: AI, dbs: FileRepositories) -> List[Message]: Runs the AI on default prompts and saves results.
+- clarify(ai: AI, dbs: FileRepositories) -> List[Message]: Interacts with the user for clarification.
+- gen_clarified_code(ai: AI, dbs: FileRepositories) -> List[dict]: Generates code after clarification.
+- execute_entrypoint(ai: AI, dbs: FileRepositories) -> List[dict]: Executes code entry point and asks user for confirmation.
+- gen_entrypoint(ai: AI, dbs: FileRepositories) -> List[dict]: Generates entry point based on information about a codebase.
+- use_feedback(ai: AI, dbs: FileRepositories): Uses feedback from users to improve code.
+- set_improve_filelist(ai: AI, dbs: FileRepositories): Sets the file list for existing code improvements.
+- assert_files_ready(ai: AI, dbs: FileRepositories): Checks for the required files for code improvement.
+- get_improve_prompt(ai: AI, dbs: FileRepositories): Interacts with the user to know what they want to fix in existing code.
+- improve_existing_code(ai: AI, dbs: FileRepositories): Generates improved code after getting the file list and user prompt.
+- human_review(ai: AI, dbs: FileRepositories): Collects and stores human review of the generated code.
 
 Constants:
 - STEPS: A dictionary that maps the Config enum to lists of functions to execute for each configuration.
@@ -676,7 +676,7 @@ def human_review(ai: AI, dbs: FileRepositories):
     return []
 
 
-def self_heal(ai: AI, dbs: DBs):
+def self_heal(ai: AI, dbs: FileRepositories):
     """Attempts to execute the code from the entrypoint and if it fails,
     sends the error output back to the AI with instructions to fix.
     This code will make `MAX_SELF_HEAL_ATTEMPTS` to try and fix the code
