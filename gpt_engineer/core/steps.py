@@ -50,6 +50,8 @@ import re
 import subprocess
 
 from enum import Enum
+from platform import platform
+from sys import version_info
 from typing import List, Union
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
@@ -66,8 +68,23 @@ from gpt_engineer.core.db import DBs
 from gpt_engineer.cli.file_selector import FILE_LIST_NAME, ask_for_files
 from gpt_engineer.cli.learning import human_review_input
 
+MAX_SELF_HEAL_ATTEMPTS = 2  # constants for self healing code
+ASSUME_WORKING_TIMEOUT = 30
+
 # Type hint for chat messages
 Message = Union[AIMessage, HumanMessage, SystemMessage]
+
+
+def get_platform_info():
+    """Returns the Platform: OS, and the Python version.
+    This is used for self healing.  There are some possible areas of conflict here if
+    you use a different version of Python in your virtualenv.  A better solution would
+    be to have this info printed from the virtualenv.
+    """
+    v = version_info
+    a = f"Python Version: {v.major}.{v.minor}.{v.micro}"
+    b = f"\nOS: {platform()}\n"
+    return a + b
 
 
 def setup_sys_prompt(dbs: DBs) -> str:
@@ -614,6 +631,70 @@ def human_review(ai: AI, dbs: DBs):
     return []
 
 
+def self_heal(ai: AI, dbs: DBs):
+    """Attempts to execute the code from the entrypoint and if it fails,
+    sends the error output back to the AI with instructions to fix.
+    This code will make `MAX_SELF_HEAL_ATTEMPTS` to try and fix the code
+    before giving up.
+    This makes the assuption that the previous step was `gen_entrypoint`,
+    this code could work with `simple_gen`, or `gen_clarified_code` as well.
+    """
+
+    # step 1. execute the entrypoint
+    log_path = dbs.workspace.path / "log.txt"
+
+    attempts = 0
+    messages = []
+
+    while attempts < MAX_SELF_HEAL_ATTEMPTS:
+        log_file = open(log_path, "w")  # wipe clean on every iteration
+        timed_out = False
+
+        p = subprocess.Popen(  # attempt to run the entrypoint
+            "bash run.sh",
+            shell=True,
+            cwd=dbs.workspace.path,
+            stdout=log_file,
+            stderr=log_file,
+            bufsize=0,
+        )
+        try:  # timeout if the process actually runs
+            p.wait(timeout=ASSUME_WORKING_TIMEOUT)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+            print("The process hit a timeout before exiting.")
+
+        # get the result and output
+        # step 2. if the return code not 0, package and send to the AI
+        if p.returncode != 0 and not timed_out:
+            print("run.sh failed.  Let's fix it.")
+
+            # pack results in an AI prompt
+
+            # Using the log from the previous step has all the code and
+            # the gen_entrypoint prompt inside.
+            if attempts < 1:
+                messages = AI.deserialize_messages(dbs.logs[gen_entrypoint.__name__])
+                messages.append(ai.fuser(get_platform_info()))  # add in OS and Py version
+
+            # append the error message
+            messages.append(ai.fuser(dbs.workspace["log.txt"]))
+
+            messages = ai.next(
+                messages, dbs.preprompts["file_format_fix"], step_name=curr_fn()
+            )
+        else:  # the process did not fail, we are done here.
+            return messages
+
+        log_file.close()
+
+        # this overwrites the existing files
+        to_files_and_memory(messages[-1].content.strip(), dbs)
+        attempts += 1
+
+    return messages
+
+
 class Config(str, Enum):
     """
     Enumeration representing different configuration modes for the code processing system.
@@ -645,6 +726,7 @@ class Config(str, Enum):
     IMPROVE_CODE = "improve_code"
     EVAL_IMPROVE_CODE = "eval_improve_code"
     EVAL_NEW_CODE = "eval_new_code"
+    SELF_HEAL = "self_heal"
 
 
 STEPS = {
@@ -683,6 +765,7 @@ STEPS = {
     ],
     Config.EVAL_IMPROVE_CODE: [assert_files_ready, improve_existing_code],
     Config.EVAL_NEW_CODE: [simple_gen],
+    Config.SELF_HEAL: [self_heal],
 }
 """
 A dictionary mapping Config modes to a list of associated processing steps.
