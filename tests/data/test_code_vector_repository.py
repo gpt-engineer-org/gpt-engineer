@@ -89,7 +89,7 @@ def test_load_and_query(monkeypatch):
     )
 
     repository = CodeVectorRepository()
-    repository.load_from_directory("tmp")
+    repository.load_from_directory("python")
 
     # act
     response = repository.query(
