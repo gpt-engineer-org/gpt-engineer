@@ -50,6 +50,8 @@ import re
 import subprocess
 
 from enum import Enum
+from platform import platform
+from sys import version_info
 from typing import List, Union
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
@@ -66,8 +68,23 @@ from gpt_engineer.core.db import DBs
 from gpt_engineer.cli.file_selector import FILE_LIST_NAME, ask_for_files
 from gpt_engineer.cli.learning import human_review_input
 
+MAX_SELF_HEAL_ATTEMPTS = 2  # constants for self healing code
+ASSUME_WORKING_TIMEOUT = 30
+
 # Type hint for chat messages
 Message = Union[AIMessage, HumanMessage, SystemMessage]
+
+
+def get_platform_info():
+    """Returns the Platform: OS, and the Python version.
+    This is used for self healing.  There are some possible areas of conflict here if
+    you use a different version of Python in your virtualenv.  A better solution would
+    be to have this info printed from the virtualenv.
+    """
+    v = version_info
+    a = f"Python Version: {v.major}.{v.minor}.{v.micro}"
+    b = f"\nOS: {platform()}\n"
+    return a + b
 
 
 def setup_sys_prompt(dbs: DBs) -> str:
@@ -203,11 +220,8 @@ def clarify(ai: AI, dbs: DBs) -> List[Message]:
     - List[Message]: A list of message objects encapsulating the AI's generated output and
       interactions.
 
-    Note:
-    The function assumes the `ai.fsystem`, `ai.next`, and `curr_fn` utilities are correctly
-    set up and functional. Ensure these prerequisites are in place before invoking `clarify`.
     """
-    messages: List[Message] = [ai.fsystem(dbs.preprompts["clarify"])]
+    messages: List[Message] = [SystemMessage(content=dbs.preprompts["clarify"])]
     user_input = dbs.input["prompt"]
     while True:
         messages = ai.next(messages, user_input, step_name=curr_fn())
@@ -261,16 +275,11 @@ def gen_clarified_code(ai: AI, dbs: DBs) -> List[dict]:
     Returns:
     - List[dict]: A list of message dictionaries capturing the AI's interactions and generated
       outputs during the code generation process.
-
-    Note:
-    The function assumes the `ai.fsystem`, `ai.next`, `AI.deserialize_messages`, `curr_fn`,
-    and `to_files` utilities are correctly set up and functional. Ensure these prerequisites
-    are in place before invoking `gen_clarified_code`.
     """
     messages = AI.deserialize_messages(dbs.logs[clarify.__name__])
 
     messages = [
-        ai.fsystem(setup_sys_prompt(dbs)),
+        SystemMessage(content=setup_sys_prompt(dbs)),
     ] + messages[
         1:
     ]  # skip the first clarify message, which was the original clarify priming prompt
@@ -425,9 +434,11 @@ def use_feedback(ai: AI, dbs: DBs):
       terminates.
     """
     messages = [
-        ai.fsystem(setup_sys_prompt(dbs)),
-        ai.fuser(f"Instructions: {dbs.input['prompt']}"),
-        ai.fassistant(dbs.memory["all_output.txt"]),  # reload previously generated code
+        SystemMessage(content=setup_sys_prompt(dbs)),
+        HumanMessage(content=f"Instructions: {dbs.input['prompt']}"),
+        AIMessage(
+            content=dbs.memory["all_output.txt"]
+        ),  # reload previously generated code
     ]
     if dbs.input["feedback"]:
         messages = ai.next(messages, dbs.input["feedback"], step_name=curr_fn())
@@ -574,14 +585,14 @@ def improve_existing_code(ai: AI, dbs: DBs):
     )  # this has file names relative to the workspace path
 
     messages = [
-        ai.fsystem(setup_sys_prompt_existing_code(dbs)),
+        SystemMessage(content=setup_sys_prompt_existing_code(dbs)),
     ]
     # Add files as input
     for file_name, file_str in files_info.items():
         code_input = format_file_to_input(file_name, file_str)
-        messages.append(ai.fuser(f"{code_input}"))
+        messages.append(HumanMessage(content=f"{code_input}"))
 
-    messages.append(ai.fuser(f"Request: {dbs.input['prompt']}"))
+    messages.append(HumanMessage(content=f"Request: {dbs.input['prompt']}"))
 
     messages = ai.next(messages, step_name=curr_fn())
 
@@ -620,6 +631,70 @@ def human_review(ai: AI, dbs: DBs):
     return []
 
 
+def self_heal(ai: AI, dbs: DBs):
+    """Attempts to execute the code from the entrypoint and if it fails,
+    sends the error output back to the AI with instructions to fix.
+    This code will make `MAX_SELF_HEAL_ATTEMPTS` to try and fix the code
+    before giving up.
+    This makes the assuption that the previous step was `gen_entrypoint`,
+    this code could work with `simple_gen`, or `gen_clarified_code` as well.
+    """
+
+    # step 1. execute the entrypoint
+    log_path = dbs.workspace.path / "log.txt"
+
+    attempts = 0
+    messages = []
+
+    while attempts < MAX_SELF_HEAL_ATTEMPTS:
+        log_file = open(log_path, "w")  # wipe clean on every iteration
+        timed_out = False
+
+        p = subprocess.Popen(  # attempt to run the entrypoint
+            "bash run.sh",
+            shell=True,
+            cwd=dbs.workspace.path,
+            stdout=log_file,
+            stderr=log_file,
+            bufsize=0,
+        )
+        try:  # timeout if the process actually runs
+            p.wait(timeout=ASSUME_WORKING_TIMEOUT)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+            print("The process hit a timeout before exiting.")
+
+        # get the result and output
+        # step 2. if the return code not 0, package and send to the AI
+        if p.returncode != 0 and not timed_out:
+            print("run.sh failed.  Let's fix it.")
+
+            # pack results in an AI prompt
+
+            # Using the log from the previous step has all the code and
+            # the gen_entrypoint prompt inside.
+            if attempts < 1:
+                messages = AI.deserialize_messages(dbs.logs[gen_entrypoint.__name__])
+                messages.append(ai.fuser(get_platform_info()))  # add in OS and Py version
+
+            # append the error message
+            messages.append(ai.fuser(dbs.workspace["log.txt"]))
+
+            messages = ai.next(
+                messages, dbs.preprompts["file_format_fix"], step_name=curr_fn()
+            )
+        else:  # the process did not fail, we are done here.
+            return messages
+
+        log_file.close()
+
+        # this overwrites the existing files
+        to_files_and_memory(messages[-1].content.strip(), dbs)
+        attempts += 1
+
+    return messages
+
+
 class Config(str, Enum):
     """
     Enumeration representing different configuration modes for the code processing system.
@@ -651,6 +726,7 @@ class Config(str, Enum):
     IMPROVE_CODE = "improve_code"
     EVAL_IMPROVE_CODE = "eval_improve_code"
     EVAL_NEW_CODE = "eval_new_code"
+    SELF_HEAL = "self_heal"
 
 
 STEPS = {
@@ -689,6 +765,7 @@ STEPS = {
     ],
     Config.EVAL_IMPROVE_CODE: [assert_files_ready, improve_existing_code],
     Config.EVAL_NEW_CODE: [simple_gen],
+    Config.SELF_HEAL: [self_heal],
 }
 """
 A dictionary mapping Config modes to a list of associated processing steps.

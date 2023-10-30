@@ -1,17 +1,25 @@
 from gpt_engineer.core.ai import AI
+from gpt_engineer.core.token_usage import TokenUsage
 from langchain.chat_models.fake import FakeListChatModel
 from langchain.chat_models.base import BaseChatModel
-import copy
+
+
+def mock_create_chat_model(self) -> BaseChatModel:
+    return FakeListChatModel(responses=["response1", "response2", "response3"])
+
+
+def mock_check_model_access_and_fallback(self, model_name):
+    return model_name
 
 
 def test_start(monkeypatch):
     # arrange
-    def mock_create_chat_model(self) -> BaseChatModel:
-        return FakeListChatModel(responses=["response1", "response2", "response3"])
-
+    monkeypatch.setattr(
+        AI, "_check_model_access_and_fallback", mock_check_model_access_and_fallback
+    )
     monkeypatch.setattr(AI, "_create_chat_model", mock_create_chat_model)
 
-    ai = AI("fake")
+    ai = AI("gpt-4")
 
     # act
     response_messages = ai.start("system prompt", "user prompt", "step name")
@@ -22,12 +30,12 @@ def test_start(monkeypatch):
 
 def test_next(monkeypatch):
     # arrange
-    def mock_create_chat_model(self) -> BaseChatModel:
-        return FakeListChatModel(responses=["response1", "response2", "response3"])
-
+    monkeypatch.setattr(
+        AI, "_check_model_access_and_fallback", mock_check_model_access_and_fallback
+    )
     monkeypatch.setattr(AI, "_create_chat_model", mock_create_chat_model)
 
-    ai = AI("fake")
+    ai = AI("gpt-4")
     response_messages = ai.start("system prompt", "user prompt", "step name")
 
     # act
@@ -41,43 +49,19 @@ def test_next(monkeypatch):
 
 def test_token_logging(monkeypatch):
     # arrange
-    def mock_create_chat_model(self) -> BaseChatModel:
-        return FakeListChatModel(responses=["response1", "response2", "response3"])
-
+    monkeypatch.setattr(
+        AI, "_check_model_access_and_fallback", mock_check_model_access_and_fallback
+    )
     monkeypatch.setattr(AI, "_create_chat_model", mock_create_chat_model)
 
-    ai = AI("fake")
+    ai = AI("gpt-4")
 
     # act
-    initial_token_counts = (
-        ai.cumulative_prompt_tokens,
-        ai.cumulative_completion_tokens,
-        ai.cumulative_total_tokens,
-    )
     response_messages = ai.start("system prompt", "user prompt", "step name")
-    token_counts_1 = (
-        ai.cumulative_prompt_tokens,
-        ai.cumulative_completion_tokens,
-        ai.cumulative_total_tokens,
-    )
+    usageCostAfterStart = ai.token_usage_log.usage_cost()
     ai.next(response_messages, "next user prompt", step_name="step name")
-    token_counts_2 = (
-        ai.cumulative_prompt_tokens,
-        ai.cumulative_completion_tokens,
-        ai.cumulative_total_tokens,
-    )
+    usageCostAfterNext = ai.token_usage_log.usage_cost()
 
     # assert
-    assert initial_token_counts == (0, 0, 0)
-
-    assert_all_greater_than(
-        token_counts_1, (1, 1, 1)
-    )  # all the token counts are greater than 1
-
-    assert_all_greater_than(
-        token_counts_2, token_counts_1
-    )  # all counts in token_counts_2 greater than token_counts_1
-
-
-def assert_all_greater_than(left, right):
-    assert all(x > y for x, y in zip(left, right))
+    assert usageCostAfterStart > 0
+    assert usageCostAfterNext > usageCostAfterStart
