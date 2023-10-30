@@ -14,7 +14,7 @@ class CodeVectorRepository:
         self._query_engine = None
         self._retriever = None
 
-    def _load_documents_from_directory(directory_path) -> List[Document]:
+    def _load_documents_from_directory(self, directory_path) -> List[Document]:
         def name_metadata_storer(filename: str) -> Dict:
             return {"filename": filename}
 
