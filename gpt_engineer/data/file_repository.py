@@ -36,7 +36,6 @@ from typing import Any, Optional, Union
 from gpt_engineer.data.supported_languages import SUPPORTED_LANGUAGES
 
 
-
 # This class represents a simple database that stores its data as files in a directory.
 class FileRepository:
     """
@@ -199,7 +198,6 @@ class FileRepository:
         elif item_path.is_dir():
             shutil.rmtree(item_path)
 
-    
     def _supported_files(self, directory: Path) -> str:
         valid_extensions = {
             ext for lang in SUPPORTED_LANGUAGES for ext in lang["extensions"]

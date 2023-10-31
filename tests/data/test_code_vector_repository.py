@@ -77,7 +77,7 @@ def mock_load_documents_from_directory(self, directory_name):
         doc1.set_content(example_snake_files.C_PLUS_PLUS)
         doc1.metadata["filename"] = "src/main.cpp"
 
-    # c is supported, however it does not pass this test 
+    # c is supported, however it does not pass this test
     # if directory_name == "c":
     #     doc1 = Document()
     #     doc1.set_content(example_snake_files.C)
@@ -95,7 +95,22 @@ def mock_load_documents_from_directory(self, directory_name):
 # @pytest.mark.skip(
 #     reason="this test makes queries to an LLM as part of creating the vector store so requires an open ai api key. Todo: run the vector store with llm=None so this can run without an LLM"
 # )
-@pytest.mark.parametrize("language", ["python", "web", "java", "c#","typescript", "ruby", "php", "go" , "kotlin", "rust", "c++"]) # ToDo: add Swift, C and other languages
+@pytest.mark.parametrize(
+    "language",
+    [
+        "python",
+        "web",
+        "java",
+        "c#",
+        "typescript",
+        "ruby",
+        "php",
+        "go",
+        "kotlin",
+        "rust",
+        "c++",
+    ],
+)  # ToDo: add Swift, C and other languages
 def test_load_and_retrieve_python(monkeypatch, language):
     # arrange
     monkeypatch.setattr(
@@ -110,7 +125,7 @@ def test_load_and_retrieve_python(monkeypatch, language):
     # act
     document_chunks = repository.relevent_code_chunks(
         "Invert the controlls so pressing the up moves the snake down, and pressing down moves the snake up.",
-        llm = None
+        llm=None,
     )
 
     # assert

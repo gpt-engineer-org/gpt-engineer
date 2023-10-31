@@ -1171,7 +1171,7 @@ class Board : JPanel(), ActionListener {
     init {
         initBoard()
     }
-    
+
     private fun initBoard() {
 
         addKeyListener(TAdapter())
@@ -1203,7 +1203,7 @@ class Board : JPanel(), ActionListener {
             x[z] = 50 - z * 10
             y[z] = 50
         }
-        
+
         locateApple()
 
         timer = Timer(DELAY, this)
@@ -1215,7 +1215,7 @@ class Board : JPanel(), ActionListener {
 
         doDrawing(g)
     }
-    
+
     private fun doDrawing(g: Graphics) {
 
         if (inGame) {
@@ -1235,7 +1235,7 @@ class Board : JPanel(), ActionListener {
         } else {
 
             gameOver(g)
-        }        
+        }
     }
 
     private fun gameOver(g: Graphics) {
@@ -1305,7 +1305,7 @@ class Board : JPanel(), ActionListener {
         if (x[0] < 0) {
             inGame = false
         }
-        
+
         if (!inGame) {
             timer.stop()
         }
@@ -1504,7 +1504,7 @@ fn main() {
 }
 """
 
-C_PLUS_PLUS ="""
+C_PLUS_PLUS = """
 #include <iostream>
 #include <conio.h>
 #include <windows.h>
@@ -1648,7 +1648,7 @@ void algorithm()
     {
         score += 10;
         fruitX = rand() % width;
-        fruitY = rand() % height; 
+        fruitY = rand() % height;
         nTail++;
     }
 }

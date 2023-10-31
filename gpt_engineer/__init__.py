@@ -5,7 +5,4 @@ from gpt_engineer.core import (
     chat_to_files,
     steps,
 )
-from gpt_engineer.data import (
-    file_repository,
-    code_vector_repository
-)
+from gpt_engineer.data import file_repository, code_vector_repository
