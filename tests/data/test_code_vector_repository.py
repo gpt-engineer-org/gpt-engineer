@@ -92,9 +92,9 @@ def mock_load_documents_from_directory(self, directory_name):
     return [doc1, nonCodeDoc]
 
 
-# @pytest.mark.skip(
-#     reason="this test makes queries to an LLM as part of creating the vector store so requires an open ai api key. Todo: run the vector store with llm=None so this can run without an LLM"
-# )
+@pytest.mark.skip(
+    reason="this test makes queries to an LLM as part of creating the vector store so requires an open ai api key. Todo: run the vector store with llm=None so this can run without an LLM"
+)
 @pytest.mark.parametrize(
     "language",
     [
