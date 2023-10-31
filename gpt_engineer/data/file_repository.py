@@ -244,37 +244,7 @@ class FileRepository:
         elif item_path.is_dir():
             shutil.rmtree(item_path)
 
-    def _xml_tree_supported_files(self, directory: Path, parent: ET.Element) -> bool:
-        valid_extensions = {
-            ext for lang in supported_languages for ext in lang["extensions"]
-        }
-
-        has_supported_files = False
-        subdir_element = ET.Element("directory", {"name": directory.name})
-
-        for item in sorted(directory.iterdir()):
-            if item.is_dir():
-                if self._xml_tree_supported_files(item, subdir_element):
-                    has_supported_files = True
-            elif item.suffix in valid_extensions:
-                ET.SubElement(subdir_element, "file", {"name": item.name})
-                has_supported_files = True
-
-        if has_supported_files:
-            parent.append(subdir_element)
-            return True
-
-        return False
-
-    def _xml_tree_all_files(self, directory: Path, parent: ET.Element):
-        subdir_element = ET.SubElement(parent, "directory", {"name": directory.name})
-
-        for item in sorted(directory.iterdir()):
-            if item.is_dir():
-                self._xml_tree_all_files(item, subdir_element)
-            else:
-                ET.SubElement(subdir_element, "file", {"name": item.name})
-
+    
     def _supported_files(self, directory: Path) -> str:
         valid_extensions = {
             ext for lang in supported_languages for ext in lang["extensions"]
@@ -292,25 +262,9 @@ class FileRepository:
         ]
         return "\n".join(file_paths)
 
-    def to_path_xml_string(self, supported_code_files_only: bool = False) -> str:
-        """
-        Returns directory structure represented as an indented XML strin. May be useful for passing to the LLM in instances where the directory structure needs to be reorganised.
-        """
-        root = ET.Element("directory", {"name": str(self.path.name)})
-        if supported_code_files_only:
-            self._xml_tree_supported_files(self.path, root)
-        else:
-            self._xml_tree_all_files(self.path, root)
-
-        xml_str = ET.tostring(root, encoding="utf-8").decode("utf-8")
-        if hasattr(ET, "indent"):
-            ET.indent(root)
-            xml_str = ET.tostring(root, encoding="utf-8").decode("utf-8")
-        return xml_str
-
     def to_path_list_string(self, supported_code_files_only: bool = False) -> str:
         """
-        Returns directory as a list of file paths. May be useful for passing to the LLM where it needs to understand the wider context of files available for reference.
+        Returns directory as a list of file paths. Useful for passing to the LLM where it needs to understand the wider context of files available for reference.
         """
         if supported_code_files_only:
             return self._supported_files(self.path)
