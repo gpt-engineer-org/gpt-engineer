@@ -3,7 +3,7 @@ from pathlib import Path
 from collections import defaultdict
 from langchain.text_splitter import TextSplitter
 from langchain.docstore.document import Document
-from gpt_engineer.data.file_repository import supported_languages
+from gpt_engineer.data.supported_languages import SUPPORTED_LANGUAGES
 import tree_sitter_languages
 
 
@@ -90,7 +90,8 @@ class DocumentChunker:
 
             chunked_documents.extend(code_splitter.split_documents(language_documents))
 
-        # chunked_documents.extend(sorted_documents.other) for now only include code files!
+        # for now only include code files!
+        # chunked_documents.extend(sorted_documents.other)
 
         return chunked_documents
 
@@ -107,7 +108,7 @@ def _sort_documents_by_programming_language_or_other(
         extension = Path(filename).suffix
         language_found = False
 
-        for lang in supported_languages:
+        for lang in SUPPORTED_LANGUAGES:
             if extension in lang["extensions"]:
                 doc.metadata["is_code"] = True
                 doc.metadata["code_language"] = lang["name"]

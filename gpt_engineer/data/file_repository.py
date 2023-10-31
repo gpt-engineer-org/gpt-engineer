@@ -33,53 +33,8 @@ import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional, Union
-import xml.etree.ElementTree as ET
+from gpt_engineer.data.supported_languages import SUPPORTED_LANGUAGES
 
-
-supported_languages = [
-    {"name": "Python", "extensions": [".py"], "tree_sitter_name": "python"},
-    {
-        "name": "JavaScript",
-        "extensions": [".js", ".mjs"],
-        "tree_sitter_name": "javascript",
-    },
-    {"name": "HTML", "extensions": [".html", ".htm"], "tree_sitter_name": "html"},
-    {"name": "CSS", "extensions": [".css"], "tree_sitter_name": "css"},
-    {"name": "Java", "extensions": [".java"], "tree_sitter_name": "java"},
-    {
-        "name": "C++",
-        "extensions": [".cpp", ".cc", ".cxx", ".h", ".hpp", ".hxx"],
-        "tree_sitter_name": "cpp",
-    },
-    {"name": "C", "extensions": [".c", ".h"], "tree_sitter_name": "c"},
-    {"name": "C#", "extensions": [".cs"], "tree_sitter_name": "c_sharp"},
-    {
-        "name": "TypeScript",
-        "extensions": [".ts", ".tsx"],
-        "tree_sitter_name": "typescript",
-    },
-    {"name": "Ruby", "extensions": [".rb", ".erb"], "tree_sitter_name": "ruby"},
-    {
-        "name": "PHP",
-        "extensions": [
-            ".php",
-            ".phtml",
-            ".php3",
-            ".php4",
-            ".php5",
-            ".php7",
-            ".phps",
-            ".php-s",
-            ".pht",
-            ".phar",
-        ],
-        "tree_sitter_name": "php",
-    },
-    {"name": "Swift", "extensions": [".swift"], "tree_sitter_name": "swift"},
-    {"name": "Go", "extensions": [".go"], "tree_sitter_name": "go"},
-    {"name": "Rust", "extensions": [".rs"], "tree_sitter_name": "rust"},
-    {"name": "Kotlin", "extensions": [".kt", ".kts"], "tree_sitter_name": "kotlin"},
-]
 
 
 # This class represents a simple database that stores its data as files in a directory.
@@ -247,7 +202,7 @@ class FileRepository:
     
     def _supported_files(self, directory: Path) -> str:
         valid_extensions = {
-            ext for lang in supported_languages for ext in lang["extensions"]
+            ext for lang in SUPPORTED_LANGUAGES for ext in lang["extensions"]
         }
         file_paths = [
             str(item)

@@ -1,7 +1,7 @@
 from typing import Dict, List
 
 from llama_index import VectorStoreIndex, SimpleDirectoryReader
-from llama_index import Document
+from llama_index import Document, ServiceContext
 from llama_index.schema import NodeWithScore
 from llama_index.retrievers import BM25Retriever
 
@@ -24,7 +24,7 @@ class CodeVectorRepository:
             directory_path,
             recursive=True,
             exclude=excluded_file_globs,
-            file_metadata=name_metadata_storer,
+            file_metadata=name_metadata_storer
         ).load_data()
 
     def load_from_directory(self, directory_path: str):
@@ -55,7 +55,7 @@ class CodeVectorRepository:
 
         return self._query_engine.query(query_string)
 
-    def relevent_code_chunks(self, query_string: str) -> List[NodeWithScore]:
+    def relevent_code_chunks(self, query_string: str, llm: str ='default') -> List[NodeWithScore]:
         """
         Retrieve code chunks relevent to a prompt
         """
