@@ -111,7 +111,7 @@ def mock_load_documents_from_directory(self, directory_name):
         "c++",
     ],
 )  # ToDo: add Swift, C and other languages
-def test_load_and_retrieve_python(monkeypatch, language):
+def test_load_and_retrieve(monkeypatch, language):
     # arrange
     monkeypatch.setattr(
         CodeVectorRepository,
@@ -140,7 +140,7 @@ def test_load_and_retrieve_python(monkeypatch, language):
 @pytest.mark.skip(
     reason="this test makes queries to an LLM so requires an open ai api key"
 )
-def test_load_and_query(monkeypatch):
+def test_load_and_query_python(monkeypatch):
     # arrange
     monkeypatch.setattr(
         CodeVectorRepository,
