@@ -33,7 +33,7 @@ import logging
 from dataclasses import dataclass
 from typing import List, Tuple
 
-from gpt_engineer.core.db import DB, DBs
+from gpt_engineer.data.file_repository import FileRepository, FileRepositories
 from gpt_engineer.cli.file_selector import FILE_LIST_NAME
 
 
@@ -87,7 +87,7 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
     return files
 
 
-def to_files_and_memory(chat: str, dbs: DBs):
+def to_files_and_memory(chat: str, dbs: FileRepositories):
     """
     Save chat to memory, and parse chat to extracted file and save them to the workspace.
 
@@ -102,7 +102,7 @@ def to_files_and_memory(chat: str, dbs: DBs):
     to_files(chat, dbs.workspace)
 
 
-def to_files(chat: str, workspace: DB):
+def to_files(chat: str, workspace: FileRepository):
     """
     Parse the chat and add all extracted files to the workspace.
 
@@ -118,7 +118,9 @@ def to_files(chat: str, workspace: DB):
         workspace[file_name] = file_content
 
 
-def get_code_strings(workspace: DB, metadata_db: DB) -> dict[str, str]:
+def get_code_strings(
+    workspace: FileRepository, metadata_db: FileRepository
+) -> dict[str, str]:
     """
     Read file_list.txt and return file names and their content.
     Parameters
@@ -181,7 +183,7 @@ def format_file_to_input(file_name: str, file_content: str) -> str:
     return file_str
 
 
-def overwrite_files_with_edits(chat: str, dbs: DBs):
+def overwrite_files_with_edits(chat: str, dbs: FileRepositories):
     edits = parse_edits(chat)
     apply_edits(edits, dbs.workspace)
 
@@ -234,7 +236,7 @@ def parse_edits(llm_response):
     return parse_all_edits(llm_response)
 
 
-def apply_edits(edits: List[Edit], workspace: DB):
+def apply_edits(edits: List[Edit], workspace: FileRepository):
     for edit in edits:
         filename = edit.filename
         if edit.before == "":

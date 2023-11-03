@@ -33,11 +33,12 @@ import openai
 import typer
 from dotenv import load_dotenv
 
+from gpt_engineer.data.file_repository import FileRepository, FileRepositories, archive
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.db import DB, DBs, archive
 from gpt_engineer.core.steps import STEPS, Config as StepsConfig
 from gpt_engineer.cli.collect import collect_learnings
 from gpt_engineer.cli.learning import check_collection_consent
+from gpt_engineer.data.code_vector_repository import CodeVectorRepository
 
 app = typer.Typer()  # creates a CLI app
 
@@ -51,7 +52,7 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def load_prompt(dbs: DBs):
+def load_prompt(dbs: FileRepositories):
     if dbs.input.get("prompt"):
         return dbs.input.get("prompt")
 
@@ -90,6 +91,12 @@ def main(
         "-i",
         help="Improve code from existing project.",
     ),
+    vector_improve_mode: bool = typer.Option(
+        False,
+        "--vector-improve",
+        "-vi",
+        help="Improve code from existing project using vector store.",
+    ),
     lite_mode: bool = typer.Option(
         False,
         "--lite",
@@ -124,6 +131,12 @@ def main(
         ), "Improve mode not compatible with other step configs"
         steps_config = StepsConfig.IMPROVE_CODE
 
+    if vector_improve_mode:
+        assert (
+            steps_config == StepsConfig.DEFAULT
+        ), "Vector improve mode not compatible with other step configs"
+        steps_config = StepsConfig.VECTOR_IMPROVE
+
     load_env_if_needed()
 
     ai = AI(
@@ -145,37 +158,40 @@ def main(
     memory_path = project_metadata_path / "memory"
     archive_path = project_metadata_path / "archive"
 
-    dbs = DBs(
-        memory=DB(memory_path),
-        logs=DB(memory_path / "logs"),
-        input=DB(input_path),
-        workspace=DB(workspace_path),
-        preprompts=DB(preprompts_path(use_custom_preprompts, input_path)),
-        archive=DB(archive_path),
-        project_metadata=DB(project_metadata_path),
+    fileRepositories = FileRepositories(
+        memory=FileRepository(memory_path),
+        logs=FileRepository(memory_path / "logs"),
+        input=FileRepository(input_path),
+        workspace=FileRepository(workspace_path),
+        preprompts=FileRepository(preprompts_path(use_custom_preprompts, input_path)),
+        archive=FileRepository(archive_path),
+        project_metadata=FileRepository(project_metadata_path),
     )
+
+    codeVectorRepository = CodeVectorRepository()
 
     if steps_config not in [
         StepsConfig.EXECUTE_ONLY,
         StepsConfig.USE_FEEDBACK,
         StepsConfig.EVALUATE,
         StepsConfig.IMPROVE_CODE,
+        StepsConfig.VECTOR_IMPROVE,
         StepsConfig.SELF_HEAL,
     ]:
-        archive(dbs)
-        load_prompt(dbs)
+        archive(fileRepositories)
+        load_prompt(fileRepositories)
 
     steps = STEPS[steps_config]
     for step in steps:
-        messages = step(ai, dbs)
-        dbs.logs[step.__name__] = AI.serialize_messages(messages)
+        messages = step(ai, fileRepositories)
+        fileRepositories.logs[step.__name__] = AI.serialize_messages(messages)
 
     print("Total api cost: $ ", ai.token_usage_log.usage_cost())
 
     if check_collection_consent():
-        collect_learnings(model, temperature, steps, dbs)
+        collect_learnings(model, temperature, steps, fileRepositories)
 
-    dbs.logs["token_usage"] = ai.token_usage_log.format_log()
+    fileRepositories.logs["token_usage"] = ai.token_usage_log.format_log()
 
 
 if __name__ == "__main__":

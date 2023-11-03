@@ -1,5 +1,4 @@
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.token_usage import TokenUsage
 from langchain.chat_models.fake import FakeListChatModel
 from langchain.chat_models.base import BaseChatModel
 
