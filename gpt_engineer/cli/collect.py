@@ -28,7 +28,7 @@ import hashlib
 from typing import List
 
 from gpt_engineer.core import steps
-from gpt_engineer.core.db import DBs
+from gpt_engineer.data.file_repository import FileRepositories
 from gpt_engineer.core.domain import Step
 from gpt_engineer.cli.learning import Learning, extract_learning
 
@@ -39,7 +39,7 @@ import hashlib
 from typing import List
 
 from gpt_engineer.core import steps
-from gpt_engineer.core.db import DBs
+from gpt_engineer.data.file_repository import FileRepositories
 from gpt_engineer.core.domain import Step
 from gpt_engineer.cli.learning import Learning, extract_learning
 
@@ -71,7 +71,9 @@ def send_learning(learning: Learning):
     )
 
 
-def collect_learnings(model: str, temperature: float, steps: List[Step], dbs: DBs):
+def collect_learnings(
+    model: str, temperature: float, steps: List[Step], dbs: FileRepositories
+):
     """
     Collect the learning data and send it to RudderStack for analysis.
 

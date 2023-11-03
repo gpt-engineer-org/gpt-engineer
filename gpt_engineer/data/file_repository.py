@@ -33,10 +33,11 @@ import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional, Union
+from gpt_engineer.data.supported_languages import SUPPORTED_LANGUAGES
 
 
 # This class represents a simple database that stores its data as files in a directory.
-class DB:
+class FileRepository:
     """
     A file-based key-value store where keys correspond to filenames and values to file contents.
 
@@ -197,20 +198,46 @@ class DB:
         elif item_path.is_dir():
             shutil.rmtree(item_path)
 
+    def _supported_files(self, directory: Path) -> str:
+        valid_extensions = {
+            ext for lang in SUPPORTED_LANGUAGES for ext in lang["extensions"]
+        }
+        file_paths = [
+            str(item)
+            for item in sorted(directory.rglob("*"))
+            if item.is_file() and item.suffix in valid_extensions
+        ]
+        return "\n".join(file_paths)
+
+    def _all_files(self, directory: Path) -> str:
+        file_paths = [
+            str(item) for item in sorted(directory.rglob("*")) if item.is_file()
+        ]
+        return "\n".join(file_paths)
+
+    def to_path_list_string(self, supported_code_files_only: bool = False) -> str:
+        """
+        Returns directory as a list of file paths. Useful for passing to the LLM where it needs to understand the wider context of files available for reference.
+        """
+        if supported_code_files_only:
+            return self._supported_files(self.path)
+        else:
+            return self._all_files(self.path)
+
 
 # dataclass for all dbs:
 @dataclass
-class DBs:
-    memory: DB
-    logs: DB
-    preprompts: DB
-    input: DB
-    workspace: DB
-    archive: DB
-    project_metadata: DB
+class FileRepositories:
+    memory: FileRepository
+    logs: FileRepository
+    preprompts: FileRepository
+    input: FileRepository
+    workspace: FileRepository
+    archive: FileRepository
+    project_metadata: FileRepository
 
 
-def archive(dbs: DBs) -> None:
+def archive(dbs: FileRepositories) -> None:
     """
     Archive the memory and workspace databases.
 
