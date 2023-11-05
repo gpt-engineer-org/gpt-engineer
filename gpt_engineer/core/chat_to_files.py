@@ -246,7 +246,12 @@ def apply_edits(edits: List[Edit], workspace: FileRepository):
                 )
             workspace[filename] = edit.after  # new file
         else:
-            if workspace[filename].count(edit.before) > 1:
+            occurrences_cnt = workspace[filename].count(edit.before)
+            if occurrences_cnt == 0:
+                logger.warn(
+                    f"While applying an edit to `{filename}`, the code block to be replaced was not found. No instances will be replaced."
+                )
+            if occurrences_cnt > 1:
                 logger.warn(
                     f"While applying an edit to `{filename}`, the code block to be replaced was found multiple times. All instances will be replaced."
                 )
