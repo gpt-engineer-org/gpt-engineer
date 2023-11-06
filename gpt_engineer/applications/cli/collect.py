@@ -30,18 +30,7 @@ from typing import List
 from gpt_engineer.core import steps
 from gpt_engineer.data.file_repository import FileRepositories
 from gpt_engineer.core.domain import Step
-from gpt_engineer.cli.learning import Learning, extract_learning
-
-...
-
-import hashlib
-
-from typing import List
-
-from gpt_engineer.core import steps
-from gpt_engineer.data.file_repository import FileRepositories
-from gpt_engineer.core.domain import Step
-from gpt_engineer.cli.learning import Learning, extract_learning
+from gpt_engineer.applications.cli.learning import Learning, extract_learning
 
 
 def send_learning(learning: Learning):

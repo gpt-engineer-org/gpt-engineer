@@ -1,7 +1,7 @@
 import textwrap
 
 from gpt_engineer.core.chat_to_files import to_files_and_memory, get_code_strings
-from gpt_engineer.cli.file_selector import FILE_LIST_NAME
+from gpt_engineer.applications.cli import FILE_LIST_NAME
 
 from unittest.mock import MagicMock
 

@@ -66,8 +66,8 @@ from gpt_engineer.core.chat_to_files import (
     to_files_and_memory,
 )
 from gpt_engineer.data.file_repository import FileRepositories
-from gpt_engineer.cli.file_selector import FILE_LIST_NAME, ask_for_files
-from gpt_engineer.cli.learning import human_review_input
+from gpt_engineer.applications.cli.file_selector import FILE_LIST_NAME, ask_for_files
+from gpt_engineer.applications.cli.learning import human_review_input
 from gpt_engineer.data.code_vector_repository import CodeVectorRepository
 
 MAX_SELF_HEAL_ATTEMPTS = 2  # constants for self healing code

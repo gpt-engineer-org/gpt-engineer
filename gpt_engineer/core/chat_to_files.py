@@ -34,7 +34,7 @@ from dataclasses import dataclass
 from typing import List, Tuple
 
 from gpt_engineer.data.file_repository import FileRepository, FileRepositories
-from gpt_engineer.cli.file_selector import FILE_LIST_NAME
+from gpt_engineer.applications.cli.file_selector import FILE_LIST_NAME
 
 
 logger = logging.getLogger(__name__)
