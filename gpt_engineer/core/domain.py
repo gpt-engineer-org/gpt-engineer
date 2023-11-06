@@ -12,7 +12,7 @@ Variables:
       is expected to return a list of dictionaries.
 """
 
-from typing import Callable, List, TypeVar
+from typing import Callable, List, TypeVar, Dict
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.data.file_repository import FileRepositories
@@ -20,4 +20,8 @@ from gpt_engineer.data.code_vector_repository import CodeVectorRepository
 
 Step = TypeVar(
     "Step", bound=Callable[[AI, FileRepositories, CodeVectorRepository], List[dict]]
+)
+
+Code = TypeVar(
+    "Code", bound=Dict
 )

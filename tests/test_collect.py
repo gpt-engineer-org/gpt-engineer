@@ -3,7 +3,6 @@ Tests the collect_learnings function in the cli/collect module.
 """
 
 import json
-import os
 
 from unittest.mock import MagicMock
 
@@ -13,7 +12,7 @@ import rudderstack.analytics as rudder_analytics
 from gpt_engineer.applications.cli import collect_learnings, steps_file_hash
 from gpt_engineer.data.file_repository import FileRepository, FileRepositories
 from gpt_engineer.applications.cli import extract_learning
-from gpt_engineer.core.steps import simple_gen
+from gpt_engineer.legacy.steps import simple_gen
 
 
 def test_collect_learnings(monkeypatch):
