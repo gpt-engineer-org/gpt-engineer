@@ -26,7 +26,7 @@ Here is an example of a step function:
 <br>
 
 ```python
-def simple_gen(ai: AI, dbs: DBs):
+def simple_gen(ai: AI, dbs: FileRepositories):
     """Generate code based on the main prompt."""
     system = dbs.preprompts["generate"]
     user = dbs.input["main_prompt"]

@@ -52,7 +52,7 @@ from typing import List, Optional
 from dataclasses_json import dataclass_json
 from termcolor import colored
 
-from gpt_engineer.core.db import DB, DBs
+from gpt_engineer.data.file_repository import FileRepository, FileRepositories
 from gpt_engineer.core.domain import Step
 
 
@@ -187,7 +187,7 @@ def ask_collection_consent() -> bool:
         return False
 
 
-def logs_to_string(steps: List[Step], logs: DB) -> str:
+def logs_to_string(steps: List[Step], logs: FileRepository) -> str:
     """
     Convert the logs of the steps to a string.
 
@@ -211,7 +211,11 @@ def logs_to_string(steps: List[Step], logs: DB) -> str:
 
 
 def extract_learning(
-    model: str, temperature: float, steps: List[Step], dbs: DBs, steps_file_hash
+    model: str,
+    temperature: float,
+    steps: List[Step],
+    dbs: FileRepositories,
+    steps_file_hash,
 ) -> Learning:
     """
     Extract the learning data from the steps and databases.

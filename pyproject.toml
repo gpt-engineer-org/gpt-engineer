@@ -24,6 +24,9 @@ dependencies = [
   'python-dotenv >= 0.21.0',
   'langchain >=0.0.240, <=0.0.312', # The upper bound is to address AiMessageChunk problem in bug report 802 and 804 on GH. If we want/need to relax this in the future, we should check that the AiMessageChunk error has been resolved.
   'agent-protocol==1.0.1',
+  'llama-index >= 0.8.49',
+  'rank-bm25 >= 0.2.2',
+  'tree_sitter_languages >= 1.8.0'
 ]
 
 classifiers = [
@@ -65,7 +68,7 @@ gpt-engineer = 'gpt_engineer.cli.main:app'
 ge = 'gpt_engineer.cli.main:app'
 
 [tool.setuptools]
-packages = ["gpt_engineer", "gpt_engineer.cli", "gpt_engineer.core"]
+packages = ["gpt_engineer", "gpt_engineer.cli", "gpt_engineer.core", "gpt_engineer.data"]
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
