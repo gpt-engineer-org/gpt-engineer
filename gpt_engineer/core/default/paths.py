@@ -1,4 +1,8 @@
+import os
+META_DATA_REL_PATH = ".gpteng"
+MEMORY_REL_PATH = os.path.join(META_DATA_REL_PATH, "memory")
+
 def memory_path(path):
-    project_metadata_path = path / ".gpteng"
-    return project_metadata_path / "memory"
+    return os.path.join(path, MEMORY_REL_PATH)
+
 

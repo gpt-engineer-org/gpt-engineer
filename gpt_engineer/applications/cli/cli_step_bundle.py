@@ -7,7 +7,7 @@ from gpt_engineer.core.default.paths import memory_path
 from gpt_engineer.applications.cli.learning import human_review
 
 
-class StepBundle(StepBundleInterface):
+class CliStepBundle(StepBundleInterface):
 
     def __init__(self, workspace_path: str):
         self.workspace_path = workspace_path

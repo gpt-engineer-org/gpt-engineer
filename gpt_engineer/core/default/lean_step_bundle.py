@@ -5,7 +5,7 @@ from gpt_engineer.core.step_bundle_interface import StepBundleInterface
 from gpt_engineer.core.default.steps import gen_code, gen_entrypoint, execute_entrypoint
 from gpt_engineer.core.default.paths import memory_path
 
-class StepBundle(StepBundleInterface):
+class LeanStepBundle(StepBundleInterface):
 
     def __init__(self, workspace_path: str):
         self.workspace_path = workspace_path
@@ -18,7 +18,6 @@ class StepBundle(StepBundleInterface):
         entrypoint = gen_entrypoint(ai, self.memory)
         code = Code(code | entrypoint)
         execute_entrypoint(self.workspace_path, entrypoint)
-        human_review(self.memory)
         return code
 
 
