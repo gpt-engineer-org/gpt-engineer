@@ -1,6 +1,7 @@
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import parse_chat
+from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, CODE_GEN_LOG_FILE
 from gpt_engineer.data.file_repository import FileRepository
 from langchain.schema import HumanMessage, SystemMessage
 
@@ -12,6 +13,8 @@ import subprocess
 
 #TODO: THIS NEEDS A BETTER SOLUTION
 PREPROMPTS_PATH = os.path.join("gpt_engineer", "preprompts")
+
+
 
 def curr_fn() -> str:
     """
@@ -49,7 +52,7 @@ def setup_sys_prompt(db: FileRepository) -> str:
     )
 
 
-def gen_code(ai: AI, prompt: str, memory: FileRepository, workspace_path: str) -> Code:
+def gen_code(workspace_path: str, ai: AI, prompt: str, memory: FileRepository) -> Code:
     """
     Executes the AI model using the default system prompts and saves the full output to memory and program to disk.
 
@@ -73,7 +76,7 @@ def gen_code(ai: AI, prompt: str, memory: FileRepository, workspace_path: str) -
     db = FileRepository(PREPROMPTS_PATH)
     messages = ai.start(setup_sys_prompt(db), prompt, step_name=curr_fn())
     chat = messages[-1].content.strip()
-    memory["all_output.txt"] = chat
+    memory[CODE_GEN_LOG_FILE] = chat
     files = parse_chat(chat)
     workspace = FileRepository(workspace_path)
     for file_name, file_content in files:
@@ -82,7 +85,7 @@ def gen_code(ai: AI, prompt: str, memory: FileRepository, workspace_path: str) -
     return code
 
 
-def gen_entrypoint(ai: AI, memory: FileRepository) -> Code:
+def gen_entrypoint(workspace_path: str, ai: AI, memory: FileRepository) -> Code:
     """
     Generates an entry point script based on a given codebase's information.
 
@@ -122,14 +125,18 @@ def gen_entrypoint(ai: AI, memory: FileRepository) -> Code:
             "Do not use placeholders, use example values (like . for a folder argument) "
             "if necessary.\n"
         ),
-        user="Information about the codebase:\n\n" + memory["all_output.txt"],
+        user="Information about the codebase:\n\n" + memory[CODE_GEN_LOG_FILE],
         step_name=curr_fn(),
     )
     print()
 
     regex = r"```\S*\n(.+?)```"
     matches = re.finditer(regex, messages[-1].content.strip(), re.DOTALL)
-    return Code({"run.sh": "\n".join(match.group(1) for match in matches)})
+    entrypoint_code = Code({ENTRYPOINT_FILE: "\n".join(match.group(1) for match in matches)})
+    # write entrypoint code to file
+    for key, val in entrypoint_code.items():
+        FileRepository(workspace_path)[key] = val
+    return entrypoint_code
 
 def execute_entrypoint(workspace_path: str, code: Code) -> None:
     """
@@ -157,7 +164,7 @@ def execute_entrypoint(workspace_path: str, code: Code) -> None:
     (e.g., executable) before invoking this function.
     """
 
-    command = code["run.sh"]
+    command = code[ENTRYPOINT_FILE]
 
     print()
     print(

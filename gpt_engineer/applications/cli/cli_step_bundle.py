@@ -15,9 +15,9 @@ class CliStepBundle(StepBundleInterface):
 
 
     def gen_code(self, ai: AI, prompt: str) -> Code:
-        code = gen_code(ai, prompt, self.memory, self.workspace_path)
+        code = gen_code(self.workspace_path, ai, prompt, self.memory)
         #TODO: evaluate whether it makes more sense to send the code than the memory to gen_entrypoint
-        entrypoint = gen_entrypoint(ai, self.memory)
+        entrypoint = gen_entrypoint(self.workspace_path, ai, self.memory)
         code = Code(code | entrypoint)
         execute_entrypoint(self.workspace_path, entrypoint)
         human_review(self.memory)
