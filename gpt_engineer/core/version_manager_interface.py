@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class StateSaver(ABC):
+class VersionManagerInterface(ABC):
 
     @abstractmethod
     def snapshot(self):

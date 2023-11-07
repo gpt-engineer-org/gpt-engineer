@@ -1,8 +1,9 @@
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.chat_to_files import parse_chat
+from gpt_engineer.core.chat_to_files import parse_chat, to_files_and_memory
 from gpt_engineer.data.file_repository import FileRepository
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from gpt_engineer.applications.cli.learning import human_review_input
 import inspect
 import os
 import re
@@ -48,9 +49,9 @@ def setup_sys_prompt(db: FileRepository) -> str:
     )
 
 
-def gen_code(ai: AI, prompt: str) -> Code:
+def gen_code(ai: AI, prompt: str, memory: FileRepository, workspace_path: str) -> Code:
     """
-    Executes the AI model using the default system prompts and saves the output.
+    Executes the AI model using the default system prompts and saves the full output to memory and program to disk.
 
     This function prepares the system prompt using the provided database configurations
     and then invokes the AI model with this system prompt and the main input prompt.
@@ -71,12 +72,17 @@ def gen_code(ai: AI, prompt: str) -> Code:
     """
     db = FileRepository(PREPROMPTS_PATH)
     messages = ai.start(setup_sys_prompt(db), prompt, step_name=curr_fn())
-    #TODO: THIS TYPE CHANGE SHOULD HAPPEN INSIDE parse_chat
-    files = {key: val for key, val in parse_chat(messages[-1].content.strip())}
-    return files
+    chat = messages[-1].content.strip()
+    memory["all_output.txt"] = chat
+    files = parse_chat(chat)
+    workspace = FileRepository(workspace_path)
+    for file_name, file_content in files:
+        workspace[file_name] = file_content
+    code = Code({key: val for key, val in files})
+    return code
 
 
-def gen_entrypoint(ai: AI, history: str) -> Code:
+def gen_entrypoint(ai: AI, memory: FileRepository) -> Code:
     """
     Generates an entry point script based on a given codebase's information.
 
@@ -116,7 +122,7 @@ def gen_entrypoint(ai: AI, history: str) -> Code:
             "Do not use placeholders, use example values (like . for a folder argument) "
             "if necessary.\n"
         ),
-        user="Information about the codebase:\n\n" + history,
+        user="Information about the codebase:\n\n" + memory["all_output.txt"],
         step_name=curr_fn(),
     )
     print()
@@ -125,7 +131,7 @@ def gen_entrypoint(ai: AI, history: str) -> Code:
     matches = re.finditer(regex, messages[-1].content.strip(), re.DOTALL)
     return Code({"run.sh": "\n".join(match.group(1) for match in matches)})
 
-def execute_entrypoint(ai: AI, code: Code) -> Code:
+def execute_entrypoint(workspace_path: str, code: Code) -> None:
     """
     Executes the specified entry point script (`run.sh`) from a workspace.
 
@@ -150,7 +156,8 @@ def execute_entrypoint(ai: AI, code: Code) -> Code:
     Ensure the script is available and that it has the appropriate permissions
     (e.g., executable) before invoking this function.
     """
-    command = dbs.workspace["run.sh"]
+
+    command = code["run.sh"]
 
     print()
     print(
@@ -178,7 +185,7 @@ def execute_entrypoint(ai: AI, code: Code) -> Code:
     print("You can press ctrl+c *once* to stop the execution.")
     print()
 
-    p = subprocess.Popen("bash run.sh", shell=True, cwd=dbs.workspace.path)
+    p = subprocess.Popen("bash run.sh", shell=True, cwd=workspace_path)
     try:
         p.wait()
     except KeyboardInterrupt:
@@ -188,7 +195,38 @@ def execute_entrypoint(ai: AI, code: Code) -> Code:
         p.kill()
         print()
 
+
+def human_review(memory: FileRepository):
+    """
+    Collects human feedback on the code and stores it in memory.
+
+    This function prompts the user for a review of the generated or improved code using the `human_review_input`
+    function. If a valid review is provided, it's serialized to JSON format and stored within the database's
+    memory under the "review" key.
+
+    Parameters:
+    - ai (AI): An instance of the AI model. Although not directly used within the function, it is kept as
+      a parameter for consistency with other functions.
+    - dbs (DBs): An instance containing the database configurations, user prompts, project metadata,
+      and memory storage. This function specifically interacts with the memory storage to save the human review.
+
+    Returns:
+    - list: Returns an empty list, indicating that there's no subsequent interaction with the LLM
+      or no further messages to be processed.
+
+    Notes:
+    - It's assumed that the `human_review_input` function handles all the interactions with the user to
+      gather feedback and returns either the feedback or None if no feedback was provided.
+    - Ensure that the database's memory has enough space or is set up correctly to store the serialized review data.
+    """
+
+    """Collects and stores human review of the code"""
+    review = human_review_input()
+    if review is not None:
+        memory["review"] = review.to_json()  # type: ignore
     return []
+
+
 def improve(ai: AI, prompt: str) -> Code:
     """
     Process and improve the code from a specified set of existing files based on a user prompt.
