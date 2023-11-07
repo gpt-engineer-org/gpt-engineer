@@ -16,7 +16,7 @@ class StepBundle(StepBundleInterface):
         code = gen_code(ai, prompt, self.memory, self.workspace_path)
         #TODO: evaluate whether it makes more sense to send the code than the memory to gen_entrypoint
         entrypoint = gen_entrypoint(ai, self.memory)
-        code = code | entrypoint
+        code = Code(code | entrypoint)
         execute_entrypoint(self.workspace_path, entrypoint)
         human_review(self.memory)
         return code

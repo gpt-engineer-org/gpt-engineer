@@ -14,7 +14,9 @@ class Agent:
         self.ai = ai or AI()
 
     def init(self, prompt: str) -> Code:
-        return self.step_bundle.gen_code(self.ai, prompt)
+        code = self.step_bundle.gen_code(self.ai, prompt)
+        hash = self.version_manager.snapshot(code)
+        return code
 
     def improve(self, prompt: str) -> Code:
         return self.step_bundle.improve_code(self.ai, prompt)
