@@ -2,7 +2,7 @@ from gpt_engineer.core.code import Code
 from gpt_engineer.core.version_manager_interface import VersionManagerInterface
 from gpt_engineer.core.step_bundle_interface import StepBundleInterface
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.default.step_bundle import StepBundle
+from gpt_engineer.core.default.lean_step_bundle import StepBundle
 from gpt_engineer.core.default.version_manager import VersionManager
 
 class Agent:

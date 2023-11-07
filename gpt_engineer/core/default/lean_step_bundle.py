@@ -2,7 +2,7 @@ from gpt_engineer.core.ai import AI
 from gpt_engineer.core.code import Code
 from gpt_engineer.data.file_repository import FileRepository
 from gpt_engineer.core.step_bundle_interface import StepBundleInterface
-from gpt_engineer.core.default.steps import gen_code, gen_entrypoint, execute_entrypoint, human_review
+from gpt_engineer.core.default.steps import gen_code, gen_entrypoint, execute_entrypoint
 from gpt_engineer.core.default.paths import memory_path
 
 class StepBundle(StepBundleInterface):

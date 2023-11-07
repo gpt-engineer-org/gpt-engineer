@@ -277,3 +277,33 @@ def get_session() -> str:
         return user_id
     except IOError:
         return "ephemeral_" + str(random.randint(0, 2**32))
+
+def human_review(memory: FileRepository):
+    """
+    Collects human feedback on the code and stores it in memory.
+
+    This function prompts the user for a review of the generated or improved code using the `human_review_input`
+    function. If a valid review is provided, it's serialized to JSON format and stored within the database's
+    memory under the "review" key.
+
+    Parameters:
+    - ai (AI): An instance of the AI model. Although not directly used within the function, it is kept as
+      a parameter for consistency with other functions.
+    - dbs (DBs): An instance containing the database configurations, user prompts, project metadata,
+      and memory storage. This function specifically interacts with the memory storage to save the human review.
+
+    Returns:
+    - list: Returns an empty list, indicating that there's no subsequent interaction with the LLM
+      or no further messages to be processed.
+
+    Notes:
+    - It's assumed that the `human_review_input` function handles all the interactions with the user to
+      gather feedback and returns either the feedback or None if no feedback was provided.
+    - Ensure that the database's memory has enough space or is set up correctly to store the serialized review data.
+    """
+
+    """Collects and stores human review of the code"""
+    review = human_review_input()
+    if review is not None:
+        memory["review"] = review.to_json()  # type: ignore
+    return []

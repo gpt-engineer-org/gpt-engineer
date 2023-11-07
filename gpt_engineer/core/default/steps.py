@@ -1,16 +1,16 @@
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.chat_to_files import parse_chat, to_files_and_memory
+from gpt_engineer.core.chat_to_files import parse_chat
 from gpt_engineer.data.file_repository import FileRepository
-from langchain.schema import AIMessage, HumanMessage, SystemMessage
-from gpt_engineer.applications.cli.learning import human_review_input
+from langchain.schema import HumanMessage, SystemMessage
+
 import inspect
 import os
 import re
 from termcolor import colored
 import subprocess
 
-#TODO: THIS IS TEMPORARY
+#TODO: THIS NEEDS A BETTER SOLUTION
 PREPROMPTS_PATH = os.path.join("gpt_engineer", "preprompts")
 
 def curr_fn() -> str:
@@ -196,35 +196,7 @@ def execute_entrypoint(workspace_path: str, code: Code) -> None:
         print()
 
 
-def human_review(memory: FileRepository):
-    """
-    Collects human feedback on the code and stores it in memory.
 
-    This function prompts the user for a review of the generated or improved code using the `human_review_input`
-    function. If a valid review is provided, it's serialized to JSON format and stored within the database's
-    memory under the "review" key.
-
-    Parameters:
-    - ai (AI): An instance of the AI model. Although not directly used within the function, it is kept as
-      a parameter for consistency with other functions.
-    - dbs (DBs): An instance containing the database configurations, user prompts, project metadata,
-      and memory storage. This function specifically interacts with the memory storage to save the human review.
-
-    Returns:
-    - list: Returns an empty list, indicating that there's no subsequent interaction with the LLM
-      or no further messages to be processed.
-
-    Notes:
-    - It's assumed that the `human_review_input` function handles all the interactions with the user to
-      gather feedback and returns either the feedback or None if no feedback was provided.
-    - Ensure that the database's memory has enough space or is set up correctly to store the serialized review data.
-    """
-
-    """Collects and stores human review of the code"""
-    review = human_review_input()
-    if review is not None:
-        memory["review"] = review.to_json()  # type: ignore
-    return []
 
 
 def improve(ai: AI, prompt: str) -> Code:
