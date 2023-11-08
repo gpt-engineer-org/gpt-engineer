@@ -278,6 +278,7 @@ def get_session() -> str:
     except IOError:
         return "ephemeral_" + str(random.randint(0, 2**32))
 
+
 def human_review(memory: FileRepository):
     """
     Collects human feedback on the code and stores it in memory.

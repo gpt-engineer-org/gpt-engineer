@@ -5,6 +5,7 @@ from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.lean_step_bundle import LeanStepBundle
 from gpt_engineer.core.default.version_manager import VersionManager
 
+
 class Agent:
     """
     The `Agent` class is responsible for managing the lifecycle of code generation and improvement.
@@ -46,7 +47,13 @@ class Agent:
                 Code: An instance of the `Code` class containing the improved code.
     """
 
-    def __init__(self, path: str, version_manager: VersionManagerInterface = None, step_bundle: StepBundleInterface = None, ai: AI = None):
+    def __init__(
+        self,
+        path: str,
+        version_manager: VersionManagerInterface = None,
+        step_bundle: StepBundleInterface = None,
+        ai: AI = None,
+    ):
         self.path = path
         self.version_manager = version_manager or VersionManager(self.path)
         self.step_bundle = step_bundle or LeanStepBundle(self.path)
@@ -61,4 +68,3 @@ class Agent:
         code = self.step_bundle.improve_code(self.ai, prompt)
         version_hash = self.version_manager.snapshot(code)
         return code
-

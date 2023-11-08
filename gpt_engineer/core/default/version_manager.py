@@ -1,8 +1,8 @@
 from gpt_engineer.core.version_manager_interface import VersionManagerInterface
 from gpt_engineer.core.code import Code
 
-class VersionManager(VersionManagerInterface):
 
+class VersionManager(VersionManagerInterface):
     def __init__(self, path: str):
         self.path = path
 

@@ -21,4 +21,3 @@ from gpt_engineer.data.code_vector_repository import CodeVectorRepository
 Step = TypeVar(
     "Step", bound=Callable[[AI, FileRepositories, CodeVectorRepository], List[dict]]
 )
-

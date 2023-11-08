@@ -1,7 +1,7 @@
 from typing import TypeVar, Dict
 
-class Code(dict):
 
+class Code(dict):
     def __setitem__(self, key, value):
         if not isinstance(key, str):
             raise TypeError("Keys must be strings")

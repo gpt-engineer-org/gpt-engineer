@@ -11,9 +11,8 @@ import re
 from termcolor import colored
 import subprocess
 
-#TODO: THIS NEEDS A BETTER SOLUTION
+# TODO: THIS NEEDS A BETTER SOLUTION
 PREPROMPTS_PATH = os.path.join("gpt_engineer", "preprompts")
-
 
 
 def curr_fn() -> str:
@@ -29,6 +28,8 @@ def curr_fn() -> str:
     - str: The name of the function that called `curr_fn()`.
     """
     return inspect.stack()[1].function
+
+
 def setup_sys_prompt(db: FileRepository) -> str:
     """
     Constructs a system prompt for the AI based on predefined instructions and philosophies.
@@ -132,11 +133,14 @@ def gen_entrypoint(workspace_path: str, ai: AI, memory: FileRepository) -> Code:
 
     regex = r"```\S*\n(.+?)```"
     matches = re.finditer(regex, messages[-1].content.strip(), re.DOTALL)
-    entrypoint_code = Code({ENTRYPOINT_FILE: "\n".join(match.group(1) for match in matches)})
+    entrypoint_code = Code(
+        {ENTRYPOINT_FILE: "\n".join(match.group(1) for match in matches)}
+    )
     # write entrypoint code to file
     for key, val in entrypoint_code.items():
         FileRepository(workspace_path)[key] = val
     return entrypoint_code
+
 
 def execute_entrypoint(workspace_path: str, code: Code) -> None:
     """
@@ -201,9 +205,6 @@ def execute_entrypoint(workspace_path: str, code: Code) -> None:
         print("Execution stopped.")
         p.kill()
         print()
-
-
-
 
 
 def improve(ai: AI, prompt: str) -> Code:

@@ -8,21 +8,18 @@ from gpt_engineer.applications.cli.learning import human_review
 
 
 class CliStepBundle(StepBundleInterface):
-
     def __init__(self, workspace_path: str):
         self.workspace_path = workspace_path
         self.memory = FileRepository(memory_path(workspace_path))
 
-
     def gen_code(self, ai: AI, prompt: str) -> Code:
         code = gen_code(self.workspace_path, ai, prompt, self.memory)
-        #TODO: evaluate whether it makes more sense to send the code than the memory to gen_entrypoint
+        # TODO: evaluate whether it makes more sense to send the code than the memory to gen_entrypoint
         entrypoint = gen_entrypoint(self.workspace_path, ai, self.memory)
         code = Code(code | entrypoint)
         execute_entrypoint(self.workspace_path, entrypoint)
         human_review(self.memory)
         return code
-
 
     def improve_code(self, ai: AI, prompt: str) -> Code:
         pass

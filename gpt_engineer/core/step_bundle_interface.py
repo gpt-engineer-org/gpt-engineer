@@ -4,7 +4,6 @@ from gpt_engineer.core.ai import AI
 
 
 class StepBundleInterface(ABC):
-
     @abstractmethod
     def gen_code(self, ai: AI, prompt: str) -> Code:
         pass
