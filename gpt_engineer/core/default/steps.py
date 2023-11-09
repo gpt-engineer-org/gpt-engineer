@@ -1,8 +1,10 @@
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import parse_chat
-from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, CODE_GEN_LOG_FILE
-from gpt_engineer.data.file_repository import FileRepository
+from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, CODE_GEN_LOG_FILE, ENTRYPOINT_LOG_FILE
+from gpt_engineer.data.file_repository import OnDiskRepository
+from gpt_engineer.core.base_repository import BaseRepository
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from langchain.schema import HumanMessage, SystemMessage
 
 import inspect
@@ -30,7 +32,7 @@ def curr_fn() -> str:
     return inspect.stack()[1].function
 
 
-def setup_sys_prompt(db: FileRepository) -> str:
+def setup_sys_prompt(db: OnDiskRepository) -> str:
     """
     Constructs a system prompt for the AI based on predefined instructions and philosophies.
 
@@ -53,7 +55,7 @@ def setup_sys_prompt(db: FileRepository) -> str:
     )
 
 
-def gen_code(workspace_path: str, ai: AI, prompt: str, memory: FileRepository) -> Code:
+def gen_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     """
     Executes the AI model using the default system prompts and saves the full output to memory and program to disk.
 
@@ -74,19 +76,16 @@ def gen_code(workspace_path: str, ai: AI, prompt: str, memory: FileRepository) -
     The function assumes the `ai.start` method and the `to_files` utility are correctly
     set up and functional. Ensure these prerequisites are in place before invoking `simple_gen`.
     """
-    db = FileRepository(PREPROMPTS_PATH)
+    db = OnDiskRepository(PREPROMPTS_PATH)
     messages = ai.start(setup_sys_prompt(db), prompt, step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files = parse_chat(chat)
-    workspace = FileRepository(workspace_path)
-    for file_name, file_content in files:
-        workspace[file_name] = file_content
     code = Code({key: val for key, val in files})
     return code
 
 
-def gen_entrypoint(workspace_path: str, ai: AI, memory: FileRepository) -> Code:
+def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository) -> Code:
     """
     Generates an entry point script based on a given codebase's information.
 
@@ -113,6 +112,7 @@ def gen_entrypoint(workspace_path: str, ai: AI, memory: FileRepository) -> Code:
     - It assumes the presence of an 'all_output.txt' file in the specified workspace
       that contains information about the codebase.
     """
+    #ToDo: This should enter the preprompts...
     messages = ai.start(
         system=(
             "You will get information about a codebase that is currently on disk in "
@@ -126,23 +126,21 @@ def gen_entrypoint(workspace_path: str, ai: AI, memory: FileRepository) -> Code:
             "Do not use placeholders, use example values (like . for a folder argument) "
             "if necessary.\n"
         ),
-        user="Information about the codebase:\n\n" + memory[CODE_GEN_LOG_FILE],
+        user="Information about the codebase:\n\n" + code.to_string(),
         step_name=curr_fn(),
     )
     print()
-
+    chat = messages[-1].content.strip()
     regex = r"```\S*\n(.+?)```"
-    matches = re.finditer(regex, messages[-1].content.strip(), re.DOTALL)
+    matches = re.finditer(regex, chat, re.DOTALL)
     entrypoint_code = Code(
         {ENTRYPOINT_FILE: "\n".join(match.group(1) for match in matches)}
     )
-    # write entrypoint code to file
-    for key, val in entrypoint_code.items():
-        FileRepository(workspace_path)[key] = val
+    memory[ENTRYPOINT_LOG_FILE] = chat
     return entrypoint_code
 
 
-def execute_entrypoint(workspace_path: str, code: Code) -> None:
+def execute_entrypoint(execution_env: BaseExecutionEnv, code: Code) -> None:
     """
     Executes the specified entry point script (`run.sh`) from a workspace.
 
@@ -167,6 +165,9 @@ def execute_entrypoint(workspace_path: str, code: Code) -> None:
     Ensure the script is available and that it has the appropriate permissions
     (e.g., executable) before invoking this function.
     """
+
+    if not ENTRYPOINT_FILE in code:
+        raise FileNotFoundError("The required entrypoint " + ENTRYPOINT_FILE + " does not exist in the code.")
 
     command = code[ENTRYPOINT_FILE]
 
@@ -196,15 +197,7 @@ def execute_entrypoint(workspace_path: str, code: Code) -> None:
     print("You can press ctrl+c *once* to stop the execution.")
     print()
 
-    p = subprocess.Popen("bash run.sh", shell=True, cwd=workspace_path)
-    try:
-        p.wait()
-    except KeyboardInterrupt:
-        print()
-        print("Stopping execution.")
-        print("Execution stopped.")
-        p.kill()
-        print()
+    execution_env.execute_program(code)
 
 
 def improve(ai: AI, prompt: str) -> Code:

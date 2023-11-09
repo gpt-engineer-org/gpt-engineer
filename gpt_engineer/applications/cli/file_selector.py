@@ -47,7 +47,7 @@ import tkinter.filedialog as fd
 from pathlib import Path
 from typing import List, Union
 
-from gpt_engineer.data.file_repository import FileRepository
+from gpt_engineer.data.file_repository import OnDiskRepository
 
 IGNORE_FOLDERS = {"site-packages", "node_modules", "venv"}
 FILE_LIST_NAME = "file_list.txt"
@@ -321,7 +321,7 @@ def is_in_ignoring_extensions(path: Path) -> bool:
     return is_hidden and is_pycache
 
 
-def ask_for_files(metadata_db: FileRepository, workspace_db: FileRepository) -> None:
+def ask_for_files(metadata_db: OnDiskRepository, workspace_db: OnDiskRepository) -> None:
     """
     Ask user to select files to improve.
     It can be done by terminal, gui, or using the old selection.

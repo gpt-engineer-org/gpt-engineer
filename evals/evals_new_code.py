@@ -11,7 +11,7 @@ from eval_tools import (
     load_evaluations_from_file,
 )
 
-from gpt_engineer.data.file_repository import FileRepository
+from gpt_engineer.data.file_repository import OnDiskRepository
 
 app = typer.Typer()  # creates a CLI app
 
@@ -20,7 +20,7 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
     """Evaluates a single prompt for creating a new project."""
     print(f"running evaluation: {eval_ob['name']}")
 
-    workspace = FileRepository(eval_ob["project_root"])
+    workspace = OnDiskRepository(eval_ob["project_root"])
     base_abs = Path(os.getcwd())
     code_base_abs = base_abs / eval_ob["project_root"]
 

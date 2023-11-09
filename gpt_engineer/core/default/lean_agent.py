@@ -1,9 +1,11 @@
 from gpt_engineer.core.code import Code
-from gpt_engineer.core.version_manager_interface import VersionManagerInterface
-from gpt_engineer.core.step_bundle_interface import StepBundleInterface
+from gpt_engineer.core.base_version_manager import BaseVersionManager
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.default.lean_step_bundle import LeanStepBundle
-
+from gpt_engineer.core.default.steps import gen_code, gen_entrypoint, execute_entrypoint
+from gpt_engineer.core.base_repository import BaseRepository
+from gpt_engineer.data.file_repository import OnDiskRepository
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
+from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 
 class Agent:
     """
@@ -12,7 +14,7 @@ class Agent:
     Attributes:
         path (str): The file path where the `Agent` will operate, used for version management and
                     file operations.
-        version_manager (VersionManagerInterface): An object that adheres to the VersionManagerInterface,
+        version_manager (BaseVersionManager): An object that adheres to the VersionManagerInterface,
                         responsible for version control of the generated code. Defaults to `VersionManager`
                         if not provided. PROBABLY GIT SHOULD BE USED IN THE DEFAULT
         step_bundle (StepBundleInterface): Workflows of code generation steps that define the behavior of gen_code and
@@ -48,18 +50,25 @@ class Agent:
 
     def __init__(
         self,
-        path: str,
-        step_bundle: StepBundleInterface = None,
+        memory: BaseRepository,
+        execution_env: BaseExecutionEnv,
         ai: AI = None,
     ):
-        self.path = path
-        self.step_bundle = step_bundle or LeanStepBundle(self.path)
+        self.memory = memory,
+        self.execution_env = execution_env,
         self.ai = ai or AI()
 
+    @classmethod
+    def with_default_config(cls, path: str, ai: AI = None):
+        return cls(OnDiskRepository(path), OnDiskExecutionEnv(path), ai)
+
     def init(self, prompt: str) -> Code:
-        code = self.step_bundle.init(self.ai, prompt)
+        code = gen_code(self.ai, prompt, self.memory)
+        # TODO: evaluate whether it makes more sense to send the code than the memory to gen_entrypoint
+        entrypoint = gen_entrypoint(self.ai, code, self.memory)
+        code = Code(code | entrypoint)
+        execute_entrypoint(self.workspace_path, code)
         return code
 
     def improve(self, prompt: str) -> Code:
-        code = self.step_bundle.improve(self.ai, prompt)
-        return code
+        pass

@@ -52,7 +52,7 @@ from typing import List, Optional
 from dataclasses_json import dataclass_json
 from termcolor import colored
 
-from gpt_engineer.data.file_repository import FileRepository, FileRepositories
+from gpt_engineer.data.file_repository import OnDiskRepository, FileRepositories
 from gpt_engineer.core.domain import Step
 
 
@@ -187,7 +187,7 @@ def ask_collection_consent() -> bool:
         return False
 
 
-def logs_to_string(steps: List[Step], logs: FileRepository) -> str:
+def logs_to_string(steps: List[Step], logs: OnDiskRepository) -> str:
     """
     Convert the logs of the steps to a string.
 
@@ -279,7 +279,7 @@ def get_session() -> str:
         return "ephemeral_" + str(random.randint(0, 2**32))
 
 
-def human_review(memory: FileRepository):
+def human_review(memory: OnDiskRepository):
     """
     Collects human feedback on the code and stores it in memory.
 

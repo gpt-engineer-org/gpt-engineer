@@ -1,11 +1,11 @@
 import pytest
 
-from gpt_engineer.data.file_repository import FileRepository, FileRepositories
+from gpt_engineer.data.file_repository import OnDiskRepository, FileRepositories
 
 
 def test_DB_operations(tmp_path):
     # Test initialization
-    db = FileRepository(tmp_path)
+    db = OnDiskRepository(tmp_path)
 
     # Test __setitem__
     db["test_key"] = "test_value"
@@ -31,22 +31,22 @@ def test_DBs_initialization(tmp_path):
     directories = [tmp_path / name for name in dir_names]
 
     # Create DB objects
-    dbs = [FileRepository(dir) for dir in directories]
+    dbs = [OnDiskRepository(dir) for dir in directories]
 
     # Create DB instance
     dbs_instance = FileRepositories(*dbs)
 
-    assert isinstance(dbs_instance.memory, FileRepository)
-    assert isinstance(dbs_instance.logs, FileRepository)
-    assert isinstance(dbs_instance.preprompts, FileRepository)
-    assert isinstance(dbs_instance.input, FileRepository)
-    assert isinstance(dbs_instance.workspace, FileRepository)
-    assert isinstance(dbs_instance.archive, FileRepository)
-    assert isinstance(dbs_instance.project_metadata, FileRepository)
+    assert isinstance(dbs_instance.memory, OnDiskRepository)
+    assert isinstance(dbs_instance.logs, OnDiskRepository)
+    assert isinstance(dbs_instance.preprompts, OnDiskRepository)
+    assert isinstance(dbs_instance.input, OnDiskRepository)
+    assert isinstance(dbs_instance.workspace, OnDiskRepository)
+    assert isinstance(dbs_instance.archive, OnDiskRepository)
+    assert isinstance(dbs_instance.project_metadata, OnDiskRepository)
 
 
 def test_large_files(tmp_path):
-    db = FileRepository(tmp_path)
+    db = OnDiskRepository(tmp_path)
     large_content = "a" * (10**6)  # 1MB of data
 
     # Test write large files
@@ -59,7 +59,7 @@ def test_large_files(tmp_path):
 def test_concurrent_access(tmp_path):
     import threading
 
-    db = FileRepository(tmp_path)
+    db = OnDiskRepository(tmp_path)
 
     num_threads = 10
     num_writes = 1000
@@ -87,7 +87,7 @@ def test_concurrent_access(tmp_path):
 
 
 def test_error_messages(tmp_path):
-    db = FileRepository(tmp_path)
+    db = OnDiskRepository(tmp_path)
 
     # Test error on getting non-existent key
     with pytest.raises(KeyError):
@@ -112,7 +112,7 @@ def test_DBs_dataclass_attributes(tmp_path):
     directories = [tmp_path / name for name in dir_names]
 
     # Create DB objects
-    dbs = [FileRepository(dir) for dir in directories]
+    dbs = [OnDiskRepository(dir) for dir in directories]
 
     # Create DBs instance
     dbs_instance = FileRepositories(*dbs)

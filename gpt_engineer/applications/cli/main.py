@@ -25,7 +25,6 @@ Notes:
 
 """
 
-import logging
 import os
 from pathlib import Path
 
@@ -33,15 +32,15 @@ import openai
 import typer
 from dotenv import load_dotenv
 
-from gpt_engineer.data.file_repository import FileRepository, FileRepositories, archive
+from gpt_engineer.data.file_repository import OnDiskRepository
 from gpt_engineer.core.ai import AI
 
 # from gpt_engineer.legacy.steps import STEPS, Config as StepsConfig
 # from gpt_engineer.applications.cli.collect import collect_learnings
 # from gpt_engineer.applications.cli.learning import check_collection_consent
 # from gpt_engineer.data.code_vector_repository import CodeVectorRepository
-from gpt_engineer.core.agent import Agent
-from gpt_engineer.applications.cli.cli_step_bundle import CliStepBundle
+from gpt_engineer.core.default.lean_agent import Agent
+
 
 app = typer.Typer()  # creates a CLI app
 
@@ -55,7 +54,7 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def load_prompt(input_repo: FileRepository):
+def load_prompt(input_repo: OnDiskRepository):
     if input_repo.get("prompt"):
         return input_repo.get("prompt")
 
@@ -153,8 +152,8 @@ def main(
     )  # resolve the string to a valid path (eg "a/b/../c" to "a/c")
     path = Path(project_path).absolute()
     print("Running gpt-engineer in", path, "\n")
-    prompt = load_prompt(FileRepository(path))
-    agent = Agent(project_path, step_bundle=CliStepBundle(project_path))
+    prompt = load_prompt(OnDiskRepository(path))
+    agent = Agent.with_default_config(project_path)
     agent.init(prompt)
     # workspace_path = path
     # input_path = path

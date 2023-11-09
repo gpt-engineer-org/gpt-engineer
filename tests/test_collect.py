@@ -10,7 +10,7 @@ import pytest
 import rudderstack.analytics as rudder_analytics
 
 from gpt_engineer.applications.cli import collect_learnings, steps_file_hash
-from gpt_engineer.data.file_repository import FileRepository, FileRepositories
+from gpt_engineer.data.file_repository import OnDiskRepository, FileRepositories
 from gpt_engineer.applications.cli import extract_learning
 from gpt_engineer.legacy.steps import simple_gen
 
@@ -22,13 +22,13 @@ def test_collect_learnings(monkeypatch):
     temperature = 0.5
     steps = [simple_gen]
     dbs = FileRepositories(
-        FileRepository("/tmp"),
-        FileRepository("/tmp"),
-        FileRepository("/tmp"),
-        FileRepository("/tmp"),
-        FileRepository("/tmp"),
-        FileRepository("/tmp"),
-        FileRepository("/tmp"),
+        OnDiskRepository("/tmp"),
+        OnDiskRepository("/tmp"),
+        OnDiskRepository("/tmp"),
+        OnDiskRepository("/tmp"),
+        OnDiskRepository("/tmp"),
+        OnDiskRepository("/tmp"),
+        OnDiskRepository("/tmp"),
     )
     dbs.input = {
         "prompt": "test prompt\n with newlines",
