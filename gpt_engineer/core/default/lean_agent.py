@@ -54,8 +54,8 @@ class Agent:
         execution_env: BaseExecutionEnv,
         ai: AI = None,
     ):
-        self.memory = memory,
-        self.execution_env = execution_env,
+        self.memory = memory
+        self.execution_env = execution_env
         self.ai = ai or AI()
 
     @classmethod
