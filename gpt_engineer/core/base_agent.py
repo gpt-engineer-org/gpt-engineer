@@ -5,6 +5,7 @@ from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.lean_step_bundle import LeanStepBundle
 from abc import ABC, abstractmethod
 
+
 class BaseAgent(ABC):
     """
     The `Agent` class is responsible for managing the lifecycle of code generation and improvement.

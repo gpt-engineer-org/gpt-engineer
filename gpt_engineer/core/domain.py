@@ -11,7 +11,7 @@ Variables:
       is expected to accept two parameters: an instance of `AI` and an instance of `DBs`. The function
       is expected to return a list of dictionaries.
 """
-#ToDo: This file and everything that depends on it should be eliminated
+# ToDo: This file and everything that depends on it should be eliminated
 
 from typing import TypeVar, Callable, List
 from gpt_engineer.core.ai import AI

@@ -1,7 +1,11 @@
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import parse_chat
-from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, CODE_GEN_LOG_FILE, ENTRYPOINT_LOG_FILE
+from gpt_engineer.core.default.paths import (
+    ENTRYPOINT_FILE,
+    CODE_GEN_LOG_FILE,
+    ENTRYPOINT_LOG_FILE,
+)
 from gpt_engineer.data.file_repository import OnDiskRepository
 from gpt_engineer.core.base_repository import BaseRepository
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
@@ -112,7 +116,7 @@ def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository) -> Code:
     - It assumes the presence of an 'all_output.txt' file in the specified workspace
       that contains information about the codebase.
     """
-    #ToDo: This should enter the preprompts...
+    # ToDo: This should enter the preprompts...
     messages = ai.start(
         system=(
             "You will get information about a codebase that is currently on disk in "
@@ -167,7 +171,9 @@ def execute_entrypoint(execution_env: BaseExecutionEnv, code: Code) -> None:
     """
 
     if not ENTRYPOINT_FILE in code:
-        raise FileNotFoundError("The required entrypoint " + ENTRYPOINT_FILE + " does not exist in the code.")
+        raise FileNotFoundError(
+            "The required entrypoint " + ENTRYPOINT_FILE + " does not exist in the code."
+        )
 
     command = code[ENTRYPOINT_FILE]
 

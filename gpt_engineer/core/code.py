@@ -12,7 +12,5 @@ class Code(dict):
             raise TypeError("Values must be strings")
         super()[key] = value
 
-
     def to_string(self):
         return "\n".join([key + "\n" + val + "\n" for key, val in self.items()])
-

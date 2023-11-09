@@ -7,6 +7,7 @@ from gpt_engineer.data.file_repository import OnDiskRepository
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 
+
 class Agent:
     """
     The `Agent` class is responsible for managing the lifecycle of code generation and improvement.
