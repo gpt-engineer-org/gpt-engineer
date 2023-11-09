@@ -11,7 +11,7 @@ class LeanStepBundle(StepBundleInterface):
         self.workspace_path = workspace_path
         self.memory = FileRepository(memory_path(workspace_path))
 
-    def gen_code(self, ai: AI, prompt: str) -> Code:
+    def init(self, ai: AI, prompt: str) -> Code:
         code = gen_code(self.workspace_path, ai, prompt, self.memory)
         # TODO: evaluate whether it makes more sense to send the code than the memory to gen_entrypoint
         entrypoint = gen_entrypoint(self.workspace_path, ai, self.memory)
@@ -19,5 +19,5 @@ class LeanStepBundle(StepBundleInterface):
         execute_entrypoint(self.workspace_path, entrypoint)
         return code
 
-    def improve_code(self, ai: AI, prompt: str) -> Code:
+    def improve(self, ai: AI, prompt: str) -> Code:
         pass
