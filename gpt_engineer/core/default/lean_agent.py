@@ -67,7 +67,7 @@ class Agent:
         # TODO: evaluate whether it makes more sense to send the code than the memory to gen_entrypoint
         entrypoint = gen_entrypoint(self.ai, code, self.memory)
         code = Code(code | entrypoint)
-        execute_entrypoint(self.workspace_path, code)
+        execute_entrypoint(self.execution_env, code)
         return code
 
     def improve(self, prompt: str) -> Code:
