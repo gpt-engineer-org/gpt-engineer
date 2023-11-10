@@ -33,8 +33,11 @@ import logging
 from dataclasses import dataclass
 from typing import List, Tuple
 
-from gpt_engineer.data.file_repository import FileRepository, FileRepositories
-from gpt_engineer.cli.file_selector import FILE_LIST_NAME
+from gpt_engineer.core.default.on_disk_repository import (
+    OnDiskRepository,
+    FileRepositories,
+)
+from gpt_engineer.applications.cli.file_selector import FILE_LIST_NAME
 
 
 logger = logging.getLogger(__name__)
@@ -102,7 +105,7 @@ def to_files_and_memory(chat: str, dbs: FileRepositories):
     to_files(chat, dbs.workspace)
 
 
-def to_files(chat: str, workspace: FileRepository):
+def to_files(chat: str, workspace: OnDiskRepository):
     """
     Parse the chat and add all extracted files to the workspace.
 
@@ -119,7 +122,7 @@ def to_files(chat: str, workspace: FileRepository):
 
 
 def get_code_strings(
-    workspace: FileRepository, metadata_db: FileRepository
+    workspace: OnDiskRepository, metadata_db: OnDiskRepository
 ) -> dict[str, str]:
     """
     Read file_list.txt and return file names and their content.
@@ -236,7 +239,7 @@ def parse_edits(llm_response):
     return parse_all_edits(llm_response)
 
 
-def apply_edits(edits: List[Edit], workspace: FileRepository):
+def apply_edits(edits: List[Edit], workspace: OnDiskRepository):
     for edit in edits:
         filename = edit.filename
         if edit.before == "":

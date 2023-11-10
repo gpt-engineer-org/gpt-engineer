@@ -40,9 +40,9 @@ def test_import():
             ai,
             domain,
             chat_to_files,
-            steps,
             file_repository,
         )
+        from gpt_engineer.legacy import steps
     except ImportError as e:
         assert False, f"Failed to import {e.name}"
 

@@ -65,10 +65,10 @@ from gpt_engineer.core.chat_to_files import (
     overwrite_files_with_edits,
     to_files_and_memory,
 )
-from gpt_engineer.data.file_repository import FileRepositories
-from gpt_engineer.cli.file_selector import FILE_LIST_NAME, ask_for_files
-from gpt_engineer.cli.learning import human_review_input
-from gpt_engineer.data.code_vector_repository import CodeVectorRepository
+from gpt_engineer.core.default.on_disk_repository import FileRepositories
+from gpt_engineer.applications.cli.file_selector import FILE_LIST_NAME, ask_for_files
+from gpt_engineer.applications.cli.learning import human_review_input
+from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
 
 MAX_SELF_HEAL_ATTEMPTS = 2  # constants for self healing code
 ASSUME_WORKING_TIMEOUT = 30
@@ -666,7 +666,7 @@ def human_review(ai: AI, dbs: FileRepositories):
     Notes:
     - It's assumed that the `human_review_input` function handles all the interactions with the user to
       gather feedback and returns either the feedback or None if no feedback was provided.
-    - Ensure that the database's memory has enough space or is set up correctly to store the serialized review data.
+    - Ensure that the database's memory has enough space or is set up correctly to store the serialized review tools.
     """
 
     """Collects and stores human review of the code"""

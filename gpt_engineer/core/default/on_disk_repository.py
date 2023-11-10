@@ -30,14 +30,14 @@ Imports:
 import datetime
 import shutil
 
-from dataclasses import dataclass
+from gpt_engineer.core.base_repository import BaseRepository
 from pathlib import Path
 from typing import Any, Optional, Union
-from gpt_engineer.data.supported_languages import SUPPORTED_LANGUAGES
+from gpt_engineer.tools.supported_languages import SUPPORTED_LANGUAGES
 
 
-# This class represents a simple database that stores its data as files in a directory.
-class FileRepository:
+# This class represents a simple database that stores its tools as files in a directory.
+class OnDiskRepository(BaseRepository):
     """
     A file-based key-value store where keys correspond to filenames and values to file contents.
 
@@ -226,15 +226,15 @@ class FileRepository:
 
 
 # dataclass for all dbs:
-@dataclass
+# @dataclass
 class FileRepositories:
-    memory: FileRepository
-    logs: FileRepository
-    preprompts: FileRepository
-    input: FileRepository
-    workspace: FileRepository
-    archive: FileRepository
-    project_metadata: FileRepository
+    memory: BaseRepository
+    logs: BaseRepository
+    preprompts: BaseRepository
+    input: BaseRepository
+    workspace: BaseRepository
+    archive: BaseRepository
+    project_metadata: BaseRepository
 
 
 def archive(dbs: FileRepositories) -> None:
