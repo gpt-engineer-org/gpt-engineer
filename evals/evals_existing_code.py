@@ -12,7 +12,7 @@ from eval_tools import (
 )
 
 from gpt_engineer.core.chat_to_files import parse_chat
-from gpt_engineer.data.file_repository import OnDiskRepository
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 
 app = typer.Typer()  # creates a CLI app
 

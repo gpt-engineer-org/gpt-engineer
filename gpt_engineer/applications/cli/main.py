@@ -32,13 +32,13 @@ import openai
 import typer
 from dotenv import load_dotenv
 
-from gpt_engineer.data.file_repository import OnDiskRepository
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.ai import AI
 
 # from gpt_engineer.legacy.steps import STEPS, Config as StepsConfig
 # from gpt_engineer.applications.cli.collect import collect_learnings
 # from gpt_engineer.applications.cli.learning import check_collection_consent
-# from gpt_engineer.data.code_vector_repository import CodeVectorRepository
+# from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
 from gpt_engineer.core.default.lean_agent import Agent
 
 

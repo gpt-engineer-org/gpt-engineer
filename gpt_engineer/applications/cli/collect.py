@@ -1,12 +1,12 @@
 """
-This module provides functionalities to handle and send learning data to RudderStack
-for the purpose of analysis and to improve the gpt-engineer system. The data is sent
+This module provides functionalities to handle and send learning tools to RudderStack
+for the purpose of analysis and to improve the gpt-engineer system. The tools is sent
 only when the user gives consent to share.
 
 The module provides the following main functions:
 
-- `send_learning`: Directly send a learning data to RudderStack.
-- `collect_learnings`: Extract, possibly adjust, and send the learning data based on
+- `send_learning`: Directly send a learning tools to RudderStack.
+- `collect_learnings`: Extract, possibly adjust, and send the learning tools based on
   provided input parameters.
 - `steps_file_hash`: Computes the SHA-256 hash of the steps file, which might be used
   for identifying the exact version or changes in the steps.
@@ -15,7 +15,7 @@ Dependencies:
 - hashlib: For generating SHA-256 hash.
 - typing: For type annotations.
 - gpt_engineer.core: Core functionalities of gpt-engineer.
-- gpt_engineer.cli.learning: Handles the extraction of learning data.
+- gpt_engineer.cli.learning: Handles the extraction of learning tools.
 
 Note:
     Data sent to RudderStack is not shared with third parties and is used solely to
@@ -28,17 +28,17 @@ import hashlib
 from typing import List
 
 from gpt_engineer.legacy import steps
-from gpt_engineer.data.file_repository import FileRepositories
+from gpt_engineer.core.default.on_disk_repository import FileRepositories
 from gpt_engineer.core.domain import Step
 from gpt_engineer.applications.cli.learning import Learning, extract_learning
 
 
 def send_learning(learning: Learning):
     """
-    Send the learning data to RudderStack for analysis.
+    Send the learning tools to RudderStack for analysis.
 
     Note:
-    This function is only called if consent is given to share data.
+    This function is only called if consent is given to share tools.
     Data is not shared to a third party. It is used with the sole purpose of
     improving gpt-engineer, and letting it handle more use cases.
     Consent logic is in gpt_engineer/learning.py
@@ -46,7 +46,7 @@ def send_learning(learning: Learning):
     Parameters
     ----------
     learning : Learning
-        The learning data to send.
+        The learning tools to send.
     """
     import rudderstack.analytics as rudder_analytics
 
@@ -64,7 +64,7 @@ def collect_learnings(
     model: str, temperature: float, steps: List[Step], dbs: FileRepositories
 ):
     """
-    Collect the learning data and send it to RudderStack for analysis.
+    Collect the learning tools and send it to RudderStack for analysis.
 
     Parameters
     ----------

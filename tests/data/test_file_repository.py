@@ -1,6 +1,6 @@
 import pytest
 
-from gpt_engineer.data.file_repository import OnDiskRepository, FileRepositories
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository, FileRepositories
 
 
 def test_DB_operations(tmp_path):
@@ -47,7 +47,7 @@ def test_DBs_initialization(tmp_path):
 
 def test_large_files(tmp_path):
     db = OnDiskRepository(tmp_path)
-    large_content = "a" * (10**6)  # 1MB of data
+    large_content = "a" * (10**6)  # 1MB of tools
 
     # Test write large files
     db["large_file"] = large_content
@@ -78,7 +78,7 @@ def test_concurrent_access(tmp_path):
     for t in threads:
         t.join()
 
-    # Verify that all expected data was written
+    # Verify that all expected tools was written
     for thread_id in range(num_threads):
         for i in range(num_writes):
             key = f"thread{thread_id}_write{i}"

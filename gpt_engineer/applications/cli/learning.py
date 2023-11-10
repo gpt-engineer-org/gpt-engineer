@@ -1,5 +1,5 @@
 """
-This module provides tools and data structures for supporting a feedback loop in the GPT Engineer application.
+This module provides tools and tools structures for supporting a feedback loop in the GPT Engineer application.
 
 The primary intent of this module is to gather feedback from the user on the output of the gpt-engineer tool,
 with their consent, and to store this feedback for further analysis and improvement of the tool.
@@ -17,13 +17,13 @@ human_review_input() -> Review:
     Interactively gathers feedback from the user regarding the performance of generated code.
 
 check_consent() -> bool:
-    Checks if the user has previously given consent to store their data and if not, asks for it.
+    Checks if the user has previously given consent to store their tools and if not, asks for it.
 
 collect_consent() -> bool:
-    Verifies if the user has given consent to store their data or prompts for it.
+    Verifies if the user has given consent to store their tools or prompts for it.
 
 ask_if_can_store() -> bool:
-    Asks the user if it's permissible to store their data for gpt-engineer improvement.
+    Asks the user if it's permissible to store their tools for gpt-engineer improvement.
 
 logs_to_string(steps: List[Step], logs: DB) -> str:
     Converts logs of steps into a readable string format.
@@ -52,7 +52,7 @@ from typing import List, Optional
 from dataclasses_json import dataclass_json
 from termcolor import colored
 
-from gpt_engineer.data.file_repository import OnDiskRepository, FileRepositories
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository, FileRepositories
 from gpt_engineer.core.domain import Step
 
 
@@ -148,7 +148,7 @@ def human_review_input() -> Review:
 
 def check_collection_consent() -> bool:
     """
-    Check if the user has given consent to store their data.
+    Check if the user has given consent to store their tools.
     If not, ask for their consent.
     """
     path = Path(".gpte_consent")
@@ -160,7 +160,7 @@ def check_collection_consent() -> bool:
 
 def ask_collection_consent() -> bool:
     """
-    Ask the user for consent to store their data.
+    Ask the user for consent to store their tools.
     """
     answer = input(
         "Is it ok if we store your prompts to help improve GPT Engineer? (y/n)"
@@ -174,7 +174,7 @@ def ask_collection_consent() -> bool:
         print(colored("Thank you️", "light_green"))
         print()
         print(
-            "(If you no longer wish to participate in data collection, delete the file .gpte_consent)"
+            "(If you no longer wish to participate in tools collection, delete the file .gpte_consent)"
         )
         return True
     else:
@@ -218,7 +218,7 @@ def extract_learning(
     steps_file_hash,
 ) -> Learning:
     """
-    Extract the learning data from the steps and databases.
+    Extract the learning tools from the steps and databases.
 
     Parameters
     ----------
@@ -236,7 +236,7 @@ def extract_learning(
     Returns
     -------
     Learning
-        The extracted learning data.
+        The extracted learning tools.
     """
     review = None
     if "review" in dbs.memory:
@@ -300,7 +300,7 @@ def human_review(memory: OnDiskRepository):
     Notes:
     - It's assumed that the `human_review_input` function handles all the interactions with the user to
       gather feedback and returns either the feedback or None if no feedback was provided.
-    - Ensure that the database's memory has enough space or is set up correctly to store the serialized review data.
+    - Ensure that the database's memory has enough space or is set up correctly to store the serialized review tools.
     """
 
     """Collects and stores human review of the code"""

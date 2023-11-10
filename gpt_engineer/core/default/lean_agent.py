@@ -3,7 +3,7 @@ from gpt_engineer.core.base_version_manager import BaseVersionManager
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.steps import gen_code, gen_entrypoint, execute_entrypoint
 from gpt_engineer.core.base_repository import BaseRepository
-from gpt_engineer.data.file_repository import OnDiskRepository
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 

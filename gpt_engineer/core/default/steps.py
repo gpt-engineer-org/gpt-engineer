@@ -6,7 +6,7 @@ from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
     ENTRYPOINT_LOG_FILE,
 )
-from gpt_engineer.data.file_repository import OnDiskRepository
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.base_repository import BaseRepository
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from langchain.schema import HumanMessage, SystemMessage
@@ -15,7 +15,6 @@ import inspect
 import os
 import re
 from termcolor import colored
-import subprocess
 
 # TODO: THIS NEEDS A BETTER SOLUTION
 PREPROMPTS_PATH = os.path.join("gpt_engineer", "preprompts")

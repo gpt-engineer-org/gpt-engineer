@@ -33,7 +33,7 @@ import logging
 from dataclasses import dataclass
 from typing import List, Tuple
 
-from gpt_engineer.data.file_repository import OnDiskRepository, FileRepositories
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository, FileRepositories
 from gpt_engineer.applications.cli.file_selector import FILE_LIST_NAME
 
 

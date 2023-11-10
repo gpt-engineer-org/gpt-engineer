@@ -33,10 +33,10 @@ import shutil
 from gpt_engineer.core.base_repository import BaseRepository
 from pathlib import Path
 from typing import Any, Optional, Union
-from gpt_engineer.data.supported_languages import SUPPORTED_LANGUAGES
+from gpt_engineer.tools.supported_languages import SUPPORTED_LANGUAGES
 
 
-# This class represents a simple database that stores its data as files in a directory.
+# This class represents a simple database that stores its tools as files in a directory.
 class OnDiskRepository(BaseRepository):
     """
     A file-based key-value store where keys correspond to filenames and values to file contents.
