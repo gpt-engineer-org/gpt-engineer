@@ -1,8 +1,6 @@
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.base_version_manager import BaseVersionManager
-from gpt_engineer.core.step_bundle_interface import StepBundleInterface
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.default.lean_step_bundle import LeanStepBundle
 from abc import ABC, abstractmethod
 
 
@@ -47,20 +45,10 @@ class BaseAgent(ABC):
                 Code: An instance of the `Code` class containing the improved code.
     """
 
-    def __init__(
-        self,
-        path: str,
-        step_bundle: StepBundleInterface = None,
-        ai: AI = None,
-    ):
-        self.path = path
-        self.step_bundle = step_bundle or LeanStepBundle(self.path)
-        self.ai = ai or AI()
-
+    @abstractmethod
     def init(self, prompt: str) -> Code:
-        code = self.step_bundle.init(self.ai, prompt)
-        return code
+        pass
 
+    @abstractmethod
     def improve(self, prompt: str) -> Code:
-        code = self.step_bundle.improve(self.ai, prompt)
-        return code
+        pass

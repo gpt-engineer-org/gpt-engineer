@@ -19,7 +19,7 @@ class OnDiskExecutionEnv(BaseExecutionEnv):
             )
 
         workspace = OnDiskRepository(self.path)
-        for file_name, file_content in code:
+        for file_name, file_content in code.items():
             workspace[file_name] = file_content
 
         p = subprocess.Popen("bash " + ENTRYPOINT_FILE, shell=True, cwd=self.path)

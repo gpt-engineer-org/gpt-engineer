@@ -8,9 +8,10 @@ from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 from gpt_engineer.core.default.paths import memory_path
 from gpt_engineer.core.base_agent import BaseAgent
+from gpt_engineer.applications.cli.learning import human_review
 
 
-class Agent(BaseAgent):
+class CliAgent(BaseAgent):
     """
     The `Agent` class is responsible for managing the lifecycle of code generation and improvement.
 
@@ -70,6 +71,7 @@ class Agent(BaseAgent):
         entrypoint = gen_entrypoint(self.ai, code, self.memory)
         code = Code(code | entrypoint)
         execute_entrypoint(self.execution_env, code)
+        human_review(self.memory)
         return code
 
     def improve(self, prompt: str) -> Code:

@@ -39,7 +39,7 @@ from gpt_engineer.core.ai import AI
 # from gpt_engineer.applications.cli.collect import collect_learnings
 # from gpt_engineer.applications.cli.learning import check_collection_consent
 # from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
-from gpt_engineer.core.default.lean_agent import Agent
+from gpt_engineer.applications.cli.cli_agent import CliAgent
 
 
 app = typer.Typer()  # creates a CLI app
@@ -153,7 +153,7 @@ def main(
     path = Path(project_path).absolute()
     print("Running gpt-engineer in", path, "\n")
     prompt = load_prompt(OnDiskRepository(path))
-    agent = Agent.with_default_config(project_path)
+    agent = CliAgent.with_default_config(project_path)
     agent.init(prompt)
     # workspace_path = path
     # input_path = path
