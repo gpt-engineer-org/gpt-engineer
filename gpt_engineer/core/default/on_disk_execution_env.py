@@ -2,6 +2,7 @@ import subprocess
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 
 
 class OnDiskExecutionEnv(BaseExecutionEnv):
@@ -9,6 +10,7 @@ class OnDiskExecutionEnv(BaseExecutionEnv):
         self.path = path
 
     def execute_program(self, code: Code) -> subprocess.Popen:
+
         if not ENTRYPOINT_FILE in code:
             raise FileNotFoundError(
                 "The required entrypoint "
@@ -16,7 +18,11 @@ class OnDiskExecutionEnv(BaseExecutionEnv):
                 + " does not exist in the code."
             )
 
-        p = subprocess.Popen("bash run.sh", shell=True, cwd=self.path)
+        workspace = OnDiskRepository(self.path)
+        for file_name, file_content in code:
+            workspace[file_name] = file_content
+
+        p = subprocess.Popen("bash " + ENTRYPOINT_FILE, shell=True, cwd=self.path)
         try:
             p.wait()
         except KeyboardInterrupt:
