@@ -63,7 +63,11 @@ class Agent(BaseAgent):
 
     @classmethod
     def with_default_config(cls, path: str, ai: AI = None):
-        return cls(memory=OnDiskRepository(memory_path(path)), execution_env=OnDiskExecutionEnv(path), ai=ai)
+        return cls(
+            memory=OnDiskRepository(memory_path(path)),
+            execution_env=OnDiskExecutionEnv(path),
+            ai=ai,
+        )
 
     def init(self, prompt: str) -> Code:
         code = gen_code(self.ai, prompt, self.memory)

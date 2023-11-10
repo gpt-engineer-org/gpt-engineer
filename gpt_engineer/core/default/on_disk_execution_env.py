@@ -10,7 +10,6 @@ class OnDiskExecutionEnv(BaseExecutionEnv):
         self.path = path
 
     def execute_program(self, code: Code) -> subprocess.Popen:
-
         if not ENTRYPOINT_FILE in code:
             raise FileNotFoundError(
                 "The required entrypoint "

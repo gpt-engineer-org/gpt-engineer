@@ -52,7 +52,10 @@ from typing import List, Optional
 from dataclasses_json import dataclass_json
 from termcolor import colored
 
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository, FileRepositories
+from gpt_engineer.core.default.on_disk_repository import (
+    OnDiskRepository,
+    FileRepositories,
+)
 from gpt_engineer.core.domain import Step
 
 
