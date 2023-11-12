@@ -63,7 +63,7 @@ from gpt_engineer.core.chat_to_files import (
     format_file_to_input,
     get_code_strings,
     overwrite_files_with_edits,
-    to_files_and_memory,
+    # to_files_and_memory,
 )
 from gpt_engineer.core.default.on_disk_repository import FileRepositories
 from gpt_engineer.applications.cli.file_selector import FILE_LIST_NAME, ask_for_files
