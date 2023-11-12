@@ -1,8 +1,10 @@
 import pytest
-from gpt_engineer.core.chat_to_files import parse_chat
+from gpt_engineer.core.chat_to_files import parse_chat, overwrite_files_with_edits, Edit, parse_edits, apply_edits
+import logging
 
 def test_standard_input():
     chat = """
+    Some text describing the code
 file1.py
 ```python
 print("Hello, World!")
@@ -122,7 +124,78 @@ def test_filename_with_different_extension():
     ]
     assert parse_chat(chat) == expected
 
-# More tests can be added following the similar structure
+# Helper function to capture log messages
+@pytest.fixture
+def log_capture():
+    class LogCaptureHandler(logging.Handler):
+        def __init__(self):
+            super().__init__()
+            self.messages = []
+
+        def emit(self, record):
+            self.messages.append(record.getMessage())
+
+    handler = LogCaptureHandler()
+    logger = logging.getLogger("your_module_logger")  # Replace with your actual logger name
+    logger.addHandler(handler)
+    yield handler
+    logger.removeHandler(handler)
+
+def test_parse_with_additional_text():
+    chat = """
+Some introductory text.
+
+```python
+some/dir/example_1.py
+<<<<<<< HEAD
+    def mul(a,b)
+=======
+    def add(a,b):
+>>>>>>> updated
+```
+
+Text between patches.
+
+```python
+some/dir/example_2.py
+<<<<<<< HEAD
+    class DBS:
+        db = 'aaa'
+=======
+    class DBS:
+        db = 'bbb'
+>>>>>>> updated
+```
+
+Ending text.
+    """
+    expected = [
+        Edit("some/dir/example_1.py", "def mul(a,b)", "def add(a,b):"),
+        Edit("some/dir/example_2.py", "class DBS:\n        db = 'aaa'", "class DBS:\n        db = 'bbb'")
+    ]
+    parsed = parse_edits(chat)
+    assert parsed == expected
+
+def test_apply_edit_new_file(log_capture):
+    edits = [Edit("new_file.py", "", "print('Hello, World!')")]
+    code = {}
+    apply_edits(edits, code)
+    assert code == {"new_file.py": "print('Hello, World!')"}
+    assert "file will be overwritten" in log_capture.messages[0]
+
+def test_apply_edit_no_match(log_capture):
+    edits = [Edit("file.py", "non-existent content", "new content")]
+    code = {"file.py": "some content"}
+    apply_edits(edits, code)
+    assert code == {"file.py": "some content"}  # No change
+    assert "code block to be replaced was not found" in log_capture.messages[0]
+
+def test_apply_edit_multiple_matches(log_capture):
+    edits = [Edit("file.py", "repeat", "new")]
+    code = {"file.py": "repeat repeat repeat"}
+    apply_edits(edits, code)
+    assert code == {"file.py": "new new new"}
+    assert "code block to be replaced was found multiple times" in log_capture.messages[0]
 
 if __name__ == "__main__":
     pytest.main()
