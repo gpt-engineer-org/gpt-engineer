@@ -31,7 +31,8 @@ import re
 import logging
 
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Union
+from pathlib import Path
 
 from gpt_engineer.core.default.on_disk_repository import (
     OnDiskRepository,
@@ -183,7 +184,7 @@ class Edit:
     after: str
 
 
-def parse_edits(llm_response):
+def parse_edits(chat: str):
     def parse_one_edit(lines):
         HEAD = "<<<<<<< HEAD"
         DIVIDER = "======="
@@ -201,27 +202,24 @@ def parse_edits(llm_response):
 
         return Edit(filename, before, after)
 
-    def parse_all_edits(txt):
-        edits = []
-        current_edit = []
-        in_fence = False
+    edits = []
+    current_edit = []
+    in_fence = False
 
-        for line in txt.split("\n"):
-            if line.startswith("```") and in_fence:
-                edits.append(parse_one_edit(current_edit))
-                current_edit = []
-                in_fence = False
-                continue
-            elif line.startswith("```") and not in_fence:
-                in_fence = True
-                continue
+    for line in chat.split("\n"):
+        if line.startswith("```") and in_fence:
+            edits.append(parse_one_edit(current_edit))
+            current_edit = []
+            in_fence = False
+            continue
+        elif line.startswith("```") and not in_fence:
+            in_fence = True
+            continue
 
-            if in_fence:
-                current_edit.append(line)
+        if in_fence:
+            current_edit.append(line)
 
-        return edits
-
-    return parse_all_edits(llm_response)
+    return edits
 
 
 def apply_edits(edits: List[Edit], code: Code):
@@ -248,7 +246,7 @@ def apply_edits(edits: List[Edit], code: Code):
             )  # existing file
 
 
-def _get_all_files_in_dir(directory):
+def _get_all_files_in_dir(directory: Union[str, Path]):
     for root, dirs, files in os.walk(directory):
         for file in files:
             yield os.path.join(root, file)
@@ -256,7 +254,7 @@ def _get_all_files_in_dir(directory):
         yield from _get_all_files_in_dir(os.path.join(root, dir))
 
 
-def _open_file(file_path) -> str:
+def _open_file(file_path: Union[str, Path]) -> str:
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             return f.read()
