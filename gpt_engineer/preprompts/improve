@@ -21,7 +21,7 @@ some/dir/example.py
 ```
 Remember, you can use multiple *edit blocks* per file.
 
-Here is an example reponse:
+Here is an example response:
 ---
 PLANNING:
 We need to change ... because ..., therefore I will add the line `a=a+1` to the function `add_one`.

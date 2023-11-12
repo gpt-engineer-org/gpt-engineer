@@ -31,14 +31,9 @@ import re
 import logging
 
 from dataclasses import dataclass
-from typing import List, Tuple, Union
-from pathlib import Path
+from typing import List, Tuple
 
-from gpt_engineer.core.default.on_disk_repository import (
-    OnDiskRepository,
-    # FileRepositories,
-)
-from gpt_engineer.applications.cli.file_selector import FILE_LIST_NAME
+
 from gpt_engineer.core.code import Code
 
 logger = logging.getLogger(__name__)
@@ -80,96 +75,21 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
         # Get the code
         code = match.group(2)
 
+        # strip blanks etc
+        code = code.strip()
+
         # Add the file to the list
         files.append((path, code))
 
     # Get all the text before the first ``` block
-    readme = chat.split("```")[0]
-    files.append(("README.md", readme))
+    # readme = chat.split("```")[0]
+    # files.append(("README.md", readme))
 
     # Return the files
     return files
 
 
-def to_files(chat: str, workspace: OnDiskRepository):
-    """
-    Parse the chat and add all extracted files to the workspace.
 
-    Parameters
-    ----------
-    chat : str
-        The chat to parse.
-    workspace : DB
-        The database containing the workspace.
-    """
-    files = parse_chat(chat)
-    for file_name, file_content in files:
-        workspace[file_name] = file_content
-
-
-def get_code_strings(
-    workspace: OnDiskRepository, metadata_db: OnDiskRepository
-) -> dict[str, str]:
-    """
-    Read file_list.txt and return file names and their content.
-    Parameters
-    ----------
-    input : dict
-        A dictionary containing the file_list.txt.
-    Returns
-    -------
-    dict[str, str]
-        A dictionary mapping file names to their content.
-    """
-
-    files_paths = metadata_db[FILE_LIST_NAME].strip().split("\n")
-    files = []
-
-    for full_file_path in files_paths:
-        if os.path.isdir(full_file_path):
-            for file_path in _get_all_files_in_dir(full_file_path):
-                files.append(file_path)
-        else:
-            files.append(full_file_path)
-
-    files_dict = {}
-
-    for path in files:
-        assert os.path.commonpath([full_file_path, workspace.path]) == str(
-            workspace.path
-        ), "Trying to edit files outside of the workspace"
-
-        file_name = os.path.relpath(path, workspace.path)
-
-        if file_name in workspace:
-            files_dict[file_name] = _open_file(path)
-
-    return files_dict
-
-
-def format_file_to_input(file_name: str, file_content: str) -> str:
-    """
-    Format a file string to use as input to the AI agent.
-
-    Parameters
-    ----------
-    file_name : str
-        The name of the file.
-    file_content : str
-        The content of the file.
-
-    Returns
-    -------
-    str
-        The formatted file string.
-    """
-    file_str = f"""
-    {file_name}
-    ```
-    {file_content}
-    ```
-    """
-    return file_str
 
 
 def overwrite_files_with_edits(chat: str, code: Code):
@@ -244,21 +164,3 @@ def apply_edits(edits: List[Edit], code: Code):
             code[filename] = code[filename].replace(
                 edit.before, edit.after
             )  # existing file
-
-
-def _get_all_files_in_dir(directory: Union[str, Path]):
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            yield os.path.join(root, file)
-    for dir in dirs:
-        yield from _get_all_files_in_dir(os.path.join(root, dir))
-
-
-def _open_file(file_path: Union[str, Path]) -> str:
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            return f.read()
-    except UnicodeDecodeError:
-        raise ValueError(
-            f"Non-text file detected: {file_path}, gpt-engineer currently only supports utf-8 decodable text files."
-        )

@@ -12,5 +12,28 @@ class Code(dict):
             raise TypeError("Values must be strings")
         super()[key] = value
 
-    def to_string(self):
-        return "\n".join([key + "\n" + val + "\n" for key, val in self.items()])
+    def to_chat(self):
+        def format_file_to_input(file_name: str, file_content: str) -> str:
+            """
+            Format a file string to use as input to the AI agent.
+
+            Parameters
+            ----------
+            file_name : str
+                The name of the file.
+            file_content : str
+                The content of the file.
+
+            Returns
+            -------
+            str
+                The formatted file string.
+            """
+            file_str = f"""
+            {file_name}
+            ```
+            {file_content}
+            ```
+            """
+            return file_str
+        return "\n".join([format_file_to_input(file_name, file_content) + "\n" for file_name, file_content in self.items()])
