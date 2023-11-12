@@ -31,14 +31,15 @@ import re
 import logging
 
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Union
+from pathlib import Path
 
 from gpt_engineer.core.default.on_disk_repository import (
     OnDiskRepository,
-    FileRepositories,
+    # FileRepositories,
 )
 from gpt_engineer.applications.cli.file_selector import FILE_LIST_NAME
-
+from gpt_engineer.core.code import Code
 
 logger = logging.getLogger(__name__)
 
@@ -88,21 +89,6 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
 
     # Return the files
     return files
-
-
-def to_files_and_memory(chat: str, dbs: FileRepositories):
-    """
-    Save chat to memory, and parse chat to extracted file and save them to the workspace.
-
-    Parameters
-    ----------
-    chat : str
-        The chat to parse.
-    dbs : DBs
-        The databases that include the memory and workspace database
-    """
-    dbs.memory["all_output.txt"] = chat
-    to_files(chat, dbs.workspace)
 
 
 def to_files(chat: str, workspace: OnDiskRepository):
@@ -186,9 +172,9 @@ def format_file_to_input(file_name: str, file_content: str) -> str:
     return file_str
 
 
-def overwrite_files_with_edits(chat: str, dbs: FileRepositories):
+def overwrite_files_with_edits(chat: str, code: Code):
     edits = parse_edits(chat)
-    apply_edits(edits, dbs.workspace)
+    apply_edits(edits, code)
 
 
 @dataclass
@@ -198,7 +184,7 @@ class Edit:
     after: str
 
 
-def parse_edits(llm_response):
+def parse_edits(chat: str):
     def parse_one_edit(lines):
         HEAD = "<<<<<<< HEAD"
         DIVIDER = "======="
@@ -216,54 +202,51 @@ def parse_edits(llm_response):
 
         return Edit(filename, before, after)
 
-    def parse_all_edits(txt):
-        edits = []
-        current_edit = []
-        in_fence = False
+    edits = []
+    current_edit = []
+    in_fence = False
 
-        for line in txt.split("\n"):
-            if line.startswith("```") and in_fence:
-                edits.append(parse_one_edit(current_edit))
-                current_edit = []
-                in_fence = False
-                continue
-            elif line.startswith("```") and not in_fence:
-                in_fence = True
-                continue
+    for line in chat.split("\n"):
+        if line.startswith("```") and in_fence:
+            edits.append(parse_one_edit(current_edit))
+            current_edit = []
+            in_fence = False
+            continue
+        elif line.startswith("```") and not in_fence:
+            in_fence = True
+            continue
 
-            if in_fence:
-                current_edit.append(line)
+        if in_fence:
+            current_edit.append(line)
 
-        return edits
-
-    return parse_all_edits(llm_response)
+    return edits
 
 
-def apply_edits(edits: List[Edit], workspace: OnDiskRepository):
+def apply_edits(edits: List[Edit], code: Code):
     for edit in edits:
         filename = edit.filename
         if edit.before == "":
-            if workspace.get(filename) is not None:
-                logger.warn(
+            if filename in code:
+                logger.warning(
                     f"The edit to be applied wants to create a new file `{filename}`, but that already exists. The file will be overwritten. See `.gpteng/memory` for previous version."
                 )
-            workspace[filename] = edit.after  # new file
+            code[filename] = edit.after  # new file
         else:
-            occurrences_cnt = workspace[filename].count(edit.before)
+            occurrences_cnt = code[filename].count(edit.before)
             if occurrences_cnt == 0:
-                logger.warn(
+                logger.warning(
                     f"While applying an edit to `{filename}`, the code block to be replaced was not found. No instances will be replaced."
                 )
             if occurrences_cnt > 1:
-                logger.warn(
+                logger.warning(
                     f"While applying an edit to `{filename}`, the code block to be replaced was found multiple times. All instances will be replaced."
                 )
-            workspace[filename] = workspace[filename].replace(
+            code[filename] = code[filename].replace(
                 edit.before, edit.after
             )  # existing file
 
 
-def _get_all_files_in_dir(directory):
+def _get_all_files_in_dir(directory: Union[str, Path]):
     for root, dirs, files in os.walk(directory):
         for file in files:
             yield os.path.join(root, file)
@@ -271,7 +254,7 @@ def _get_all_files_in_dir(directory):
         yield from _get_all_files_in_dir(os.path.join(root, dir))
 
 
-def _open_file(file_path) -> str:
+def _open_file(file_path: Union[str, Path]) -> str:
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             return f.read()

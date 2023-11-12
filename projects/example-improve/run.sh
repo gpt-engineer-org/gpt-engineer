@@ -4,4 +4,4 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # b) Run all necessary parts of the codebase
-python src/main.py
+python main.py
