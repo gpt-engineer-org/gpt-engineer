@@ -1,244 +1,128 @@
-import textwrap
+import pytest
+from gpt_engineer.core.chat_to_files import parse_chat
 
-from gpt_engineer.core.chat_to_files import to_files_and_memory, get_code_strings
-from gpt_engineer.applications.cli import FILE_LIST_NAME
+def test_standard_input():
+    chat = """
+file1.py
+```python
+print("Hello, World!")
+```
 
-from unittest.mock import MagicMock
+file2.py
+```python
+def add(a, b):
+    return a + b
+```
+    """
+    expected = [
+        ("file1.py", 'print("Hello, World!")'),
+        ("file2.py", 'def add(a, b):\n    return a + b')
+    ]
+    assert parse_chat(chat) == expected
 
+def test_no_code_blocks():
+    chat = "Just some regular chat without code."
+    expected = []
+    assert parse_chat(chat) == expected
 
-class DummyDBs:
-    memory = {}
-    logs = {}
-    preprompts = {}
-    input = {}
-    workspace = {}
-    archive = {}
-    project_metadata = {}
+def test_special_characters_in_filename():
+    chat = """
+    file[1].py
+    ```python
+    print("File 1")
+    ```
 
+    file`2`.py
+    ```python
+    print("File 2")
+    ```
+    """
+    expected = [
+        ("file[1].py", 'print("File 1")'),
+        ("file`2`.py", 'print("File 2")')
+    ]
+    parsed = parse_chat(chat)
+    assert parsed == expected
 
-def test_to_files_and_memory():
-    chat = textwrap.dedent(
-        """
-    This is a sample program.
+def test_empty_code_blocks():
+    chat = """
+    empty.py
+    ```
+    ```
+    """
+    expected = [
+        ("empty.py", '')
+    ]
+    assert parse_chat(chat) == expected
 
+def test_mixed_content():
+    chat = """
+    script.sh
+    ```bash
+    echo "Hello"
+    ```
+
+    script.py
+    ```python
+    print("World")
+    ```
+    """
+    expected = [
+        ("script.sh", 'echo "Hello"'),
+        ("script.py", 'print("World")')
+    ]
+    assert parse_chat(chat) == expected
+
+def test_filename_line_break():
+    chat = """
     file1.py
-    ```python
-    print("Hello, World!")
-    ```
-
-    file2.py
-    ```python
-    def add(a, b):
-        return a + b
-    ```
-    """
-    )
-
-    dbs = DummyDBs()
-    to_files_and_memory(chat, dbs)
-
-    assert dbs.memory["all_output.txt"] == chat
-
-    expected_files = {
-        "file1.py": 'print("Hello, World!")\n',
-        "file2.py": "def add(a, b):\n    return a + b\n",
-        "README.md": "\nThis is a sample program.\n\nfile1.py\n",
-    }
-
-    for file_name, file_content in expected_files.items():
-        assert dbs.workspace[file_name] == file_content
-
-
-def test_to_files_with_square_brackets():
-    chat = textwrap.dedent(
-        """
-    This is a sample program.
-
-    [file1.py]
-    ```python
-    print("Hello, World!")
-    ```
-
-    [file2.py]
-    ```python
-    def add(a, b):
-        return a + b
-    ```
-    """
-    )
-    dbs = DummyDBs()
-    to_files_and_memory(chat, dbs)
-
-    assert dbs.memory["all_output.txt"] == chat
-
-    expected_files = {
-        "file1.py": 'print("Hello, World!")\n',
-        "file2.py": "def add(a, b):\n    return a + b\n",
-        "README.md": "\nThis is a sample program.\n\n[file1.py]\n",
-    }
-
-    for file_name, file_content in expected_files.items():
-        assert dbs.workspace[file_name] == file_content
-
-
-def test_files_with_brackets_in_name():
-    chat = textwrap.dedent(
-        """
-    This is a sample program.
-
-    [id].jsx
-    ```javascript
-    console.log("Hello, World!")
-    ```
-    """
-    )
-
-    dbs = DummyDBs()
-    to_files_and_memory(chat, dbs)
-
-    assert dbs.memory["all_output.txt"] == chat
-
-    expected_files = {
-        "[id].jsx": 'console.log("Hello, World!")\n',
-        "README.md": "\nThis is a sample program.\n\n[id].jsx\n",
-    }
-
-    for file_name, file_content in expected_files.items():
-        assert dbs.workspace[file_name] == file_content
-
-
-def test_files_with_file_colon():
-    chat = textwrap.dedent(
-        """
-    This is a sample program.
-
-    [FILE: file1.py]
+    
     ```python
     print("Hello, World!")
     ```
     """
-    )
+    expected = [
+        ("file1.py", 'print("Hello, World!")')
+    ]
+    assert parse_chat(chat) == expected
 
-    dbs = DummyDBs()
-    to_files_and_memory(chat, dbs)
-
-    assert dbs.memory["all_output.txt"] == chat
-
-    expected_files = {
-        "file1.py": 'print("Hello, World!")\n',
-        "README.md": "\nThis is a sample program.\n\n[FILE: file1.py]\n",
-    }
-
-    for file_name, file_content in expected_files.items():
-        assert dbs.workspace[file_name] == file_content
-
-
-def test_files_with_back_tick():
-    chat = textwrap.dedent(
-        """
-    This is a sample program.
-
+def test_filename_in_backticks():
+    chat = """
     `file1.py`
     ```python
     print("Hello, World!")
     ```
     """
-    )
+    expected = [
+        ("file1.py", 'print("Hello, World!")')
+    ]
+    assert parse_chat(chat) == expected
 
-    dbs = DummyDBs()
-    to_files_and_memory(chat, dbs)
-
-    assert dbs.memory["all_output.txt"] == chat
-
-    expected_files = {
-        "file1.py": 'print("Hello, World!")\n',
-        "README.md": "\nThis is a sample program.\n\n`file1.py`\n",
-    }
-
-    for file_name, file_content in expected_files.items():
-        assert dbs.workspace[file_name] == file_content
-
-
-def test_files_with_newline_between():
-    chat = textwrap.dedent(
-        """
-    This is a sample program.
-
-    file1.py
-
+def test_filename_with_file_tag():
+    chat = """
+    [FILE: file1.py]
     ```python
     print("Hello, World!")
     ```
     """
-    )
+    expected = [
+        ("file1.py", 'print("Hello, World!")')
+    ]
+    assert parse_chat(chat) == expected
 
-    dbs = DummyDBs()
-    to_files_and_memory(chat, dbs)
-
-    assert dbs.memory["all_output.txt"] == chat
-
-    expected_files = {
-        "file1.py": 'print("Hello, World!")\n',
-        "README.md": "\nThis is a sample program.\n\nfile1.py\n\n",
-    }
-
-    for file_name, file_content in expected_files.items():
-        assert dbs.workspace[file_name] == file_content
-
-
-def test_files_with_newline_between_header():
-    chat = textwrap.dedent(
-        """
-    This is a sample program.
-
-    ## file1.py
-
-    ```python
-    print("Hello, World!")
+def test_filename_with_different_extension():
+    chat = """
+    [id].jsx
+    ```javascript
+    console.log("Hello, World!")
     ```
     """
-    )
+    expected = [
+        ("[id].jsx", 'console.log("Hello, World!")')
+    ]
+    assert parse_chat(chat) == expected
 
-    dbs = DummyDBs()
-    to_files_and_memory(chat, dbs)
+# More tests can be added following the similar structure
 
-    assert dbs.memory["all_output.txt"] == chat
-
-    expected_files = {
-        "file1.py": 'print("Hello, World!")\n',
-        "README.md": "\nThis is a sample program.\n\n## file1.py\n\n",
-    }
-
-    for file_name, file_content in expected_files.items():
-        assert dbs.workspace[file_name] == file_content
-
-
-def test_get_code_strings(monkeypatch):
-    # arrange
-    mock_db = MagicMock()
-    mock_db.path = "path/to"
-    data = {"file1.txt": "This is file 1 content", "file2.txt": "This is file 2 content"}
-    mock_db.__getitem__ = lambda self, x: data.get(x)
-    mock_db.__contains__ = lambda self, x: x in data
-
-    mock_metadata_db = {FILE_LIST_NAME: "path/to/file1.txt\npath/to/file2.txt"}
-
-    def mock_get_all_files_in_dir(directory):
-        return ["path/to/file1.txt", "path/to/file2.txt"]
-
-    def mock_open_file(path):
-        return f"File Data for file: {path}"
-
-    monkeypatch.setattr(
-        "gpt_engineer.core.chat_to_files._get_all_files_in_dir", mock_get_all_files_in_dir
-    )
-
-    monkeypatch.setattr("gpt_engineer.core.chat_to_files._open_file", mock_open_file)
-
-    # act
-    result = get_code_strings(mock_db, mock_metadata_db)
-
-    print(result)
-    # assert
-    assert result["file1.txt"] == "File Data for file: path/to/file1.txt"
-    assert result["file2.txt"] == "File Data for file: path/to/file2.txt"
+if __name__ == "__main__":
+    pytest.main()

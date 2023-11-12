@@ -60,8 +60,8 @@ from pathlib import Path
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import (
-    format_file_to_input,
-    get_code_strings,
+    # format_file_to_input,
+    # get_code_strings,
     overwrite_files_with_edits,
     # to_files_and_memory,
 )

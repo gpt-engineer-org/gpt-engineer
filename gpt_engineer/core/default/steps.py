@@ -1,6 +1,6 @@
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.chat_to_files import parse_chat, overwrite_files_with_edits, format_file_to_input
+from gpt_engineer.core.chat_to_files import parse_chat, overwrite_files_with_edits#, format_file_to_input
 from gpt_engineer.core.default.paths import (
     ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
@@ -129,7 +129,7 @@ def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository) -> Code:
             "Do not use placeholders, use example values (like . for a folder argument) "
             "if necessary.\n"
         ),
-        user="Information about the codebase:\n\n" + code.to_string(),
+        user="Information about the codebase:\n\n" + code.to_chat(),
         step_name=curr_fn(),
     )
     print()
@@ -265,9 +265,7 @@ def improve(ai: AI, prompt: str, code: Code) -> Code:
         SystemMessage(content=setup_sys_prompt_existing_code(db)),
     ]
     # Add files as input
-    for file_name, file_str in code.items():
-        code_input = format_file_to_input(file_name, file_str)
-        messages.append(HumanMessage(content=f"{code_input}"))
+    messages.append(HumanMessage(content=f"{code.to_chat()}"))
 
     messages.append(HumanMessage(content=f"Request: {prompt}"))
 
