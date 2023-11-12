@@ -1,5 +1,6 @@
 import pytest
-from gpt_engineer.core.chat_to_files import parse_chat, overwrite_files_with_edits, Edit, parse_edits, apply_edits
+from gpt_engineer.core.chat_to_files import parse_chat, Edit, parse_edits, apply_edits
+from gpt_engineer.core.chat_to_files import logger as parse_logger
 import logging
 
 def test_standard_input():
@@ -136,10 +137,9 @@ def log_capture():
             self.messages.append(record.getMessage())
 
     handler = LogCaptureHandler()
-    logger = logging.getLogger("your_module_logger")  # Replace with your actual logger name
-    logger.addHandler(handler)
+    parse_logger.addHandler(handler)
     yield handler
-    logger.removeHandler(handler)
+    parse_logger.removeHandler(handler)
 
 def test_parse_with_additional_text():
     chat = """
@@ -178,7 +178,7 @@ Ending text.
 
 def test_apply_edit_new_file(log_capture):
     edits = [Edit("new_file.py", "", "print('Hello, World!')")]
-    code = {}
+    code = {"new_file.py": "some content"}
     apply_edits(edits, code)
     assert code == {"new_file.py": "print('Hello, World!')"}
     assert "file will be overwritten" in log_capture.messages[0]
