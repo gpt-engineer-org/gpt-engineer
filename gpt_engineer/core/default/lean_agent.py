@@ -76,5 +76,5 @@ class Agent(BaseAgent):
         execute_entrypoint(self.execution_env, code)
         return code
 
-    def improve(self, prompt: str) -> Code:
+    def improve(self, prompt: str, code: Code) -> Code:
         pass

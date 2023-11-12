@@ -35,10 +35,10 @@ from typing import List, Tuple
 
 from gpt_engineer.core.default.on_disk_repository import (
     OnDiskRepository,
-    FileRepositories,
+    # FileRepositories,
 )
 from gpt_engineer.applications.cli.file_selector import FILE_LIST_NAME
-
+from gpt_engineer.core.code import Code
 
 logger = logging.getLogger(__name__)
 
@@ -88,21 +88,6 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
 
     # Return the files
     return files
-
-
-def to_files_and_memory(chat: str, dbs: FileRepositories):
-    """
-    Save chat to memory, and parse chat to extracted file and save them to the workspace.
-
-    Parameters
-    ----------
-    chat : str
-        The chat to parse.
-    dbs : DBs
-        The databases that include the memory and workspace database
-    """
-    dbs.memory["all_output.txt"] = chat
-    to_files(chat, dbs.workspace)
 
 
 def to_files(chat: str, workspace: OnDiskRepository):
@@ -186,9 +171,9 @@ def format_file_to_input(file_name: str, file_content: str) -> str:
     return file_str
 
 
-def overwrite_files_with_edits(chat: str, dbs: FileRepositories):
+def overwrite_files_with_edits(chat: str, code: Code):
     edits = parse_edits(chat)
-    apply_edits(edits, dbs.workspace)
+    apply_edits(edits, code)
 
 
 @dataclass
@@ -239,26 +224,26 @@ def parse_edits(llm_response):
     return parse_all_edits(llm_response)
 
 
-def apply_edits(edits: List[Edit], workspace: OnDiskRepository):
+def apply_edits(edits: List[Edit], code: Code):
     for edit in edits:
         filename = edit.filename
         if edit.before == "":
-            if workspace.get(filename) is not None:
-                logger.warn(
+            if filename in code:
+                logger.warning(
                     f"The edit to be applied wants to create a new file `{filename}`, but that already exists. The file will be overwritten. See `.gpteng/memory` for previous version."
                 )
-            workspace[filename] = edit.after  # new file
+            code[filename] = edit.after  # new file
         else:
-            occurrences_cnt = workspace[filename].count(edit.before)
+            occurrences_cnt = code[filename].count(edit.before)
             if occurrences_cnt == 0:
-                logger.warn(
+                logger.warning(
                     f"While applying an edit to `{filename}`, the code block to be replaced was not found. No instances will be replaced."
                 )
             if occurrences_cnt > 1:
-                logger.warn(
+                logger.warning(
                     f"While applying an edit to `{filename}`, the code block to be replaced was found multiple times. All instances will be replaced."
                 )
-            workspace[filename] = workspace[filename].replace(
+            code[filename] = code[filename].replace(
                 edit.before, edit.after
             )  # existing file
 

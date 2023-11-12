@@ -1,6 +1,6 @@
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.chat_to_files import parse_chat
+from gpt_engineer.core.chat_to_files import parse_chat, overwrite_files_with_edits, format_file_to_input
 from gpt_engineer.core.default.paths import (
     ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
@@ -205,7 +205,28 @@ def execute_entrypoint(execution_env: BaseExecutionEnv, code: Code) -> None:
     execution_env.execute_program(code)
 
 
-def improve(ai: AI, prompt: str) -> Code:
+def setup_sys_prompt_existing_code(db: OnDiskRepository) -> str:
+    """
+    Constructs a system prompt for the AI focused on improving an existing codebase.
+
+    This function sets up the system prompts for the AI, guiding it on how to
+    work with and improve an existing code base. The generated prompt consists
+    of the "improve" instruction (with dynamic format replacements) and the coding
+    "philosophy" taken from the given DBs object.
+
+    Parameters:
+    - dbs (DBs): The database object containing pre-defined prompts and instructions.
+
+    Returns:
+    - str: The constructed system prompt focused on existing code improvement for the AI.
+    """
+    return (
+        db.preprompts["improve"].replace("FILE_FORMAT", db.preprompts["file_format"])
+        + "\nUseful to know:\n"
+        + db.preprompts["philosophy"]
+    )
+
+def improve(ai: AI, prompt: str, code: Code) -> Code:
     """
     Process and improve the code from a specified set of existing files based on a user prompt.
 
@@ -236,21 +257,21 @@ def improve(ai: AI, prompt: str) -> Code:
     to sent the formatted prompt to the LLM.
     """
 
-    files_info = get_code_strings(
-        dbs.workspace, dbs.project_metadata
-    )  # this has file names relative to the workspace path
-
+    # files_info = get_code_strings(
+    #     dbs.workspace, dbs.project_metadata
+    # )  # this has file names relative to the workspace path
+    db = OnDiskRepository(PREPROMPTS_PATH)
     messages = [
-        SystemMessage(content=setup_sys_prompt_existing_code(dbs)),
+        SystemMessage(content=setup_sys_prompt_existing_code(db)),
     ]
     # Add files as input
-    for file_name, file_str in files_info.items():
+    for file_name, file_str in code.items():
         code_input = format_file_to_input(file_name, file_str)
         messages.append(HumanMessage(content=f"{code_input}"))
 
-    messages.append(HumanMessage(content=f"Request: {dbs.input['prompt']}"))
+    messages.append(HumanMessage(content=f"Request: {prompt}"))
 
     messages = ai.next(messages, step_name=curr_fn())
 
-    overwrite_files_with_edits(messages[-1].content.strip(), dbs)
+    overwrite_files_with_edits(messages[-1].content.strip(), code)
     return messages

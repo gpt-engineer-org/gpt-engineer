@@ -50,5 +50,5 @@ class BaseAgent(ABC):
         pass
 
     @abstractmethod
-    def improve(self, prompt: str) -> Code:
+    def improve(self, prompt: str, code: Code) -> Code:
         pass
