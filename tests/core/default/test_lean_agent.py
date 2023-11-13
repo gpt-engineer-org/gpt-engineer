@@ -33,7 +33,8 @@ def test_improve():
         }
     )
     lean_agent = LeanAgent.with_default_config(temp_dir, AI(streaming=False))
-    lean_agent.improve("Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",
+    lean_agent.improve(
+        "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",
         code,
     )
     outfile = "output.txt"

@@ -11,7 +11,7 @@ from gpt_engineer.core.base_repository import BaseRepository
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
-from gpt_engineer.core.default.paths import memory_path
+from gpt_engineer.core.default.paths import memory_path, ENTRYPOINT_FILE
 from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.applications.cli.learning import human_review
 
@@ -85,8 +85,9 @@ class CliAgent(BaseAgent):
 
     def improve(self, prompt: str, code: Code) -> Code:
         code = improve(self.ai, prompt, code)
-        entrypoint = gen_entrypoint(self.ai, code, self.memory)
-        code = Code(code | entrypoint)
+        if not ENTRYPOINT_FILE in code:
+            entrypoint = gen_entrypoint(self.ai, code, self.memory)
+            code = Code(code | entrypoint)
         execute_entrypoint(self.execution_env, code)
         human_review(self.memory)
         return code

@@ -90,7 +90,11 @@ class AI:
     """
 
     def __init__(
-        self, model_name="gpt-4-1106-preview", temperature=0.1, azure_endpoint="", streaming=True,
+        self,
+        model_name="gpt-4-1106-preview",
+        temperature=0.1,
+        azure_endpoint="",
+        streaming=True,
     ):
         """
         Initialize the AI class.
