@@ -3,7 +3,11 @@ import os
 
 from unittest.mock import MagicMock
 
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository, FileRepositories, archive
+from gpt_engineer.core.default.on_disk_repository import (
+    OnDiskRepository,
+    FileRepositories,
+    archive,
+)
 
 
 def freeze_at(monkeypatch, time):

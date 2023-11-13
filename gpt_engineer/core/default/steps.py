@@ -1,6 +1,6 @@
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.chat_to_files import parse_chat, overwrite_files_with_edits#, format_file_to_input
+from gpt_engineer.core.chat_to_files import parse_chat, overwrite_code_with_edits
 from gpt_engineer.core.default.paths import (
     ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
@@ -35,7 +35,7 @@ def curr_fn() -> str:
     return inspect.stack()[1].function
 
 
-def setup_sys_prompt(db: OnDiskRepository) -> str:
+def setup_sys_prompt(preprompts: OnDiskRepository) -> str:
     """
     Constructs a system prompt for the AI based on predefined instructions and philosophies.
 
@@ -45,16 +45,16 @@ def setup_sys_prompt(db: OnDiskRepository) -> str:
     "philosophy" taken from the given DBs object.
 
     Parameters:
-    - dbs (DBs): The database object containing pre-defined prompts and instructions.
+    - preprompts (DBs): The database object containing pre-defined prompts and instructions.
 
     Returns:
     - str: The constructed system prompt for the AI.
     """
     return (
-        db["roadmap"]
-        + db["generate"].replace("FILE_FORMAT", db["file_format"])
+        preprompts["roadmap"]
+        + preprompts["generate"].replace("FILE_FORMAT", preprompts["file_format"])
         + "\nUseful to know:\n"
-        + db["philosophy"]
+        + preprompts["philosophy"]
     )
 
 
@@ -69,7 +69,7 @@ def gen_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
 
     Parameters:
     - ai (AI): An instance of the AI model.
-    - dbs (DBs): An instance containing the database configurations, including system and
+    - preprompts (DBs): An instance containing the database configurations, including system and
       input prompts, and file formatting preferences.
 
     Returns:
@@ -79,8 +79,8 @@ def gen_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     The function assumes the `ai.start` method and the `to_files` utility are correctly
     set up and functional. Ensure these prerequisites are in place before invoking `simple_gen`.
     """
-    db = OnDiskRepository(PREPROMPTS_PATH)
-    messages = ai.start(setup_sys_prompt(db), prompt, step_name=curr_fn())
+    preprompts = OnDiskRepository(PREPROMPTS_PATH)
+    messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files = parse_chat(chat)
@@ -99,7 +99,7 @@ def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository) -> Code:
 
     Parameters:
     - ai (AI): An instance of the AI model.
-    - dbs (DBs): An instance containing the database configurations and workspace
+    - prepromptss (DBs): An instance containing the database configurations and workspace
       information, particularly the 'all_output.txt' which contains details about the
       codebase on disk.
 
@@ -155,8 +155,6 @@ def execute_entrypoint(execution_env: BaseExecutionEnv, code: Code) -> None:
     Parameters:
     - ai (AI): An instance of the AI model, not directly used in this function but
       included for consistency with other functions.
-    - dbs (DBs): An instance containing the database configurations and workspace
-      information.
 
     Returns:
     - List[dict]: An empty list. This function does not produce a list of messages
@@ -205,7 +203,7 @@ def execute_entrypoint(execution_env: BaseExecutionEnv, code: Code) -> None:
     execution_env.execute_program(code)
 
 
-def setup_sys_prompt_existing_code(db: OnDiskRepository) -> str:
+def setup_sys_prompt_existing_code(preprompts: OnDiskRepository) -> str:
     """
     Constructs a system prompt for the AI focused on improving an existing codebase.
 
@@ -215,16 +213,17 @@ def setup_sys_prompt_existing_code(db: OnDiskRepository) -> str:
     "philosophy" taken from the given DBs object.
 
     Parameters:
-    - dbs (DBs): The database object containing pre-defined prompts and instructions.
+    - preprompts (DBs): The database object containing pre-defined prompts and instructions.
 
     Returns:
     - str: The constructed system prompt focused on existing code improvement for the AI.
     """
     return (
-        db.preprompts["improve"].replace("FILE_FORMAT", db.preprompts["file_format"])
+        preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format"])
         + "\nUseful to know:\n"
-        + db.preprompts["philosophy"]
+        + preprompts["philosophy"]
     )
+
 
 def improve(ai: AI, prompt: str, code: Code) -> Code:
     """
@@ -271,5 +270,5 @@ def improve(ai: AI, prompt: str, code: Code) -> Code:
 
     messages = ai.next(messages, step_name=curr_fn())
 
-    overwrite_files_with_edits(messages[-1].content.strip(), code)
-    return messages
+    overwrite_code_with_edits(messages[-1].content.strip(), code)
+    return code

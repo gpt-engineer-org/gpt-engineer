@@ -26,7 +26,6 @@ Functions:
 - apply_edits: Applies file edits to a workspace.
 """
 
-import os
 import re
 import logging
 
@@ -89,10 +88,7 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
     return files
 
 
-
-
-
-def overwrite_files_with_edits(chat: str, code: Code):
+def overwrite_code_with_edits(chat: str, code: Code):
     edits = parse_edits(chat)
     apply_edits(edits, code)
 

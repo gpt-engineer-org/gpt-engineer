@@ -1,6 +1,9 @@
 import pytest
 
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository, FileRepositories
+from gpt_engineer.core.default.on_disk_repository import (
+    OnDiskRepository,
+    FileRepositories,
+)
 
 
 def test_DB_operations(tmp_path):
