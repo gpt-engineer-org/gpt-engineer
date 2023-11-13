@@ -56,6 +56,7 @@ from gpt_engineer.core.default.on_disk_repository import (
     OnDiskRepository,
     FileRepositories,
 )
+from gpt_engineer.core.base_repository import BaseRepository
 from gpt_engineer.core.domain import Step
 
 
@@ -282,7 +283,7 @@ def get_session() -> str:
         return "ephemeral_" + str(random.randint(0, 2**32))
 
 
-def human_review(memory: OnDiskRepository):
+def human_review(memory: BaseRepository):
     """
     Collects human feedback on the code and stores it in memory.
 

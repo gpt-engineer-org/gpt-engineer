@@ -3,6 +3,7 @@ from gpt_engineer.core.chat_to_files import parse_chat, Edit, parse_edits, apply
 from gpt_engineer.core.chat_to_files import logger as parse_logger
 import logging
 
+
 def test_standard_input():
     chat = """
     Some text describing the code
@@ -19,14 +20,16 @@ def add(a, b):
     """
     expected = [
         ("file1.py", 'print("Hello, World!")'),
-        ("file2.py", 'def add(a, b):\n    return a + b')
+        ("file2.py", "def add(a, b):\n    return a + b"),
     ]
     assert parse_chat(chat) == expected
+
 
 def test_no_code_blocks():
     chat = "Just some regular chat without code."
     expected = []
     assert parse_chat(chat) == expected
+
 
 def test_special_characters_in_filename():
     chat = """
@@ -40,12 +43,10 @@ def test_special_characters_in_filename():
     print("File 2")
     ```
     """
-    expected = [
-        ("file[1].py", 'print("File 1")'),
-        ("file`2`.py", 'print("File 2")')
-    ]
+    expected = [("file[1].py", 'print("File 1")'), ("file`2`.py", 'print("File 2")')]
     parsed = parse_chat(chat)
     assert parsed == expected
+
 
 def test_empty_code_blocks():
     chat = """
@@ -53,10 +54,9 @@ def test_empty_code_blocks():
     ```
     ```
     """
-    expected = [
-        ("empty.py", '')
-    ]
+    expected = [("empty.py", "")]
     assert parse_chat(chat) == expected
+
 
 def test_mixed_content():
     chat = """
@@ -70,11 +70,9 @@ def test_mixed_content():
     print("World")
     ```
     """
-    expected = [
-        ("script.sh", 'echo "Hello"'),
-        ("script.py", 'print("World")')
-    ]
+    expected = [("script.sh", 'echo "Hello"'), ("script.py", 'print("World")')]
     assert parse_chat(chat) == expected
+
 
 def test_filename_line_break():
     chat = """
@@ -84,10 +82,9 @@ def test_filename_line_break():
     print("Hello, World!")
     ```
     """
-    expected = [
-        ("file1.py", 'print("Hello, World!")')
-    ]
+    expected = [("file1.py", 'print("Hello, World!")')]
     assert parse_chat(chat) == expected
+
 
 def test_filename_in_backticks():
     chat = """
@@ -96,10 +93,9 @@ def test_filename_in_backticks():
     print("Hello, World!")
     ```
     """
-    expected = [
-        ("file1.py", 'print("Hello, World!")')
-    ]
+    expected = [("file1.py", 'print("Hello, World!")')]
     assert parse_chat(chat) == expected
+
 
 def test_filename_with_file_tag():
     chat = """
@@ -108,10 +104,9 @@ def test_filename_with_file_tag():
     print("Hello, World!")
     ```
     """
-    expected = [
-        ("file1.py", 'print("Hello, World!")')
-    ]
+    expected = [("file1.py", 'print("Hello, World!")')]
     assert parse_chat(chat) == expected
+
 
 def test_filename_with_different_extension():
     chat = """
@@ -120,10 +115,9 @@ def test_filename_with_different_extension():
     console.log("Hello, World!")
     ```
     """
-    expected = [
-        ("[id].jsx", 'console.log("Hello, World!")')
-    ]
+    expected = [("[id].jsx", 'console.log("Hello, World!")')]
     assert parse_chat(chat) == expected
+
 
 # Helper function to capture log messages
 @pytest.fixture
@@ -140,6 +134,7 @@ def log_capture():
     parse_logger.addHandler(handler)
     yield handler
     parse_logger.removeHandler(handler)
+
 
 def test_parse_with_additional_text():
     chat = """
@@ -171,10 +166,15 @@ Ending text.
     """
     expected = [
         Edit("some/dir/example_1.py", "def mul(a,b)", "def add(a,b):"),
-        Edit("some/dir/example_2.py", "class DBS:\n        db = 'aaa'", "class DBS:\n        db = 'bbb'")
+        Edit(
+            "some/dir/example_2.py",
+            "class DBS:\n        db = 'aaa'",
+            "class DBS:\n        db = 'bbb'",
+        ),
     ]
     parsed = parse_edits(chat)
     assert parsed == expected
+
 
 def test_apply_edit_new_file(log_capture):
     edits = [Edit("new_file.py", "", "print('Hello, World!')")]
@@ -183,6 +183,7 @@ def test_apply_edit_new_file(log_capture):
     assert code == {"new_file.py": "print('Hello, World!')"}
     assert "file will be overwritten" in log_capture.messages[0]
 
+
 def test_apply_edit_no_match(log_capture):
     edits = [Edit("file.py", "non-existent content", "new content")]
     code = {"file.py": "some content"}
@@ -190,12 +191,14 @@ def test_apply_edit_no_match(log_capture):
     assert code == {"file.py": "some content"}  # No change
     assert "code block to be replaced was not found" in log_capture.messages[0]
 
+
 def test_apply_edit_multiple_matches(log_capture):
     edits = [Edit("file.py", "repeat", "new")]
     code = {"file.py": "repeat repeat repeat"}
     apply_edits(edits, code)
     assert code == {"file.py": "new new new"}
     assert "code block to be replaced was found multiple times" in log_capture.messages[0]
+
 
 if __name__ == "__main__":
     pytest.main()

@@ -62,7 +62,7 @@ from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import (
     # format_file_to_input,
     # get_code_strings,
-    overwrite_files_with_edits,
+    overwrite_code_with_edits,
     # to_files_and_memory,
 )
 from gpt_engineer.core.default.on_disk_repository import FileRepositories
@@ -522,7 +522,7 @@ def vector_improve(ai: AI, dbs: FileRepositories):
 
     messages = ai.next(messages, step_name=curr_fn())
 
-    overwrite_files_with_edits(messages[-1].content.strip(), dbs)
+    overwrite_code_with_edits(messages[-1].content.strip(), dbs)
     return messages
 
 
@@ -641,7 +641,7 @@ def improve_existing_code(ai: AI, dbs: FileRepositories):
 
     messages = ai.next(messages, step_name=curr_fn())
 
-    overwrite_files_with_edits(messages[-1].content.strip(), dbs)
+    overwrite_code_with_edits(messages[-1].content.strip(), dbs)
     return messages
 
 

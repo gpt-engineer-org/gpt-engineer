@@ -7,10 +7,10 @@ from pathlib import Path
 class Code(dict):
     def __setitem__(self, key, value):
         if not isinstance(key, str | Path):
-            raise TypeError("Keys must be strings")
+            raise TypeError("Keys must be strings or Path's")
         if not isinstance(value, str):
             raise TypeError("Values must be strings")
-        super()[key] = value
+        super().__setitem__(key, value)
 
     def to_chat(self):
         def format_file_to_input(file_name: str, file_content: str) -> str:
@@ -30,10 +30,16 @@ class Code(dict):
                 The formatted file string.
             """
             file_str = f"""
-            {file_name}
-            ```
-            {file_content}
+{file_name}
+```
+{file_content}
             ```
             """
             return file_str
-        return "\n".join([format_file_to_input(file_name, file_content) + "\n" for file_name, file_content in self.items()])
+
+        return "\n".join(
+            [
+                format_file_to_input(file_name, file_content) + "\n"
+                for file_name, file_content in self.items()
+            ]
+        )

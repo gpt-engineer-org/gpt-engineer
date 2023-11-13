@@ -10,7 +10,10 @@ import pytest
 import rudderstack.analytics as rudder_analytics
 
 from gpt_engineer.applications.cli import collect_learnings, steps_file_hash
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository, FileRepositories
+from gpt_engineer.core.default.on_disk_repository import (
+    OnDiskRepository,
+    FileRepositories,
+)
 from gpt_engineer.applications.cli import extract_learning
 from gpt_engineer.legacy.steps import simple_gen
 

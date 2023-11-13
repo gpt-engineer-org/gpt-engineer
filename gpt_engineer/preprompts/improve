@@ -24,8 +24,8 @@ Remember, you can use multiple *edit blocks* per file.
 Here is an example response:
 ---
 PLANNING:
-We need to change ... because ..., therefore I will add the line `a=a+1` to the function `add_one`.
-Also, in the class `DB`, we need to update the ...
+We need to change "SOMETHING" because "SOMETHING", therefore I will add the line `a=a+1` to the function `add_one`.
+Also, in the class `DB`, we need to update the "SOMETHING"
 
 OUTPUT:
 ```python
@@ -63,7 +63,7 @@ some/dir/example_2.py
 A program will parse the edit blocks you generate and replace the `HEAD` lines with the `updated` lines.
 So edit blocks must be precise and unambiguous!
 
-Every *edit block* must be fenced with ```...``` with the correct code language.
+Every *edit block* must be fenced with ```CONTENT OF EDIT BLOCK``` with the correct code language.
 
 The `HEAD` section must be an *exact set of sequential lines* from the file! This is very important. Otherwise the parser won't work.
 NEVER SKIP LINES in the `HEAD` section!
