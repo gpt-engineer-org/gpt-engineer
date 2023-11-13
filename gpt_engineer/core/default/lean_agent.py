@@ -1,17 +1,15 @@
 from gpt_engineer.core.code import Code
-from gpt_engineer.core.base_version_manager import BaseVersionManager
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.steps import (
     gen_code,
     gen_entrypoint,
-    execute_entrypoint,
     improve,
 )
 from gpt_engineer.core.base_repository import BaseRepository
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
-from gpt_engineer.core.default.paths import memory_path
+from gpt_engineer.core.default.paths import memory_path, ENTRYPOINT_FILE
 from gpt_engineer.core.base_agent import BaseAgent
 
 
@@ -39,13 +37,12 @@ class LeanAgent(BaseAgent):
         entrypoint = gen_entrypoint(self.ai, code, self.memory)
         code = Code(code | entrypoint)
         self.execution_env.execute_program(code)
-        # execute_entrypoint(self.execution_env, code)
         return code
 
     def improve(self, prompt: str, code: Code) -> Code:
         code = improve(self.ai, prompt, code)
-        entrypoint = gen_entrypoint(self.ai, code, self.memory)
-        code = Code(code | entrypoint)
+        if not ENTRYPOINT_FILE in code:
+            entrypoint = gen_entrypoint(self.ai, code, self.memory)
+            code = Code(code | entrypoint)
         self.execution_env.execute_program(code)
-        # execute_entrypoint(self.execution_env, code)
         return code
