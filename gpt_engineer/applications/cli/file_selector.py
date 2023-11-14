@@ -48,7 +48,7 @@ from pathlib import Path
 from typing import List, Union
 
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-
+from gpt_engineer.core.default.paths import metadata_path
 IGNORE_FOLDERS = {"site-packages", "node_modules", "venv"}
 FILE_LIST_NAME = "file_list.txt"
 
@@ -321,7 +321,7 @@ def is_in_ignoring_extensions(path: Path) -> bool:
     return is_hidden and is_pycache
 
 
-def ask_for_files(metadata_db: OnDiskRepository, workspace_db: OnDiskRepository) -> None:
+def ask_for_files(project_path: Union[str, Path]) -> None:
     """
     Ask user to select files to improve.
     It can be done by terminal, gui, or using the old selection.
@@ -329,6 +329,7 @@ def ask_for_files(metadata_db: OnDiskRepository, workspace_db: OnDiskRepository)
     Returns:
         dict[str, str]: Dictionary where key = file name and value = file path
     """
+    metadata_db = metadata_path(project_path)
     if FILE_LIST_NAME in metadata_db:
         print(
             f"File list detected at {metadata_db.path / FILE_LIST_NAME}. "
@@ -367,10 +368,10 @@ def ask_for_files(metadata_db: OnDiskRepository, workspace_db: OnDiskRepository)
 
     if selection_number == 1:
         # Open GUI selection
-        file_path_list = gui_file_selector(workspace_db.path)
+        file_path_list = gui_file_selector(project_path)
     elif selection_number == 2:
         # Open terminal selection
-        file_path_list = terminal_file_selector(workspace_db.path)
+        file_path_list = terminal_file_selector(project_path)
     if (
         selection_number <= 0
         or selection_number > 3

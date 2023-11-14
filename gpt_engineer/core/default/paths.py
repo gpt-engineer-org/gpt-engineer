@@ -9,3 +9,7 @@ ENTRYPOINT_LOG_FILE = "gen_entrypoint_chat.txt"
 
 def memory_path(path):
     return os.path.join(path, MEMORY_REL_PATH)
+
+
+def metadata_path(path):
+    return os.path.join(path, META_DATA_REL_PATH)
