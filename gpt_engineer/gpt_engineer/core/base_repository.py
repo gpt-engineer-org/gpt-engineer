@@ -7,8 +7,8 @@ class BaseRepository(ABC):
     """
     Abstract base class for a repository.
 
-    This class serves as a base for creating repository classes that manage
-    storage, retrieval, and other operations on data or objects within a specific
-    domain or context.
+    This class defines the interface for repositories that manage storage and retrieval
+    of data or code. Implementations of this class should provide concrete storage
+    mechanisms and data retrieval methods.
     """
     pass

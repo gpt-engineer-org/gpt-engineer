@@ -7,9 +7,9 @@ class BaseExecutionEnv(ABC):
     """
     Abstract base class for an execution environment.
 
-    This class defines the interface for executing a program represented by
-    a `Code` object. Implementations of this class are expected to provide
-    a concrete method for executing the code and handling the execution process.
+    This class defines the interface for execution environments where code can be run.
+    Implementations of this class should provide a method to execute code and return
+    the process handle.
     """
     # ToDo: Figure out long term solution to the return variable (potentially a status class?), for now, return a process
     @abstractmethod

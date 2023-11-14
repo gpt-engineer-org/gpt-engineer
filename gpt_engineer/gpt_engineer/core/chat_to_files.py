@@ -90,17 +90,17 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
 
 def overwrite_code_with_edits(chat: str, code: Code):
     """
-    Overwrite the code with edits extracted from the chat.
+    Overwrites the code with edits extracted from the chat.
 
-    This function takes a chat string and a `Code` object, parses the chat for
-    edits, and applies those edits to the `Code` object.
+    This function parses the chat to identify code edits and then applies those edits
+    to the provided code object.
 
     Parameters
     ----------
     chat : str
         The chat content containing code edits.
     code : Code
-        The `Code` object to apply the edits to.
+        The code object to apply the edits to.
     """
     edits = parse_edits(chat)
     apply_edits(edits, code)
@@ -114,22 +114,6 @@ class Edit:
 
 
 def parse_edits(chat: str):
-    """
-    Parse the chat content to extract code edits.
-
-    This function processes the chat string to identify and extract code edits,
-    which are represented as `Edit` objects.
-
-    Parameters
-    ----------
-    chat : str
-        The chat content containing code edits.
-
-    Returns
-    -------
-    List[Edit]
-        A list of `Edit` objects representing the parsed code edits.
-    """
     def parse_one_edit(lines):
         HEAD = "<<<<<<< HEAD"
         DIVIDER = "\n=======\n"
@@ -168,19 +152,6 @@ def parse_edits(chat: str):
 
 
 def apply_edits(edits: List[Edit], code: Code):
-    """
-    Apply the given edits to the specified code.
-
-    This function takes a list of `Edit` objects and a `Code` object, then
-    applies each edit to the corresponding file within the `Code` object.
-
-    Parameters
-    ----------
-    edits : List[Edit]
-        A list of `Edit` objects representing the code edits to apply.
-    code : Code
-        The `Code` object to which the edits will be applied.
-    """
     for edit in edits:
         filename = edit.filename
         if edit.before == "":

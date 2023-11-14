@@ -6,11 +6,11 @@ from abc import ABC, abstractmethod
 
 class BaseAgent(ABC):
     """
-    Abstract base class for an agent that interacts with the AI model.
+    Abstract base class for an agent that interacts with code.
 
-    This class defines the interface for initializing and improving code
-    based on a given prompt. Implementations of this class are expected to
-    provide concrete methods for these actions.
+    This class defines the interface for agents that can initialize and improve code
+    based on a given prompt. Implementations of this class should provide concrete
+    methods for initializing and improving code.
     """
     @abstractmethod
     def init(self, prompt: str) -> Code:

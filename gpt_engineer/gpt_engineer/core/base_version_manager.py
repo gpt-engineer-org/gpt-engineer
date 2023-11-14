@@ -6,9 +6,9 @@ class BaseVersionManager(ABC):
     """
     Abstract base class for a version manager.
 
-    This class defines the interface for managing versions of code, including
-    creating snapshots of the code state. Implementations of this class are
-    expected to provide concrete methods for these versioning actions.
+    This class defines the interface for version managers that handle the creation
+    and management of code snapshots. Implementations of this class should provide
+    methods to create and retrieve snapshots of code at various stages.
     """
     @abstractmethod
     def snapshot(self, code: Code) -> str:

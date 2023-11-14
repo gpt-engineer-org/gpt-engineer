@@ -6,12 +6,11 @@ from pathlib import Path
 # ToDo: implement as mutable mapping, potentially holding a dict instead of being a dict.
 class Code(dict):
     """
-    A dictionary subclass representing a collection of code files.
+    A dictionary subclass that represents a collection of code files.
 
     This class extends the standard dictionary to enforce string keys and values,
-    representing filenames and their corresponding code content. It provides
-    functionality to set items with type checking and to format the code for chat
-    with the AI agent.
+    representing filenames and their respective code content. It provides a method
+    to format the code into a chat-friendly string for AI interactions.
     """
     def __setitem__(self, key, value):
         if not isinstance(key, str | Path):
@@ -21,18 +20,6 @@ class Code(dict):
         super().__setitem__(key, value)
 
     def to_chat(self):
-        """
-        Format the code files into a string suitable for chat input to the AI agent.
-
-        This method converts the code files stored in the `Code` object into a
-        formatted string with filenames and code blocks, ready to be used as input
-        for chat-based interactions with an AI model.
-
-        Returns
-        -------
-        str
-            A string containing the formatted code files for chat input.
-        """
         def format_file_to_input(file_name: str, file_content: str) -> str:
             """
             Format a file string to use as input to the AI agent.
