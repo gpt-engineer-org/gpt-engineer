@@ -152,7 +152,7 @@ def main(
     # project_path = os.path.abspath(
     #     project_path
     # )  # resolve the string to a valid path (eg "a/b/../c" to "a/c")
-    path = Path(project_path)#.absolute()
+    path = Path(project_path)  # .absolute()
     print("Running gpt-engineer in", path, "\n")
     prompt = load_prompt(OnDiskRepository(path))
     agent = CliAgent.with_default_config(project_path)

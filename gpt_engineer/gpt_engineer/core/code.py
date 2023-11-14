@@ -12,6 +12,7 @@ class Code(dict):
     representing filenames and their respective code content. It provides a method
     to format the code into a chat-friendly string for AI interactions.
     """
+
     def __setitem__(self, key, value):
         if not isinstance(key, str | Path):
             raise TypeError("Keys must be strings or Path's")

@@ -12,6 +12,7 @@ class BaseAgent(ABC):
     based on a given prompt. Implementations of this class should provide concrete
     methods for initializing and improving code.
     """
+
     @abstractmethod
     def init(self, prompt: str) -> Code:
         pass

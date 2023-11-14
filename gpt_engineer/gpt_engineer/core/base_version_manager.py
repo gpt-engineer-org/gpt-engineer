@@ -10,6 +10,7 @@ class BaseVersionManager(ABC):
     and management of code snapshots. Implementations of this class should provide
     methods to create and retrieve snapshots of code at various stages.
     """
+
     @abstractmethod
     def snapshot(self, code: Code) -> str:
         pass

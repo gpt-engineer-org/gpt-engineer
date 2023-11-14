@@ -11,4 +11,5 @@ class BaseRepository(ABC):
     of data or code. Implementations of this class should provide concrete storage
     mechanisms and data retrieval methods.
     """
+
     pass

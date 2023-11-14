@@ -50,6 +50,7 @@ from typing import List, Union
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.default.paths import metadata_path
 from gpt_engineer.core.code import Code
+
 IGNORE_FOLDERS = {"site-packages", "node_modules", "venv"}
 FILE_LIST_NAME = "file_list.txt"
 
@@ -337,7 +338,6 @@ def ask_for_files(project_path: Union[str, Path]) -> Code:
             "Edit or delete it if you want to select new files."
         )
     else:
-
         use_last_string = ""
         if FILE_LIST_NAME in metadata_db:
             use_last_string = (
