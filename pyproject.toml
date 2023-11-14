@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 
 [project]
 name = "gpt-engineer"
-version = "0.1.0"
+version = "0.2.0"
 description = "Specify what you want it to build, the AI asks for clarification, and then builds it."
 readme = "README.md"
 requires-python = ">=3.8, <4.0"
@@ -64,11 +64,11 @@ doc = [
 
 
 [project.scripts]
-gpt-engineer = 'gpt_engineer.cli.main:app'
-ge = 'gpt_engineer.cli.main:app'
+gpt-engineer = 'gpt_engineer.applications.cli.main:app'
+ge = 'gpt_engineer.appications.cli.main:app'
 
 [tool.setuptools]
-packages = ["gpt_engineer", "gpt_engineer.cli", "gpt_engineer.core", "gpt_engineer.data"]
+packages = ["gpt_engineer", "gpt_engineer.applications", "gpt_engineer.applications.cli", "gpt_engineer.core", "gpt_engineer.core.default", "gpt_engineer.tools", "gpt_engineer.legacy"]
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]

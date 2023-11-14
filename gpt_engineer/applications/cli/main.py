@@ -34,6 +34,8 @@ from dotenv import load_dotenv
 
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.ai import AI
+from gpt_engineer.core.code import Code
+from gpt_engineer.applications.cli.file_selector import ask_for_files
 
 # from gpt_engineer.legacy.steps import STEPS, Config as StepsConfig
 # from gpt_engineer.applications.cli.collect import collect_learnings
@@ -147,14 +149,18 @@ def main(
         azure_endpoint=azure_endpoint,
     )
 
-    project_path = os.path.abspath(
-        project_path
-    )  # resolve the string to a valid path (eg "a/b/../c" to "a/c")
-    path = Path(project_path).absolute()
+    # project_path = os.path.abspath(
+    #     project_path
+    # )  # resolve the string to a valid path (eg "a/b/../c" to "a/c")
+    path = Path(project_path)  # .absolute()
     print("Running gpt-engineer in", path, "\n")
     prompt = load_prompt(OnDiskRepository(path))
     agent = CliAgent.with_default_config(project_path)
-    agent.init(prompt)
+    if improve_mode:
+        code = ask_for_files(project_path)
+        agent.improve(prompt, code)
+    else:
+        agent.init(prompt)
     # workspace_path = path
     # input_path = path
     #

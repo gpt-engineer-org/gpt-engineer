@@ -89,6 +89,19 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
 
 
 def overwrite_code_with_edits(chat: str, code: Code):
+    """
+    Overwrites the code with edits extracted from the chat.
+
+    This function parses the chat to identify code edits and then applies those edits
+    to the provided code object.
+
+    Parameters
+    ----------
+    chat : str
+        The chat content containing code edits.
+    code : Code
+        The code object to apply the edits to.
+    """
     edits = parse_edits(chat)
     apply_edits(edits, code)
 
