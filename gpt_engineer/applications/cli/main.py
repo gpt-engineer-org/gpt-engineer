@@ -159,7 +159,8 @@ def main(
     if improve_mode:
         code = ask_for_files(project_path)
         agent.improve(prompt, code)
-    agent.init(prompt)
+    else:
+        agent.init(prompt)
     # workspace_path = path
     # input_path = path
     #
