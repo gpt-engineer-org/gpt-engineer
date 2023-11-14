@@ -389,7 +389,7 @@ def ask_for_files(project_path: Union[str, Path]) -> Code:
     with open(metadata_db.path / FILE_LIST_NAME, "r") as file_list:
         for file in file_list:
             with open(file.strip(), "r") as content:
-                content_dict[file] = content.read()
+                content_dict[file.strip()] = content.read()
     return Code(content_dict)
 
 

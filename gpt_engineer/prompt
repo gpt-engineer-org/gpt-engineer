@@ -1,1 +1,1 @@
-Update/add documentation strings and comments to the prgram. Make sure everything is up to date
+go through all functions and classes and check if there is a documentation string. if not, make one. If there is one, update it. Make sure to never replace any code. The function of the program is not allowed to change
