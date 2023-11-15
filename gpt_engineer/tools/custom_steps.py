@@ -1,8 +1,8 @@
 import subprocess
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
-from langchain.schema import SystemMessage, HumanMessage
+from langchain.schema import SystemMessage, HumanMessage, AIMessage
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import overwrite_code_with_edits
@@ -14,13 +14,14 @@ from gpt_engineer.core.default.paths import (
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE
 )
-from gpt_engineer.core.default.steps import curr_fn, PREPROMPTS_PATH
+from gpt_engineer.core.default.steps import curr_fn, PREPROMPTS_PATH, setup_sys_prompt
 from gpt_engineer.core.chat_to_files import parse_chat
 from gpt_engineer.core.code import Code
 from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
+# Type hint for chat messages
+Message = Union[AIMessage, HumanMessage, SystemMessage]
 
-
-def self_heal(ai: AI, dbs: FileRepositories):
+def self_heal(ai: AI, dbs: OnDiskRepository):
     """Attempts to execute the code from the entrypoint and if it fails,
     sends the error output back to the AI with instructions to fix.
     This code will make `MAX_SELF_HEAL_ATTEMPTS` to try and fix the code
@@ -84,7 +85,7 @@ def self_heal(ai: AI, dbs: FileRepositories):
     return messages
 
 
-def vector_improve(ai: AI, dbs: FileRepositories):
+def vector_improve(ai: AI, dbs: OnDiskRepository):
     code_vector_repository = CodeVectorRepository()
     code_vector_repository.load_from_directory(dbs.workspace.path)
     releventDocuments = code_vector_repository.relevent_code_chunks(dbs.input["prompt"])
@@ -115,7 +116,7 @@ def vector_improve(ai: AI, dbs: FileRepositories):
     return messages
 
 
-def gen_clarified_code(ai: AI, dbs: FileRepositories) -> List[dict]:
+def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     """
     Generates code based on clarifications obtained from the user.
 
@@ -132,45 +133,9 @@ def gen_clarified_code(ai: AI, dbs: FileRepositories) -> List[dict]:
     - List[dict]: A list of message dictionaries capturing the AI's interactions and generated
       outputs during the code generation process.
     """
-    messages = AI.deserialize_messages(dbs.logs[clarify.__name__])
-
-    messages = [
-        SystemMessage(content=setup_sys_prompt(dbs)),
-    ] + messages[
-        1:
-    ]  # skip the first clarify message, which was the original clarify priming prompt
-    messages = ai.next(
-        messages,
-        dbs.preprompts["generate"].replace("FILE_FORMAT", dbs.preprompts["file_format"]),
-        step_name=curr_fn(),
-    )
-
-    to_files_and_memory(messages[-1].content.strip(), dbs)
-    return messages
-
-
-def clarify(ai: AI, dbs: FileRepositories) -> List[Message]:
-    """
-    Interactively queries the user for clarifications on the prompt and saves the AI's responses.
-
-    This function presents a series of clarifying questions to the user, based on the AI's
-    initial assessment of the provided prompt. The user can continue to interact and seek
-    clarifications until they indicate that they have "nothing to clarify" or manually
-    opt to move on. If the user doesn't provide any input, the AI is instructed to make its
-    own assumptions and to state them explicitly before proceeding.
-
-    Parameters:
-    - ai (AI): An instance of the AI model.
-    - dbs (DBs): An instance containing the database configurations, which includes system
-      and input prompts.
-
-    Returns:
-    - List[Message]: A list of message objects encapsulating the AI's generated output and
-      interactions.
-
-    """
-    messages: List[Message] = [SystemMessage(content=dbs.preprompts["clarify"])]
-    user_input = dbs.input["prompt"]
+    preprompts = OnDiskRepository(PREPROMPTS_PATH)
+    messages: List[Message] = [SystemMessage(content=preprompts["clarify"])]
+    user_input = prompt
     while True:
         messages = ai.next(messages, user_input, step_name=curr_fn())
         msg = messages[-1].content.strip()
@@ -195,7 +160,7 @@ def clarify(ai: AI, dbs: FileRepositories) -> List[Message]:
                 step_name=curr_fn(),
             )
             print()
-            return messages
+
 
         user_input += """
             \n\n
@@ -204,7 +169,24 @@ def clarify(ai: AI, dbs: FileRepositories) -> List[Message]:
             """
 
     print()
+
+    messages = [
+        SystemMessage(content=setup_sys_prompt(preprompts)),
+    ] + messages[
+        1:
+    ]  # skip the first clarify message, which was the original clarify priming prompt
+    messages = ai.next(
+        messages,
+        preprompts["generate"].replace("FILE_FORMAT", preprompts["file_format"]),
+        step_name=curr_fn(),
+    )
+
+    chat = messages[-1].content.strip()
+    memory[CODE_GEN_LOG_FILE] = chat
+    files = parse_chat(chat)
+    code = Code({key: val for key, val in files})
     return messages
+
 
 
 def lite_gen(ai: AI, prompt: str, memory: BaseRepository) -> Code:
@@ -236,4 +218,4 @@ def lite_gen(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     memory[CODE_GEN_LOG_FILE] = chat
     files = parse_chat(chat)
     code = Code({key: val for key, val in files})
-    return messages
+    return code

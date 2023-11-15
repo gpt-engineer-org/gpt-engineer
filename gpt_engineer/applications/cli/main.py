@@ -36,11 +36,8 @@ from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.code import Code
 from gpt_engineer.applications.cli.file_selector import ask_for_files
-
-# from gpt_engineer.legacy.steps import STEPS, Config as StepsConfig
-# from gpt_engineer.applications.cli.collect import collect_learnings
-# from gpt_engineer.applications.cli.learning import check_collection_consent
-# from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
+from gpt_engineer.tools.custom_steps import lite_gen, gen_clarified_code
+from gpt_engineer.core.default.steps import gen_code
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 
 
@@ -104,6 +101,12 @@ def main(
         "-l",
         help="Lite mode - run only the main prompt.",
     ),
+    clarify_mode: bool = typer.Option(
+        False,
+        "--clarify",
+        "-c",
+        help="Lite mode - discuss specification with AI before implementation.",
+    ),
     azure_endpoint: str = typer.Option(
         "",
         "--azure",
@@ -152,7 +155,13 @@ def main(
     path = Path(project_path)  # .absolute()
     print("Running gpt-engineer in", path, "\n")
     prompt = load_prompt(OnDiskRepository(path))
-    agent = CliAgent.with_default_config(project_path)
+    if clarify_mode:
+        code_gen_fn = gen_clarified_code
+    elif lite_mode:
+        code_gen_fn = lite_gen
+    else:
+        code_gen_fn = gen_code
+    agent = CliAgent.with_default_config(project_path, code_gen_fn=code_gen_fn)
     if improve_mode:
         code = ask_for_files(project_path)
         agent.improve(prompt, code)

@@ -2,7 +2,7 @@ import pytest
 
 from gpt_engineer.core.default.on_disk_repository import (
     OnDiskRepository,
-    FileRepositories,
+    # FileRepositories,
 )
 
 
@@ -19,33 +19,6 @@ def test_DB_operations(tmp_path):
     val = db["test_key"]
 
     assert val == "test_value"
-
-
-def test_DBs_initialization(tmp_path):
-    dir_names = [
-        "memory",
-        "logs",
-        "preprompts",
-        "input",
-        "workspace",
-        "archive",
-        "project_metadata",
-    ]
-    directories = [tmp_path / name for name in dir_names]
-
-    # Create DB objects
-    dbs = [OnDiskRepository(dir) for dir in directories]
-
-    # Create DB instance
-    dbs_instance = FileRepositories(*dbs)
-
-    assert isinstance(dbs_instance.memory, OnDiskRepository)
-    assert isinstance(dbs_instance.logs, OnDiskRepository)
-    assert isinstance(dbs_instance.preprompts, OnDiskRepository)
-    assert isinstance(dbs_instance.input, OnDiskRepository)
-    assert isinstance(dbs_instance.workspace, OnDiskRepository)
-    assert isinstance(dbs_instance.archive, OnDiskRepository)
-    assert isinstance(dbs_instance.project_metadata, OnDiskRepository)
 
 
 def test_large_files(tmp_path):
@@ -101,29 +74,3 @@ def test_error_messages(tmp_path):
 
     assert str(e.value) == "val must be str"
 
-
-def test_DBs_dataclass_attributes(tmp_path):
-    dir_names = [
-        "memory",
-        "logs",
-        "preprompts",
-        "input",
-        "workspace",
-        "archive",
-        "project_metadata",
-    ]
-    directories = [tmp_path / name for name in dir_names]
-
-    # Create DB objects
-    dbs = [OnDiskRepository(dir) for dir in directories]
-
-    # Create DBs instance
-    dbs_instance = FileRepositories(*dbs)
-
-    assert dbs_instance.memory == dbs[0]
-    assert dbs_instance.logs == dbs[1]
-    assert dbs_instance.preprompts == dbs[2]
-    assert dbs_instance.input == dbs[3]
-    assert dbs_instance.workspace == dbs[4]
-    assert dbs_instance.archive == dbs[5]
-    assert dbs_instance.project_metadata == dbs[6]
