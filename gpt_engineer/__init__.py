@@ -4,6 +4,5 @@ from gpt_engineer.core import (
     domain,
     chat_to_files,
 )
-from gpt_engineer.legacy import steps
 from gpt_engineer.tools import code_vector_repository
 from gpt_engineer.core.default import on_disk_repository

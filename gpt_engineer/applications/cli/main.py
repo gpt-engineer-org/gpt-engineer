@@ -86,9 +86,6 @@ def main(
     project_path: str = typer.Argument("projects/example", help="path"),
     model: str = typer.Argument("gpt-4-1106-preview", help="model id string"),
     temperature: float = 0.1,
-    # steps_config: StepsConfig = typer.Option(
-    #     StepsConfig.DEFAULT, "--steps", "-s", help="decide which steps to run"
-    # ),
     improve_mode: bool = typer.Option(
         False,
         "--improve",
