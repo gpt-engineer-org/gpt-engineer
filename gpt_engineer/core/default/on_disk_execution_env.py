@@ -6,6 +6,16 @@ from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 
 
 class OnDiskExecutionEnv(BaseExecutionEnv):
+    """
+    An execution environment that runs code on the local file system.
+
+    This class is responsible for executing code that is stored on disk. It ensures that
+    the necessary entrypoint file exists and then runs the code using a subprocess. If the
+    execution is interrupted by the user, it handles the interruption gracefully.
+
+    Attributes:
+        path (str): The file system path where the code is located and will be executed.
+    """
     def __init__(self, path: str):
         self.path = path
 

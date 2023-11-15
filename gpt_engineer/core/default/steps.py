@@ -26,13 +26,11 @@ def curr_fn() -> str:
     """
     Retrieves the name of the calling function.
 
-    This function uses Python's inspection capabilities to dynamically fetch the
-    name of the function that called `curr_fn()`. This approach ensures that the
-    function's name isn't hardcoded, making it more resilient to refactoring and
-    changes to function names.
+    This utility function uses Python's inspection capabilities to dynamically fetch the
+    name of the function that called `curr_fn()`. It is used for tracking and logging purposes.
 
     Returns:
-    - str: The name of the function that called `curr_fn()`.
+        str: The name of the function that called `curr_fn()`.
     """
     return inspect.stack()[1].function
 
@@ -41,16 +39,15 @@ def setup_sys_prompt(preprompts: OnDiskRepository) -> str:
     """
     Constructs a system prompt for the AI based on predefined instructions and philosophies.
 
-    This function is responsible for setting up the system prompts for the AI, instructing
-    it on how to generate code and the coding philosophy to adhere to. The constructed prompt
-    consists of the "roadmap", "generate" (with dynamic format replacements), and the coding
-    "philosophy" taken from the given DBs object.
+    This function prepares a system prompt that guides the AI in generating code according to
+    specific instructions and coding philosophies. It combines various components such as the
+    roadmap, generate instructions, and coding philosophy from the provided repository.
 
     Parameters:
-    - preprompts (DBs): The database object containing pre-defined prompts and instructions.
+        preprompts (OnDiskRepository): The repository containing predefined prompts and instructions.
 
     Returns:
-    - str: The constructed system prompt for the AI.
+        str: The constructed system prompt for the AI.
     """
     return (
         preprompts["roadmap"]
@@ -62,24 +59,19 @@ def setup_sys_prompt(preprompts: OnDiskRepository) -> str:
 
 def gen_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     """
-    Executes the AI model using the default system prompts and saves the full output to memory and program to disk.
+    Generates code based on a given prompt using an AI model.
 
-    This function prepares the system prompt using the provided database configurations
-    and then invokes the AI model with this system prompt and the main input prompt.
-    Once the AI generates the output, this function saves it to the specified workspace.
-    The AI's execution is tracked using the name of the current function for contextual reference.
+    This function uses the AI model to generate code from a given prompt. It sets up the system
+    prompt, invokes the AI model, and then saves the generated output to memory. The generated
+    code is also saved to disk.
 
     Parameters:
-    - ai (AI): An instance of the AI model.
-    - preprompts (DBs): An instance containing the database configurations, including system and
-      input prompts, and file formatting preferences.
+        ai (AI): The AI model used for code generation.
+        prompt (str): The user prompt that describes what code to generate.
+        memory (BaseRepository): The repository where the generated code and full output are saved.
 
     Returns:
-    - List[Message]: A list of message objects encapsulating the AI's generated output.
-
-    Note:
-    The function assumes the `ai.start` method and the `to_files` utility are correctly
-    set up and functional. Ensure these prerequisites are in place before invoking `simple_gen`.
+        Code: A dictionary-like object containing the generated code files.
     """
     preprompts = OnDiskRepository(PREPROMPTS_PATH)
     messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
@@ -92,30 +84,19 @@ def gen_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
 
 def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository) -> Code:
     """
-    Generates an entry point script based on a given codebase's information.
+    Generates an entry point script for a given codebase.
 
-    This function prompts the AI model to generate a series of Unix terminal commands
-    required to a) install dependencies and b) run all necessary components of a codebase
-    provided in the workspace. The generated commands are then saved to 'run.sh' in the
-    workspace.
+    This function prompts the AI model to generate Unix terminal commands necessary for installing
+    dependencies and running all parts of the codebase. The generated commands are saved to 'run.sh'
+    and the interaction is logged.
 
     Parameters:
-    - ai (AI): An instance of the AI model.
-    - prepromptss (DBs): An instance containing the database configurations and workspace
-      information, particularly the 'all_output.txt' which contains details about the
-      codebase on disk.
+        ai (AI): The AI model used for generating the entry point script.
+        code (Code): The codebase information used to generate the script.
+        memory (BaseRepository): The repository where the interaction is logged.
 
     Returns:
-    - List[dict]: A list of messages containing the AI's response.
-
-    Notes:
-    - The AI is instructed not to install packages globally, use 'sudo', provide
-      explanatory comments, or use placeholders. Instead, it should use example values
-      where necessary.
-    - The function uses regular expressions to extract command blocks from the AI's
-      response to create the 'run.sh' script.
-    - It assumes the presence of an 'all_output.txt' file in the specified workspace
-      that contains information about the codebase.
+        Code: A dictionary-like object containing the entry point script.
     """
     # ToDo: This should enter the preprompts...
     messages = ai.start(
@@ -147,27 +128,20 @@ def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository) -> Code:
 
 def execute_entrypoint(execution_env: BaseExecutionEnv, code: Code) -> None:
     """
-    Executes the specified entry point script (`run.sh`) from a workspace.
+    Executes the entry point script in a given execution environment.
 
-    This function prompts the user to confirm whether they wish to execute a script named
-    'run.sh' located in the specified workspace. If the user confirms, the script is
-    executed using a subprocess. The user is informed that they can interrupt the
-    execution at any time using ctrl+c.
+    This function handles user confirmation and execution of the 'run.sh' script. It ensures that
+    the script exists in the code and then proceeds to execute it, allowing the user to interrupt
+    the process if necessary.
 
     Parameters:
-    - ai (AI): An instance of the AI model, not directly used in this function but
-      included for consistency with other functions.
+        execution_env (BaseExecutionEnv): The environment in which the script is executed.
+        code (Code): The codebase containing the 'run.sh' script.
 
     Returns:
-    - List[dict]: An empty list. This function does not produce a list of messages
-      but returns an empty list for consistency with the return type of other related
-      functions.
-
-    Note:
-    The function assumes the presence of a 'run.sh' script in the specified workspace.
-    Ensure the script is available and that it has the appropriate permissions
-    (e.g., executable) before invoking this function.
+        None
     """
+
 
     if not ENTRYPOINT_FILE in code:
         raise FileNotFoundError(
@@ -207,18 +181,17 @@ def execute_entrypoint(execution_env: BaseExecutionEnv, code: Code) -> None:
 
 def setup_sys_prompt_existing_code(preprompts: OnDiskRepository) -> str:
     """
-    Constructs a system prompt for the AI focused on improving an existing codebase.
+    Constructs a system prompt for the AI to improve existing code.
 
-    This function sets up the system prompts for the AI, guiding it on how to
-    work with and improve an existing code base. The generated prompt consists
-    of the "improve" instruction (with dynamic format replacements) and the coding
-    "philosophy" taken from the given DBs object.
+    This function prepares a system prompt that instructs the AI on how to approach improving
+    an existing codebase. It combines the "improve" instruction with the coding philosophy from
+    the provided repository.
 
     Parameters:
-    - preprompts (DBs): The database object containing pre-defined prompts and instructions.
+        preprompts (OnDiskRepository): The repository containing predefined prompts and instructions.
 
     Returns:
-    - str: The constructed system prompt focused on existing code improvement for the AI.
+        str: The constructed system prompt for code improvement.
     """
     return (
         preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format"])
@@ -229,38 +202,21 @@ def setup_sys_prompt_existing_code(preprompts: OnDiskRepository) -> str:
 
 def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository) -> Code:
     """
-    Process and improve the code from a specified set of existing files based on a user prompt.
+    Improves existing code based on user input using an AI model.
 
-    This function first retrieves the code from the designated files and then formats this
-    code to be processed by the Language Learning Model (LLM). After setting up the system prompt
-    for existing code improvements, the files' contents are sent to the LLM. Finally, the user's
-    prompt detailing desired improvements is passed to the LLM, and the subsequent response
-    from the LLM is used to overwrite the original files.
+    This function processes and enhances the code from a set of existing files based on a user
+    prompt. It formats the code for the AI model, sends it for processing, and then applies the
+    improvements to the original files.
 
     Parameters:
-    - ai (AI): An instance of the AI model that is responsible for processing and generating
-      responses based on the provided system and user inputs.
-    - dbs (DBs): An instance containing the database configurations, user prompts, and project metadata.
-      It is used to fetch the selected files for improvement and the user's improvement prompt.
+        ai (AI): The AI model used for code improvement.
+        prompt (str): The user prompt detailing the desired code improvements.
+        code (Code): The existing codebase to be improved.
+        memory (BaseRepository): The repository where the improvement process is logged.
 
     Returns:
-    - list[Message]: Returns a list of Message objects that record the interaction between the
-      system, user, and the AI model. This includes both the input to and the response from the LLM.
-
-    Notes:
-    - Ensure that the user has correctly set up the desired files for improvement and provided an
-      appropriate prompt before calling this function.
-    - The function expects the files to be formatted in a specific way to be properly processed by the LLM.
+        Code: A dictionary-like object containing the improved code files.
     """
-
-    """
-    After the file list and prompt have been aquired, this function is called
-    to sent the formatted prompt to the LLM.
-    """
-
-    # files_info = get_code_strings(
-    #     dbs.workspace, dbs.project_metadata
-    # )  # this has file names relative to the workspace path
     db = OnDiskRepository(PREPROMPTS_PATH)
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(db)),
