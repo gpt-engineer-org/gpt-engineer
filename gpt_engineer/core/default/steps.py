@@ -5,6 +5,7 @@ from gpt_engineer.core.default.paths import (
     ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
     ENTRYPOINT_LOG_FILE,
+    IMPROVE_LOG_FILE
 )
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.base_repository import BaseRepository
@@ -226,7 +227,7 @@ def setup_sys_prompt_existing_code(preprompts: OnDiskRepository) -> str:
     )
 
 
-def improve(ai: AI, prompt: str, code: Code) -> Code:
+def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository) -> Code:
     """
     Process and improve the code from a specified set of existing files based on a user prompt.
 
@@ -271,5 +272,10 @@ def improve(ai: AI, prompt: str, code: Code) -> Code:
 
     messages = ai.next(messages, step_name=curr_fn())
 
-    overwrite_code_with_edits(messages[-1].content.strip(), code)
+    chat = messages[-1].content.strip()
+
+    overwrite_code_with_edits(chat, code)
+
+    memory[IMPROVE_LOG_FILE] = chat
+
     return code

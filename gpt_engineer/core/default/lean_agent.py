@@ -40,7 +40,7 @@ class LeanAgent(BaseAgent):
         return code
 
     def improve(self, prompt: str, code: Code) -> Code:
-        code = improve(self.ai, prompt, code)
+        code = improve(self.ai, prompt, code, self.memory)
         if not ENTRYPOINT_FILE in code:
             entrypoint = gen_entrypoint(self.ai, code, self.memory)
             code = Code(code | entrypoint)
