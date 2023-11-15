@@ -5,7 +5,33 @@ from pathlib import Path
 # class Code(MutableMapping[str | Path, str]):
 # ToDo: implement as mutable mapping, potentially holding a dict instead of being a dict.
 class Code(dict):
+    """
+    A dictionary-based container for managing code files.
+
+    This class extends the standard dictionary to enforce string keys and values,
+    representing filenames and their corresponding code content. It provides a method
+    to format its contents for chat-based interaction with an AI agent.
+
+    Methods
+    -------
+    to_chat() -> str:
+        Format the code files for chat-based interaction, returning a string suitable for AI input.
+    """
+
     def __setitem__(self, key, value):
+        """
+        Set the code content for the given filename.
+
+        This method overrides the dictionary's __setitem__ to enforce type checks on the key and value.
+        The key must be a string or a Path object, and the value must be a string representing the code content.
+
+        Parameters
+        ----------
+        key : str | Path
+            The filename as a key for the code content.
+        value : str
+            The code content to associate with the filename.
+        """
         if not isinstance(key, str | Path):
             raise TypeError("Keys must be strings or Path's")
         if not isinstance(value, str):
