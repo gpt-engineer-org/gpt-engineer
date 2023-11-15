@@ -15,9 +15,10 @@ import inspect
 import os
 import re
 from termcolor import colored
+from pathlib import Path
 
 # TODO: THIS NEEDS A BETTER SOLUTION
-PREPROMPTS_PATH = os.path.join("gpt_engineer", "preprompts")
+PREPROMPTS_PATH = Path(__file__).parent.parent.parent / "preprompts"
 
 
 def curr_fn() -> str:
