@@ -79,17 +79,17 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
             # Using the log from the previous step has all the code and
             # the gen_entrypoint prompt inside.
             if attempts < 1:
-                messages = AI.deserialize_messages(code.to_chat())
-                messages.append(ai.fuser(get_platform_info()))  # add in OS and Py version
-
-            # append the error message
+                messages: List[Message] = [SystemMessage(content=code.to_chat())]
+                # messages.append(ai.fuser(get_platform_info()))  # add in OS and Py version WHAT IS ai.fuser()???
+                messages.append(SystemMessage(content=get_platform_info()))
+                # append the error message
             # Wait for the process to terminate and get stdout and stderr
             stdout, stderr = process.communicate()
 
             # stdout and stderr are bytes, decode them to string if needed
             output = stdout.decode('utf-8')
             error = stderr.decode('utf-8')
-            messages.append(ai.fuser(output + "\n " + error))
+            messages.append(SystemMessage(content=output + "\n " + error))
 
             messages = ai.next(
                 messages, preprompts["file_format_fix"], step_name=curr_fn()
@@ -101,41 +101,42 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
 
         # this overwrites the existing files
         # to_files_and_memory(messages[-1].content.strip(), dbs)
-        code = parse_chat(messages[-1].content.strip())
+        files = parse_chat(messages[-1].content.strip())
+        code = Code({key: val for key, val in files})
         attempts += 1
 
     return code
 
-
-def vector_improve(ai: AI, dbs: OnDiskRepository):
-    code_vector_repository = CodeVectorRepository()
-    code_vector_repository.load_from_directory(dbs.workspace.path)
-    releventDocuments = code_vector_repository.relevent_code_chunks(dbs.input["prompt"])
-
-    code_file_list = f"Here is a list of all the existing code files present in the root directory your code will be added to:"
-    code_file_list += "\n {fileRepositories.workspace.to_path_list_string()}"
-
-    relevent_file_contents = f"Here are files relevent to the query which you may like to change, reference or add to \n"
-
-    for doc in releventDocuments:
-        filename_without_path = Path(doc.metadata["filename"]).name
-        file_content = dbs.workspace[filename_without_path]
-        relevent_file_contents += format_file_to_input(
-            filename_without_path, file_content
-        )
-
-    messages = [
-        SystemMessage(content=setup_sys_prompt_existing_code(dbs)),
-    ]
-
-    messages.append(HumanMessage(content=f"{code_file_list}"))
-    messages.append(HumanMessage(content=f"{relevent_file_contents}"))
-    messages.append(HumanMessage(content=f"Request: {dbs.input['prompt']}"))
-
-    messages = ai.next(messages, step_name=curr_fn())
-
-    overwrite_code_with_edits(messages[-1].content.strip(), dbs)
-    return messages
+# Todo: Adapt to refactor and code object
+# def vector_improve(ai: AI, dbs: OnDiskRepository):
+#     code_vector_repository = CodeVectorRepository()
+#     code_vector_repository.load_from_directory(dbs.workspace.path)
+#     releventDocuments = code_vector_repository.relevent_code_chunks(dbs.input["prompt"])
+#
+#     code_file_list = f"Here is a list of all the existing code files present in the root directory your code will be added to:"
+#     code_file_list += "\n {fileRepositories.workspace.to_path_list_string()}"
+#
+#     relevent_file_contents = f"Here are files relevent to the query which you may like to change, reference or add to \n"
+#
+#     for doc in releventDocuments:
+#         filename_without_path = Path(doc.metadata["filename"]).name
+#         file_content = dbs.workspace[filename_without_path]
+#         relevent_file_contents += format_file_to_input(
+#             filename_without_path, file_content
+#         )
+#
+#     messages = [
+#         SystemMessage(content=setup_sys_prompt_existing_code(dbs)),
+#     ]
+#
+#     messages.append(HumanMessage(content=f"{code_file_list}"))
+#     messages.append(HumanMessage(content=f"{relevent_file_contents}"))
+#     messages.append(HumanMessage(content=f"Request: {dbs.input['prompt']}"))
+#
+#     messages = ai.next(messages, step_name=curr_fn())
+#
+#     overwrite_code_with_edits(messages[-1].content.strip(), dbs)
+#     return messages
 
 
 def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
@@ -207,7 +208,7 @@ def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     memory[CODE_GEN_LOG_FILE] = chat
     files = parse_chat(chat)
     code = Code({key: val for key, val in files})
-    return messages
+    return code
 
 
 

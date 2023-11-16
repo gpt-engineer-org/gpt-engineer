@@ -16,15 +16,14 @@ from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.applications.cli.learning import human_review
 from typing import TypeVar, Callable
 
-
-code_gen_fn_type = TypeVar(
-    "code_gen_fn_type", bound=Callable[[AI, str, BaseRepository], Code]
+CodeGenType = TypeVar(
+    "CodeGenType", bound=Callable[[AI, str, BaseRepository], Code]
 )
-execute_entrypoint_fn_type = TypeVar(
-    "execute_entrypoint_fn_type", bound=Callable[[AI, BaseExecutionEnv, Code], None]
+ExecuteEntrypointType = TypeVar(
+    "ExecuteEntrypointType", bound=Callable[[AI, BaseExecutionEnv, Code], None]
 )
-improve_fn_type = TypeVar(
-    "improve_fn_type", bound=Callable[[AI, str, Code, BaseRepository], Code]
+ImproveType = TypeVar(
+    "ImproveType", bound=Callable[[AI, str, Code, BaseRepository], Code]
 )
 
 class CliAgent(BaseAgent):
@@ -73,9 +72,9 @@ class CliAgent(BaseAgent):
         memory: BaseRepository,
         execution_env: BaseExecutionEnv,
         ai: AI = None,
-        code_gen_fn: code_gen_fn_type = gen_code,
-        execute_entrypoint_fn: execute_entrypoint_fn_type = execute_entrypoint,
-        improve_fn: improve_fn_type = improve
+        code_gen_fn: CodeGenType = gen_code,
+        execute_entrypoint_fn: ExecuteEntrypointType = execute_entrypoint,
+        improve_fn: ImproveType = improve
     ):
         self.memory = memory
         self.execution_env = execution_env
@@ -85,7 +84,7 @@ class CliAgent(BaseAgent):
         self.improve_fn = improve_fn
 
     @classmethod
-    def with_default_config(cls, path: str, ai: AI = None, code_gen_fn: code_gen_fn_type = gen_code, execute_entrypoint_fn: execute_entrypoint_fn_type = execute_entrypoint, improve_fn: improve_fn_type = improve):
+    def with_default_config(cls, path: str, ai: AI = None, code_gen_fn: CodeGenType = gen_code, execute_entrypoint_fn: ExecuteEntrypointType = execute_entrypoint, improve_fn: ImproveType = improve):
         return cls(
             memory=OnDiskRepository(memory_path(path)),
             execution_env=OnDiskExecutionEnv(path),
