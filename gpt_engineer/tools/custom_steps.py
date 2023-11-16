@@ -1,7 +1,8 @@
 import subprocess
 from pathlib import Path
 from typing import List, Union
-
+from platform import platform
+from sys import version_info
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 
 from gpt_engineer.core.ai import AI
@@ -17,11 +18,25 @@ from gpt_engineer.core.default.paths import (
 from gpt_engineer.core.default.steps import curr_fn, PREPROMPTS_PATH, setup_sys_prompt
 from gpt_engineer.core.chat_to_files import parse_chat
 from gpt_engineer.core.code import Code
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
 # Type hint for chat messages
 Message = Union[AIMessage, HumanMessage, SystemMessage]
+MAX_SELF_HEAL_ATTEMPTS = 2
 
-def self_heal(ai: AI, dbs: OnDiskRepository):
+
+def get_platform_info():
+    """Returns the Platform: OS, and the Python version.
+    This is used for self healing.  There are some possible areas of conflict here if
+    you use a different version of Python in your virtualenv.  A better solution would
+    be to have this info printed from the virtualenv.
+    """
+    v = version_info
+    a = f"Python Version: {v.major}.{v.minor}.{v.micro}"
+    b = f"\nOS: {platform()}\n"
+    return a + b
+
+def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
     """Attempts to execute the code from the entrypoint and if it fails,
     sends the error output back to the AI with instructions to fix.
     This code will make `MAX_SELF_HEAL_ATTEMPTS` to try and fix the code
@@ -31,32 +46,32 @@ def self_heal(ai: AI, dbs: OnDiskRepository):
     """
 
     # step 1. execute the entrypoint
-    log_path = dbs.workspace.path / "log.txt"
+    # log_path = dbs.workspace.path / "log.txt"
 
     attempts = 0
     messages = []
-
+    preprompts = OnDiskRepository(PREPROMPTS_PATH)
     while attempts < MAX_SELF_HEAL_ATTEMPTS:
-        log_file = open(log_path, "w")  # wipe clean on every iteration
-        timed_out = False
+        # log_file = open(log_path, "w")  # wipe clean on every iteration
+        # timed_out = False
 
-        p = subprocess.Popen(  # attempt to run the entrypoint
-            "bash run.sh",
-            shell=True,
-            cwd=dbs.workspace.path,
-            stdout=log_file,
-            stderr=log_file,
-            bufsize=0,
-        )
-        try:  # timeout if the process actually runs
-            p.wait(timeout=ASSUME_WORKING_TIMEOUT)
-        except subprocess.TimeoutExpired:
-            timed_out = True
-            print("The process hit a timeout before exiting.")
-
+        # p = subprocess.Popen(  # attempt to run the entrypoint
+        #     "bash run.sh",
+        #     shell=True,
+        #     cwd=dbs.workspace.path,
+        #     stdout=log_file,
+        #     stderr=log_file,
+        #     bufsize=0,
+        # )
+        # try:  # timeout if the process actually runs
+        #     p.wait(timeout=ASSUME_WORKING_TIMEOUT)
+        # except subprocess.TimeoutExpired:
+        #     timed_out = True
+        #     print("The process hit a timeout before exiting.")
+        process = execution_env.execute_program(code)
         # get the result and output
         # step 2. if the return code not 0, package and send to the AI
-        if p.returncode != 0 and not timed_out:
+        if process.returncode != 0:
             print("run.sh failed.  Let's fix it.")
 
             # pack results in an AI prompt
@@ -64,25 +79,32 @@ def self_heal(ai: AI, dbs: OnDiskRepository):
             # Using the log from the previous step has all the code and
             # the gen_entrypoint prompt inside.
             if attempts < 1:
-                messages = AI.deserialize_messages(dbs.logs[gen_entrypoint.__name__])
+                messages = AI.deserialize_messages(code.to_chat())
                 messages.append(ai.fuser(get_platform_info()))  # add in OS and Py version
 
             # append the error message
-            messages.append(ai.fuser(dbs.workspace["log.txt"]))
+            # Wait for the process to terminate and get stdout and stderr
+            stdout, stderr = process.communicate()
+
+            # stdout and stderr are bytes, decode them to string if needed
+            output = stdout.decode('utf-8')
+            error = stderr.decode('utf-8')
+            messages.append(ai.fuser(output + "\n " + error))
 
             messages = ai.next(
-                messages, dbs.preprompts["file_format_fix"], step_name=curr_fn()
+                messages, preprompts["file_format_fix"], step_name=curr_fn()
             )
         else:  # the process did not fail, we are done here.
-            return messages
+            return code
 
-        log_file.close()
+        # log_file.close()
 
         # this overwrites the existing files
-        to_files_and_memory(messages[-1].content.strip(), dbs)
+        # to_files_and_memory(messages[-1].content.strip(), dbs)
+        code = parse_chat(messages[-1].content.strip())
         attempts += 1
 
-    return messages
+    return code
 
 
 def vector_improve(ai: AI, dbs: OnDiskRepository):

@@ -126,7 +126,7 @@ def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository) -> Code:
     return entrypoint_code
 
 
-def execute_entrypoint(execution_env: BaseExecutionEnv, code: Code) -> None:
+def execute_entrypoint(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> None:
     """
     Executes the entry point script in a given execution environment.
 
@@ -140,6 +140,10 @@ def execute_entrypoint(execution_env: BaseExecutionEnv, code: Code) -> None:
 
     Returns:
         None
+
+    Parameters
+    ----------
+    ai
     """
 
 
@@ -217,9 +221,9 @@ def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository) -> Code:
     Returns:
         Code: A dictionary-like object containing the improved code files.
     """
-    db = OnDiskRepository(PREPROMPTS_PATH)
+    preprompts = OnDiskRepository(PREPROMPTS_PATH)
     messages = [
-        SystemMessage(content=setup_sys_prompt_existing_code(db)),
+        SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]
     # Add files as input
     messages.append(HumanMessage(content=f"{code.to_chat()}"))

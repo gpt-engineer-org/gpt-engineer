@@ -21,7 +21,7 @@ code_gen_fn_type = TypeVar(
     "code_gen_fn_type", bound=Callable[[AI, str, BaseRepository], Code]
 )
 execute_entrypoint_fn_type = TypeVar(
-    "execute_entrypoint_fn_type", bound=Callable[[BaseExecutionEnv, Code], None]
+    "execute_entrypoint_fn_type", bound=Callable[[AI, BaseExecutionEnv, Code], None]
 )
 improve_fn_type = TypeVar(
     "improve_fn_type", bound=Callable[[AI, str, Code, BaseRepository], Code]
@@ -99,7 +99,7 @@ class CliAgent(BaseAgent):
         code = self.code_gen_fn(self.ai, prompt, self.memory)
         entrypoint = gen_entrypoint(self.ai, code, self.memory)
         code = Code(code | entrypoint)
-        self.execute_entrypoint_fn(self.execution_env, code)
+        self.execute_entrypoint_fn(self.ai, self.execution_env, code)
         human_review(self.memory)
         return code
 
@@ -108,6 +108,6 @@ class CliAgent(BaseAgent):
         if not ENTRYPOINT_FILE in code:
             entrypoint = gen_entrypoint(self.ai, code, self.memory)
             code = Code(code | entrypoint)
-        self.execute_entrypoint_fn(self.execution_env, code)
+        self.execute_entrypoint_fn(self.ai, self.execution_env, code)
         human_review(self.memory)
         return code

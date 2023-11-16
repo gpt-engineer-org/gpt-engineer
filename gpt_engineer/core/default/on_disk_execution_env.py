@@ -26,12 +26,12 @@ class OnDiskExecutionEnv(BaseExecutionEnv):
                 + ENTRYPOINT_FILE
                 + " does not exist in the code."
             )
-
+        # ToDo: The fact that execution is the de-facto way of saving the code to disk presently should change once version manager is implemented.
         workspace = OnDiskRepository(self.path)
         for file_name, file_content in code.items():
             workspace[file_name] = file_content
 
-        p = subprocess.Popen("bash " + ENTRYPOINT_FILE, shell=True, cwd=self.path)
+        p = subprocess.Popen("bash " + ENTRYPOINT_FILE, shell=True, cwd=self.path, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
             p.wait()
         except KeyboardInterrupt:

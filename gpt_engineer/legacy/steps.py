@@ -65,16 +65,7 @@ ASSUME_WORKING_TIMEOUT = 30
 Message = Union[AIMessage, HumanMessage, SystemMessage]
 
 
-def get_platform_info():
-    """Returns the Platform: OS, and the Python version.
-    This is used for self healing.  There are some possible areas of conflict here if
-    you use a different version of Python in your virtualenv.  A better solution would
-    be to have this info printed from the virtualenv.
-    """
-    v = version_info
-    a = f"Python Version: {v.major}.{v.minor}.{v.micro}"
-    b = f"\nOS: {platform()}\n"
-    return a + b
+
 
 
 def curr_fn() -> str:
