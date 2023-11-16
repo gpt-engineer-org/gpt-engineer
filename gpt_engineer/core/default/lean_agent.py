@@ -14,6 +14,18 @@ from gpt_engineer.core.base_agent import BaseAgent
 
 
 class LeanAgent(BaseAgent):
+    """
+    An agent that uses AI to generate and improve code based on a given prompt.
+
+    This agent is capable of initializing a codebase from a prompt and improving an existing
+    codebase based on user input. It uses an AI model to generate and refine code, and it
+    interacts with a repository and an execution environment to manage and execute the code.
+
+    Attributes:
+        memory (BaseRepository): The repository where the code and related data are stored.
+        execution_env (BaseExecutionEnv): The environment in which the code is executed.
+        ai (AI): The AI model used for generating and improving code.
+    """
     def __init__(
         self,
         memory: BaseRepository,
@@ -40,7 +52,7 @@ class LeanAgent(BaseAgent):
         return code
 
     def improve(self, prompt: str, code: Code) -> Code:
-        code = improve(self.ai, prompt, code)
+        code = improve(self.ai, prompt, code, self.memory)
         if not ENTRYPOINT_FILE in code:
             entrypoint = gen_entrypoint(self.ai, code, self.memory)
             code = Code(code | entrypoint)

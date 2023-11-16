@@ -45,6 +45,16 @@ class OnDiskRepository(BaseRepository):
     facilitate CRUD-like interactions. It allows for quick checks on the existence of keys,
     retrieval of values based on keys, and setting new key-value pairs.
 
+    Attributes:
+        path (Path): The directory path where the database files are stored.
+    """
+    """
+    A file-based key-value store where keys correspond to filenames and values to file contents.
+
+    This class provides an interface to a file-based database, leveraging file operations to
+    facilitate CRUD-like interactions. It allows for quick checks on the existence of keys,
+    retrieval of values based on keys, and setting new key-value pairs.
+
     Attributes
     ----------
     path : Path
@@ -228,6 +238,21 @@ class OnDiskRepository(BaseRepository):
 # dataclass for all dbs:
 # @dataclass
 class FileRepositories:
+    """
+    Encapsulates multiple file-based repositories representing different aspects of a project.
+
+    This class holds references to various repositories used for storing different types of
+    data, such as memory, logs, preprompts, input, workspace, archive, and project metadata.
+
+    Attributes:
+        memory (BaseRepository): The repository for storing memory-related data.
+        logs (BaseRepository): The repository for storing log files.
+        preprompts (BaseRepository): The repository for storing preprompt data.
+        input (BaseRepository): The repository for storing input data.
+        workspace (BaseRepository): The repository representing the workspace.
+        archive (BaseRepository): The repository for archiving data.
+        project_metadata (BaseRepository): The repository for storing project metadata.
+    """
     memory: BaseRepository
     logs: BaseRepository
     preprompts: BaseRepository
@@ -238,6 +263,16 @@ class FileRepositories:
 
 
 def archive(dbs: FileRepositories) -> None:
+    """
+    Archives the contents of memory and workspace repositories.
+
+    This function moves the contents of the memory and workspace repositories to the archive
+    repository, organizing them with a timestamp. It is used to preserve the state of these
+    repositories at a specific point in time.
+
+    Parameters:
+        dbs (FileRepositories): The collection of repositories to be archived.
+    """
     """
     Archive the memory and workspace databases.
 

@@ -36,11 +36,8 @@ from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.code import Code
 from gpt_engineer.applications.cli.file_selector import ask_for_files
-
-# from gpt_engineer.legacy.steps import STEPS, Config as StepsConfig
-# from gpt_engineer.applications.cli.collect import collect_learnings
-# from gpt_engineer.applications.cli.learning import check_collection_consent
-# from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
+from gpt_engineer.tools.custom_steps import lite_gen, gen_clarified_code, self_heal
+from gpt_engineer.core.default.steps import gen_code, execute_entrypoint
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 
 
@@ -86,9 +83,6 @@ def main(
     project_path: str = typer.Argument("projects/example", help="path"),
     model: str = typer.Argument("gpt-4-1106-preview", help="model id string"),
     temperature: float = 0.1,
-    # steps_config: StepsConfig = typer.Option(
-    #     StepsConfig.DEFAULT, "--steps", "-s", help="decide which steps to run"
-    # ),
     improve_mode: bool = typer.Option(
         False,
         "--improve",
@@ -106,6 +100,18 @@ def main(
         "--lite",
         "-l",
         help="Lite mode - run only the main prompt.",
+    ),
+    clarify_mode: bool = typer.Option(
+        False,
+        "--clarify",
+        "-c",
+        help="Lite mode - discuss specification with AI before implementation.",
+    ),
+    self_heal_mode: bool = typer.Option(
+        False,
+        "--self-heal",
+        "-sh",
+        help="Lite mode - discuss specification with AI before implementation.",
     ),
     azure_endpoint: str = typer.Option(
         "",
@@ -153,9 +159,22 @@ def main(
     #     project_path
     # )  # resolve the string to a valid path (eg "a/b/../c" to "a/c")
     path = Path(project_path)  # .absolute()
-    print("Running gpt-engineer in", path, "\n")
+    print("Running gpt-engineer in", path.absolute(), "\n")
     prompt = load_prompt(OnDiskRepository(path))
-    agent = CliAgent.with_default_config(project_path)
+    # configure generation function
+    if clarify_mode:
+        code_gen_fn = gen_clarified_code
+    elif lite_mode:
+        code_gen_fn = lite_gen
+    else:
+        code_gen_fn = gen_code
+    # configure execution function
+    if self_heal_mode:
+        execution_fn = self_heal
+    else:
+        execution_fn = execute_entrypoint
+
+    agent = CliAgent.with_default_config(project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn)
     if improve_mode:
         code = ask_for_files(project_path)
         agent.improve(prompt, code)
