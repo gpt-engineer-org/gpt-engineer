@@ -6,7 +6,7 @@ from sys import version_info
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.prepromt_holder import PrepromptHolder
+from gpt_engineer.core.preprompt_holder import PrepromptHolder
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.base_repository import BaseRepository
 from gpt_engineer.core.default.paths import (

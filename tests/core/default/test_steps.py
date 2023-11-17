@@ -6,8 +6,9 @@ from gpt_engineer.core.default.paths import (
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE
 )
+from gpt_engineer.core.preprompt_holder import PrepromptHolder
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.default.steps import gen_code, curr_fn
+from gpt_engineer.core.default.steps import gen_code, curr_fn, setup_sys_prompt, setup_sys_prompt_existing_code
 from langchain.schema import HumanMessage, SystemMessage
 import tempfile
 import pytest
@@ -151,3 +152,19 @@ class TestStepUtilities:
         # Assert
         assert actual_name == expected_name
 
+    def test_constructs_system_prompt_with_predefined_instructions_and_philosophies(self):
+        preprompts = PrepromptHolder.get_preprompts()
+        sys_prompt = setup_sys_prompt(preprompts)
+        expected_prompt = (
+            preprompts["roadmap"]
+            + preprompts["generate"].replace("FILE_FORMAT", preprompts["file_format"])
+            + "\nUseful to know:\n"
+            + preprompts["philosophy"]
+        )
+        assert sys_prompt == expected_prompt
+
+    def test_constructs_system_prompt(self):
+        preprompts = PrepromptHolder.get_preprompts()
+        expected_prompt = preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format"]) + "\nUseful to know:\n" + preprompts["philosophy"]
+        actual_prompt = setup_sys_prompt_existing_code(preprompts)
+        assert actual_prompt == expected_prompt

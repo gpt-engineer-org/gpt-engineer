@@ -15,7 +15,7 @@ from langchain.schema import HumanMessage, SystemMessage
 import inspect
 import re
 from termcolor import colored
-from gpt_engineer.core.prepromt_holder import PrepromptHolder
+from gpt_engineer.core.preprompt_holder import PrepromptHolder
 
 
 def curr_fn() -> str:
