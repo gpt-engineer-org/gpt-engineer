@@ -6,20 +6,21 @@ from sys import version_info
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.chat_to_files import overwrite_code_with_edits
+from gpt_engineer.core.prepromt_holder import PrepromptHolder
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.base_repository import BaseRepository
 from gpt_engineer.core.default.paths import (
     ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
     ENTRYPOINT_LOG_FILE,
-    IMPROVE_LOG_FILE
+    IMPROVE_LOG_FILE,
 )
-from gpt_engineer.core.default.steps import curr_fn, PREPROMPTS_PATH, setup_sys_prompt
+from gpt_engineer.core.default.steps import curr_fn, setup_sys_prompt
 from gpt_engineer.core.chat_to_files import parse_chat
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
+
 # Type hint for chat messages
 Message = Union[AIMessage, HumanMessage, SystemMessage]
 MAX_SELF_HEAL_ATTEMPTS = 2
@@ -36,6 +37,7 @@ def get_platform_info():
     b = f"\nOS: {platform()}\n"
     return a + b
 
+
 def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
     """Attempts to execute the code from the entrypoint and if it fails,
     sends the error output back to the AI with instructions to fix.
@@ -50,7 +52,7 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
 
     attempts = 0
     messages = []
-    preprompts = OnDiskRepository(PREPROMPTS_PATH)
+    preprompts = PrepromptHolder.get_preprompts()
     while attempts < MAX_SELF_HEAL_ATTEMPTS:
         # log_file = open(log_path, "w")  # wipe clean on every iteration
         # timed_out = False
@@ -87,8 +89,8 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
             stdout, stderr = process.communicate()
 
             # stdout and stderr are bytes, decode them to string if needed
-            output = stdout.decode('utf-8')
-            error = stderr.decode('utf-8')
+            output = stdout.decode("utf-8")
+            error = stderr.decode("utf-8")
             messages.append(SystemMessage(content=output + "\n " + error))
 
             messages = ai.next(
@@ -106,6 +108,7 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
         attempts += 1
 
     return code
+
 
 # Todo: Adapt to refactor and code object
 # def vector_improve(ai: AI, dbs: OnDiskRepository):
@@ -156,7 +159,7 @@ def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     - List[dict]: A list of message dictionaries capturing the AI's interactions and generated
       outputs during the code generation process.
     """
-    preprompts = OnDiskRepository(PREPROMPTS_PATH)
+    preprompts = PrepromptHolder.get_preprompts()
     messages: List[Message] = [SystemMessage(content=preprompts["clarify"])]
     user_input = prompt
     while True:
@@ -184,7 +187,6 @@ def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
             )
             print()
 
-
         user_input += """
             \n\n
             Is anything else unclear? If yes, ask another question.\n
@@ -211,7 +213,6 @@ def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     return code
 
 
-
 def lite_gen(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     """
     Executes the AI model using the main prompt and saves the generated results.
@@ -233,10 +234,8 @@ def lite_gen(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     The function assumes the `ai.start` method and the `to_files` utility to be correctly
     set up and functional. Ensure these prerequisites before invoking `lite_gen`.
     """
-    preprompts = OnDiskRepository(PREPROMPTS_PATH)
-    messages = ai.start(
-        prompt, preprompts["file_format"], step_name=curr_fn()
-    )
+    preprompts = PrepromptHolder.get_preprompts()
+    messages = ai.start(prompt, preprompts["file_format"], step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files = parse_chat(chat)

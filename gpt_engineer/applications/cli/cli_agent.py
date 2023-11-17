@@ -16,15 +16,14 @@ from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.applications.cli.learning import human_review
 from typing import TypeVar, Callable
 
-CodeGenType = TypeVar(
-    "CodeGenType", bound=Callable[[AI, str, BaseRepository], Code]
-)
+CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseRepository], Code])
 ExecuteEntrypointType = TypeVar(
     "ExecuteEntrypointType", bound=Callable[[AI, BaseExecutionEnv, Code], None]
 )
 ImproveType = TypeVar(
     "ImproveType", bound=Callable[[AI, str, Code, BaseRepository], Code]
 )
+
 
 class CliAgent(BaseAgent):
     """
@@ -74,7 +73,7 @@ class CliAgent(BaseAgent):
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
         execute_entrypoint_fn: ExecuteEntrypointType = execute_entrypoint,
-        improve_fn: ImproveType = improve
+        improve_fn: ImproveType = improve,
     ):
         self.memory = memory
         self.execution_env = execution_env
@@ -84,14 +83,21 @@ class CliAgent(BaseAgent):
         self.improve_fn = improve_fn
 
     @classmethod
-    def with_default_config(cls, path: str, ai: AI = None, code_gen_fn: CodeGenType = gen_code, execute_entrypoint_fn: ExecuteEntrypointType = execute_entrypoint, improve_fn: ImproveType = improve):
+    def with_default_config(
+        cls,
+        path: str,
+        ai: AI = None,
+        code_gen_fn: CodeGenType = gen_code,
+        execute_entrypoint_fn: ExecuteEntrypointType = execute_entrypoint,
+        improve_fn: ImproveType = improve,
+    ):
         return cls(
             memory=OnDiskRepository(memory_path(path)),
             execution_env=OnDiskExecutionEnv(path),
             ai=ai,
             code_gen_fn=code_gen_fn,
             execute_entrypoint_fn=execute_entrypoint_fn,
-            improve_fn=improve_fn
+            improve_fn=improve_fn,
         )
 
     def init(self, prompt: str) -> Code:
@@ -102,7 +108,9 @@ class CliAgent(BaseAgent):
         human_review(self.memory)
         return code
 
-    def improve(self, code: Code, prompt: str, execution_command: str = ENTRYPOINT_FILE) -> Code:
+    def improve(
+        self, code: Code, prompt: str, execution_command: str = ENTRYPOINT_FILE
+    ) -> Code:
         code = self.improve_fn(self.ai, prompt, code, self.memory)
         if not execution_command in code:
             entrypoint = gen_entrypoint(self.ai, code, self.memory)

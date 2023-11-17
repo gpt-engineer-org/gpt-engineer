@@ -5,7 +5,7 @@ from gpt_engineer.core.default.paths import (
     ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
     ENTRYPOINT_LOG_FILE,
-    IMPROVE_LOG_FILE
+    IMPROVE_LOG_FILE,
 )
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.base_repository import BaseRepository
@@ -13,13 +13,9 @@ from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from langchain.schema import HumanMessage, SystemMessage
 
 import inspect
-import os
 import re
 from termcolor import colored
-from pathlib import Path
-
-# TODO: THIS NEEDS A BETTER SOLUTION
-PREPROMPTS_PATH = Path(__file__).parent.parent.parent / "preprompts"
+from gpt_engineer.core.prepromt_holder import PrepromptHolder
 
 
 def curr_fn() -> str:
@@ -73,7 +69,7 @@ def gen_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     Returns:
         Code: A dictionary-like object containing the generated code files.
     """
-    preprompts = OnDiskRepository(PREPROMPTS_PATH)
+    preprompts = PrepromptHolder.get_preprompts()
     messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
@@ -145,7 +141,6 @@ def execute_entrypoint(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> N
     ----------
     ai
     """
-
 
     if not ENTRYPOINT_FILE in code:
         raise FileNotFoundError(
@@ -221,7 +216,7 @@ def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository) -> Code:
     Returns:
         Code: A dictionary-like object containing the improved code files.
     """
-    preprompts = OnDiskRepository(PREPROMPTS_PATH)
+    preprompts = PrepromptHolder.get_preprompts()
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]

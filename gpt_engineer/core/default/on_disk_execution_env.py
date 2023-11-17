@@ -16,6 +16,7 @@ class OnDiskExecutionEnv(BaseExecutionEnv):
     Attributes:
         path (str): The file system path where the code is located and will be executed.
     """
+
     def __init__(self, path: str):
         self.path = path
 
@@ -31,7 +32,13 @@ class OnDiskExecutionEnv(BaseExecutionEnv):
         for file_name, file_content in code.items():
             workspace[file_name] = file_content
 
-        p = subprocess.Popen("bash " + ENTRYPOINT_FILE, shell=True, cwd=self.path, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(
+            "bash " + ENTRYPOINT_FILE,
+            shell=True,
+            cwd=self.path,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
         try:
             p.wait()
         except KeyboardInterrupt:

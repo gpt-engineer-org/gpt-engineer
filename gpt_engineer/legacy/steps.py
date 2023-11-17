@@ -56,16 +56,19 @@ from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.on_disk_repository import FileRepositories
-from gpt_engineer.tools.custom_steps import self_heal, vector_improve, gen_clarified_code, clarify, lite_gen
+from gpt_engineer.tools.custom_steps import (
+    self_heal,
+    vector_improve,
+    gen_clarified_code,
+    clarify,
+    lite_gen,
+)
 
 MAX_SELF_HEAL_ATTEMPTS = 2  # constants for self healing code
 ASSUME_WORKING_TIMEOUT = 30
 
 # Type hint for chat messages
 Message = Union[AIMessage, HumanMessage, SystemMessage]
-
-
-
 
 
 def curr_fn() -> str:

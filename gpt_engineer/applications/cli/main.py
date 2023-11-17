@@ -174,7 +174,9 @@ def main(
     else:
         execution_fn = execute_entrypoint
 
-    agent = CliAgent.with_default_config(project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn)
+    agent = CliAgent.with_default_config(
+        project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn
+    )
     if improve_mode:
         code = ask_for_files(project_path)
         agent.improve(code, prompt)

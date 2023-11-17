@@ -48,6 +48,7 @@ class OnDiskRepository(BaseRepository):
     Attributes:
         path (Path): The directory path where the database files are stored.
     """
+
     """
     A file-based key-value store where keys correspond to filenames and values to file contents.
 
@@ -253,6 +254,7 @@ class FileRepositories:
         archive (BaseRepository): The repository for archiving data.
         project_metadata (BaseRepository): The repository for storing project metadata.
     """
+
     memory: BaseRepository
     logs: BaseRepository
     preprompts: BaseRepository
