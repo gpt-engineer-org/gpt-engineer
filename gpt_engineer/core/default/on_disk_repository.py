@@ -28,6 +28,7 @@ Imports:
 """
 
 import datetime
+import json
 import shutil
 
 from gpt_engineer.core.base_repository import BaseRepository
@@ -234,6 +235,12 @@ class OnDiskRepository(BaseRepository):
             return self._supported_files(self.path)
         else:
             return self._all_files(self.path)
+
+    def to_json(self) -> str:
+        file_paths = [
+            str(item.relative_to(self.path)) for item in sorted(self.path.rglob("*")) if item.is_file()
+        ]
+        return json.dumps({file_path: self[file_path] for file_path in file_paths})
 
 
 # dataclass for all dbs:
