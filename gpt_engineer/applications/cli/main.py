@@ -177,7 +177,7 @@ def main(
     agent = CliAgent.with_default_config(project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn)
     if improve_mode:
         code = ask_for_files(project_path)
-        agent.improve(prompt, code)
+        agent.improve(code, prompt)
     else:
         agent.init(prompt)
     # workspace_path = path

@@ -25,5 +25,7 @@ class BaseAgent(ABC):
         pass
 
     @abstractmethod
-    def improve(self, prompt: str, code: Code) -> Code:
+    def improve(self, code: Code, prompt: str, execution_command: str) -> Code:
         pass
+
+    # CHANGE SIGNATURE TO CODE, PROMPT, EXECUTION_COMMAND

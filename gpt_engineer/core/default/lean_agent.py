@@ -51,9 +51,9 @@ class LeanAgent(BaseAgent):
         self.execution_env.execute_program(code)
         return code
 
-    def improve(self, prompt: str, code: Code) -> Code:
+    def improve(self, code: Code, prompt: str, execution_command: str = ENTRYPOINT_FILE) -> Code:
         code = improve(self.ai, prompt, code, self.memory)
-        if not ENTRYPOINT_FILE in code:
+        if not execution_command in code:
             entrypoint = gen_entrypoint(self.ai, code, self.memory)
             code = Code(code | entrypoint)
         self.execution_env.execute_program(code)
