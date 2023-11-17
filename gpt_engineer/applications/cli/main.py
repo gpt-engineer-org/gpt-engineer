@@ -39,6 +39,7 @@ from gpt_engineer.applications.cli.file_selector import ask_for_files
 from gpt_engineer.tools.custom_steps import lite_gen, gen_clarified_code, self_heal
 from gpt_engineer.core.default.steps import gen_code, execute_entrypoint
 from gpt_engineer.applications.cli.cli_agent import CliAgent
+from gpt_engineer.applications.cli.collect import collect_and_send_human_review
 
 
 app = typer.Typer()  # creates a CLI app
@@ -174,12 +175,17 @@ def main(
     else:
         execution_fn = execute_entrypoint
 
-    agent = CliAgent.with_default_config(project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn)
+    agent = CliAgent.with_default_config(
+        project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn
+    )
     if improve_mode:
         code = ask_for_files(project_path)
-        agent.improve(prompt, code)
+        agent.improve(code, prompt)
     else:
         agent.init(prompt)
+    # collect user feedback if user consents
+    config = (code_gen_fn.__name__, execution_fn.__name__)
+    collect_and_send_human_review(prompt, model, temperature, config, agent.memory)
     # workspace_path = path
     # input_path = path
     #

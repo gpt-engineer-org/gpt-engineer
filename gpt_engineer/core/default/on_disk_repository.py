@@ -28,6 +28,7 @@ Imports:
 """
 
 import datetime
+import json
 import shutil
 
 from gpt_engineer.core.base_repository import BaseRepository
@@ -48,6 +49,7 @@ class OnDiskRepository(BaseRepository):
     Attributes:
         path (Path): The directory path where the database files are stored.
     """
+
     """
     A file-based key-value store where keys correspond to filenames and values to file contents.
 
@@ -234,66 +236,10 @@ class OnDiskRepository(BaseRepository):
         else:
             return self._all_files(self.path)
 
-
-# dataclass for all dbs:
-# @dataclass
-class FileRepositories:
-    """
-    Encapsulates multiple file-based repositories representing different aspects of a project.
-
-    This class holds references to various repositories used for storing different types of
-    data, such as memory, logs, preprompts, input, workspace, archive, and project metadata.
-
-    Attributes:
-        memory (BaseRepository): The repository for storing memory-related data.
-        logs (BaseRepository): The repository for storing log files.
-        preprompts (BaseRepository): The repository for storing preprompt data.
-        input (BaseRepository): The repository for storing input data.
-        workspace (BaseRepository): The repository representing the workspace.
-        archive (BaseRepository): The repository for archiving data.
-        project_metadata (BaseRepository): The repository for storing project metadata.
-    """
-    memory: BaseRepository
-    logs: BaseRepository
-    preprompts: BaseRepository
-    input: BaseRepository
-    workspace: BaseRepository
-    archive: BaseRepository
-    project_metadata: BaseRepository
-
-
-def archive(dbs: FileRepositories) -> None:
-    """
-    Archives the contents of memory and workspace repositories.
-
-    This function moves the contents of the memory and workspace repositories to the archive
-    repository, organizing them with a timestamp. It is used to preserve the state of these
-    repositories at a specific point in time.
-
-    Parameters:
-        dbs (FileRepositories): The collection of repositories to be archived.
-    """
-    """
-    Archive the memory and workspace databases.
-
-    Parameters
-    ----------
-    dbs : DBs
-        The databases to archive.
-    """
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    shutil.move(
-        str(dbs.memory.path), str(dbs.archive.path / timestamp / dbs.memory.path.name)
-    )
-
-    exclude_dir = ".gpteng"
-    items_to_copy = [f for f in dbs.workspace.path.iterdir() if not f.name == exclude_dir]
-
-    for item_path in items_to_copy:
-        destination_path = dbs.archive.path / timestamp / item_path.name
-        if item_path.is_file():
-            shutil.copy2(item_path, destination_path)
-        elif item_path.is_dir():
-            shutil.copytree(item_path, destination_path)
-
-    return []
+    def to_json(self) -> str:
+        file_paths = [
+            str(item.relative_to(self.path))
+            for item in sorted(self.path.rglob("*"))
+            if item.is_file()
+        ]
+        return json.dumps({file_path: self[file_path] for file_path in file_paths})

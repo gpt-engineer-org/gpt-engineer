@@ -47,17 +47,12 @@ import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from dataclasses_json import dataclass_json
 from termcolor import colored
 
-from gpt_engineer.core.default.on_disk_repository import (
-    OnDiskRepository,
-    FileRepositories,
-)
-from gpt_engineer.core.base_repository import BaseRepository
-from gpt_engineer.core.domain import Step
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 
 
 @dataclass_json
@@ -73,14 +68,11 @@ class Review:
 @dataclass_json
 @dataclass
 class Learning:
+    prompt: str
     model: str
     temperature: float
-    steps: str
-    steps_file_hash: str
-    prompt: str
+    config: str
     logs: str
-    workspace: str
-    feedback: Optional[str]
     session: str
     review: Optional[Review]
     timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
@@ -191,35 +183,13 @@ def ask_collection_consent() -> bool:
         return False
 
 
-def logs_to_string(steps: List[Step], logs: OnDiskRepository) -> str:
-    """
-    Convert the logs of the steps to a string.
-
-    Parameters
-    ----------
-    steps : List[Step]
-        The list of steps.
-    logs : DB
-        The database containing the logs.
-
-    Returns
-    -------
-    str
-        The logs of the steps as a string.
-    """
-    chunks = []
-    for step in steps:
-        chunks.append(f"--- {step.__name__} ---\n")
-        chunks.append(logs[step.__name__])
-    return "\n".join(chunks)
-
-
 def extract_learning(
+    prompt: str,
     model: str,
     temperature: float,
-    steps: List[Step],
-    dbs: FileRepositories,
-    steps_file_hash,
+    config: Tuple[str, ...],
+    memory: OnDiskRepository,
+    review: Review,
 ) -> Learning:
     """
     Extract the learning tools from the steps and databases.
@@ -242,19 +212,13 @@ def extract_learning(
     Learning
         The extracted learning tools.
     """
-    review = None
-    if "review" in dbs.memory:
-        review = Review.from_json(dbs.memory["review"])  # type: ignore
     learning = Learning(
-        prompt=dbs.input["prompt"],
+        prompt=prompt,
         model=model,
         temperature=temperature,
-        steps=json.dumps([step.__name__ for step in steps]),
-        steps_file_hash=steps_file_hash,
-        feedback=dbs.input.get("feedback"),
+        config=json.dumps(config),
         session=get_session(),
-        logs=logs_to_string(steps, dbs.logs),
-        workspace=dbs.memory.get("all_output.txt"),
+        logs=memory.to_json(),
         review=review,
     )
     return learning
@@ -281,34 +245,3 @@ def get_session() -> str:
         return user_id
     except IOError:
         return "ephemeral_" + str(random.randint(0, 2**32))
-
-
-def human_review(memory: BaseRepository):
-    """
-    Collects human feedback on the code and stores it in memory.
-
-    This function prompts the user for a review of the generated or improved code using the `human_review_input`
-    function. If a valid review is provided, it's serialized to JSON format and stored within the database's
-    memory under the "review" key.
-
-    Parameters:
-    - ai (AI): An instance of the AI model. Although not directly used within the function, it is kept as
-      a parameter for consistency with other functions.
-    - dbs (DBs): An instance containing the database configurations, user prompts, project metadata,
-      and memory storage. This function specifically interacts with the memory storage to save the human review.
-
-    Returns:
-    - list: Returns an empty list, indicating that there's no subsequent interaction with the LLM
-      or no further messages to be processed.
-
-    Notes:
-    - It's assumed that the `human_review_input` function handles all the interactions with the user to
-      gather feedback and returns either the feedback or None if no feedback was provided.
-    - Ensure that the database's memory has enough space or is set up correctly to store the serialized review tools.
-    """
-
-    """Collects and stores human review of the code"""
-    review = human_review_input()
-    if review is not None:
-        memory["review"] = review.to_json()  # type: ignore
-    return []

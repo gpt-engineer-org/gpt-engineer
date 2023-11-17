@@ -25,12 +25,15 @@ Note:
 """
 import hashlib
 
-from typing import List
+from typing import List, Tuple
 
-from gpt_engineer.legacy import steps
-from gpt_engineer.core.default.on_disk_repository import FileRepositories
-from gpt_engineer.core.domain import Step
-from gpt_engineer.applications.cli.learning import Learning, extract_learning
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
+from gpt_engineer.applications.cli.learning import (
+    Learning,
+    extract_learning,
+    human_review_input,
+    Review,
+)
 
 
 def send_learning(learning: Learning):
@@ -61,7 +64,12 @@ def send_learning(learning: Learning):
 
 
 def collect_learnings(
-    model: str, temperature: float, steps: List[Step], dbs: FileRepositories
+    prompt: str,
+    model: str,
+    temperature: float,
+    config: any,
+    memory: OnDiskRepository,
+    review: Review,
 ):
     """
     Collect the learning tools and send it to RudderStack for analysis.
@@ -77,9 +85,7 @@ def collect_learnings(
     dbs : DBs
         The database containing the workspace.
     """
-    learnings = extract_learning(
-        model, temperature, steps, dbs, steps_file_hash=steps_file_hash()
-    )
+    learnings = extract_learning(prompt, model, temperature, config, memory, review)
     try:
         send_learning(learnings)
     except RuntimeError as e:
@@ -109,15 +115,51 @@ def collect_learnings(
             )
 
 
-def steps_file_hash():
-    """
-    Compute the SHA-256 hash of the steps file.
+# def steps_file_hash():
+#     """
+#     Compute the SHA-256 hash of the steps file.
+#
+#     Returns
+#     -------
+#     str
+#         The SHA-256 hash of the steps file.
+#     """
+#     with open(steps.__file__, "r") as f:
+#         content = f.read()
+#         return hashlib.sha256(content.encode("utf-8")).hexdigest()
 
-    Returns
-    -------
-    str
-        The SHA-256 hash of the steps file.
+
+def collect_and_send_human_review(
+    prompt: str,
+    model: str,
+    temperature: float,
+    config: Tuple[str, ...],
+    memory: OnDiskRepository,
+):
     """
-    with open(steps.__file__, "r") as f:
-        content = f.read()
-        return hashlib.sha256(content.encode("utf-8")).hexdigest()
+    Collects human feedback on the code and stores it in memory.
+
+    This function prompts the user for a review of the generated or improved code using the `human_review_input`
+    function. If a valid review is provided, it's serialized to JSON format and stored within the database's
+    memory under the "review" key.
+
+    Parameters:
+    - ai (AI): An instance of the AI model. Although not directly used within the function, it is kept as
+      a parameter for consistency with other functions.
+    - dbs (DBs): An instance containing the database configurations, user prompts, project metadata,
+      and memory storage. This function specifically interacts with the memory storage to save the human review.
+
+    Returns:
+    - list: Returns an empty list, indicating that there's no subsequent interaction with the LLM
+      or no further messages to be processed.
+
+    Notes:
+    - It's assumed that the `human_review_input` function handles all the interactions with the user to
+      gather feedback and returns either the feedback or None if no feedback was provided.
+    - Ensure that the database's memory has enough space or is set up correctly to store the serialized review tools.
+    """
+
+    """Collects and stores human review of the code"""
+    review = human_review_input()
+    collect_learnings(prompt, model, temperature, config, memory, review)
+    return []

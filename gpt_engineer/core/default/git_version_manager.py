@@ -13,6 +13,7 @@ class GitVersionManager(BaseVersionManager):
     Attributes:
         path (str): The file system path where the Git repository is located.
     """
+
     def __init__(self, path: str):
         self.path = path
 
