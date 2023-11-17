@@ -238,6 +238,8 @@ class OnDiskRepository(BaseRepository):
 
     def to_json(self) -> str:
         file_paths = [
-            str(item.relative_to(self.path)) for item in sorted(self.path.rglob("*")) if item.is_file()
+            str(item.relative_to(self.path))
+            for item in sorted(self.path.rglob("*"))
+            if item.is_file()
         ]
         return json.dumps({file_path: self[file_path] for file_path in file_paths})

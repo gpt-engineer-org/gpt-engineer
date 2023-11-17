@@ -183,29 +183,6 @@ def ask_collection_consent() -> bool:
         return False
 
 
-def logs_to_string(steps: List[Step], logs: OnDiskRepository) -> str:
-    """
-    Convert the logs of the steps to a string.
-
-    Parameters
-    ----------
-    steps : List[Step]
-        The list of steps.
-    logs : DB
-        The database containing the logs.
-
-    Returns
-    -------
-    str
-        The logs of the steps as a string.
-    """
-    chunks = []
-    for step in steps:
-        chunks.append(f"--- {step.__name__} ---\n")
-        chunks.append(logs[step.__name__])
-    return "\n".join(chunks)
-
-
 def extract_learning(
     prompt: str,
     model: str,
