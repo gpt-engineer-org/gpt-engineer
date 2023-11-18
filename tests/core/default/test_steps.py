@@ -8,7 +8,7 @@ from gpt_engineer.core.default.paths import (
 )
 from gpt_engineer.core.preprompt_holder import PrepromptHolder
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.default.steps import gen_code, curr_fn, setup_sys_prompt, setup_sys_prompt_existing_code
+from gpt_engineer.core.default.steps import gen_code, curr_fn, setup_sys_prompt, setup_sys_prompt_existing_code, gen_entrypoint
 from langchain.schema import HumanMessage, SystemMessage
 import tempfile
 import pytest
@@ -169,3 +169,67 @@ class TestStepUtilities:
         expected_prompt = preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format"]) + "\nUseful to know:\n" + preprompts["philosophy"]
         actual_prompt = setup_sys_prompt_existing_code(preprompts)
         assert actual_prompt == expected_prompt
+class TestGenEntrypoint:
+
+    factorial_entrypoint = """
+Irrelevant explanations
+```sh
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pytest test_factorial.py
+```
+    """
+
+    class MockAI:
+
+        def __init__(self, content):
+            self.content=content
+        def start(self, system, user, step_name):
+            return [SystemMessage(content=self.content)]
+
+    #  The function receives valid input and generates a valid entry point script.
+    def test_valid_input_generates_valid_entrypoint(self):
+        # Mock AI class
+
+
+        ai_mock = TestGenEntrypoint.MockAI(TestGenEntrypoint.factorial_entrypoint)
+        code = Code()
+        tempdir = tempfile.gettempdir()
+        memory = OnDiskRepository(tempdir)
+        # Act
+        entrypoint_code = gen_entrypoint(ai_mock, code, memory)
+
+        # Assert
+        assert ENTRYPOINT_FILE in entrypoint_code
+        assert isinstance(entrypoint_code[ENTRYPOINT_FILE], str)
+        assert entrypoint_code[ENTRYPOINT_FILE] == """python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pytest test_factorial.py
+"""
+        assert ENTRYPOINT_LOG_FILE in memory
+        assert isinstance(memory[ENTRYPOINT_LOG_FILE], str)
+        assert memory[ENTRYPOINT_LOG_FILE] == TestGenEntrypoint.factorial_entrypoint.strip()
+
+
+    #  The function receives an empty codebase and returns an empty entry point script.
+    def test_empty_codebase_returns_empty_entrypoint(self):
+        # Arrange
+        ai_mock = TestGenEntrypoint.MockAI("Irrelevant explanation")
+
+        code = Code()
+        tempdir = tempfile.gettempdir()
+        memory = OnDiskRepository(tempdir)
+
+        # Act
+        entrypoint_code = gen_entrypoint(ai_mock, code, memory)
+
+        # Assert
+        assert ENTRYPOINT_FILE in entrypoint_code
+        assert isinstance(entrypoint_code[ENTRYPOINT_FILE], str)
+        assert entrypoint_code[ENTRYPOINT_FILE] == ""
+        assert ENTRYPOINT_LOG_FILE in memory
+        assert isinstance(memory[ENTRYPOINT_LOG_FILE], str)
+        assert memory[ENTRYPOINT_LOG_FILE] == "Irrelevant explanation"
+

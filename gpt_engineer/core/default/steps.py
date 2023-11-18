@@ -94,7 +94,7 @@ def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository) -> Code:
     Returns:
         Code: A dictionary-like object containing the entry point script.
     """
-    # ToDo: This should enter the preprompts...
+    # ToDo: This should probably go into the preprompts...
     messages = ai.start(
         system=(
             "You will get information about a codebase that is currently on disk in "
