@@ -6,12 +6,14 @@ from gpt_engineer.core.default.paths import (
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE
 )
+from gpt_engineer.core.ai import AI
 from gpt_engineer.core.preprompt_holder import PrepromptHolder
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.default.steps import gen_code, curr_fn, setup_sys_prompt, setup_sys_prompt_existing_code, gen_entrypoint
+from gpt_engineer.core.default.steps import gen_code, curr_fn, setup_sys_prompt, setup_sys_prompt_existing_code, gen_entrypoint, improve
 from langchain.schema import HumanMessage, SystemMessage
 import tempfile
 import pytest
+from unittest.mock import MagicMock
 
 factorial_program = """
 To implement a function that calculates the factorial of a number in Python, we will create a simple Python module with a single function `factorial`. The factorial of a non-negative integer `n` is the product of all positive integers less than or equal to `n`. It is denoted by `n!`. The factorial of 0 is defined to be 1.
@@ -233,3 +235,52 @@ pytest test_factorial.py
         assert isinstance(memory[ENTRYPOINT_LOG_FILE], str)
         assert memory[ENTRYPOINT_LOG_FILE] == "Irrelevant explanation"
 
+
+class TestImprove:
+
+    def test_improve_existing_code(self, tmp_path):
+        # Mock the AI class
+        ai_patch = """
+Some introductory text.
+
+```python
+main.py
+<<<<<<< HEAD
+    print('Hello, World!')
+=======
+    print('Goodbye, World!')
+>>>>>>> updated
+```"""
+        ai_mock = MagicMock(spec=AI)
+        ai_mock.next.return_value = [
+            SystemMessage(content=ai_patch)
+        ]
+
+        # Create a Code object with existing code
+        code = Code({
+            "main.py": "print('Hello, World!')",
+            "requirements.txt": "numpy==1.18.1",
+            "README.md": "This is a sample code repository."
+        })
+
+        # Create a BaseRepository object for memory
+        memory = OnDiskRepository(tmp_path)
+
+        # Define the user prompt
+        prompt = "Change the program to print 'Goodbye, World!' instead of 'Hello, World!'"
+
+        # Call the improve function
+        improved_code = improve(ai_mock, prompt, code, memory)
+
+
+        # Assert that the code was improved correctly
+        expected_code = Code({
+            "main.py": "print('Goodbye, World!')",
+            "requirements.txt": "numpy==1.18.1",
+            "README.md": "This is a sample code repository."
+        })
+        assert improved_code == expected_code
+
+        # Assert that the improvement process was logged in the memory
+        assert IMPROVE_LOG_FILE in memory
+        assert memory[IMPROVE_LOG_FILE] == ai_patch.strip()

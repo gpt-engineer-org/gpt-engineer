@@ -2,7 +2,6 @@ import pytest
 
 from gpt_engineer.core.default.on_disk_repository import (
     OnDiskRepository,
-    # FileRepositories,
 )
 
 
