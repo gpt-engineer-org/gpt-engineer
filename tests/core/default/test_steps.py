@@ -5,6 +5,7 @@ from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE,
+    PREPROMPTS_PATH
 )
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.preprompt_holder import PrepromptHolder
@@ -77,7 +78,7 @@ class TestGenCode:
         prompt = "Write a function that calculates the factorial of a number."
 
         memory = OnDiskRepository(tempfile.gettempdir())
-        code = gen_code(ai, prompt, memory)
+        code = gen_code(ai, prompt, memory, PREPROMPTS_PATH)
 
         assert isinstance(code, Code)
         assert len(code) == 2
@@ -94,7 +95,7 @@ class TestGenCode:
         ai = MockAI()
         prompt = "Write a function that calculates the factorial of a number."
         memory = OnDiskRepository(tempfile.gettempdir())
-        code = gen_code(ai, prompt, memory)
+        code = gen_code(ai, prompt, memory, PREPROMPTS_PATH)
 
         assert isinstance(code, Code)
         assert len(code) == 2
@@ -113,7 +114,7 @@ class TestGenCode:
         memory = OnDiskRepository(tempfile.gettempdir())
 
         with pytest.raises(TypeError):
-            code = gen_code(ai, prompt, memory)
+            code = gen_code(ai, prompt, memory, PREPROMPTS_PATH)
             code[123] = "code"
 
     #  Raises TypeError if values are not strings.
@@ -128,7 +129,7 @@ class TestGenCode:
         memory = OnDiskRepository(tempfile.gettempdir())
 
         with pytest.raises(TypeError):
-            code = gen_code(ai, prompt, memory)
+            code = gen_code(ai, prompt, memory, PREPROMPTS_PATH)
             code["file.py"] = 123
 
     #  Raises KeyError if the file does not exist in the database.
@@ -143,7 +144,7 @@ class TestGenCode:
         memory = OnDiskRepository(tempfile.gettempdir())
 
         with pytest.raises(KeyError):
-            code = gen_code(ai, prompt, memory)
+            code = gen_code(ai, prompt, memory, PREPROMPTS_PATH)
             code["nonexistent_file.py"]
 
 
@@ -162,7 +163,7 @@ class TestStepUtilities:
         assert actual_name == expected_name
 
     def test_constructs_system_prompt_with_predefined_instructions_and_philosophies(self):
-        preprompts = PrepromptHolder.get_preprompts()
+        preprompts = PrepromptHolder.get_preprompts(PREPROMPTS_PATH)
         sys_prompt = setup_sys_prompt(preprompts)
         expected_prompt = (
             preprompts["roadmap"]
@@ -173,7 +174,7 @@ class TestStepUtilities:
         assert sys_prompt == expected_prompt
 
     def test_constructs_system_prompt(self):
-        preprompts = PrepromptHolder.get_preprompts()
+        preprompts = PrepromptHolder.get_preprompts(PREPROMPTS_PATH)
         expected_prompt = (
             preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format"])
             + "\nUseful to know:\n"
@@ -210,7 +211,7 @@ pytest test_factorial.py
         tempdir = tempfile.gettempdir()
         memory = OnDiskRepository(tempdir)
         # Act
-        entrypoint_code = gen_entrypoint(ai_mock, code, memory)
+        entrypoint_code = gen_entrypoint(ai_mock, code, memory, PREPROMPTS_PATH)
 
         # Assert
         assert ENTRYPOINT_FILE in entrypoint_code
@@ -239,7 +240,7 @@ pytest test_factorial.py
         memory = OnDiskRepository(tempdir)
 
         # Act
-        entrypoint_code = gen_entrypoint(ai_mock, code, memory)
+        entrypoint_code = gen_entrypoint(ai_mock, code, memory, PREPROMPTS_PATH)
 
         # Assert
         assert ENTRYPOINT_FILE in entrypoint_code
@@ -285,7 +286,7 @@ main.py
         )
 
         # Call the improve function
-        improved_code = improve(ai_mock, prompt, code, memory)
+        improved_code = improve(ai_mock, prompt, code, memory, PREPROMPTS_PATH)
 
         # Assert that the code was improved correctly
         expected_code = Code(

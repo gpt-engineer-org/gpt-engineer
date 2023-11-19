@@ -6,12 +6,15 @@ from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE,
+    PREPROMPTS_PATH,
 )
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.base_repository import BaseRepository
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
-from langchain.schema import HumanMessage, SystemMessage
 
+from typing import Union, MutableMapping
+from pathlib import Path
+from langchain.schema import HumanMessage, SystemMessage
 import inspect
 import re
 from termcolor import colored
@@ -31,7 +34,7 @@ def curr_fn() -> str:
     return inspect.stack()[1].function
 
 
-def setup_sys_prompt(preprompts: OnDiskRepository) -> str:
+def setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
     """
     Constructs a system prompt for the AI based on predefined instructions and philosophies.
 
@@ -53,7 +56,7 @@ def setup_sys_prompt(preprompts: OnDiskRepository) -> str:
     )
 
 
-def gen_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
+def gen_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_path: Union[str, Path]) -> Code:
     """
     Generates code based on a given prompt using an AI model.
 
@@ -69,7 +72,7 @@ def gen_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     Returns:
         Code: A dictionary-like object containing the generated code files.
     """
-    preprompts = PrepromptHolder.get_preprompts()
+    preprompts = PrepromptHolder.get_preprompts(preprompts_path)
     messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
@@ -78,7 +81,7 @@ def gen_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     return code
 
 
-def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository) -> Code:
+def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository, preprompts_path: Union[str, Path]) -> Code:
     """
     Generates an entry point script for a given codebase.
 
@@ -94,20 +97,9 @@ def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository) -> Code:
     Returns:
         Code: A dictionary-like object containing the entry point script.
     """
-    # ToDo: This should probably go into the preprompts...
+    preprompts = PrepromptHolder.get_preprompts(preprompts_path)
     messages = ai.start(
-        system=(
-            "You will get information about a codebase that is currently on disk in "
-            "the current folder.\n"
-            "From this you will answer with code blocks that includes all the necessary "
-            "unix terminal commands to "
-            "a) install dependencies "
-            "b) run all necessary parts of the codebase (in parallel if necessary).\n"
-            "Do not install globally. Do not use sudo.\n"
-            "Do not explain the code, just give the commands.\n"
-            "Do not use placeholders, use example values (like . for a folder argument) "
-            "if necessary.\n"
-        ),
+        system=(preprompts["entrypoint"]),
         user="Information about the codebase:\n\n" + code.to_chat(),
         step_name=curr_fn(),
     )
@@ -178,7 +170,7 @@ def execute_entrypoint(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> N
     execution_env.execute_program(code)
 
 
-def setup_sys_prompt_existing_code(preprompts: OnDiskRepository) -> str:
+def setup_sys_prompt_existing_code(preprompts: MutableMapping[Union[str, Path], str]) -> str:
     """
     Constructs a system prompt for the AI to improve existing code.
 
@@ -199,7 +191,7 @@ def setup_sys_prompt_existing_code(preprompts: OnDiskRepository) -> str:
     )
 
 
-def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository) -> Code:
+def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_path: Union[str, Path]) -> Code:
     """
     Improves existing code based on user input using an AI model.
 
@@ -216,7 +208,7 @@ def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository) -> Code:
     Returns:
         Code: A dictionary-like object containing the improved code files.
     """
-    preprompts = PrepromptHolder.get_preprompts()
+    preprompts = PrepromptHolder.get_preprompts(preprompts_path)
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]
