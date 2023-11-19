@@ -9,13 +9,11 @@ from unittest.mock import MagicMock
 import pytest
 import rudderstack.analytics as rudder_analytics
 
-from gpt_engineer.applications.cli import collect_learnings, steps_file_hash
+from gpt_engineer.applications.cli.collect import collect_learnings
 from gpt_engineer.core.default.on_disk_repository import (
     OnDiskRepository,
-    FileRepositories,
 )
-from gpt_engineer.applications.cli import extract_learning
-from gpt_engineer.legacy.steps import simple_gen
+from gpt_engineer.applications.cli.learning import extract_learning
 
 
 def test_collect_learnings(monkeypatch):
