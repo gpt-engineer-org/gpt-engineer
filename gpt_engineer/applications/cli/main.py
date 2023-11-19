@@ -34,13 +34,13 @@ from dotenv import load_dotenv
 
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.default.paths import PREPROMPTS_PATH
 from gpt_engineer.applications.cli.file_selector import ask_for_files
 from gpt_engineer.tools.custom_steps import lite_gen, gen_clarified_code, self_heal
 from gpt_engineer.core.default.steps import gen_code, execute_entrypoint
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
-
+import logging
 
 app = typer.Typer()  # creates a CLI app
 
@@ -64,19 +64,19 @@ def load_prompt(input_repo: OnDiskRepository):
     return input_repo.get("prompt")
 
 
-# def preprompts_path(use_custom_preprompts: bool, input_path: Path = None) -> Path:
-#     original_preprompts_path = Path(__file__).parent.parent / "preprompts"
-#     if not use_custom_preprompts:
-#         return original_preprompts_path
-#
-#     custom_preprompts_path = input_path / "preprompts"
-#     if not custom_preprompts_path.exists():
-#         custom_preprompts_path.mkdir()
-#
-#     for file in original_preprompts_path.glob("*"):
-#         if not (custom_preprompts_path / file.name).exists():
-#             (custom_preprompts_path / file.name).write_text(file.read_text())
-#     return custom_preprompts_path
+def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
+    original_preprompts_path = PREPROMPTS_PATH
+    if not use_custom_preprompts:
+        return original_preprompts_path
+
+    custom_preprompts_path = input_path / "preprompts"
+    if not custom_preprompts_path.exists():
+        custom_preprompts_path.mkdir()
+
+    for file in original_preprompts_path.glob("*"):
+        if not (custom_preprompts_path / file.name).exists():
+            (custom_preprompts_path / file.name).write_text(file.read_text())
+    return custom_preprompts_path
 
 
 @app.command()
@@ -129,7 +129,7 @@ def main(
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
-    # logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
+    logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
     #
     # if lite_mode:
     #     assert not improve_mode, "Lite mode cannot improve code"
@@ -175,8 +175,10 @@ def main(
     else:
         execution_fn = execute_entrypoint
 
+
+    preprompts_path = get_preprompts_path(use_custom_preprompts, Path(project_path))
     agent = CliAgent.with_default_config(
-        project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn
+        project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn, preprompts_path=preprompts_path
     )
     if improve_mode:
         code = ask_for_files(project_path)
@@ -186,47 +188,8 @@ def main(
     # collect user feedback if user consents
     config = (code_gen_fn.__name__, execution_fn.__name__)
     collect_and_send_human_review(prompt, model, temperature, config, agent.memory)
-    # workspace_path = path
-    # input_path = path
-    #
-    # project_metadata_path = path / ".gpteng"
-    # memory_path = project_metadata_path / "memory"
-    # archive_path = project_metadata_path / "archive"
-    #
-    # fileRepositories = FileRepositories(
-    #     memory=FileRepository(memory_path),
-    #     logs=FileRepository(memory_path / "logs"),
-    #     input=FileRepository(input_path),
-    #     workspace=FileRepository(workspace_path),
-    #     preprompts=FileRepository(preprompts_path(use_custom_preprompts, input_path)),
-    #     archive=FileRepository(archive_path),
-    #     project_metadata=FileRepository(project_metadata_path),
-    # )
-    #
-    # codeVectorRepository = CodeVectorRepository()
-    #
-    # if steps_config not in [
-    #     StepsConfig.EXECUTE_ONLY,
-    #     StepsConfig.USE_FEEDBACK,
-    #     StepsConfig.EVALUATE,
-    #     StepsConfig.IMPROVE_CODE,
-    #     StepsConfig.VECTOR_IMPROVE,
-    #     StepsConfig.SELF_HEAL,
-    # ]:
-    #     archive(fileRepositories)
-    #     load_prompt(fileRepositories)
-    #
-    # steps = STEPS[steps_config]
-    # for step in steps:
-    #     messages = step(ai, fileRepositories)
-    #     fileRepositories.logs[step.__name__] = AI.serialize_messages(messages)
 
     print("Total api cost: $ ", ai.token_usage_log.usage_cost())
-
-    # if check_collection_consent():
-    #     collect_learnings(model, temperature, steps, fileRepositories)
-    #
-    # fileRepositories.logs["token_usage"] = ai.token_usage_log.format_log()
 
 
 if __name__ == "__main__":

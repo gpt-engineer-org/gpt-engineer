@@ -33,7 +33,7 @@ import shutil
 
 from gpt_engineer.core.base_repository import BaseRepository
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, List
 from gpt_engineer.tools.supported_languages import SUPPORTED_LANGUAGES
 
 
@@ -210,21 +210,29 @@ class OnDiskRepository(BaseRepository):
         elif item_path.is_dir():
             shutil.rmtree(item_path)
 
-    def _supported_files(self, directory: Path) -> str:
+    def __iter__(self) -> List[str]:
+        return sorted(
+            str(item.relative_to(self.path))
+            for item in sorted(self.path.rglob("*"))
+            if item.is_file()
+        )
+
+    def __len__(self):
+        return len(self.__iter__())
+
+    def _supported_files(self) -> str:
         valid_extensions = {
             ext for lang in SUPPORTED_LANGUAGES for ext in lang["extensions"]
         }
         file_paths = [
             str(item)
-            for item in sorted(directory.rglob("*"))
-            if item.is_file() and item.suffix in valid_extensions
+            for item in self
+            if Path(item).is_file() and Path(item).suffix in valid_extensions
         ]
         return "\n".join(file_paths)
 
-    def _all_files(self, directory: Path) -> str:
-        file_paths = [
-            str(item) for item in sorted(directory.rglob("*")) if item.is_file()
-        ]
+    def _all_files(self) -> str:
+        file_paths = [str(item) for item in self if Path(item).is_file()]
         return "\n".join(file_paths)
 
     def to_path_list_string(self, supported_code_files_only: bool = False) -> str:
@@ -232,14 +240,9 @@ class OnDiskRepository(BaseRepository):
         Returns directory as a list of file paths. Useful for passing to the LLM where it needs to understand the wider context of files available for reference.
         """
         if supported_code_files_only:
-            return self._supported_files(self.path)
+            return self._supported_files()
         else:
-            return self._all_files(self.path)
+            return self._all_files()
 
     def to_json(self) -> str:
-        file_paths = [
-            str(item.relative_to(self.path))
-            for item in sorted(self.path.rglob("*"))
-            if item.is_file()
-        ]
-        return json.dumps({file_path: self[file_path] for file_path in file_paths})
+        return json.dumps({file_path: self[file_path] for file_path in self})

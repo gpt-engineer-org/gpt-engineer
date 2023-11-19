@@ -2,7 +2,6 @@ import pytest
 
 from gpt_engineer.core.default.on_disk_repository import (
     OnDiskRepository,
-    # FileRepositories,
 )
 
 
@@ -73,4 +72,3 @@ def test_error_messages(tmp_path):
         db["key"] = ["Invalid", "value"]
 
     assert str(e.value) == "val must be str"
-

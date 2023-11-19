@@ -4,14 +4,24 @@ from gpt_engineer.core.default.paths import (
     ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
     ENTRYPOINT_LOG_FILE,
-    IMPROVE_LOG_FILE
+    IMPROVE_LOG_FILE,
+    PREPROMPTS_PATH
 )
+from gpt_engineer.core.ai import AI
 from gpt_engineer.core.preprompt_holder import PrepromptHolder
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.default.steps import gen_code, curr_fn, setup_sys_prompt, setup_sys_prompt_existing_code
+from gpt_engineer.core.default.steps import (
+    gen_code,
+    curr_fn,
+    setup_sys_prompt,
+    setup_sys_prompt_existing_code,
+    gen_entrypoint,
+    improve,
+)
 from langchain.schema import HumanMessage, SystemMessage
 import tempfile
 import pytest
+from unittest.mock import MagicMock
 
 factorial_program = """
 To implement a function that calculates the factorial of a number in Python, we will create a simple Python module with a single function `factorial`. The factorial of a non-negative integer `n` is the product of all positive integers less than or equal to `n`. It is denoted by `n!`. The factorial of 0 is defined to be 1.
@@ -55,8 +65,8 @@ requirements.txt
 This concludes a fully working implementation.```
 """
 
-class TestGenCode:
 
+class TestGenCode:
     #  Generates code based on a given prompt using an AI model.
     def test_generates_code_using_ai_model(self):
         # Mock AI class
@@ -66,15 +76,14 @@ class TestGenCode:
 
         ai = MockAI()
         prompt = "Write a function that calculates the factorial of a number."
-        
+
         memory = OnDiskRepository(tempfile.gettempdir())
-        code = gen_code(ai, prompt, memory)
+        code = gen_code(ai, prompt, memory, PREPROMPTS_PATH)
 
         assert isinstance(code, Code)
         assert len(code) == 2
         assert CODE_GEN_LOG_FILE in memory
         assert memory[CODE_GEN_LOG_FILE] == factorial_program.strip()
-
 
     #  The generated code is saved to disk.
     def test_generated_code_saved_to_disk(self):
@@ -86,7 +95,7 @@ class TestGenCode:
         ai = MockAI()
         prompt = "Write a function that calculates the factorial of a number."
         memory = OnDiskRepository(tempfile.gettempdir())
-        code = gen_code(ai, prompt, memory)
+        code = gen_code(ai, prompt, memory, PREPROMPTS_PATH)
 
         assert isinstance(code, Code)
         assert len(code) == 2
@@ -105,7 +114,7 @@ class TestGenCode:
         memory = OnDiskRepository(tempfile.gettempdir())
 
         with pytest.raises(TypeError):
-            code = gen_code(ai, prompt, memory)
+            code = gen_code(ai, prompt, memory, PREPROMPTS_PATH)
             code[123] = "code"
 
     #  Raises TypeError if values are not strings.
@@ -120,7 +129,7 @@ class TestGenCode:
         memory = OnDiskRepository(tempfile.gettempdir())
 
         with pytest.raises(TypeError):
-            code = gen_code(ai, prompt, memory)
+            code = gen_code(ai, prompt, memory, PREPROMPTS_PATH)
             code["file.py"] = 123
 
     #  Raises KeyError if the file does not exist in the database.
@@ -135,7 +144,7 @@ class TestGenCode:
         memory = OnDiskRepository(tempfile.gettempdir())
 
         with pytest.raises(KeyError):
-            code = gen_code(ai, prompt, memory)
+            code = gen_code(ai, prompt, memory, PREPROMPTS_PATH)
             code["nonexistent_file.py"]
 
 
@@ -154,7 +163,7 @@ class TestStepUtilities:
         assert actual_name == expected_name
 
     def test_constructs_system_prompt_with_predefined_instructions_and_philosophies(self):
-        preprompts = PrepromptHolder.get_preprompts()
+        preprompts = PrepromptHolder.get_preprompts(PREPROMPTS_PATH)
         sys_prompt = setup_sys_prompt(preprompts)
         expected_prompt = (
             preprompts["roadmap"]
@@ -165,7 +174,130 @@ class TestStepUtilities:
         assert sys_prompt == expected_prompt
 
     def test_constructs_system_prompt(self):
-        preprompts = PrepromptHolder.get_preprompts()
-        expected_prompt = preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format"]) + "\nUseful to know:\n" + preprompts["philosophy"]
+        preprompts = PrepromptHolder.get_preprompts(PREPROMPTS_PATH)
+        expected_prompt = (
+            preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format"])
+            + "\nUseful to know:\n"
+            + preprompts["philosophy"]
+        )
         actual_prompt = setup_sys_prompt_existing_code(preprompts)
         assert actual_prompt == expected_prompt
+
+
+class TestGenEntrypoint:
+    factorial_entrypoint = """
+Irrelevant explanations
+```sh
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pytest test_factorial.py
+```
+    """
+
+    class MockAI:
+        def __init__(self, content):
+            self.content = content
+
+        def start(self, system, user, step_name):
+            return [SystemMessage(content=self.content)]
+
+    #  The function receives valid input and generates a valid entry point script.
+    def test_valid_input_generates_valid_entrypoint(self):
+        # Mock AI class
+
+        ai_mock = TestGenEntrypoint.MockAI(TestGenEntrypoint.factorial_entrypoint)
+        code = Code()
+        tempdir = tempfile.gettempdir()
+        memory = OnDiskRepository(tempdir)
+        # Act
+        entrypoint_code = gen_entrypoint(ai_mock, code, memory, PREPROMPTS_PATH)
+
+        # Assert
+        assert ENTRYPOINT_FILE in entrypoint_code
+        assert isinstance(entrypoint_code[ENTRYPOINT_FILE], str)
+        assert (
+            entrypoint_code[ENTRYPOINT_FILE]
+            == """python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pytest test_factorial.py
+"""
+        )
+        assert ENTRYPOINT_LOG_FILE in memory
+        assert isinstance(memory[ENTRYPOINT_LOG_FILE], str)
+        assert (
+            memory[ENTRYPOINT_LOG_FILE] == TestGenEntrypoint.factorial_entrypoint.strip()
+        )
+
+    #  The function receives an empty codebase and returns an empty entry point script.
+    def test_empty_codebase_returns_empty_entrypoint(self):
+        # Arrange
+        ai_mock = TestGenEntrypoint.MockAI("Irrelevant explanation")
+
+        code = Code()
+        tempdir = tempfile.gettempdir()
+        memory = OnDiskRepository(tempdir)
+
+        # Act
+        entrypoint_code = gen_entrypoint(ai_mock, code, memory, PREPROMPTS_PATH)
+
+        # Assert
+        assert ENTRYPOINT_FILE in entrypoint_code
+        assert isinstance(entrypoint_code[ENTRYPOINT_FILE], str)
+        assert entrypoint_code[ENTRYPOINT_FILE] == ""
+        assert ENTRYPOINT_LOG_FILE in memory
+        assert isinstance(memory[ENTRYPOINT_LOG_FILE], str)
+        assert memory[ENTRYPOINT_LOG_FILE] == "Irrelevant explanation"
+
+
+class TestImprove:
+    def test_improve_existing_code(self, tmp_path):
+        # Mock the AI class
+        ai_patch = """
+Some introductory text.
+
+```python
+main.py
+<<<<<<< HEAD
+    print('Hello, World!')
+=======
+    print('Goodbye, World!')
+>>>>>>> updated
+```"""
+        ai_mock = MagicMock(spec=AI)
+        ai_mock.next.return_value = [SystemMessage(content=ai_patch)]
+
+        # Create a Code object with existing code
+        code = Code(
+            {
+                "main.py": "print('Hello, World!')",
+                "requirements.txt": "numpy==1.18.1",
+                "README.md": "This is a sample code repository.",
+            }
+        )
+
+        # Create a BaseRepository object for memory
+        memory = OnDiskRepository(tmp_path)
+
+        # Define the user prompt
+        prompt = (
+            "Change the program to print 'Goodbye, World!' instead of 'Hello, World!'"
+        )
+
+        # Call the improve function
+        improved_code = improve(ai_mock, prompt, code, memory, PREPROMPTS_PATH)
+
+        # Assert that the code was improved correctly
+        expected_code = Code(
+            {
+                "main.py": "print('Goodbye, World!')",
+                "requirements.txt": "numpy==1.18.1",
+                "README.md": "This is a sample code repository.",
+            }
+        )
+        assert improved_code == expected_code
+
+        # Assert that the improvement process was logged in the memory
+        assert IMPROVE_LOG_FILE in memory
+        assert memory[IMPROVE_LOG_FILE] == ai_patch.strip()

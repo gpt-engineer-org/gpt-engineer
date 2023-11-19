@@ -4,8 +4,8 @@ Tests for the revised tools collection consent mechanism in the cli/learning mod
 import pytest
 from unittest.mock import patch
 from pathlib import Path
-from gpt_engineer.applications.cli import ask_collection_consent
-from gpt_engineer.applications.cli import check_collection_consent
+from gpt_engineer.applications.cli.learning import ask_collection_consent
+from gpt_engineer.applications.cli.learning import check_collection_consent
 
 
 # Use a fixture to clean up created files after each test
