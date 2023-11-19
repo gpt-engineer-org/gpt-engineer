@@ -6,7 +6,6 @@ from unittest.mock import patch, MagicMock
 
 
 class TestOnDiskExecutionEnv(unittest.TestCase):
-
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.env = OnDiskExecutionEnv(self.temp_dir.name)
@@ -22,18 +21,16 @@ class TestOnDiskExecutionEnv(unittest.TestCase):
         """
         code = {
             ENTRYPOINT_FILE: entrypoint_content,
-            "script.py": "print('This is a test script')"
+            "script.py": "print('This is a test script')",
         }
-        with patch('subprocess.Popen') as mock_popen:
+        with patch("subprocess.Popen") as mock_popen:
             mock_popen.return_value.wait.return_value = 0
             process = self.env.execute_program(code)
             self.assertIsNotNone(process)
             mock_popen.assert_called_once()
 
     def test_missing_entrypoint(self):
-        code = {
-            "script.py": "print('This is a test script')"
-        }
+        code = {"script.py": "print('This is a test script')"}
         with self.assertRaises(FileNotFoundError):
             self.env.execute_program(code)
 
@@ -43,9 +40,9 @@ class TestOnDiskExecutionEnv(unittest.TestCase):
         """
         code = {
             ENTRYPOINT_FILE: entrypoint_content,
-            "script.py": "print('This is a test script')"
+            "script.py": "print('This is a test script')",
         }
-        with patch('subprocess.Popen') as mock_popen:
+        with patch("subprocess.Popen") as mock_popen:
             mock_process = MagicMock()
             mock_process.wait.side_effect = KeyboardInterrupt
             mock_popen.return_value = mock_process
@@ -58,17 +55,18 @@ class TestOnDiskExecutionEnv(unittest.TestCase):
         """
         code = {
             ENTRYPOINT_FILE: entrypoint_content,
-            "script.py": "import sys; print('Out'); sys.stderr.write('Error')"
+            "script.py": "import sys; print('Out'); sys.stderr.write('Error')",
         }
-        with patch('subprocess.Popen') as mock_popen:
+        with patch("subprocess.Popen") as mock_popen:
             process = MagicMock()
             process.wait.return_value = 0
-            process.communicate.return_value = (b'Out\n', b'Error\n')
+            process.communicate.return_value = (b"Out\n", b"Error\n")
             mock_popen.return_value = process
             process = self.env.execute_program(code)
             stdout, stderr = process.communicate()
-            self.assertEqual(stdout, b'Out\n')
-            self.assertEqual(stderr, b'Error\n')
+            self.assertEqual(stdout, b"Out\n")
+            self.assertEqual(stderr, b"Error\n")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

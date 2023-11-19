@@ -33,7 +33,10 @@ def test_improve():
         }
     )
     lean_agent = LeanAgent.with_default_config(temp_dir, AI(streaming=False))
-    lean_agent.improve(code, "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'")
+    lean_agent.improve(
+        code,
+        "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",
+    )
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
     assert os.path.isfile(file_path)

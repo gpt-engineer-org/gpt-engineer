@@ -72,4 +72,3 @@ def test_error_messages(tmp_path):
         db["key"] = ["Invalid", "value"]
 
     assert str(e.value) == "val must be str"
-
