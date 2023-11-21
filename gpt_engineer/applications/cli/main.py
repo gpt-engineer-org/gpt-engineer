@@ -54,13 +54,18 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def load_prompt(input_repo: OnDiskRepository):
+def load_prompt(input_repo: OnDiskRepository, improve_mode):
     if input_repo.get("prompt"):
         return input_repo.get("prompt")
 
-    input_repo["prompt"] = input(
-        "\nWhat application do you want gpt-engineer to generate?\n"
-    )
+    if not improve_mode:
+        input_repo["prompt"] = input(
+            "\nWhat application do you want gpt-engineer to generate?\n"
+        )
+    else:
+        input_repo["prompt"] = input(
+            "\nHow do you want to improve the application?\n"
+        )
     return input_repo.get("prompt")
 
 
@@ -161,7 +166,7 @@ def main(
     # )  # resolve the string to a valid path (eg "a/b/../c" to "a/c")
     path = Path(project_path)  # .absolute()
     print("Running gpt-engineer in", path.absolute(), "\n")
-    prompt = load_prompt(OnDiskRepository(path))
+    prompt = load_prompt(OnDiskRepository(path), improve_mode)
     # configure generation function
     if clarify_mode:
         code_gen_fn = gen_clarified_code

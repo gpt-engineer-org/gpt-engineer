@@ -305,6 +305,7 @@ class TerminalFileSelector:
             print("Please use a valid number/series of numbers.\n")
             sys.exit(1)
 
+
         return selected_paths
 
 
@@ -381,6 +382,9 @@ def ask_for_files(project_path: Union[str, Path]) -> Code:
             print("Invalid number. Select a number from the list above.\n")
             sys.exit(1)
 
+        #ToDO: Replace this hack that makes all file_path relative to the right thing
+        file_path_list = [os.path.relpath(file_path.strip(), project_path) for file_path in file_path_list]
+
         if not selection_number == 3:
             metadata_db[FILE_LIST_NAME] = "\n".join(
                 str(file_path) for file_path in file_path_list
@@ -388,7 +392,7 @@ def ask_for_files(project_path: Union[str, Path]) -> Code:
     content_dict = dict()
     with open(metadata_db.path / FILE_LIST_NAME, "r") as file_list:
         for file in file_list:
-            with open(file.strip(), "r") as content:
+            with open(os.path.join(project_path, file.strip()), "r") as content:
                 content_dict[file.strip()] = content.read()
     return Code(content_dict)
 
