@@ -33,7 +33,7 @@ import shutil
 
 from gpt_engineer.core.base_repository import BaseRepository
 from pathlib import Path
-from typing import Any, Optional, Union, List
+from typing import Any, Optional, Union, Iterator, Dict
 from gpt_engineer.tools.supported_languages import SUPPORTED_LANGUAGES
 
 
@@ -180,7 +180,8 @@ class OnDiskRepository(BaseRepository):
         if str(key).startswith("../"):
             raise ValueError(f"File name {key} attempted to access parent path.")
 
-        assert isinstance(val, str), "val must be str"
+        if not isinstance(val, str):
+            raise TypeError("val must be str")
 
         full_path = self.path / key
         full_path.parent.mkdir(parents=True, exist_ok=True)
@@ -210,15 +211,15 @@ class OnDiskRepository(BaseRepository):
         elif item_path.is_dir():
             shutil.rmtree(item_path)
 
-    def __iter__(self) -> List[str]:
-        return sorted(
+    def __iter__(self) -> Iterator[str]:
+        return iter(sorted(
             str(item.relative_to(self.path))
             for item in sorted(self.path.rglob("*"))
-            if item.is_file()
+            if item.is_file())
         )
 
     def __len__(self):
-        return len(self.__iter__())
+        return len(list(self.__iter__()))
 
     def _supported_files(self) -> str:
         valid_extensions = {
@@ -244,5 +245,9 @@ class OnDiskRepository(BaseRepository):
         else:
             return self._all_files()
 
+    def to_dict(self) -> Dict[str|Path, str]:
+        return {file_path: self[file_path] for file_path in self}
+
     def to_json(self) -> str:
-        return json.dumps({file_path: self[file_path] for file_path in self})
+        return json.dumps(self.to_dict())
+

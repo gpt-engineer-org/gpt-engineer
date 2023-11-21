@@ -142,7 +142,7 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
 #     return messages
 
 
-def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
+def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_path: Union[str, Path]) -> Code:
     """
     Generates code based on clarifications obtained from the user.
 
@@ -159,7 +159,7 @@ def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     - List[dict]: A list of message dictionaries capturing the AI's interactions and generated
       outputs during the code generation process.
     """
-    preprompts = PrepromptHolder.get_preprompts()
+    preprompts = PrepromptHolder.get_preprompts(preprompts_path)
     messages: List[Message] = [SystemMessage(content=preprompts["clarify"])]
     user_input = prompt
     while True:
@@ -205,7 +205,7 @@ def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
         preprompts["generate"].replace("FILE_FORMAT", preprompts["file_format"]),
         step_name=curr_fn(),
     )
-
+    print()
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files = parse_chat(chat)
@@ -213,7 +213,7 @@ def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     return code
 
 
-def lite_gen(ai: AI, prompt: str, memory: BaseRepository) -> Code:
+def lite_gen(ai: AI, prompt: str, memory: BaseRepository, preprompts_path: Union[str, Path]) -> Code:
     """
     Executes the AI model using the main prompt and saves the generated results.
 
@@ -234,7 +234,7 @@ def lite_gen(ai: AI, prompt: str, memory: BaseRepository) -> Code:
     The function assumes the `ai.start` method and the `to_files` utility to be correctly
     set up and functional. Ensure these prerequisites before invoking `lite_gen`.
     """
-    preprompts = PrepromptHolder.get_preprompts()
+    preprompts = PrepromptHolder.get_preprompts(preprompts_path)
     messages = ai.start(prompt, preprompts["file_format"], step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
