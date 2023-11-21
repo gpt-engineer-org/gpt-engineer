@@ -178,7 +178,7 @@ def main(
 
     preprompts_path = get_preprompts_path(use_custom_preprompts, Path(project_path))
     agent = CliAgent.with_default_config(
-        project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn, preprompts_path=preprompts_path
+        project_path, ai=ai, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn, preprompts_path=preprompts_path
     )
     if improve_mode:
         code = ask_for_files(project_path)
