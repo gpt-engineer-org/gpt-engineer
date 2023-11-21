@@ -22,7 +22,7 @@ dependencies = [
   'tiktoken >=0.0.4',
   'tabulate == 0.9.0',
   'python-dotenv >= 0.21.0',
-  'langchain >=0.0.240, <=0.0.312', # The upper bound is to address AiMessageChunk problem in bug report 802 and 804 on GH. If we want/need to relax this in the future, we should check that the AiMessageChunk error has been resolved.
+  'langchain >= 0.0.335', 
   'agent-protocol==1.0.1',
   'llama-index >= 0.8.49',
   'rank-bm25 >= 0.2.2',
@@ -68,7 +68,7 @@ gpt-engineer = 'gpt_engineer.applications.cli.main:app'
 ge = 'gpt_engineer.appications.cli.main:app'
 
 [tool.setuptools]
-packages = ["gpt_engineer", "gpt_engineer.applications", "gpt_engineer.applications.cli", "gpt_engineer.core", "gpt_engineer.core.default", "gpt_engineer.tools", "gpt_engineer.legacy"]
+packages = ["gpt_engineer", "gpt_engineer.applications", "gpt_engineer.applications.cli", "gpt_engineer.core", "gpt_engineer.core.default", "gpt_engineer.tools"]
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
