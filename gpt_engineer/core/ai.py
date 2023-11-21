@@ -89,7 +89,13 @@ class AI:
 
     """
 
-    def __init__(self, model_name="gpt-4", temperature=0.1, azure_endpoint=""):
+    def __init__(
+        self,
+        model_name="gpt-4-1106-preview",
+        temperature=0.1,
+        azure_endpoint="",
+        streaming=True,
+    ):
         """
         Initialize the AI class.
 
@@ -103,7 +109,7 @@ class AI:
         self.temperature = temperature
         self.azure_endpoint = azure_endpoint
         self.model_name = self._check_model_access_and_fallback(model_name)
-
+        self.streaming = streaming
         self.llm = self._create_chat_model()
         self.token_usage_log = TokenUsageLog(model_name)
 
@@ -254,7 +260,7 @@ class AI:
         # Modify implicit is_chunk property to ALWAYS false
         # since Langchain's Message schema is stricter
         prevalidated_data = [
-            {**item, "data": {**item["data"], "is_chunk": False}} for item in data
+            {**item, "tools": {**item["tools"], "is_chunk": False}} for item in data
         ]
         return list(messages_from_dict(prevalidated_data))  # type: ignore
 
@@ -306,13 +312,13 @@ class AI:
                 openai_api_version=os.getenv("OPENAI_API_VERSION", "2023-05-15"),
                 deployment_name=self.model_name,
                 openai_api_type="azure",
-                streaming=True,
+                streaming=self.streaming,
             )
 
         return ChatOpenAI(
             model=self.model_name,
             temperature=self.temperature,
-            streaming=True,
+            streaming=self.streaming,
             client=openai.ChatCompletion,
         )
 

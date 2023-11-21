@@ -1,5 +1,5 @@
 """
-This module provides tools and data structures for supporting a feedback loop in the GPT Engineer application.
+This module provides tools and tools structures for supporting a feedback loop in the GPT Engineer application.
 
 The primary intent of this module is to gather feedback from the user on the output of the gpt-engineer tool,
 with their consent, and to store this feedback for further analysis and improvement of the tool.
@@ -17,13 +17,13 @@ human_review_input() -> Review:
     Interactively gathers feedback from the user regarding the performance of generated code.
 
 check_consent() -> bool:
-    Checks if the user has previously given consent to store their data and if not, asks for it.
+    Checks if the user has previously given consent to store their tools and if not, asks for it.
 
 collect_consent() -> bool:
-    Verifies if the user has given consent to store their data or prompts for it.
+    Verifies if the user has given consent to store their tools or prompts for it.
 
 ask_if_can_store() -> bool:
-    Asks the user if it's permissible to store their data for gpt-engineer improvement.
+    Asks the user if it's permissible to store their tools for gpt-engineer improvement.
 
 logs_to_string(steps: List[Step], logs: DB) -> str:
     Converts logs of steps into a readable string format.
@@ -47,13 +47,12 @@ import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from dataclasses_json import dataclass_json
 from termcolor import colored
 
-from gpt_engineer.data.file_repository import FileRepository, FileRepositories
-from gpt_engineer.core.domain import Step
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 
 
 @dataclass_json
@@ -69,14 +68,11 @@ class Review:
 @dataclass_json
 @dataclass
 class Learning:
+    prompt: str
     model: str
     temperature: float
-    steps: str
-    steps_file_hash: str
-    prompt: str
+    config: str
     logs: str
-    workspace: str
-    feedback: Optional[str]
     session: str
     review: Optional[Review]
     timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
@@ -148,7 +144,7 @@ def human_review_input() -> Review:
 
 def check_collection_consent() -> bool:
     """
-    Check if the user has given consent to store their data.
+    Check if the user has given consent to store their tools.
     If not, ask for their consent.
     """
     path = Path(".gpte_consent")
@@ -160,7 +156,7 @@ def check_collection_consent() -> bool:
 
 def ask_collection_consent() -> bool:
     """
-    Ask the user for consent to store their data.
+    Ask the user for consent to store their tools.
     """
     answer = input(
         "Is it ok if we store your prompts to help improve GPT Engineer? (y/n)"
@@ -174,7 +170,7 @@ def ask_collection_consent() -> bool:
         print(colored("Thank you️", "light_green"))
         print()
         print(
-            "(If you no longer wish to participate in data collection, delete the file .gpte_consent)"
+            "(If you no longer wish to participate in tools collection, delete the file .gpte_consent)"
         )
         return True
     else:
@@ -187,38 +183,16 @@ def ask_collection_consent() -> bool:
         return False
 
 
-def logs_to_string(steps: List[Step], logs: FileRepository) -> str:
-    """
-    Convert the logs of the steps to a string.
-
-    Parameters
-    ----------
-    steps : List[Step]
-        The list of steps.
-    logs : DB
-        The database containing the logs.
-
-    Returns
-    -------
-    str
-        The logs of the steps as a string.
-    """
-    chunks = []
-    for step in steps:
-        chunks.append(f"--- {step.__name__} ---\n")
-        chunks.append(logs[step.__name__])
-    return "\n".join(chunks)
-
-
 def extract_learning(
+    prompt: str,
     model: str,
     temperature: float,
-    steps: List[Step],
-    dbs: FileRepositories,
-    steps_file_hash,
+    config: Tuple[str, ...],
+    memory: OnDiskRepository,
+    review: Review,
 ) -> Learning:
     """
-    Extract the learning data from the steps and databases.
+    Extract the learning tools from the steps and databases.
 
     Parameters
     ----------
@@ -236,21 +210,15 @@ def extract_learning(
     Returns
     -------
     Learning
-        The extracted learning data.
+        The extracted learning tools.
     """
-    review = None
-    if "review" in dbs.memory:
-        review = Review.from_json(dbs.memory["review"])  # type: ignore
     learning = Learning(
-        prompt=dbs.input["prompt"],
+        prompt=prompt,
         model=model,
         temperature=temperature,
-        steps=json.dumps([step.__name__ for step in steps]),
-        steps_file_hash=steps_file_hash,
-        feedback=dbs.input.get("feedback"),
+        config=json.dumps(config),
         session=get_session(),
-        logs=logs_to_string(steps, dbs.logs),
-        workspace=dbs.memory.get("all_output.txt"),
+        logs=memory.to_json(),
         review=review,
     )
     return learning

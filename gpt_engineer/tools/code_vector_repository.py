@@ -5,7 +5,7 @@ from llama_index import Document, ServiceContext
 from llama_index.schema import NodeWithScore
 from llama_index.retrievers import BM25Retriever
 
-from gpt_engineer.data.document_chunker import DocumentChunker
+from gpt_engineer.tools.document_chunker import DocumentChunker
 
 
 class CodeVectorRepository:

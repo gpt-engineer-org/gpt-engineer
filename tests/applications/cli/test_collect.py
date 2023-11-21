@@ -3,17 +3,17 @@ Tests the collect_learnings function in the cli/collect module.
 """
 
 import json
-import os
 
 from unittest.mock import MagicMock
 
 import pytest
 import rudderstack.analytics as rudder_analytics
 
-from gpt_engineer.cli.collect import collect_learnings, steps_file_hash
-from gpt_engineer.data.file_repository import FileRepository, FileRepositories
-from gpt_engineer.cli.learning import extract_learning
-from gpt_engineer.core.steps import simple_gen
+from gpt_engineer.applications.cli.collect import collect_learnings
+from gpt_engineer.core.default.on_disk_repository import (
+    OnDiskRepository,
+)
+from gpt_engineer.applications.cli.learning import extract_learning
 
 
 def test_collect_learnings(monkeypatch):
@@ -23,13 +23,13 @@ def test_collect_learnings(monkeypatch):
     temperature = 0.5
     steps = [simple_gen]
     dbs = FileRepositories(
-        FileRepository("/tmp"),
-        FileRepository("/tmp"),
-        FileRepository("/tmp"),
-        FileRepository("/tmp"),
-        FileRepository("/tmp"),
-        FileRepository("/tmp"),
-        FileRepository("/tmp"),
+        OnDiskRepository("/tmp"),
+        OnDiskRepository("/tmp"),
+        OnDiskRepository("/tmp"),
+        OnDiskRepository("/tmp"),
+        OnDiskRepository("/tmp"),
+        OnDiskRepository("/tmp"),
+        OnDiskRepository("/tmp"),
     )
     dbs.input = {
         "prompt": "test prompt\n with newlines",

@@ -1,11 +1,11 @@
 """
-Tests for the revised data collection consent mechanism in the cli/learning module.
+Tests for the revised tools collection consent mechanism in the cli/learning module.
 """
 import pytest
 from unittest.mock import patch
 from pathlib import Path
-from gpt_engineer.cli.learning import ask_collection_consent
-from gpt_engineer.cli.learning import check_collection_consent
+from gpt_engineer.applications.cli.learning import ask_collection_consent
+from gpt_engineer.applications.cli.learning import check_collection_consent
 
 
 # Use a fixture to clean up created files after each test

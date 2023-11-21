@@ -59,6 +59,12 @@ benchmark
 
 .gpte_consent
 
+# projects folder apart from default prompt
+
+projects
+!projects/example/prompt
+!projects/example-improve
+
 # docs
 
 docs/_build

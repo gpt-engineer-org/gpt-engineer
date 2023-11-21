@@ -12,7 +12,7 @@ from eval_tools import (
 )
 
 from gpt_engineer.core.chat_to_files import parse_chat
-from gpt_engineer.data.file_repository import FileRepository
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 
 app = typer.Typer()  # creates a CLI app
 
@@ -25,7 +25,7 @@ def single_evaluate(eval_ob: dict) -> list[bool]:
     # load the known files into the project
     # the files can be anywhere in the projects folder
 
-    workspace = FileRepository(eval_ob["project_root"])
+    workspace = OnDiskRepository(eval_ob["project_root"])
     file_list_string = ""
     code_base_abs = Path(os.getcwd()) / eval_ob["project_root"]
 

@@ -25,7 +25,6 @@ Notes:
 
 """
 
-import logging
 import os
 from pathlib import Path
 
@@ -33,12 +32,15 @@ import openai
 import typer
 from dotenv import load_dotenv
 
-from gpt_engineer.data.file_repository import FileRepository, FileRepositories, archive
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.steps import STEPS, Config as StepsConfig
-from gpt_engineer.cli.collect import collect_learnings
-from gpt_engineer.cli.learning import check_collection_consent
-from gpt_engineer.data.code_vector_repository import CodeVectorRepository
+from gpt_engineer.core.default.paths import PREPROMPTS_PATH
+from gpt_engineer.applications.cli.file_selector import ask_for_files
+from gpt_engineer.tools.custom_steps import lite_gen, gen_clarified_code, self_heal
+from gpt_engineer.core.default.steps import gen_code, execute_entrypoint
+from gpt_engineer.applications.cli.cli_agent import CliAgent
+from gpt_engineer.applications.cli.collect import collect_and_send_human_review
+import logging
 
 app = typer.Typer()  # creates a CLI app
 
@@ -52,18 +54,18 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def load_prompt(dbs: FileRepositories):
-    if dbs.input.get("prompt"):
-        return dbs.input.get("prompt")
+def load_prompt(input_repo: OnDiskRepository):
+    if input_repo.get("prompt"):
+        return input_repo.get("prompt")
 
-    dbs.input["prompt"] = input(
+    input_repo["prompt"] = input(
         "\nWhat application do you want gpt-engineer to generate?\n"
     )
-    return dbs.input.get("prompt")
+    return input_repo.get("prompt")
 
 
-def preprompts_path(use_custom_preprompts: bool, input_path: Path = None) -> Path:
-    original_preprompts_path = Path(__file__).parent.parent / "preprompts"
+def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
+    original_preprompts_path = PREPROMPTS_PATH
     if not use_custom_preprompts:
         return original_preprompts_path
 
@@ -80,11 +82,8 @@ def preprompts_path(use_custom_preprompts: bool, input_path: Path = None) -> Pat
 @app.command()
 def main(
     project_path: str = typer.Argument("projects/example", help="path"),
-    model: str = typer.Argument("gpt-4", help="model id string"),
+    model: str = typer.Argument("gpt-4-1106-preview", help="model id string"),
     temperature: float = 0.1,
-    steps_config: StepsConfig = typer.Option(
-        StepsConfig.DEFAULT, "--steps", "-s", help="decide which steps to run"
-    ),
     improve_mode: bool = typer.Option(
         False,
         "--improve",
@@ -103,6 +102,18 @@ def main(
         "-l",
         help="Lite mode - run only the main prompt.",
     ),
+    clarify_mode: bool = typer.Option(
+        False,
+        "--clarify",
+        "-c",
+        help="Lite mode - discuss specification with AI before implementation.",
+    ),
+    self_heal_mode: bool = typer.Option(
+        False,
+        "--self-heal",
+        "-sh",
+        help="Lite mode - discuss specification with AI before implementation.",
+    ),
     azure_endpoint: str = typer.Option(
         "",
         "--azure",
@@ -119,23 +130,23 @@ def main(
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
-
-    if lite_mode:
-        assert not improve_mode, "Lite mode cannot improve code"
-        if steps_config == StepsConfig.DEFAULT:
-            steps_config = StepsConfig.LITE
-
-    if improve_mode:
-        assert (
-            steps_config == StepsConfig.DEFAULT
-        ), "Improve mode not compatible with other step configs"
-        steps_config = StepsConfig.IMPROVE_CODE
-
-    if vector_improve_mode:
-        assert (
-            steps_config == StepsConfig.DEFAULT
-        ), "Vector improve mode not compatible with other step configs"
-        steps_config = StepsConfig.VECTOR_IMPROVE
+    #
+    # if lite_mode:
+    #     assert not improve_mode, "Lite mode cannot improve code"
+    #     if steps_config == StepsConfig.DEFAULT:
+    #         steps_config = StepsConfig.LITE
+    #
+    # if improve_mode:
+    #     assert (
+    #         steps_config == StepsConfig.DEFAULT
+    #     ), "Improve mode not compatible with other step configs"
+    #     steps_config = StepsConfig.IMPROVE_CODE
+    #
+    # if vector_improve_mode:
+    #     assert (
+    #         steps_config == StepsConfig.DEFAULT
+    #     ), "Vector improve mode not compatible with other step configs"
+    #     steps_config = StepsConfig.VECTOR_IMPROVE
 
     load_env_if_needed()
 
@@ -145,53 +156,40 @@ def main(
         azure_endpoint=azure_endpoint,
     )
 
-    project_path = os.path.abspath(
-        project_path
-    )  # resolve the string to a valid path (eg "a/b/../c" to "a/c")
-    path = Path(project_path).absolute()
-    print("Running gpt-engineer in", path, "\n")
+    # project_path = os.path.abspath(
+    #     project_path
+    # )  # resolve the string to a valid path (eg "a/b/../c" to "a/c")
+    path = Path(project_path)  # .absolute()
+    print("Running gpt-engineer in", path.absolute(), "\n")
+    prompt = load_prompt(OnDiskRepository(path))
+    # configure generation function
+    if clarify_mode:
+        code_gen_fn = gen_clarified_code
+    elif lite_mode:
+        code_gen_fn = lite_gen
+    else:
+        code_gen_fn = gen_code
+    # configure execution function
+    if self_heal_mode:
+        execution_fn = self_heal
+    else:
+        execution_fn = execute_entrypoint
 
-    workspace_path = path
-    input_path = path
 
-    project_metadata_path = path / ".gpteng"
-    memory_path = project_metadata_path / "memory"
-    archive_path = project_metadata_path / "archive"
-
-    fileRepositories = FileRepositories(
-        memory=FileRepository(memory_path),
-        logs=FileRepository(memory_path / "logs"),
-        input=FileRepository(input_path),
-        workspace=FileRepository(workspace_path),
-        preprompts=FileRepository(preprompts_path(use_custom_preprompts, input_path)),
-        archive=FileRepository(archive_path),
-        project_metadata=FileRepository(project_metadata_path),
+    preprompts_path = get_preprompts_path(use_custom_preprompts, Path(project_path))
+    agent = CliAgent.with_default_config(
+        project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn, preprompts_path=preprompts_path
     )
-
-    codeVectorRepository = CodeVectorRepository()
-
-    if steps_config not in [
-        StepsConfig.EXECUTE_ONLY,
-        StepsConfig.USE_FEEDBACK,
-        StepsConfig.EVALUATE,
-        StepsConfig.IMPROVE_CODE,
-        StepsConfig.VECTOR_IMPROVE,
-        StepsConfig.SELF_HEAL,
-    ]:
-        archive(fileRepositories)
-        load_prompt(fileRepositories)
-
-    steps = STEPS[steps_config]
-    for step in steps:
-        messages = step(ai, fileRepositories)
-        fileRepositories.logs[step.__name__] = AI.serialize_messages(messages)
+    if improve_mode:
+        code = ask_for_files(project_path)
+        agent.improve(code, prompt)
+    else:
+        agent.init(prompt)
+    # collect user feedback if user consents
+    config = (code_gen_fn.__name__, execution_fn.__name__)
+    collect_and_send_human_review(prompt, model, temperature, config, agent.memory)
 
     print("Total api cost: $ ", ai.token_usage_log.usage_cost())
-
-    if check_collection_consent():
-        collect_learnings(model, temperature, steps, fileRepositories)
-
-    fileRepositories.logs["token_usage"] = ai.token_usage_log.format_log()
 
 
 if __name__ == "__main__":

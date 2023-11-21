@@ -7,11 +7,11 @@ import requests
 
 def post_data(url, extra_arguments):
     """
-    Make an HTTP POST request with extra_arguments as data.
+    Make an HTTP POST request with extra_arguments as tools.
 
     Args:
     - url (str): The URL to which the POST request should be sent.
-    - extra_arguments (dict): A dictionary of data that needs to be sent in the POST request.
+    - extra_arguments (dict): A dictionary of tools that needs to be sent in the POST request.
 
     Returns:
     - response: The response from the server.

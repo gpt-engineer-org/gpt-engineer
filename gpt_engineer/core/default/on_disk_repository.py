@@ -28,16 +28,28 @@ Imports:
 """
 
 import datetime
+import json
 import shutil
 
-from dataclasses import dataclass
+from gpt_engineer.core.base_repository import BaseRepository
 from pathlib import Path
-from typing import Any, Optional, Union
-from gpt_engineer.data.supported_languages import SUPPORTED_LANGUAGES
+from typing import Any, Optional, Union, List
+from gpt_engineer.tools.supported_languages import SUPPORTED_LANGUAGES
 
 
-# This class represents a simple database that stores its data as files in a directory.
-class FileRepository:
+# This class represents a simple database that stores its tools as files in a directory.
+class OnDiskRepository(BaseRepository):
+    """
+    A file-based key-value store where keys correspond to filenames and values to file contents.
+
+    This class provides an interface to a file-based database, leveraging file operations to
+    facilitate CRUD-like interactions. It allows for quick checks on the existence of keys,
+    retrieval of values based on keys, and setting new key-value pairs.
+
+    Attributes:
+        path (Path): The directory path where the database files are stored.
+    """
+
     """
     A file-based key-value store where keys correspond to filenames and values to file contents.
 
@@ -198,21 +210,29 @@ class FileRepository:
         elif item_path.is_dir():
             shutil.rmtree(item_path)
 
-    def _supported_files(self, directory: Path) -> str:
+    def __iter__(self) -> List[str]:
+        return sorted(
+            str(item.relative_to(self.path))
+            for item in sorted(self.path.rglob("*"))
+            if item.is_file()
+        )
+
+    def __len__(self):
+        return len(self.__iter__())
+
+    def _supported_files(self) -> str:
         valid_extensions = {
             ext for lang in SUPPORTED_LANGUAGES for ext in lang["extensions"]
         }
         file_paths = [
             str(item)
-            for item in sorted(directory.rglob("*"))
-            if item.is_file() and item.suffix in valid_extensions
+            for item in self
+            if Path(item).is_file() and Path(item).suffix in valid_extensions
         ]
         return "\n".join(file_paths)
 
-    def _all_files(self, directory: Path) -> str:
-        file_paths = [
-            str(item) for item in sorted(directory.rglob("*")) if item.is_file()
-        ]
+    def _all_files(self) -> str:
+        file_paths = [str(item) for item in self if Path(item).is_file()]
         return "\n".join(file_paths)
 
     def to_path_list_string(self, supported_code_files_only: bool = False) -> str:
@@ -220,45 +240,9 @@ class FileRepository:
         Returns directory as a list of file paths. Useful for passing to the LLM where it needs to understand the wider context of files available for reference.
         """
         if supported_code_files_only:
-            return self._supported_files(self.path)
+            return self._supported_files()
         else:
-            return self._all_files(self.path)
+            return self._all_files()
 
-
-# dataclass for all dbs:
-@dataclass
-class FileRepositories:
-    memory: FileRepository
-    logs: FileRepository
-    preprompts: FileRepository
-    input: FileRepository
-    workspace: FileRepository
-    archive: FileRepository
-    project_metadata: FileRepository
-
-
-def archive(dbs: FileRepositories) -> None:
-    """
-    Archive the memory and workspace databases.
-
-    Parameters
-    ----------
-    dbs : DBs
-        The databases to archive.
-    """
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    shutil.move(
-        str(dbs.memory.path), str(dbs.archive.path / timestamp / dbs.memory.path.name)
-    )
-
-    exclude_dir = ".gpteng"
-    items_to_copy = [f for f in dbs.workspace.path.iterdir() if not f.name == exclude_dir]
-
-    for item_path in items_to_copy:
-        destination_path = dbs.archive.path / timestamp / item_path.name
-        if item_path.is_file():
-            shutil.copy2(item_path, destination_path)
-        elif item_path.is_dir():
-            shutil.copytree(item_path, destination_path)
-
-    return []
+    def to_json(self) -> str:
+        return json.dumps({file_path: self[file_path] for file_path in self})
