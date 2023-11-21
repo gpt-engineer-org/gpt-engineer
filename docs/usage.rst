@@ -20,7 +20,8 @@ Run
 - `gpt-engineer projects/my-new-project`
   - (Note, `gpt-engineer --help` lets you see all available options. For example `--steps use_feedback` lets you improve/fix code in a project)
 
-By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
+By running gpt-engineer you agree to our `terms <https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md>`_
+.
 
 Results
 =======
