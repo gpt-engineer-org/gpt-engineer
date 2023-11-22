@@ -1,11 +1,13 @@
 import os.path
 
+import openai.error
+
 from gpt_engineer.core.ai import AI
+from gpt_engineer.core.token_usage import TokenUsageLog
 from pathlib import Path
 import json
 from typing import List, Optional, Union
 
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.schema import (
     AIMessage,
     HumanMessage,
@@ -18,7 +20,16 @@ Message = Union[AIMessage, HumanMessage, SystemMessage]
 class CachingAI(AI):
 
     def __init__(self):
-        super().__init__(streaming=False)
+        self.temperature = 0.1
+        self.azure_endpoint = ""
+        try:
+            self.model_name = self._check_model_access_and_fallback("gpt-4-1106-preview")
+            self.llm = self._create_chat_model()
+        except openai.error.AuthenticationError:
+            self.model_name = "cached_response_model"
+            self.llm = None
+        self.streaming = False
+        self.token_usage_log = TokenUsageLog("gpt-4-1106-preview")
         self.cache_file = Path(__file__).parent / "ai_cache.json"
 
     def next(
