@@ -124,12 +124,13 @@ def vector_improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, prep
     for doc in relevant_documents:
         file_path = os.path.relpath(doc.metadata["filename"], temp_dir)
         relevant_code[file_path] = code[file_path]
+    print("Relevant documents to be modified are: " + "\n".join(sorted(relevant_code.keys())))
     preprompts = PrepromptHolder.get_preprompts(preprompts_path)
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]
     # Add files as input
-    messages.append(HumanMessage(content=f"{code.to_chat()}"))
+    messages.append(HumanMessage(content=f"{relevant_code.to_chat()}"))
 
     messages.append(HumanMessage(content=f"Request: {prompt}"))
 
