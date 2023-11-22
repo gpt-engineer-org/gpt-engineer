@@ -40,6 +40,7 @@ from gpt_engineer.tools.custom_steps import lite_gen, gen_clarified_code, self_h
 from gpt_engineer.core.default.steps import gen_code, execute_entrypoint, improve
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
+from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 import logging
 
 app = typer.Typer()  # creates a CLI app
@@ -177,8 +178,9 @@ def main(
 
 
     preprompts_path = get_preprompts_path(use_custom_preprompts, Path(project_path))
+    preprompts_holder = PrepromptsHolder(preprompts_path)
     agent = CliAgent.with_default_config(
-        project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn, improve_fn=improve_fn, preprompts_path=preprompts_path
+        project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn, improve_fn=improve_fn, preprompts_holder=preprompts_holder
     )
     if improve_mode:
         if --vector_improve_mode:

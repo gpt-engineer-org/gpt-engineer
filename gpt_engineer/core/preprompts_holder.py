@@ -3,7 +3,7 @@ from pathlib import Path
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 
 
-class PrepromptHolder:
+class PrepromptsHolder:
     def __init__(self, preprompts_path: Path):
         self.preprompts_path = preprompts_path
 

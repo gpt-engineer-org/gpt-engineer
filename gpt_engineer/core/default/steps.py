@@ -19,7 +19,7 @@ from langchain.schema import HumanMessage, SystemMessage
 import inspect
 import re
 from termcolor import colored
-from gpt_engineer.core.preprompt_holder import PrepromptHolder
+from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
 
 def curr_fn() -> str:
@@ -37,7 +37,7 @@ def setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
     )
 
 
-def gen_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptHolder) -> Code:
+def gen_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
     chat = messages[-1].content.strip()
@@ -47,7 +47,7 @@ def gen_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: Pre
     return code
 
 
-def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository, preprompts_holder: PrepromptHolder) -> Code:
+def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
         system=(preprompts["entrypoint"]),
@@ -127,7 +127,7 @@ def incorrect_edit(code: Code, chat: str) -> List[str,]:
 
 
 
-def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_holder: PrepromptHolder) -> Code:
+def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
     preprompts = preprompts_holder.get_preprompts()
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),

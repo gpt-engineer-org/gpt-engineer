@@ -6,7 +6,7 @@ from sys import version_info
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 import tempfile
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.preprompt_holder import PrepromptHolder
+from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.base_repository import BaseRepository
 from gpt_engineer.core.default.paths import (
@@ -52,7 +52,7 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
 
     attempts = 0
     messages = []
-    preprompts = PrepromptHolder.get_preprompts()
+    preprompts = PrepromptsHolder.get_preprompts()
     while attempts < MAX_SELF_HEAL_ATTEMPTS:
         # log_file = open(log_path, "w")  # wipe clean on every iteration
         # timed_out = False
@@ -111,7 +111,7 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
 
 
 # Todo: Adapt to refactor and code object
-def vector_improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_path: Union[str, Path]):
+def vector_improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_holder: PrepromptsHolder):
     code_vector_repository = CodeVectorRepository()
     #ToDo: Replace this hacky way to get the right langchain document format
     temp_dir = tempfile.mkdtemp()
@@ -125,7 +125,7 @@ def vector_improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, prep
         file_path = os.path.relpath(doc.metadata["filename"], temp_dir)
         relevant_code[file_path] = code[file_path]
     print("Relevant documents to be modified are: " + "\n".join(sorted(relevant_code.keys())))
-    preprompts = PrepromptHolder.get_preprompts(preprompts_path)
+    preprompts = preprompts_holder.get_preprompts()
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]
@@ -141,7 +141,7 @@ def vector_improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, prep
     return code
 
 
-def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_path: Union[str, Path]) -> Code:
+def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
     """
     Generates code based on clarifications obtained from the user.
 
@@ -158,7 +158,7 @@ def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_p
     - List[dict]: A list of message dictionaries capturing the AI's interactions and generated
       outputs during the code generation process.
     """
-    preprompts = PrepromptHolder.get_preprompts(preprompts_path)
+    preprompts = preprompts_holder.get_preprompts()
     messages: List[Message] = [SystemMessage(content=preprompts["clarify"])]
     user_input = prompt
     while True:
@@ -212,7 +212,7 @@ def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_p
     return code
 
 
-def lite_gen(ai: AI, prompt: str, memory: BaseRepository, preprompts_path: Union[str, Path]) -> Code:
+def lite_gen(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
     """
     Executes the AI model using the main prompt and saves the generated results.
 
@@ -233,7 +233,7 @@ def lite_gen(ai: AI, prompt: str, memory: BaseRepository, preprompts_path: Union
     The function assumes the `ai.start` method and the `to_files` utility to be correctly
     set up and functional. Ensure these prerequisites before invoking `lite_gen`.
     """
-    preprompts = PrepromptHolder.get_preprompts(preprompts_path)
+    preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(prompt, preprompts["file_format"], step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat

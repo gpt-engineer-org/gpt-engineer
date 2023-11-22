@@ -11,7 +11,7 @@ from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 from gpt_engineer.core.default.paths import memory_path, ENTRYPOINT_FILE, PREPROMPTS_PATH
 from gpt_engineer.core.base_agent import BaseAgent
-from gpt_engineer.core.preprompt_holder import PrepromptHolder
+from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
 
 
@@ -35,20 +35,20 @@ class LeanAgent(BaseAgent):
             memory: BaseRepository,
             execution_env: BaseExecutionEnv,
             ai: AI = None,
-            preprompts_holder: PrepromptHolder = None
+            preprompts_holder: PrepromptsHolder = None
     ):
-        self.preprompts_holder = preprompts_holder or PrepromptHolder(PREPROMPTS_PATH)
+        self.preprompts_holder = preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH)
         self.memory = memory
         self.execution_env = execution_env
         self.ai = ai or AI()
 
     @classmethod
-    def with_default_config(cls, path: str, ai: AI = None, preprompts_holder: PrepromptHolder = None):
+    def with_default_config(cls, path: str, ai: AI = None, preprompts_holder: PrepromptsHolder = None):
         return cls(
             memory=OnDiskRepository(memory_path(path)),
             execution_env=OnDiskExecutionEnv(path),
             ai=ai,
-            preprompts_holder=preprompts_holder or PrepromptHolder(PREPROMPTS_PATH),
+            preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )
 
     def init(self, prompt: str) -> Code:
