@@ -1,25 +1,4 @@
-"""
-This module provides an interface to interact with AI models.
-It leverages the OpenAI GPT models and allows for integration with Azure-based instances of the same.
-The AI class encapsulates the chat functionalities, allowing to start, advance, and manage a conversation with the model.
 
-Key Features:
-- Integration with Azure-based OpenAI instances through the LangChain AzureChatOpenAI class.
-- Token usage logging to monitor the number of tokens consumed during a conversation.
-- Seamless fallback to default models in case the desired model is unavailable.
-- Serialization and deserialization of chat messages for easier transmission and storage.
-
-Classes:
-- AI: Main class providing chat functionalities.
-
-Dependencies:
-- langchain: For chat models and message schemas.
-- openai: For the core GPT models interaction.
-- backoff: For handling rate limits and retries.
-- typing: For type hints.
-
-For more specific details, refer to the docstrings within each class and function.
-"""
 
 from __future__ import annotations
 
@@ -53,41 +32,7 @@ logger = logging.getLogger(__name__)
 
 
 class AI:
-    """
-    A class to interface with a language model for chat-based interactions.
-
-    This class provides methods to initiate and maintain conversations using
-    a specified language model. It handles token counting, message creation,
-    serialization and deserialization of chat messages, and interfaces with
-    the language model to get AI-generated responses.
-
-    Attributes
-    ----------
-    temperature : float
-        The temperature setting for the model, affecting the randomness of the output.
-    azure_endpoint : str
-        The Azure endpoint URL, if applicable.
-    model_name : str
-        The name of the model being used.
-    llm : Any
-        The chat model instance.
-    token_usage_log : Any
-        The token usage log used to store cumulitive tokens used during the lifetime of the ai class
-
-    Methods
-    -------
-    start(system, user, step_name) -> List[Message]:
-        Start the conversation with a system and user message.
-    next(messages, prompt, step_name) -> List[Message]:
-        Advance the conversation by interacting with the language model.
-    backoff_inference(messages, callbacks) -> Any:
-        Interact with the model using an exponential backoff strategy in case of rate limits.
-    serialize_messages(messages) -> str:
-        Serialize a list of messages to a JSON string.
-    deserialize_messages(jsondictstr) -> List[Message]:
-        Deserialize a JSON string into a list of messages.
-
-    """
+    
 
     def __init__(
         self,
@@ -324,28 +269,5 @@ class AI:
 
 
 def serialize_messages(messages: List[Message]) -> str:
-    """
-    Serialize a list of chat messages into a JSON-formatted string.
-
-    This function acts as a wrapper around the `AI.serialize_messages` method,
-    providing a more straightforward access to message serialization.
-
-    Parameters
-    ----------
-    messages : List[Message]
-        A list of chat messages to be serialized. Each message should be an
-        instance of the `Message` type (which includes `AIMessage`, `HumanMessage`,
-        and `SystemMessage`).
-
-    Returns
-    -------
-    str
-        A JSON-formatted string representation of the input messages.
-
-    Example
-    -------
-    >>> msgs = [SystemMessage(content="Hello"), HumanMessage(content="Hi, AI!")]
-    >>> serialize_messages(msgs)
-    '[{"type": "system", "content": "Hello"}, {"type": "human", "content": "Hi, AI!"}]'
-    """
+    
     return AI.serialize_messages(messages)

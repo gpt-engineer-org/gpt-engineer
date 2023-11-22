@@ -13,12 +13,13 @@ from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 from gpt_engineer.core.default.paths import memory_path, ENTRYPOINT_FILE, PREPROMPTS_PATH
 from gpt_engineer.core.base_agent import BaseAgent
+from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from typing import TypeVar, Callable, Union
 from pathlib import Path
 
 CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseRepository], Code])
-ExecuteEntrypointType = TypeVar(
-    "ExecuteEntrypointType", bound=Callable[[AI, BaseExecutionEnv, Code], None]
+ExecutionType = TypeVar(
+    "ExecutionType", bound=Callable[[AI, BaseExecutionEnv, Code], None]
 )
 ImproveType = TypeVar(
     "ImproveType", bound=Callable[[AI, str, Code, BaseRepository], Code]
@@ -72,9 +73,9 @@ class CliAgent(BaseAgent):
         execution_env: BaseExecutionEnv,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
-        execute_entrypoint_fn: ExecuteEntrypointType = execute_entrypoint,
+        execute_entrypoint_fn: ExecutionType = execute_entrypoint,
         improve_fn: ImproveType = improve,
-        preprompts_path: Union[str, Path] = PREPROMPTS_PATH,
+        preprompts_holder: PrepromptsHolder = None
     ):
         self.memory = memory
         self.execution_env = execution_env
@@ -82,7 +83,7 @@ class CliAgent(BaseAgent):
         self.code_gen_fn = code_gen_fn
         self.execute_entrypoint_fn = execute_entrypoint_fn
         self.improve_fn = improve_fn
-        self.preprompts_path = preprompts_path
+        self.preprompts_holder = preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH)
 
     @classmethod
     def with_default_config(
@@ -90,9 +91,9 @@ class CliAgent(BaseAgent):
         path: str,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
-        execute_entrypoint_fn: ExecuteEntrypointType = execute_entrypoint,
+        execute_entrypoint_fn: ExecutionType = execute_entrypoint,
         improve_fn: ImproveType = improve,
-        preprompts_path: Union[str, Path] = PREPROMPTS_PATH,
+        preprompts_holder: PrepromptsHolder = None
     ):
         return cls(
             memory=OnDiskRepository(memory_path(path)),
@@ -101,12 +102,12 @@ class CliAgent(BaseAgent):
             code_gen_fn=code_gen_fn,
             execute_entrypoint_fn=execute_entrypoint_fn,
             improve_fn=improve_fn,
-            preprompts_path=preprompts_path,
+            preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )
 
     def init(self, prompt: str) -> Code:
-        code = self.code_gen_fn(self.ai, prompt, self.memory, preprompts_path=self.preprompts_path)
-        entrypoint = gen_entrypoint(self.ai, code, self.memory, preprompts_path=self.preprompts_path)
+        code = self.code_gen_fn(self.ai, prompt, self.memory, self.preprompts_holder)
+        entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
         code = Code(code | entrypoint)
         self.execute_entrypoint_fn(self.ai, self.execution_env, code)
         return code
@@ -114,9 +115,9 @@ class CliAgent(BaseAgent):
     def improve(
         self, code: Code, prompt: str, execution_command: str = ENTRYPOINT_FILE
     ) -> Code:
-        code = self.improve_fn(self.ai, prompt, code, self.memory, preprompts_path=self.preprompts_path)
+        code = self.improve_fn(self.ai, prompt, code, self.memory, self.preprompts_holder)
         if not execution_command in code:
-            entrypoint = gen_entrypoint(self.ai, code, self.memory, preprompts_path=self.preprompts_path)
+            entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
             code = Code(code | entrypoint)
         self.execute_entrypoint_fn(self.ai, self.execution_env, code)
         return code

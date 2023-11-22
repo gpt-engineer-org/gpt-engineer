@@ -69,6 +69,7 @@ The `HEAD` section must be an *exact set of sequential lines* from the file! Thi
 NEVER SKIP LINES in the `HEAD` section!
 NEVER ELIDE LINES AND REPLACE THEM WITH A COMMENT!
 NEVER OMIT ANY WHITESPACE in the `HEAD` section!
+WHEN MODIFYING MULTIPLE EXISTING FUNCTIONS IN ONE FILE, ALWAYS MAKE ONE edit block PER FUNCTION (AN EXISTING SINGLE FUNCTION MAY BE REPLACED WITH MULTIPLE FUNCTIONS INSIDE edit block)
 
 Edits to different parts of a file each need their own *edit block*.
 
