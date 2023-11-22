@@ -4,6 +4,7 @@ from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.lean_agent import LeanAgent
 from gpt_engineer.core.code import Code
 import os
+from tests.caching_ai import CachingAI
 
 from gpt_engineer.core.chat_to_files import parse_chat, Edit, parse_edits, apply_edits
 from gpt_engineer.core.chat_to_files import logger as parse_logger
@@ -12,7 +13,8 @@ import logging
 
 def test_init():
     temp_dir = tempfile.mkdtemp()
-    lean_agent = LeanAgent.with_default_config(temp_dir, AI(streaming=False))
+
+    lean_agent = LeanAgent.with_default_config(temp_dir, CachingAI())
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
     code = lean_agent.init(
@@ -32,7 +34,7 @@ def test_improve():
             "run.sh": "python3 main.py\n",
         }
     )
-    lean_agent = LeanAgent.with_default_config(temp_dir, AI(streaming=False))
+    lean_agent = LeanAgent.with_default_config(temp_dir, CachingAI())
     lean_agent.improve(
         code,
         "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",

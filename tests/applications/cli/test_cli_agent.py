@@ -1,6 +1,6 @@
 import pytest
 import tempfile
-from gpt_engineer.core.ai import AI
+from tests.caching_ai import CachingAI
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.core.code import Code
 import os
@@ -13,7 +13,7 @@ import logging
 def test_init(monkeypatch):
     monkeypatch.setattr('builtins.input', lambda: "y")
     temp_dir = tempfile.mkdtemp()
-    lean_agent = CliAgent.with_default_config(temp_dir, AI(streaming=False))
+    lean_agent = CliAgent.with_default_config(temp_dir, CachingAI())
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
     code = lean_agent.init(
@@ -34,7 +34,7 @@ def test_improve(monkeypatch):
             "run.sh": "python3 main.py\n",
         }
     )
-    lean_agent = CliAgent.with_default_config(temp_dir, AI(streaming=False))
+    lean_agent = CliAgent.with_default_config(temp_dir, CachingAI())
     lean_agent.improve(
         code,
         "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",
