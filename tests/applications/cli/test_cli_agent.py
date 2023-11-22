@@ -1,20 +1,20 @@
 import pytest
 import tempfile
-from gpt_engineer.core.ai import AI
-from gpt_engineer.core.default.lean_agent import LeanAgent
+from tests.caching_ai import CachingAI
+from gpt_engineer.applications.cli.cli_agent import CliAgent
+from gpt_engineer.tools.custom_steps import self_heal
 from gpt_engineer.core.code import Code
 import os
-from tests.caching_ai import CachingAI
 
 from gpt_engineer.core.chat_to_files import parse_chat, Edit, parse_edits, apply_edits
 from gpt_engineer.core.chat_to_files import logger as parse_logger
 import logging
 
 
-def test_init():
+def test_init_standard_config(monkeypatch):
+    monkeypatch.setattr('builtins.input', lambda: "y")
     temp_dir = tempfile.mkdtemp()
-
-    lean_agent = LeanAgent.with_default_config(temp_dir, CachingAI())
+    lean_agent = CliAgent.with_default_config(temp_dir, CachingAI())
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
     code = lean_agent.init(
@@ -24,8 +24,23 @@ def test_init():
     with open(file_path, "r") as file:
         assert file.read().strip() == "Hello World!"
 
+def test_init_self_heal_config(monkeypatch):
+    monkeypatch.setattr('builtins.input', lambda: "y")
+    temp_dir = tempfile.mkdtemp()
 
-def test_improve():
+    lean_agent = CliAgent.with_default_config(temp_dir, CachingAI(), execute_entrypoint_fn=self_heal)
+    outfile = "output.txt"
+    file_path = os.path.join(temp_dir, outfile)
+    code = lean_agent.init(
+        f"Make a program that prints 'Hello World!' to a file called '{outfile}' (sf_var_manipulated_cache)"
+    )
+    assert os.path.isfile(file_path)
+    with open(file_path, "r") as file:
+        assert file.read().strip() == "Hello World!"
+
+
+def test_improve_standard_config(monkeypatch):
+    monkeypatch.setattr('builtins.input', lambda: "y")
     temp_dir = tempfile.mkdtemp()
     code = Code(
         {
@@ -34,7 +49,7 @@ def test_improve():
             "run.sh": "python3 main.py\n",
         }
     )
-    lean_agent = LeanAgent.with_default_config(temp_dir, CachingAI())
+    lean_agent = CliAgent.with_default_config(temp_dir, CachingAI())
     lean_agent.improve(
         code,
         "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",
@@ -45,6 +60,8 @@ def test_improve():
     with open(file_path, "r") as file:
         file_content = file.read().strip()
         assert file_content == "!dlroW olleH"
+
+
 
 
 if __name__ == "__main__":

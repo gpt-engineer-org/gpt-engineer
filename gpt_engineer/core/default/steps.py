@@ -65,7 +65,7 @@ def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository, preprompts_holder
     return entrypoint_code
 
 
-def execute_entrypoint(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> None:
+def execute_entrypoint(ai: AI, execution_env: BaseExecutionEnv, code: Code, preprompts_holder: PrepromptsHolder = None) -> None:
     
 
     if not ENTRYPOINT_FILE in code:
@@ -102,6 +102,7 @@ def execute_entrypoint(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> N
     print()
 
     execution_env.execute_program(code)
+    return code
 
 
 def setup_sys_prompt_existing_code(preprompts: MutableMapping[Union[str, Path], str]) -> str:

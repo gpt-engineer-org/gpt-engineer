@@ -38,7 +38,7 @@ def get_platform_info():
     return a + b
 
 
-def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
+def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code, preprompts_holder: PrepromptsHolder = None) -> Code:
     """Attempts to execute the code from the entrypoint and if it fails,
     sends the error output back to the AI with instructions to fix.
     This code will make `MAX_SELF_HEAL_ATTEMPTS` to try and fix the code
@@ -52,7 +52,9 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
 
     attempts = 0
     messages = []
-    preprompts = PrepromptsHolder.get_preprompts()
+    if preprompts_holder is None:
+        raise AssertionError("Prepromptsholder required for self-heal")
+    preprompts = preprompts_holder.get_preprompts()
     while attempts < MAX_SELF_HEAL_ATTEMPTS:
         # log_file = open(log_path, "w")  # wipe clean on every iteration
         # timed_out = False
@@ -104,7 +106,7 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
         # this overwrites the existing files
         # to_files_and_memory(messages[-1].content.strip(), dbs)
         files = parse_chat(messages[-1].content.strip())
-        code = Code({key: val for key, val in files})
+        code = {**code, **Code({key: val for key, val in files})}
         attempts += 1
 
     return code

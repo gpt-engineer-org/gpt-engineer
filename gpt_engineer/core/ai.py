@@ -205,7 +205,7 @@ class AI:
         # Modify implicit is_chunk property to ALWAYS false
         # since Langchain's Message schema is stricter
         prevalidated_data = [
-            {**item, "tools": {**item["tools"], "is_chunk": False}} for item in data
+            {**item, "tools": {**item.get("tools", {}), "is_chunk": False}} for item in data
         ]
         return list(messages_from_dict(prevalidated_data))  # type: ignore
 

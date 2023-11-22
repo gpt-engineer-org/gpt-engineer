@@ -19,7 +19,7 @@ from pathlib import Path
 
 CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseRepository], Code])
 ExecutionType = TypeVar(
-    "ExecutionType", bound=Callable[[AI, BaseExecutionEnv, Code], None]
+    "ExecutionType", bound=Callable[[AI, BaseExecutionEnv, Code], Code]
 )
 ImproveType = TypeVar(
     "ImproveType", bound=Callable[[AI, str, Code, BaseRepository], Code]
@@ -109,7 +109,7 @@ class CliAgent(BaseAgent):
         code = self.code_gen_fn(self.ai, prompt, self.memory, self.preprompts_holder)
         entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
         code = Code(code | entrypoint)
-        self.execute_entrypoint_fn(self.ai, self.execution_env, code)
+        code = self.execute_entrypoint_fn(self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder)
         return code
 
     def improve(
@@ -119,5 +119,5 @@ class CliAgent(BaseAgent):
         if not execution_command in code:
             entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
             code = Code(code | entrypoint)
-        self.execute_entrypoint_fn(self.ai, self.execution_env, code)
+        code = self.execute_entrypoint_fn(self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder)
         return code
