@@ -17,8 +17,8 @@ from typing import TypeVar, Callable, Union
 from pathlib import Path
 
 CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseRepository], Code])
-ExecuteEntrypointType = TypeVar(
-    "ExecuteEntrypointType", bound=Callable[[AI, BaseExecutionEnv, Code], None]
+ExecutionType = TypeVar(
+    "ExecutionType", bound=Callable[[AI, BaseExecutionEnv, Code], None]
 )
 ImproveType = TypeVar(
     "ImproveType", bound=Callable[[AI, str, Code, BaseRepository], Code]
@@ -72,7 +72,7 @@ class CliAgent(BaseAgent):
         execution_env: BaseExecutionEnv,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
-        execute_entrypoint_fn: ExecuteEntrypointType = execute_entrypoint,
+        execute_entrypoint_fn: ExecutionType = execute_entrypoint,
         improve_fn: ImproveType = improve,
         preprompts_path: Union[str, Path] = PREPROMPTS_PATH,
     ):
@@ -90,7 +90,7 @@ class CliAgent(BaseAgent):
         path: str,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
-        execute_entrypoint_fn: ExecuteEntrypointType = execute_entrypoint,
+        execute_entrypoint_fn: ExecutionType = execute_entrypoint,
         improve_fn: ImproveType = improve,
         preprompts_path: Union[str, Path] = PREPROMPTS_PATH,
     ):

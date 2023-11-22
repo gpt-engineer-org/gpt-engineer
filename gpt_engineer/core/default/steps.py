@@ -229,10 +229,7 @@ def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_
     ]
     # Add files as input
     messages.append(HumanMessage(content=f"{code.to_chat()}"))
-
     messages.append(HumanMessage(content=f"Request: {prompt}"))
-
-
     problems = [""]
     # check edit correctness
     edit_refinements = 0
@@ -243,9 +240,6 @@ def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_
         if len(problems) > 0:
             messages.append(HumanMessage(content=f"Some previously produced edits were not on the requested format, or the HEAD part was not found in the code. Details: " + "\n".join(problems) + "\n Please provide ALL the edits again, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"))
         edit_refinements += 1
-
     overwrite_code_with_edits(chat, code)
-
     memory[IMPROVE_LOG_FILE] = chat
-
     return code

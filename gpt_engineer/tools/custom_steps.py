@@ -1,10 +1,10 @@
-import subprocess
+import os.path
 from pathlib import Path
 from typing import List, Union
 from platform import platform
 from sys import version_info
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
-
+import tempfile
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.preprompt_holder import PrepromptHolder
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
@@ -15,8 +15,8 @@ from gpt_engineer.core.default.paths import (
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE,
 )
-from gpt_engineer.core.default.steps import curr_fn, setup_sys_prompt
-from gpt_engineer.core.chat_to_files import parse_chat
+from gpt_engineer.core.default.steps import curr_fn, setup_sys_prompt, setup_sys_prompt_existing_code
+from gpt_engineer.core.chat_to_files import parse_chat, overwrite_code_with_edits
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
@@ -111,35 +111,33 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code) -> Code:
 
 
 # Todo: Adapt to refactor and code object
-# def vector_improve(ai: AI, dbs: OnDiskRepository):
-#     code_vector_repository = CodeVectorRepository()
-#     code_vector_repository.load_from_directory(dbs.workspace.path)
-#     releventDocuments = code_vector_repository.relevent_code_chunks(dbs.input["prompt"])
-#
-#     code_file_list = f"Here is a list of all the existing code files present in the root directory your code will be added to:"
-#     code_file_list += "\n {fileRepositories.workspace.to_path_list_string()}"
-#
-#     relevent_file_contents = f"Here are files relevent to the query which you may like to change, reference or add to \n"
-#
-#     for doc in releventDocuments:
-#         filename_without_path = Path(doc.metadata["filename"]).name
-#         file_content = dbs.workspace[filename_without_path]
-#         relevent_file_contents += format_file_to_input(
-#             filename_without_path, file_content
-#         )
-#
-#     messages = [
-#         SystemMessage(content=setup_sys_prompt_existing_code(dbs)),
-#     ]
-#
-#     messages.append(HumanMessage(content=f"{code_file_list}"))
-#     messages.append(HumanMessage(content=f"{relevent_file_contents}"))
-#     messages.append(HumanMessage(content=f"Request: {dbs.input['prompt']}"))
-#
-#     messages = ai.next(messages, step_name=curr_fn())
-#
-#     overwrite_code_with_edits(messages[-1].content.strip(), dbs)
-#     return messages
+def vector_improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_path: Union[str, Path]):
+    code_vector_repository = CodeVectorRepository()
+    #ToDo: Replace this hacky way to get the right langchain document format
+    temp_dir = tempfile.mkdtemp()
+    temp_saver = OnDiskRepository(temp_dir)
+    for file, content in code.items():
+        temp_saver[file] = content
+    code_vector_repository.load_from_directory(temp_dir)
+    relevant_documents = code_vector_repository.relevent_code_chunks(prompt)
+    relevant_code = Code()
+    for doc in relevant_documents:
+        file_path = os.path.relpath(doc.metadata["filename"], temp_dir)
+        relevant_code[file_path] = code[file_path]
+    preprompts = PrepromptHolder.get_preprompts(preprompts_path)
+    messages = [
+        SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
+    ]
+    # Add files as input
+    messages.append(HumanMessage(content=f"{code.to_chat()}"))
+
+    messages.append(HumanMessage(content=f"Request: {prompt}"))
+
+    messages = ai.next(messages, step_name=curr_fn())
+    chat = messages[-1].content.strip()
+    overwrite_code_with_edits(chat, code)
+    memory[IMPROVE_LOG_FILE] = chat
+    return code
 
 
 def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_path: Union[str, Path]) -> Code:

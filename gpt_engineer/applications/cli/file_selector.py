@@ -254,7 +254,7 @@ class TerminalFileSelector:
         self.file_path_list = file_path_list
         self.selectable_file_paths = file_path_enumeration
 
-    def ask_for_selection(self) -> List[str]:
+    def ask_for_selection(self, all: bool=False) -> List[str]:
         """
         Prompts the user to select files by providing a series of index numbers, ranges, or 'all' to select everything.
 
@@ -267,16 +267,19 @@ class TerminalFileSelector:
             - Example input: 1,2,3-5,7,9,13-15,18,20
             - Users can also input 'all' to select all displayed files.
         """
-        user_input = input(
-            "\n".join(
-                [
-                    "Select files by entering the numbers separated by commas/spaces or",
-                    "specify range with a dash. ",
-                    "Example: 1,2,3-5,7,9,13-15,18,20 (enter 'all' to select everything)",
-                    "\n\nSelect files:",
-                ]
+        if all:
+            user_input = "all"
+        else:
+            user_input = input(
+                "\n".join(
+                    [
+                        "Select files by entering the numbers separated by commas/spaces or",
+                        "specify range with a dash. ",
+                        "Example: 1,2,3-5,7,9,13-15,18,20 (enter 'all' to select everything)",
+                        "\n\nSelect files:",
+                    ]
+                )
             )
-        )
         selected_paths = []
         regex = r"\d+(-\d+)?([, ]\d+(-\d+)?)*"
 
@@ -396,6 +399,16 @@ def ask_for_files(project_path: Union[str, Path]) -> Code:
                 content_dict[file.strip()] = content.read()
     return Code(content_dict)
 
+def get_all_code(project_path: str) -> Code:
+    file_selection = terminal_file_selector(project_path, all=True)
+    # ToDO: Replace this hack that makes all file_path relative to the right thing
+    file_selection = [os.path.relpath(str(file_path).strip(), project_path) for file_path in file_selection]
+    content_dict = dict()
+
+    for file in file_selection:
+        with open(os.path.join(project_path, file.strip()), "r") as content:
+            content_dict[file.strip()] = content.read()
+    return Code(content_dict)
 
 def gui_file_selector(input_path: str) -> List[str]:
     """
@@ -413,10 +426,10 @@ def gui_file_selector(input_path: str) -> List[str]:
     )
 
 
-def terminal_file_selector(input_path: str) -> List[str]:
+def terminal_file_selector(input_path: str, all: bool = False) -> List[str]:
     """
     Display a terminal file selection to select context files.
     """
     file_selector = TerminalFileSelector(Path(input_path))
     file_selector.display()
-    return file_selector.ask_for_selection()
+    return file_selector.ask_for_selection(all=all)
