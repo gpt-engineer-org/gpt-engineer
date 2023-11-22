@@ -11,8 +11,8 @@ from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 from gpt_engineer.core.default.paths import memory_path, ENTRYPOINT_FILE, PREPROMPTS_PATH
 from gpt_engineer.core.base_agent import BaseAgent
-from typing import Union
-from pathlib import Path
+from gpt_engineer.core.preprompt_holder import PrepromptHolder
+
 
 
 class LeanAgent(BaseAgent):
@@ -29,40 +29,41 @@ class LeanAgent(BaseAgent):
         ai (AI): The AI model used for generating and improving code.
     """
 
+
     def __init__(
-        self,
-        memory: BaseRepository,
-        execution_env: BaseExecutionEnv,
-        ai: AI = None,
-        preprompts_path: Union[str, Path] = PREPROMPTS_PATH
+            self,
+            memory: BaseRepository,
+            execution_env: BaseExecutionEnv,
+            ai: AI = None,
+            preprompts_holder: PrepromptHolder = None
     ):
+        self.preprompts_holder = preprompts_holder or PrepromptHolder(PREPROMPTS_PATH)
         self.memory = memory
         self.execution_env = execution_env
         self.ai = ai or AI()
-        self.preprompts_path = preprompts_path
 
     @classmethod
-    def with_default_config(cls, path: str, ai: AI = None, preprompts_path: Union[str, Path] = PREPROMPTS_PATH):
+    def with_default_config(cls, path: str, ai: AI = None, preprompts_holder: PrepromptHolder = None):
         return cls(
             memory=OnDiskRepository(memory_path(path)),
             execution_env=OnDiskExecutionEnv(path),
             ai=ai,
-            preprompts_path=preprompts_path,
+            preprompts_holder=preprompts_holder or PrepromptHolder(PREPROMPTS_PATH),
         )
 
     def init(self, prompt: str) -> Code:
-        code = gen_code(self.ai, prompt, self.memory, preprompts_path=self.preprompts_path)
-        entrypoint = gen_entrypoint(self.ai, code, self.memory, preprompts_path=self.preprompts_path)
+        code = gen_code(self.ai, prompt, self.memory, self.preprompts_holder)
+        entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
         code = Code(code | entrypoint)
         self.execution_env.execute_program(code)
         return code
 
     def improve(
-        self, code: Code, prompt: str, execution_command: str = ENTRYPOINT_FILE
+            self, code: Code, prompt: str, execution_command: str = ENTRYPOINT_FILE
     ) -> Code:
-        code = improve(self.ai, prompt, code, self.memory, preprompts_path=self.preprompts_path)
+        code = improve(self.ai, prompt, code, self.memory, self.preprompts_holder)
         if not execution_command in code:
-            entrypoint = gen_entrypoint(self.ai, code, self.memory, preprompts_path=self.preprompts_path)
+            entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
             code = Code(code | entrypoint)
         self.execution_env.execute_program(code)
         return code

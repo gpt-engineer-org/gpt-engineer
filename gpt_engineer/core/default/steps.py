@@ -37,9 +37,8 @@ def setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
     )
 
 
-def gen_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_path: Union[str, Path]) -> Code:
-    
-    preprompts = PrepromptHolder.get_preprompts(preprompts_path)
+def gen_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptHolder) -> Code:
+    preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
@@ -48,9 +47,8 @@ def gen_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_path: Union
     return code
 
 
-def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository, preprompts_path: Union[str, Path]) -> Code:
-    
-    preprompts = PrepromptHolder.get_preprompts(preprompts_path)
+def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository, preprompts_holder: PrepromptHolder) -> Code:
+    preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
         system=(preprompts["entrypoint"]),
         user="Information about the codebase:\n\n" + code.to_chat(),
@@ -129,9 +127,8 @@ def incorrect_edit(code: Code, chat: str) -> List[str,]:
 
 
 
-def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_path: Union[str, Path]) -> Code:
-    
-    preprompts = PrepromptHolder.get_preprompts(preprompts_path)
+def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_holder: PrepromptHolder) -> Code:
+    preprompts = preprompts_holder.get_preprompts()
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]
