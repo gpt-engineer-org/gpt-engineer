@@ -2,6 +2,7 @@ import pytest
 import tempfile
 from tests.caching_ai import CachingAI
 from gpt_engineer.applications.cli.cli_agent import CliAgent
+from gpt_engineer.tools.custom_steps import self_heal
 from gpt_engineer.core.code import Code
 import os
 
@@ -10,7 +11,7 @@ from gpt_engineer.core.chat_to_files import logger as parse_logger
 import logging
 
 
-def test_init(monkeypatch):
+def test_init_standard_config(monkeypatch):
     monkeypatch.setattr('builtins.input', lambda: "y")
     temp_dir = tempfile.mkdtemp()
     lean_agent = CliAgent.with_default_config(temp_dir, CachingAI())
@@ -23,8 +24,22 @@ def test_init(monkeypatch):
     with open(file_path, "r") as file:
         assert file.read().strip() == "Hello World!"
 
+def test_init_self_heal_config(monkeypatch):
+    monkeypatch.setattr('builtins.input', lambda: "y")
+    temp_dir = tempfile.mkdtemp()
 
-def test_improve(monkeypatch):
+    lean_agent = CliAgent.with_default_config(temp_dir, CachingAI(), execute_entrypoint_fn=self_heal)
+    outfile = "output.txt"
+    file_path = os.path.join(temp_dir, outfile)
+    code = lean_agent.init(
+        f"Make a program that prints 'Hello World!' to a file called '{outfile}' (sf_var_manipulated_cache)"
+    )
+    assert os.path.isfile(file_path)
+    with open(file_path, "r") as file:
+        assert file.read().strip() == "Hello World!"
+
+
+def test_improve_standard_config(monkeypatch):
     monkeypatch.setattr('builtins.input', lambda: "y")
     temp_dir = tempfile.mkdtemp()
     code = Code(
@@ -45,6 +60,8 @@ def test_improve(monkeypatch):
     with open(file_path, "r") as file:
         file_content = file.read().strip()
         assert file_content == "!dlroW olleH"
+
+
 
 
 if __name__ == "__main__":
