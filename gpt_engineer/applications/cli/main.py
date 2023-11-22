@@ -35,11 +35,12 @@ from dotenv import load_dotenv
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH
-from gpt_engineer.applications.cli.file_selector import ask_for_files
-from gpt_engineer.tools.custom_steps import lite_gen, gen_clarified_code, self_heal
-from gpt_engineer.core.default.steps import gen_code, execute_entrypoint
+from gpt_engineer.applications.cli.file_selector import ask_for_files, get_all_code
+from gpt_engineer.tools.custom_steps import lite_gen, gen_clarified_code, self_heal, vector_improve
+from gpt_engineer.core.default.steps import gen_code, execute_entrypoint, improve
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
+from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 import logging
 
 app = typer.Typer()  # creates a CLI app
@@ -54,13 +55,18 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def load_prompt(input_repo: OnDiskRepository):
+def load_prompt(input_repo: OnDiskRepository, improve_mode):
     if input_repo.get("prompt"):
         return input_repo.get("prompt")
 
-    input_repo["prompt"] = input(
-        "\nWhat application do you want gpt-engineer to generate?\n"
-    )
+    if not improve_mode:
+        input_repo["prompt"] = input(
+            "\nWhat application do you want gpt-engineer to generate?\n"
+        )
+    else:
+        input_repo["prompt"] = input(
+            "\nHow do you want to improve the application?\n"
+        )
     return input_repo.get("prompt")
 
 
@@ -131,22 +137,12 @@ def main(
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
     #
-    # if lite_mode:
-    #     assert not improve_mode, "Lite mode cannot improve code"
-    #     if steps_config == StepsConfig.DEFAULT:
-    #         steps_config = StepsConfig.LITE
-    #
-    # if improve_mode:
-    #     assert (
-    #         steps_config == StepsConfig.DEFAULT
-    #     ), "Improve mode not compatible with other step configs"
-    #     steps_config = StepsConfig.IMPROVE_CODE
-    #
-    # if vector_improve_mode:
-    #     assert (
-    #         steps_config == StepsConfig.DEFAULT
-    #     ), "Vector improve mode not compatible with other step configs"
-    #     steps_config = StepsConfig.VECTOR_IMPROVE
+    if vector_improve_mode and not improve_mode:
+        print("Vector improve mode implies improve mode, setting improve_mode=True")
+        improve_mode=True
+
+    if improve_mode:
+        assert not (clarify_mode or lite_mode), "Clarify and lite mode are not active for improve mode"
 
     load_env_if_needed()
 
@@ -161,7 +157,7 @@ def main(
     # )  # resolve the string to a valid path (eg "a/b/../c" to "a/c")
     path = Path(project_path)  # .absolute()
     print("Running gpt-engineer in", path.absolute(), "\n")
-    prompt = load_prompt(OnDiskRepository(path))
+    prompt = load_prompt(OnDiskRepository(path), improve_mode)
     # configure generation function
     if clarify_mode:
         code_gen_fn = gen_clarified_code
@@ -175,13 +171,22 @@ def main(
     else:
         execution_fn = execute_entrypoint
 
+    if --vector_improve_mode:
+        improve_fn = vector_improve
+    else:
+        improve_fn = improve
+
 
     preprompts_path = get_preprompts_path(use_custom_preprompts, Path(project_path))
+    preprompts_holder = PrepromptsHolder(preprompts_path)
     agent = CliAgent.with_default_config(
-        project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn, preprompts_path=preprompts_path
+        project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn, improve_fn=improve_fn, preprompts_holder=preprompts_holder
     )
     if improve_mode:
-        code = ask_for_files(project_path)
+        if --vector_improve_mode:
+            code = get_all_code(project_path)
+        else:
+            code = ask_for_files(project_path)
         agent.improve(code, prompt)
     else:
         agent.init(prompt)
