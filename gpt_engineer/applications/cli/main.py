@@ -180,7 +180,7 @@ def main(
     preprompts_path = get_preprompts_path(use_custom_preprompts, Path(project_path))
     preprompts_holder = PrepromptsHolder(preprompts_path)
     agent = CliAgent.with_default_config(
-        project_path, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn, improve_fn=improve_fn, preprompts_holder=preprompts_holder
+        project_path, ai=ai, code_gen_fn=code_gen_fn, execute_entrypoint_fn=execution_fn, improve_fn=improve_fn, preprompts_holder=preprompts_holder
     )
     if improve_mode:
         if --vector_improve_mode:
