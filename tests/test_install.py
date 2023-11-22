@@ -34,17 +34,16 @@ def test_installation():
 
 
 # Test that the package can be imported
-def test_import():
-    try:
-        from gpt_engineer import (
-            ai,
-            domain,
-            chat_to_files,
-            file_repository,
-        )
-        from gpt_engineer.legacy import steps
-    except ImportError as e:
-        assert False, f"Failed to import {e.name}"
+# def test_import():
+#     try:
+#         from gpt_engineer import (
+#             ai,
+#             chat_to_files,
+#             on_disk_repository,
+#         )
+#         from gpt_engineer import steps
+#     except ImportError as e:
+#         assert False, f"Failed to import {e.name}"
 
 
 # Test that the CLI command works

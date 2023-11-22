@@ -1,7 +1,7 @@
 import pytest
 import tempfile
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.default.lean_agent import LeanAgent
+from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.core.code import Code
 import os
 
@@ -10,9 +10,10 @@ from gpt_engineer.core.chat_to_files import logger as parse_logger
 import logging
 
 
-def test_init():
+def test_init(monkeypatch):
+    monkeypatch.setattr('builtins.input', lambda: "y")
     temp_dir = tempfile.mkdtemp()
-    lean_agent = LeanAgent.with_default_config(temp_dir, AI(streaming=False))
+    lean_agent = CliAgent.with_default_config(temp_dir, AI(streaming=False))
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
     code = lean_agent.init(
@@ -23,7 +24,8 @@ def test_init():
         assert file.read().strip() == "Hello World!"
 
 
-def test_improve():
+def test_improve(monkeypatch):
+    monkeypatch.setattr('builtins.input', lambda: "y")
     temp_dir = tempfile.mkdtemp()
     code = Code(
         {
@@ -32,7 +34,7 @@ def test_improve():
             "run.sh": "python3 main.py\n",
         }
     )
-    lean_agent = LeanAgent.with_default_config(temp_dir, AI(streaming=False))
+    lean_agent = CliAgent.with_default_config(temp_dir, AI(streaming=False))
     lean_agent.improve(
         code,
         "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",

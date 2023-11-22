@@ -65,6 +65,15 @@ requirements.txt
 This concludes a fully working implementation.```
 """
 
+factorial_entrypoint = """
+Irrelevant explanations
+```sh
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pytest test_factorial.py
+```
+    """
 
 class TestGenCode:
     #  Generates code based on a given prompt using an AI model.
@@ -189,15 +198,7 @@ class TestStepUtilities:
 
 
 class TestGenEntrypoint:
-    factorial_entrypoint = """
-Irrelevant explanations
-```sh
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-pytest test_factorial.py
-```
-    """
+
 
     class MockAI:
         def __init__(self, content):
@@ -210,7 +211,7 @@ pytest test_factorial.py
     def test_valid_input_generates_valid_entrypoint(self):
         # Mock AI class
 
-        ai_mock = TestGenEntrypoint.MockAI(TestGenEntrypoint.factorial_entrypoint)
+        ai_mock = TestGenEntrypoint.MockAI(factorial_entrypoint)
         code = Code()
         tempdir = tempfile.mkdtemp()
         memory = OnDiskRepository(tempdir)
@@ -232,7 +233,7 @@ pytest test_factorial.py
         assert ENTRYPOINT_LOG_FILE in memory
         assert isinstance(memory[ENTRYPOINT_LOG_FILE], str)
         assert (
-            memory[ENTRYPOINT_LOG_FILE] == TestGenEntrypoint.factorial_entrypoint.strip()
+            memory[ENTRYPOINT_LOG_FILE] == factorial_entrypoint.strip()
         )
 
     #  The function receives an empty codebase and returns an empty entry point script.
