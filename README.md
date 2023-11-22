@@ -1,4 +1,4 @@
-# GPT Engineer
+# GPT Engineer + Browser GUI  🚀 
 
 [![Discord Follow](https://dcbadge.vercel.app/api/server/8tcDQ89Ej2?style=flat)](https://discord.gg/8tcDQ89Ej2)
 [![GitHub Repo stars](https://img.shields.io/github/stars/AntonOsika/gpt-engineer?style=social)](https://github.com/AntonOsika/gpt-engineer)
@@ -7,6 +7,12 @@
 **Specify what you want it to build, the AI asks for clarification, and then builds it.**
 
 GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
+
+**
+It now comes with a real-time websocket interface between an optimized fast-loading ReactJS web app running on localhost and the Python3 agent. **
+
+<img width="1768" alt="Screenshot 2023-11-22 at 20 09 29" src="https://github.com/zdanl/gpt-engineer/assets/114028070/25400e63-a011-45a7-927e-1fcc819b2b6c">
+
 
 - [Demo](https://twitter.com/antonosika/status/1667641038104674306)
 
@@ -33,6 +39,13 @@ For **development**:
 - `cd gpt-engineer`
 - `python -m pip install -e .`
   - (or: `make install && source venv/bin/activate` for a venv)
+
+For **GUI** release:
+
+- `cd /app`
+- `npm run build`
+- `npm install`
+
 
 **API Key**
 
