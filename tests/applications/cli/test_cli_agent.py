@@ -12,7 +12,7 @@ import logging
 
 
 def test_init_standard_config(monkeypatch):
-    monkeypatch.setattr('builtins.input', lambda: "y")
+    monkeypatch.setattr("builtins.input", lambda: "y")
     temp_dir = tempfile.mkdtemp()
     cli_agent = CliAgent.with_default_config(temp_dir, CachingAI())
     outfile = "output.txt"
@@ -24,8 +24,9 @@ def test_init_standard_config(monkeypatch):
     with open(file_path, "r") as file:
         assert file.read().strip() == "Hello World!"
 
+
 def test_init_lite_config(monkeypatch):
-    monkeypatch.setattr('builtins.input', lambda: "y")
+    monkeypatch.setattr("builtins.input", lambda: "y")
     temp_dir = tempfile.mkdtemp()
     cli_agent = CliAgent.with_default_config(temp_dir, CachingAI(), code_gen_fn=lite_gen)
     outfile = "output.txt"
@@ -37,10 +38,13 @@ def test_init_lite_config(monkeypatch):
     with open(file_path, "r") as file:
         assert file.read().strip() == "Hello World!"
 
+
 def test_init_clarified_gen_config(monkeypatch):
-    monkeypatch.setattr('builtins.input', lambda: "y")
+    monkeypatch.setattr("builtins.input", lambda: "y")
     temp_dir = tempfile.mkdtemp()
-    cli_agent = CliAgent.with_default_config(temp_dir, CachingAI(), code_gen_fn=clarified_gen)
+    cli_agent = CliAgent.with_default_config(
+        temp_dir, CachingAI(), code_gen_fn=clarified_gen
+    )
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
     code = cli_agent.init(
@@ -50,11 +54,14 @@ def test_init_clarified_gen_config(monkeypatch):
     with open(file_path, "r") as file:
         assert file.read().strip() == "Hello World!"
 
+
 def test_init_self_heal_config(monkeypatch):
-    monkeypatch.setattr('builtins.input', lambda: "y")
+    monkeypatch.setattr("builtins.input", lambda: "y")
     temp_dir = tempfile.mkdtemp()
 
-    cli_agent = CliAgent.with_default_config(temp_dir, CachingAI(), execute_entrypoint_fn=self_heal)
+    cli_agent = CliAgent.with_default_config(
+        temp_dir, CachingAI(), execute_entrypoint_fn=self_heal
+    )
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
     code = cli_agent.init(
@@ -66,7 +73,7 @@ def test_init_self_heal_config(monkeypatch):
 
 
 def test_improve_standard_config(monkeypatch):
-    monkeypatch.setattr('builtins.input', lambda: "y")
+    monkeypatch.setattr("builtins.input", lambda: "y")
     temp_dir = tempfile.mkdtemp()
     code = Code(
         {
@@ -86,8 +93,6 @@ def test_improve_standard_config(monkeypatch):
     with open(file_path, "r") as file:
         file_content = file.read().strip()
         assert file_content == "!dlroW olleH"
-
-
 
 
 if __name__ == "__main__":

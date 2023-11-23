@@ -212,10 +212,12 @@ class OnDiskRepository(BaseRepository):
             shutil.rmtree(item_path)
 
     def __iter__(self) -> Iterator[str]:
-        return iter(sorted(
-            str(item.relative_to(self.path))
-            for item in sorted(self.path.rglob("*"))
-            if item.is_file())
+        return iter(
+            sorted(
+                str(item.relative_to(self.path))
+                for item in sorted(self.path.rglob("*"))
+                if item.is_file()
+            )
         )
 
     def __len__(self):
@@ -245,9 +247,8 @@ class OnDiskRepository(BaseRepository):
         else:
             return self._all_files()
 
-    def to_dict(self) -> Dict[str|Path, str]:
+    def to_dict(self) -> Dict[str | Path, str]:
         return {file_path: self[file_path] for file_path in self}
 
     def to_json(self) -> str:
         return json.dumps(self.to_dict())
-

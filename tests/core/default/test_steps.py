@@ -5,7 +5,7 @@ from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE,
-    PREPROMPTS_PATH
+    PREPROMPTS_PATH,
 )
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
@@ -74,6 +74,7 @@ pip install -r requirements.txt
 pytest test_factorial.py
 ```
     """
+
 
 class TestGenCode:
     #  Generates code based on a given prompt using an AI model.
@@ -198,8 +199,6 @@ class TestStepUtilities:
 
 
 class TestGenEntrypoint:
-
-
     class MockAI:
         def __init__(self, content):
             self.content = content
@@ -232,9 +231,7 @@ pytest test_factorial.py
         )
         assert ENTRYPOINT_LOG_FILE in memory
         assert isinstance(memory[ENTRYPOINT_LOG_FILE], str)
-        assert (
-            memory[ENTRYPOINT_LOG_FILE] == factorial_entrypoint.strip()
-        )
+        assert memory[ENTRYPOINT_LOG_FILE] == factorial_entrypoint.strip()
 
     #  The function receives an empty codebase and returns an empty entry point script.
     def test_empty_codebase_returns_empty_entrypoint(self):

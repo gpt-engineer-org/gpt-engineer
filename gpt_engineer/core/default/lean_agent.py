@@ -14,7 +14,6 @@ from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
 
-
 class LeanAgent(BaseAgent):
     """
     An agent that uses AI to generate and improve code based on a given prompt.
@@ -29,13 +28,12 @@ class LeanAgent(BaseAgent):
         ai (AI): The AI model used for generating and improving code.
     """
 
-
     def __init__(
-            self,
-            memory: BaseRepository,
-            execution_env: BaseExecutionEnv,
-            ai: AI = None,
-            preprompts_holder: PrepromptsHolder = None
+        self,
+        memory: BaseRepository,
+        execution_env: BaseExecutionEnv,
+        ai: AI = None,
+        preprompts_holder: PrepromptsHolder = None,
     ):
         self.preprompts_holder = preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH)
         self.memory = memory
@@ -43,7 +41,9 @@ class LeanAgent(BaseAgent):
         self.ai = ai or AI()
 
     @classmethod
-    def with_default_config(cls, path: str, ai: AI = None, preprompts_holder: PrepromptsHolder = None):
+    def with_default_config(
+        cls, path: str, ai: AI = None, preprompts_holder: PrepromptsHolder = None
+    ):
         return cls(
             memory=OnDiskRepository(memory_path(path)),
             execution_env=OnDiskExecutionEnv(path),
@@ -59,11 +59,13 @@ class LeanAgent(BaseAgent):
         return code
 
     def improve(
-            self, code: Code, prompt: str, execution_command: str = ENTRYPOINT_FILE
+        self, code: Code, prompt: str, execution_command: str = ENTRYPOINT_FILE
     ) -> Code:
         code = improve(self.ai, prompt, code, self.memory, self.preprompts_holder)
         if not execution_command in code:
-            entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
+            entrypoint = gen_entrypoint(
+                self.ai, code, self.memory, self.preprompts_holder
+            )
             code = Code(code | entrypoint)
-        code =self.execution_env.execute_program(code)
+        code = self.execution_env.execute_program(code)
         return code

@@ -15,7 +15,11 @@ from gpt_engineer.core.default.paths import (
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE,
 )
-from gpt_engineer.core.default.steps import curr_fn, setup_sys_prompt, setup_sys_prompt_existing_code
+from gpt_engineer.core.default.steps import (
+    curr_fn,
+    setup_sys_prompt,
+    setup_sys_prompt_existing_code,
+)
 from gpt_engineer.core.chat_to_files import parse_chat, overwrite_code_with_edits
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
@@ -38,7 +42,12 @@ def get_platform_info():
     return a + b
 
 
-def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code, preprompts_holder: PrepromptsHolder = None) -> Code:
+def self_heal(
+    ai: AI,
+    execution_env: BaseExecutionEnv,
+    code: Code,
+    preprompts_holder: PrepromptsHolder = None,
+) -> Code:
     """Attempts to execute the code from the entrypoint and if it fails,
     sends the error output back to the AI with instructions to fix.
     This code will make `MAX_SELF_HEAL_ATTEMPTS` to try and fix the code
@@ -113,9 +122,15 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code, preprompts_ho
 
 
 # Todo: Adapt to refactor and code object
-def vector_improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_holder: PrepromptsHolder):
+def vector_improve(
+    ai: AI,
+    prompt: str,
+    code: Code,
+    memory: BaseRepository,
+    preprompts_holder: PrepromptsHolder,
+):
     code_vector_repository = CodeVectorRepository()
-    #ToDo: Replace this hacky way to get the right langchain document format
+    # ToDo: Replace this hacky way to get the right langchain document format
     temp_dir = tempfile.mkdtemp()
     temp_saver = OnDiskRepository(temp_dir)
     for file, content in code.items():
@@ -126,7 +141,10 @@ def vector_improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, prep
     for doc in relevant_documents:
         file_path = os.path.relpath(doc.metadata["filename"], temp_dir)
         relevant_code[file_path] = code[file_path]
-    print("Relevant documents to be modified are: " + "\n".join(sorted(relevant_code.keys())))
+    print(
+        "Relevant documents to be modified are: "
+        + "\n".join(sorted(relevant_code.keys()))
+    )
     preprompts = preprompts_holder.get_preprompts()
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
@@ -143,7 +161,9 @@ def vector_improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, prep
     return code
 
 
-def clarified_gen(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
+def clarified_gen(
+    ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder
+) -> Code:
     """
     Generates code based on clarifications obtained from the user.
 
@@ -214,7 +234,9 @@ def clarified_gen(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder
     return code
 
 
-def lite_gen(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
+def lite_gen(
+    ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder
+) -> Code:
     """
     Executes the AI model using the main prompt and saves the generated results.
 

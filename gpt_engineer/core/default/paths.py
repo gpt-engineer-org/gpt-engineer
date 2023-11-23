@@ -9,6 +9,7 @@ ENTRYPOINT_FILE = "run.sh"
 ENTRYPOINT_LOG_FILE = "gen_entrypoint_chat.txt"
 PREPROMPTS_PATH = Path(__file__).parent.parent.parent / "preprompts"
 
+
 def memory_path(path):
     return os.path.join(path, MEMORY_REL_PATH)
 
