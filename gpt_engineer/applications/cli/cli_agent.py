@@ -75,7 +75,7 @@ class CliAgent(BaseAgent):
         code_gen_fn: CodeGenType = gen_code,
         execute_entrypoint_fn: ExecutionType = execute_entrypoint,
         improve_fn: ImproveType = improve,
-        preprompts_holder: PrepromptsHolder = None
+        preprompts_holder: PrepromptsHolder = None,
     ):
         self.memory = memory
         self.execution_env = execution_env
@@ -93,7 +93,7 @@ class CliAgent(BaseAgent):
         code_gen_fn: CodeGenType = gen_code,
         execute_entrypoint_fn: ExecutionType = execute_entrypoint,
         improve_fn: ImproveType = improve,
-        preprompts_holder: PrepromptsHolder = None
+        preprompts_holder: PrepromptsHolder = None,
     ):
         return cls(
             memory=OnDiskRepository(memory_path(path)),
@@ -109,7 +109,9 @@ class CliAgent(BaseAgent):
         code = self.code_gen_fn(self.ai, prompt, self.memory, self.preprompts_holder)
         entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
         code = Code(code | entrypoint)
-        code = self.execute_entrypoint_fn(self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder)
+        code = self.execute_entrypoint_fn(
+            self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder
+        )
         return code
 
     def improve(
@@ -117,7 +119,11 @@ class CliAgent(BaseAgent):
     ) -> Code:
         code = self.improve_fn(self.ai, prompt, code, self.memory, self.preprompts_holder)
         if not execution_command in code:
-            entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
+            entrypoint = gen_entrypoint(
+                self.ai, code, self.memory, self.preprompts_holder
+            )
             code = Code(code | entrypoint)
-        code = self.execute_entrypoint_fn(self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder)
+        code = self.execute_entrypoint_fn(
+            self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder
+        )
         return code

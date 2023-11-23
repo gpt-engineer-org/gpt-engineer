@@ -17,8 +17,8 @@ from langchain.schema import (
 # Type hint for a chat message
 Message = Union[AIMessage, HumanMessage, SystemMessage]
 
-class CachingAI(AI):
 
+class CachingAI(AI):
     def __init__(self):
         self.temperature = 0.1
         self.azure_endpoint = ""
@@ -80,5 +80,6 @@ class CachingAI(AI):
             cache[messages_key] = self.serialize_messages(messages)
             with open(self.cache_file, "w") as cache_file:
                 json.dump(cache, cache_file)
+                cache_file.write("\n")
 
         return self.deserialize_messages(cache[messages_key])

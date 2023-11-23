@@ -1,4 +1,5 @@
 import os.path
+from termcolor import colored
 from pathlib import Path
 from typing import List, Union
 from platform import platform
@@ -15,7 +16,11 @@ from gpt_engineer.core.default.paths import (
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE,
 )
-from gpt_engineer.core.default.steps import curr_fn, setup_sys_prompt, setup_sys_prompt_existing_code
+from gpt_engineer.core.default.steps import (
+    curr_fn,
+    setup_sys_prompt,
+    setup_sys_prompt_existing_code,
+)
 from gpt_engineer.core.chat_to_files import parse_chat, overwrite_code_with_edits
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
@@ -38,7 +43,12 @@ def get_platform_info():
     return a + b
 
 
-def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code, preprompts_holder: PrepromptsHolder = None) -> Code:
+def self_heal(
+    ai: AI,
+    execution_env: BaseExecutionEnv,
+    code: Code,
+    preprompts_holder: PrepromptsHolder = None,
+) -> Code:
     """Attempts to execute the code from the entrypoint and if it fails,
     sends the error output back to the AI with instructions to fix.
     This code will make `MAX_SELF_HEAL_ATTEMPTS` to try and fix the code
@@ -49,6 +59,10 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code, preprompts_ho
 
     # step 1. execute the entrypoint
     # log_path = dbs.workspace.path / "log.txt"
+    if not ENTRYPOINT_FILE in code:
+        raise FileNotFoundError(
+            "The required entrypoint " + ENTRYPOINT_FILE + " does not exist in the code."
+        )
 
     attempts = 0
     messages = []
@@ -56,22 +70,20 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code, preprompts_ho
         raise AssertionError("Prepromptsholder required for self-heal")
     preprompts = preprompts_holder.get_preprompts()
     while attempts < MAX_SELF_HEAL_ATTEMPTS:
-        # log_file = open(log_path, "w")  # wipe clean on every iteration
-        # timed_out = False
-
-        # p = subprocess.Popen(  # attempt to run the entrypoint
-        #     "bash run.sh",
-        #     shell=True,
-        #     cwd=dbs.workspace.path,
-        #     stdout=log_file,
-        #     stderr=log_file,
-        #     bufsize=0,
-        # )
-        # try:  # timeout if the process actually runs
-        #     p.wait(timeout=ASSUME_WORKING_TIMEOUT)
-        # except subprocess.TimeoutExpired:
-        #     timed_out = True
-        #     print("The process hit a timeout before exiting.")
+        command = code[ENTRYPOINT_FILE]
+        print(
+            colored(
+                "Do you want to execute this code? (Y/n)",
+                "red",
+            )
+        )
+        print()
+        print(command)
+        print()
+        if input().lower() not in ["", "y", "yes"]:
+            print("Ok, not executing the code.")
+            return []
+        print("Executing the code...")
         process = execution_env.execute_program(code)
         # get the result and output
         # step 2. if the return code not 0, package and send to the AI
@@ -93,6 +105,9 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code, preprompts_ho
             # stdout and stderr are bytes, decode them to string if needed
             output = stdout.decode("utf-8")
             error = stderr.decode("utf-8")
+            print("stdout: " + output)
+            print(colored("stderr: " + error, "red"))
+
             messages.append(SystemMessage(content=output + "\n " + error))
 
             messages = ai.next(
@@ -113,9 +128,15 @@ def self_heal(ai: AI, execution_env: BaseExecutionEnv, code: Code, preprompts_ho
 
 
 # Todo: Adapt to refactor and code object
-def vector_improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_holder: PrepromptsHolder):
+def vector_improve(
+    ai: AI,
+    prompt: str,
+    code: Code,
+    memory: BaseRepository,
+    preprompts_holder: PrepromptsHolder,
+):
     code_vector_repository = CodeVectorRepository()
-    #ToDo: Replace this hacky way to get the right langchain document format
+    # ToDo: Replace this hacky way to get the right langchain document format
     temp_dir = tempfile.mkdtemp()
     temp_saver = OnDiskRepository(temp_dir)
     for file, content in code.items():
@@ -126,7 +147,10 @@ def vector_improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, prep
     for doc in relevant_documents:
         file_path = os.path.relpath(doc.metadata["filename"], temp_dir)
         relevant_code[file_path] = code[file_path]
-    print("Relevant documents to be modified are: " + "\n".join(sorted(relevant_code.keys())))
+    print(
+        "Relevant documents to be modified are: "
+        + "\n".join(sorted(relevant_code.keys()))
+    )
     preprompts = preprompts_holder.get_preprompts()
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
@@ -143,7 +167,9 @@ def vector_improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, prep
     return code
 
 
-def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
+def clarified_gen(
+    ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder
+) -> Code:
     """
     Generates code based on clarifications obtained from the user.
 
@@ -174,8 +200,8 @@ def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_h
             print("Nothing to clarify.")
             break
 
-        print()
-        user_input = input('(answer in text, or "c" to move on)\n')
+        print('(answer in text, or "c" to move on)\n')
+        user_input = input()
         print()
 
         if not user_input or user_input == "c":
@@ -214,7 +240,9 @@ def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_h
     return code
 
 
-def lite_gen(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
+def lite_gen(
+    ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder
+) -> Code:
     """
     Executes the AI model using the main prompt and saves the generated results.
 

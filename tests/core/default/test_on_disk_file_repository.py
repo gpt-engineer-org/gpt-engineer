@@ -6,6 +6,7 @@ from gpt_engineer.core.default.on_disk_repository import (
 
 import unittest
 
+
 def test_DB_operations(tmp_path):
     # Test initialization
     db = OnDiskRepository(tmp_path)
@@ -79,8 +80,8 @@ def test_error_messages(tmp_path):
 
 import pytest
 
-class TestOnDiskRepository:
 
+class TestOnDiskRepository:
     #  can set and get a value for a key
     def test_set_and_get_value(self, tmp_path):
         db = OnDiskRepository(tmp_path)

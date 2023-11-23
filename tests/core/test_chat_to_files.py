@@ -77,7 +77,7 @@ def test_mixed_content():
 def test_filename_line_break():
     chat = """
     file1.py
-    
+
     ```python
     print("Hello, World!")
     ```

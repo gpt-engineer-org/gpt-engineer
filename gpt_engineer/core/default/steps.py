@@ -1,6 +1,10 @@
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.chat_to_files import parse_chat, overwrite_code_with_edits, parse_edits
+from gpt_engineer.core.chat_to_files import (
+    parse_chat,
+    overwrite_code_with_edits,
+    parse_edits,
+)
 from gpt_engineer.core.default.paths import (
     ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
@@ -23,12 +27,10 @@ from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
 
 def curr_fn() -> str:
-    
     return inspect.stack()[1].function
 
 
 def setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
-    
     return (
         preprompts["roadmap"]
         + preprompts["generate"].replace("FILE_FORMAT", preprompts["file_format"])
@@ -37,7 +39,9 @@ def setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
     )
 
 
-def gen_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
+def gen_code(
+    ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder
+) -> Code:
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
     chat = messages[-1].content.strip()
@@ -47,7 +51,9 @@ def gen_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: Pre
     return code
 
 
-def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
+def gen_entrypoint(
+    ai: AI, code: Code, memory: BaseRepository, preprompts_holder: PrepromptsHolder
+) -> Code:
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
         system=(preprompts["entrypoint"]),
@@ -65,9 +71,12 @@ def gen_entrypoint(ai: AI, code: Code, memory: BaseRepository, preprompts_holder
     return entrypoint_code
 
 
-def execute_entrypoint(ai: AI, execution_env: BaseExecutionEnv, code: Code, preprompts_holder: PrepromptsHolder = None) -> None:
-    
-
+def execute_entrypoint(
+    ai: AI,
+    execution_env: BaseExecutionEnv,
+    code: Code,
+    preprompts_holder: PrepromptsHolder = None,
+) -> None:
     if not ENTRYPOINT_FILE in code:
         raise FileNotFoundError(
             "The required entrypoint " + ENTRYPOINT_FILE + " does not exist in the code."
@@ -101,12 +110,20 @@ def execute_entrypoint(ai: AI, execution_env: BaseExecutionEnv, code: Code, prep
     print("You can press ctrl+c *once* to stop the execution.")
     print()
 
-    execution_env.execute_program(code)
+    process = execution_env.execute_program(code)
+    stdout, stderr = process.communicate()
+
+    # stdout and stderr are bytes, decode them to string if needed
+    output = stdout.decode("utf-8")
+    error = stderr.decode("utf-8")
+    print("stdout: " + output)
+    print("stderr: " + error)
     return code
 
 
-def setup_sys_prompt_existing_code(preprompts: MutableMapping[Union[str, Path], str]) -> str:
-    
+def setup_sys_prompt_existing_code(
+    preprompts: MutableMapping[Union[str, Path], str]
+) -> str:
     return (
         preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format"])
         + "\nUseful to know:\n"
@@ -123,12 +140,21 @@ def incorrect_edit(code: Code, chat: str) -> List[str,]:
         problems.append(str(problem))
     for edit in edits:
         if not edit.before in code[edit.filename]:
-            problems.append("This section, assigned to be exchanged for an edit block, does not have an exact match in the code: " + edit.before + "\nThis is often a result of placeholders, such as ... or references to 'existing code' or 'rest of function' etc, which cannot be used the HEAD part of the edit blocks. Also, to get a match, all comments, including long doc strings may have to be reproduced in the patch HEAD")
+            problems.append(
+                "This section, assigned to be exchanged for an edit block, does not have an exact match in the code: "
+                + edit.before
+                + "\nThis is often a result of placeholders, such as ... or references to 'existing code' or 'rest of function' etc, which cannot be used the HEAD part of the edit blocks. Also, to get a match, all comments, including long doc strings may have to be reproduced in the patch HEAD"
+            )
     return problems
 
 
-
-def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
+def improve(
+    ai: AI,
+    prompt: str,
+    code: Code,
+    memory: BaseRepository,
+    preprompts_holder: PrepromptsHolder,
+) -> Code:
     preprompts = preprompts_holder.get_preprompts()
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
@@ -144,7 +170,13 @@ def improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, preprompts_
         chat = messages[-1].content.strip()
         problems = incorrect_edit(code, chat)
         if len(problems) > 0:
-            messages.append(HumanMessage(content=f"Some previously produced edits were not on the requested format, or the HEAD part was not found in the code. Details: " + "\n".join(problems) + "\n Please provide ALL the edits again, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"))
+            messages.append(
+                HumanMessage(
+                    content=f"Some previously produced edits were not on the requested format, or the HEAD part was not found in the code. Details: "
+                    + "\n".join(problems)
+                    + "\n Please provide ALL the edits again, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
+                )
+            )
         edit_refinements += 1
     overwrite_code_with_edits(chat, code)
     memory[IMPROVE_LOG_FILE] = chat

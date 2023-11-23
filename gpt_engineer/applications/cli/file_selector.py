@@ -254,7 +254,7 @@ class TerminalFileSelector:
         self.file_path_list = file_path_list
         self.selectable_file_paths = file_path_enumeration
 
-    def ask_for_selection(self, all: bool=False) -> List[str]:
+    def ask_for_selection(self, all: bool = False) -> List[str]:
         """
         Prompts the user to select files by providing a series of index numbers, ranges, or 'all' to select everything.
 
@@ -307,7 +307,6 @@ class TerminalFileSelector:
         else:
             print("Please use a valid number/series of numbers.\n")
             sys.exit(1)
-
 
         return selected_paths
 
@@ -385,8 +384,11 @@ def ask_for_files(project_path: Union[str, Path]) -> Code:
             print("Invalid number. Select a number from the list above.\n")
             sys.exit(1)
 
-        #ToDO: Replace this hack that makes all file_path relative to the right thing
-        file_path_list = [os.path.relpath(file_path.strip(), project_path) for file_path in file_path_list]
+        # ToDO: Replace this hack that makes all file_path relative to the right thing
+        file_path_list = [
+            os.path.relpath(file_path.strip(), project_path)
+            for file_path in file_path_list
+        ]
 
         if not selection_number == 3:
             metadata_db[FILE_LIST_NAME] = "\n".join(
@@ -399,16 +401,21 @@ def ask_for_files(project_path: Union[str, Path]) -> Code:
                 content_dict[file.strip()] = content.read()
     return Code(content_dict)
 
+
 def get_all_code(project_path: str) -> Code:
     file_selection = terminal_file_selector(project_path, all=True)
     # ToDO: Replace this hack that makes all file_path relative to the right thing
-    file_selection = [os.path.relpath(str(file_path).strip(), project_path) for file_path in file_selection]
+    file_selection = [
+        os.path.relpath(str(file_path).strip(), project_path)
+        for file_path in file_selection
+    ]
     content_dict = dict()
 
     for file in file_selection:
         with open(os.path.join(project_path, file.strip()), "r") as content:
             content_dict[file.strip()] = content.read()
     return Code(content_dict)
+
 
 def gui_file_selector(input_path: str) -> List[str]:
     """
