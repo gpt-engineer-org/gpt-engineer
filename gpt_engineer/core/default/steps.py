@@ -110,7 +110,14 @@ def execute_entrypoint(
     print("You can press ctrl+c *once* to stop the execution.")
     print()
 
-    execution_env.execute_program(code)
+    process = execution_env.execute_program(code)
+    stdout, stderr = process.communicate()
+
+    # stdout and stderr are bytes, decode them to string if needed
+    output = stdout.decode("utf-8")
+    error = stderr.decode("utf-8")
+    print("stdout: " + output)
+    print("stderr: " + error)
     return code
 
 

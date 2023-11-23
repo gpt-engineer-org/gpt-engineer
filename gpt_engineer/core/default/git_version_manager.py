@@ -24,5 +24,5 @@ class GitVersionManager(BaseVersionManager):
             workspace[file_name] = file_content
         # Typically save to file and/or git and return a hash
 
-        #Todo: Implement push to git!
+        # Todo: Implement push to git!
         return ""

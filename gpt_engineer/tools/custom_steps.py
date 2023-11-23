@@ -1,4 +1,5 @@
 import os.path
+from termcolor import colored
 from pathlib import Path
 from typing import List, Union
 from platform import platform
@@ -58,6 +59,10 @@ def self_heal(
 
     # step 1. execute the entrypoint
     # log_path = dbs.workspace.path / "log.txt"
+    if not ENTRYPOINT_FILE in code:
+        raise FileNotFoundError(
+            "The required entrypoint " + ENTRYPOINT_FILE + " does not exist in the code."
+        )
 
     attempts = 0
     messages = []
@@ -65,22 +70,20 @@ def self_heal(
         raise AssertionError("Prepromptsholder required for self-heal")
     preprompts = preprompts_holder.get_preprompts()
     while attempts < MAX_SELF_HEAL_ATTEMPTS:
-        # log_file = open(log_path, "w")  # wipe clean on every iteration
-        # timed_out = False
-
-        # p = subprocess.Popen(  # attempt to run the entrypoint
-        #     "bash run.sh",
-        #     shell=True,
-        #     cwd=dbs.workspace.path,
-        #     stdout=log_file,
-        #     stderr=log_file,
-        #     bufsize=0,
-        # )
-        # try:  # timeout if the process actually runs
-        #     p.wait(timeout=ASSUME_WORKING_TIMEOUT)
-        # except subprocess.TimeoutExpired:
-        #     timed_out = True
-        #     print("The process hit a timeout before exiting.")
+        command = code[ENTRYPOINT_FILE]
+        print(
+            colored(
+                "Do you want to execute this code? (Y/n)",
+                "red",
+            )
+        )
+        print()
+        print(command)
+        print()
+        if input().lower() not in ["", "y", "yes"]:
+            print("Ok, not executing the code.")
+            return []
+        print("Executing the code...")
         process = execution_env.execute_program(code)
         # get the result and output
         # step 2. if the return code not 0, package and send to the AI
@@ -102,6 +105,9 @@ def self_heal(
             # stdout and stderr are bytes, decode them to string if needed
             output = stdout.decode("utf-8")
             error = stderr.decode("utf-8")
+            print("stdout: " + output)
+            print(colored("stderr: " + error, "red"))
+
             messages.append(SystemMessage(content=output + "\n " + error))
 
             messages = ai.next(
