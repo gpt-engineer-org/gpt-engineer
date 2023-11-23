@@ -80,5 +80,6 @@ class CachingAI(AI):
             cache[messages_key] = self.serialize_messages(messages)
             with open(self.cache_file, "w") as cache_file:
                 json.dump(cache, cache_file)
+                cache_file.write('\n')
 
         return self.deserialize_messages(cache[messages_key])
