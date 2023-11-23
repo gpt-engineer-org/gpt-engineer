@@ -42,6 +42,7 @@ from gpt_engineer.tools.custom_steps import (
     self_heal,
     vector_improve,
 )
+from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.default.steps import gen_code, execute_entrypoint, improve
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
@@ -196,9 +197,14 @@ def main(
             code = get_all_code(project_path)
         else:
             code = ask_for_files(project_path)
-        agent.improve(code, prompt)
+        code = agent.improve(code, prompt)
     else:
-        agent.init(prompt)
+        code = agent.init(prompt)
+
+    # make snapshot of code
+    version_manager = GitVersionManager(project_path)
+    version_manager.snapshot(code)
+
     # collect user feedback if user consents
     config = (code_gen_fn.__name__, execution_fn.__name__)
     collect_and_send_human_review(prompt, model, temperature, config, agent.memory)
