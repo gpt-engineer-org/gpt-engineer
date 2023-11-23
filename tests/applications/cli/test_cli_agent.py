@@ -2,7 +2,7 @@ import pytest
 import tempfile
 from tests.caching_ai import CachingAI
 from gpt_engineer.applications.cli.cli_agent import CliAgent
-from gpt_engineer.tools.custom_steps import self_heal
+from gpt_engineer.tools.custom_steps import self_heal, lite_gen, clarified_gen
 from gpt_engineer.core.code import Code
 import os
 
@@ -14,11 +14,37 @@ import logging
 def test_init_standard_config(monkeypatch):
     monkeypatch.setattr('builtins.input', lambda: "y")
     temp_dir = tempfile.mkdtemp()
-    lean_agent = CliAgent.with_default_config(temp_dir, CachingAI())
+    cli_agent = CliAgent.with_default_config(temp_dir, CachingAI())
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
-    code = lean_agent.init(
+    code = cli_agent.init(
         f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
+    )
+    assert os.path.isfile(file_path)
+    with open(file_path, "r") as file:
+        assert file.read().strip() == "Hello World!"
+
+def test_init_lite_config(monkeypatch):
+    monkeypatch.setattr('builtins.input', lambda: "y")
+    temp_dir = tempfile.mkdtemp()
+    cli_agent = CliAgent.with_default_config(temp_dir, CachingAI(), code_gen_fn=lite_gen)
+    outfile = "output.txt"
+    file_path = os.path.join(temp_dir, outfile)
+    code = cli_agent.init(
+        f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
+    )
+    assert os.path.isfile(file_path)
+    with open(file_path, "r") as file:
+        assert file.read().strip() == "Hello World!"
+
+def test_init_clarified_gen_config(monkeypatch):
+    monkeypatch.setattr('builtins.input', lambda: "y")
+    temp_dir = tempfile.mkdtemp()
+    cli_agent = CliAgent.with_default_config(temp_dir, CachingAI(), code_gen_fn=clarified_gen)
+    outfile = "output.txt"
+    file_path = os.path.join(temp_dir, outfile)
+    code = cli_agent.init(
+        f"Make a program that prints 'Hello World!' to a file called '{outfile} either using python or javascript'"
     )
     assert os.path.isfile(file_path)
     with open(file_path, "r") as file:
@@ -28,10 +54,10 @@ def test_init_self_heal_config(monkeypatch):
     monkeypatch.setattr('builtins.input', lambda: "y")
     temp_dir = tempfile.mkdtemp()
 
-    lean_agent = CliAgent.with_default_config(temp_dir, CachingAI(), execute_entrypoint_fn=self_heal)
+    cli_agent = CliAgent.with_default_config(temp_dir, CachingAI(), execute_entrypoint_fn=self_heal)
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
-    code = lean_agent.init(
+    code = cli_agent.init(
         f"Make a program that prints 'Hello World!' to a file called '{outfile}' (sf_var_manipulated_cache)"
     )
     assert os.path.isfile(file_path)
@@ -49,8 +75,8 @@ def test_improve_standard_config(monkeypatch):
             "run.sh": "python3 main.py\n",
         }
     )
-    lean_agent = CliAgent.with_default_config(temp_dir, CachingAI())
-    lean_agent.improve(
+    cli_agent = CliAgent.with_default_config(temp_dir, CachingAI())
+    cli_agent.improve(
         code,
         "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",
     )

@@ -143,7 +143,7 @@ def vector_improve(ai: AI, prompt: str, code: Code, memory: BaseRepository, prep
     return code
 
 
-def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
+def clarified_gen(ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder) -> Code:
     """
     Generates code based on clarifications obtained from the user.
 
@@ -174,8 +174,8 @@ def gen_clarified_code(ai: AI, prompt: str, memory: BaseRepository, preprompts_h
             print("Nothing to clarify.")
             break
 
-        print()
-        user_input = input('(answer in text, or "c" to move on)\n')
+        print('(answer in text, or "c" to move on)\n')
+        user_input = input()
         print()
 
         if not user_input or user_input == "c":

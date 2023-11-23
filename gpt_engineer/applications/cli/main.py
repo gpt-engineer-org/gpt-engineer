@@ -36,7 +36,7 @@ from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH
 from gpt_engineer.applications.cli.file_selector import ask_for_files, get_all_code
-from gpt_engineer.tools.custom_steps import lite_gen, gen_clarified_code, self_heal, vector_improve
+from gpt_engineer.tools.custom_steps import lite_gen, clarified_gen, self_heal, vector_improve
 from gpt_engineer.core.default.steps import gen_code, execute_entrypoint, improve
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
@@ -160,7 +160,7 @@ def main(
     prompt = load_prompt(OnDiskRepository(path), improve_mode)
     # configure generation function
     if clarify_mode:
-        code_gen_fn = gen_clarified_code
+        code_gen_fn = clarified_gen
     elif lite_mode:
         code_gen_fn = lite_gen
     else:
