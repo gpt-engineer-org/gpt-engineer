@@ -11,18 +11,13 @@ from gpt_engineer.core.default.paths import memory_path
 import os
 
 
-
 def test_init_standard_config(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda: "y")
     temp_dir = tempfile.mkdtemp()
     memory = OnDiskRepository(memory_path(temp_dir))
     version_manager = GitVersionManager(temp_dir)
     execution_env = OnDiskExecutionEnv(version_manager)
-    cli_agent = CliAgent.with_default_config(
-        memory,
-        execution_env,
-        ai=CachingAI()
-    )
+    cli_agent = CliAgent.with_default_config(memory, execution_env, ai=CachingAI())
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
     code = cli_agent.init(
