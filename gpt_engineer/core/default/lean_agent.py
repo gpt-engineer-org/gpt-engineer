@@ -5,6 +5,7 @@ from gpt_engineer.core.default.steps import (
     gen_entrypoint,
     improve,
 )
+from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.base_repository import BaseRepository
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
@@ -46,7 +47,7 @@ class LeanAgent(BaseAgent):
     ):
         return cls(
             memory=OnDiskRepository(memory_path(path)),
-            execution_env=OnDiskExecutionEnv(path),
+            execution_env=OnDiskExecutionEnv(GitVersionManager(path)),
             ai=ai,
             preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )

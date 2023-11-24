@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from gpt_engineer.core.code import Code
+from typing import Union
+from pathlib import Path
 
 
 class BaseVersionManager(ABC):
@@ -15,6 +17,10 @@ class BaseVersionManager(ABC):
     snapshot(code: Code) -> str:
         Create a snapshot of the given code and return a reference to it.
     """
+
+    @abstractmethod
+    def __init__(self, path: Union[str, Path]):
+        pass
 
     @abstractmethod
     def snapshot(self, code: Code) -> str:

@@ -34,7 +34,7 @@ from dotenv import load_dotenv
 
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.default.paths import PREPROMPTS_PATH
+from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.applications.cli.file_selector import ask_for_files, get_all_code
 from gpt_engineer.tools.custom_steps import (
     lite_gen,
@@ -47,6 +47,7 @@ from gpt_engineer.core.default.steps import gen_code, execute_entrypoint, improv
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 import logging
 
 app = typer.Typer()  # creates a CLI app
@@ -184,8 +185,12 @@ def main(
 
     preprompts_path = get_preprompts_path(use_custom_preprompts, Path(project_path))
     preprompts_holder = PrepromptsHolder(preprompts_path)
+    memory = OnDiskRepository(memory_path(project_path))
+    version_manager = GitVersionManager(project_path)
+    execution_env = OnDiskExecutionEnv(version_manager)
     agent = CliAgent.with_default_config(
-        project_path,
+        memory,
+        execution_env,
         ai=ai,
         code_gen_fn=code_gen_fn,
         execute_entrypoint_fn=execution_fn,
@@ -202,7 +207,6 @@ def main(
         code = agent.init(prompt)
 
     # make snapshot of code
-    version_manager = GitVersionManager(project_path)
     version_manager.snapshot(code)
 
     # collect user feedback if user consents

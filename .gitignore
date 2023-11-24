@@ -83,3 +83,9 @@ docs/db/
 poetry.lock
 .aider*
 .gpteng
+
+# webapp specific
+webapp/node_modules
+webapp/package-lock.json
+
+webapp/.next/
