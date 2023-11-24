@@ -1,6 +1,8 @@
 from gpt_engineer.core.base_version_manager import BaseVersionManager
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
+from typing import Union
+from pathlib import Path
 
 
 class GitVersionManager(BaseVersionManager):
@@ -15,7 +17,7 @@ class GitVersionManager(BaseVersionManager):
         path (str): The file system path where the Git repository is located.
     """
 
-    def __init__(self, path: str):
+    def __init__(self, path: Union[str, Path]):
         self.path = path
 
     def snapshot(self, code: Code) -> str:

@@ -1,4 +1,5 @@
 import subprocess
+from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
@@ -17,8 +18,8 @@ class OnDiskExecutionEnv(BaseExecutionEnv):
         path (str): The file system path where the code is located and will be executed.
     """
 
-    def __init__(self, path: str):
-        self.path = path
+    def __init__(self, version_manager: GitVersionManager):
+        self.version_manager = version_manager
 
     def execute_program(self, code: Code) -> subprocess.Popen:
         if not ENTRYPOINT_FILE in code:
@@ -28,14 +29,12 @@ class OnDiskExecutionEnv(BaseExecutionEnv):
                 + " does not exist in the code."
             )
         # ToDo: The fact that execution is the de-facto way of saving the code to disk presently should change once version manager is implemented.
-        workspace = OnDiskRepository(self.path)
-        for file_name, file_content in code.items():
-            workspace[file_name] = file_content
+        self.version_manager.snapshot(code)
 
         p = subprocess.Popen(
             "bash " + ENTRYPOINT_FILE,
             shell=True,
-            cwd=self.path,
+            cwd=self.version_manager.path,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )

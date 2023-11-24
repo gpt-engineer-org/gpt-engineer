@@ -1,5 +1,6 @@
 import unittest
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
+from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
 import tempfile
 from unittest.mock import patch, MagicMock
@@ -8,7 +9,7 @@ from unittest.mock import patch, MagicMock
 class TestOnDiskExecutionEnv(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
-        self.env = OnDiskExecutionEnv(self.temp_dir.name)
+        self.env = OnDiskExecutionEnv(GitVersionManager(self.temp_dir.name))
 
     def tearDown(self):
         self.temp_dir.cleanup()

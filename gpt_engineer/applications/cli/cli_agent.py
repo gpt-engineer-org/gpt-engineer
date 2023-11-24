@@ -1,5 +1,5 @@
 from gpt_engineer.core.code import Code
-from gpt_engineer.core.base_version_manager import BaseVersionManager
+from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.steps import (
     gen_code,
@@ -88,7 +88,8 @@ class CliAgent(BaseAgent):
     @classmethod
     def with_default_config(
         cls,
-        path: str,
+        memory: OnDiskRepository,
+        execution_env: OnDiskExecutionEnv,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
         execute_entrypoint_fn: ExecutionType = execute_entrypoint,
@@ -96,8 +97,8 @@ class CliAgent(BaseAgent):
         preprompts_holder: PrepromptsHolder = None,
     ):
         return cls(
-            memory=OnDiskRepository(memory_path(path)),
-            execution_env=OnDiskExecutionEnv(path),
+            memory=memory,
+            execution_env=execution_env,
             ai=ai,
             code_gen_fn=code_gen_fn,
             execute_entrypoint_fn=execute_entrypoint_fn,

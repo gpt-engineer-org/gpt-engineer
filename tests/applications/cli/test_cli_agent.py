@@ -4,17 +4,25 @@ from tests.caching_ai import CachingAI
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.tools.custom_steps import self_heal, lite_gen, clarified_gen
 from gpt_engineer.core.code import Code
+from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
+from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
+from gpt_engineer.core.default.git_version_manager import GitVersionManager
+from gpt_engineer.core.default.paths import memory_path
 import os
 
-from gpt_engineer.core.chat_to_files import parse_chat, Edit, parse_edits, apply_edits
-from gpt_engineer.core.chat_to_files import logger as parse_logger
-import logging
 
 
 def test_init_standard_config(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda: "y")
     temp_dir = tempfile.mkdtemp()
-    cli_agent = CliAgent.with_default_config(temp_dir, CachingAI())
+    memory = OnDiskRepository(memory_path(temp_dir))
+    version_manager = GitVersionManager(temp_dir)
+    execution_env = OnDiskExecutionEnv(version_manager)
+    cli_agent = CliAgent.with_default_config(
+        memory,
+        execution_env,
+        ai=CachingAI()
+    )
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
     code = cli_agent.init(
@@ -28,7 +36,15 @@ def test_init_standard_config(monkeypatch):
 def test_init_lite_config(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda: "y")
     temp_dir = tempfile.mkdtemp()
-    cli_agent = CliAgent.with_default_config(temp_dir, CachingAI(), code_gen_fn=lite_gen)
+    memory = OnDiskRepository(memory_path(temp_dir))
+    version_manager = GitVersionManager(temp_dir)
+    execution_env = OnDiskExecutionEnv(version_manager)
+    cli_agent = CliAgent.with_default_config(
+        memory,
+        execution_env,
+        ai=CachingAI(),
+        code_gen_fn=lite_gen,
+    )
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
     code = cli_agent.init(
@@ -42,8 +58,14 @@ def test_init_lite_config(monkeypatch):
 def test_init_clarified_gen_config(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda: "y")
     temp_dir = tempfile.mkdtemp()
+    memory = OnDiskRepository(memory_path(temp_dir))
+    version_manager = GitVersionManager(temp_dir)
+    execution_env = OnDiskExecutionEnv(version_manager)
     cli_agent = CliAgent.with_default_config(
-        temp_dir, CachingAI(), code_gen_fn=clarified_gen
+        memory,
+        execution_env,
+        ai=CachingAI(),
+        code_gen_fn=clarified_gen,
     )
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
@@ -82,7 +104,14 @@ def test_improve_standard_config(monkeypatch):
             "run.sh": "python3 main.py\n",
         }
     )
-    cli_agent = CliAgent.with_default_config(temp_dir, CachingAI())
+    memory = OnDiskRepository(memory_path(temp_dir))
+    version_manager = GitVersionManager(temp_dir)
+    execution_env = OnDiskExecutionEnv(version_manager)
+    cli_agent = CliAgent.with_default_config(
+        memory,
+        execution_env,
+        ai=CachingAI(),
+    )
     cli_agent.improve(
         code,
         "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",
