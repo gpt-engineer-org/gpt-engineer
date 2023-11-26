@@ -178,7 +178,7 @@ def main(
     else:
         execution_fn = execute_entrypoint
 
-    if --vector_improve_mode:
+    if vector_improve_mode:
         improve_fn = vector_improve
     else:
         improve_fn = improve
@@ -198,7 +198,7 @@ def main(
         preprompts_holder=preprompts_holder,
     )
     if improve_mode:
-        if --vector_improve_mode:
+        if vector_improve_mode:
             code = get_all_code(project_path)
         else:
             code = ask_for_files(project_path)
