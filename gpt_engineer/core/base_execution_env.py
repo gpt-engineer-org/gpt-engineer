@@ -1,5 +1,6 @@
+import subprocess
 from abc import ABC, abstractmethod
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.code import Files, Code
 from subprocess import Popen
 
 
@@ -17,7 +18,33 @@ class BaseExecutionEnv(ABC):
         Execute the given code and return the process handle.
     """
 
-    # ToDo: Figure out long term solution to the return variable (potentially a status class?), for now, return a process
     @abstractmethod
-    def execute_program(self, code: Code) -> Popen:
-        pass
+    def run(self, command: str, timeout: int | None = None) -> tuple[str, str, int]:
+        """
+        Runs a command in the execution environment.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def popen(self, command: str) -> Popen:
+        """
+        Runs a command in the execution environment.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def upload(self, files: Files) -> "ExecutionEnv":
+        """
+        Uploads files to the execution environment.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def download(self) -> Files:
+        """
+        Downloads files from the execution environment.
+        """
+        raise NotImplementedError
+
+    def execute_program(self, code: Code, command: str) -> subprocess.Popen:
+        return self.upload(code).popen(command)

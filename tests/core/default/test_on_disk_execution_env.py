@@ -26,14 +26,14 @@ class TestOnDiskExecutionEnv(unittest.TestCase):
         }
         with patch("subprocess.Popen") as mock_popen:
             mock_popen.return_value.wait.return_value = 0
-            process = self.env.execute_program(code)
+            process = self.env.popen(code)
             self.assertIsNotNone(process)
             mock_popen.assert_called_once()
 
     def test_missing_entrypoint(self):
         code = {"script.py": "print('This is a test script')"}
         with self.assertRaises(FileNotFoundError):
-            self.env.execute_program(code)
+            self.env.popen(code)
 
     def test_keyboard_interrupt_handling(self):
         entrypoint_content = """
@@ -47,7 +47,7 @@ class TestOnDiskExecutionEnv(unittest.TestCase):
             mock_process = MagicMock()
             mock_process.wait.side_effect = KeyboardInterrupt
             mock_popen.return_value = mock_process
-            self.env.execute_program(code)
+            self.env.popen(code)
             mock_process.kill.assert_called_once()
 
     def test_execution_with_output(self):
@@ -63,7 +63,7 @@ class TestOnDiskExecutionEnv(unittest.TestCase):
             process.wait.return_value = 0
             process.communicate.return_value = (b"Out\n", b"Error\n")
             mock_popen.return_value = process
-            process = self.env.execute_program(code)
+            process = self.env.popen(code)
             stdout, stderr = process.communicate()
             self.assertEqual(stdout, b"Out\n")
             self.assertEqual(stderr, b"Error\n")
