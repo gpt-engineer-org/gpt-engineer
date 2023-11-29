@@ -161,5 +161,5 @@ def collect_and_send_human_review(
 
     """Collects and stores human review of the code"""
     review = human_review_input()
-    collect_learnings(prompt, model, temperature, config, memory, review)
-    # return []
+    if review:
+        collect_learnings(prompt, model, temperature, config, memory, review)
