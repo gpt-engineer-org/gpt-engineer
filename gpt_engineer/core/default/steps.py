@@ -110,7 +110,7 @@ def execute_entrypoint(
     print("You can press ctrl+c *once* to stop the execution.")
     print()
 
-    process = execution_env.upload(code).popen(command1)
+    process = execution_env.upload(code).popen(f"bash {ENTRYPOINT_FILE}")
     stdout, stderr = process.communicate()
 
     # stdout and stderr are bytes, decode them to string if needed

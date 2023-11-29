@@ -187,7 +187,7 @@ def main(
     preprompts_holder = PrepromptsHolder(preprompts_path)
     memory = OnDiskRepository(memory_path(project_path))
     version_manager = GitVersionManager(project_path)
-    execution_env = OnDiskExecutionEnv(version_manager)
+    execution_env = OnDiskExecutionEnv()
     agent = CliAgent.with_default_config(
         memory,
         execution_env,

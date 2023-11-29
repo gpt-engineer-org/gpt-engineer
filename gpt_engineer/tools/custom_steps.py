@@ -82,9 +82,9 @@ def self_heal(
         print()
         if input().lower() not in ["", "y", "yes"]:
             print("Ok, not executing the code.")
-            return []
+            return code
         print("Executing the code...")
-        process = execution_env.upload(code).popen(command1)
+        process = execution_env.upload(code).popen(f"bash {ENTRYPOINT_FILE}")
         # get the result and output
         # step 2. if the return code not 0, package and send to the AI
         if process.returncode != 0:

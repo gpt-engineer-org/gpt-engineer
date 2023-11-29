@@ -1,4 +1,6 @@
 import unittest
+
+from gpt_engineer.core.code import Files
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
@@ -9,7 +11,7 @@ from unittest.mock import patch, MagicMock
 class TestOnDiskExecutionEnv(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
-        self.env = OnDiskExecutionEnv(GitVersionManager(self.temp_dir.name))
+        self.env = OnDiskExecutionEnv()
 
     def tearDown(self):
         self.temp_dir.cleanup()
@@ -26,14 +28,15 @@ class TestOnDiskExecutionEnv(unittest.TestCase):
         }
         with patch("subprocess.Popen") as mock_popen:
             mock_popen.return_value.wait.return_value = 0
-            process = self.env.popen(code)
+            process = self.env.upload(Files(code)).popen(f"bash {ENTRYPOINT_FILE}")
             self.assertIsNotNone(process)
             mock_popen.assert_called_once()
 
     def test_missing_entrypoint(self):
         code = {"script.py": "print('This is a test script')"}
-        with self.assertRaises(FileNotFoundError):
-            self.env.popen(code)
+        p = self.env.upload(Files(code)).popen(f"bash {ENTRYPOINT_FILE}")
+        p.communicate()
+        assert p.returncode != 0
 
     def test_keyboard_interrupt_handling(self):
         entrypoint_content = """
@@ -47,7 +50,7 @@ class TestOnDiskExecutionEnv(unittest.TestCase):
             mock_process = MagicMock()
             mock_process.wait.side_effect = KeyboardInterrupt
             mock_popen.return_value = mock_process
-            self.env.popen(code)
+            self.env.upload(Files(code)).popen(f"bash {ENTRYPOINT_FILE}")
             mock_process.kill.assert_called_once()
 
     def test_execution_with_output(self):
@@ -63,7 +66,7 @@ class TestOnDiskExecutionEnv(unittest.TestCase):
             process.wait.return_value = 0
             process.communicate.return_value = (b"Out\n", b"Error\n")
             mock_popen.return_value = process
-            process = self.env.popen(code)
+            process = self.env.upload(Files(code)).popen(f"bash {ENTRYPOINT_FILE}")
             stdout, stderr = process.communicate()
             self.assertEqual(stdout, b"Out\n")
             self.assertEqual(stderr, b"Error\n")

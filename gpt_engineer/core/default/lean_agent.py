@@ -5,7 +5,6 @@ from gpt_engineer.core.default.steps import (
     gen_entrypoint,
     improve,
 )
-from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.base_repository import BaseRepository
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
@@ -47,7 +46,7 @@ class LeanAgent(BaseAgent):
     ):
         return cls(
             memory=OnDiskRepository(memory_path(path)),
-            execution_env=OnDiskExecutionEnv(GitVersionManager(path)),
+            execution_env=OnDiskExecutionEnv(),
             ai=ai,
             preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )
@@ -57,17 +56,20 @@ class LeanAgent(BaseAgent):
         entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
         code = Code(code | entrypoint)
         env = self.execution_env
-        env.upload(code).popen(f"bash {ENTRYPOINT_FILE}")
+        env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
         return code
 
     def improve(
-        self, code: Code, prompt: str, execution_command: str = ENTRYPOINT_FILE
+        self,
+        code: Code,
+        prompt: str,
+        execution_command: str = None,
     ) -> Code:
         code = improve(self.ai, prompt, code, self.memory, self.preprompts_holder)
-        if not execution_command in code:
+        if not execution_command and ENTRYPOINT_FILE not in code:
             entrypoint = gen_entrypoint(
                 self.ai, code, self.memory, self.preprompts_holder
             )
             code = Code(code | entrypoint)
-        self.execution_env.upload(code).popen(f"bash {ENTRYPOINT_FILE}")
+        self.execution_env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
         return code

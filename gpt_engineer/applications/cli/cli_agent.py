@@ -116,10 +116,10 @@ class CliAgent(BaseAgent):
         return code
 
     def improve(
-        self, code: Code, prompt: str, execution_command: str = ENTRYPOINT_FILE
+        self, code: Code, prompt: str, execution_command: str | None = None
     ) -> Code:
         code = self.improve_fn(self.ai, prompt, code, self.memory, self.preprompts_holder)
-        if not execution_command in code:
+        if not execution_command and ENTRYPOINT_FILE not in code:
             entrypoint = gen_entrypoint(
                 self.ai, code, self.memory, self.preprompts_holder
             )

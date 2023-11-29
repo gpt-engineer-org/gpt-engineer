@@ -7,15 +7,7 @@ def mock_create_chat_model(self) -> BaseChatModel:
     return FakeListChatModel(responses=["response1", "response2", "response3"])
 
 
-def mock_check_model_access_and_fallback(self, model_name):
-    return model_name
-
-
 def test_start(monkeypatch):
-    # arrange
-    monkeypatch.setattr(
-        AI, "_check_model_access_and_fallback", mock_check_model_access_and_fallback
-    )
     monkeypatch.setattr(AI, "_create_chat_model", mock_create_chat_model)
 
     ai = AI("gpt-4")
@@ -29,9 +21,6 @@ def test_start(monkeypatch):
 
 def test_next(monkeypatch):
     # arrange
-    monkeypatch.setattr(
-        AI, "_check_model_access_and_fallback", mock_check_model_access_and_fallback
-    )
     monkeypatch.setattr(AI, "_create_chat_model", mock_create_chat_model)
 
     ai = AI("gpt-4")
@@ -48,9 +37,6 @@ def test_next(monkeypatch):
 
 def test_token_logging(monkeypatch):
     # arrange
-    monkeypatch.setattr(
-        AI, "_check_model_access_and_fallback", mock_check_model_access_and_fallback
-    )
     monkeypatch.setattr(AI, "_create_chat_model", mock_create_chat_model)
 
     ai = AI("gpt-4")

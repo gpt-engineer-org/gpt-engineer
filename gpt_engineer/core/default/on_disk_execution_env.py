@@ -1,5 +1,6 @@
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 
 from gpt_engineer.core.default.git_version_manager import GitVersionManager
@@ -39,7 +40,7 @@ class FileStore:
         return Code(files)
 
 
-class OnDiskExecutionEnv(BaseExecutionEnv, FileStore):
+class OnDiskExecutionEnv(FileStore, BaseExecutionEnv):
     """
     An execution environment that runs code on the local file system.
 
@@ -68,3 +69,35 @@ class OnDiskExecutionEnv(BaseExecutionEnv, FileStore):
             p.kill()
             print()
         return p
+
+    def run(self, command: str, timeout: int | None = None) -> tuple[str, str, int]:
+        start = time.time()
+        print("\n--- Start of run ---")
+        # while running, also print the stdout and stderr
+        p = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=self.working_dir,
+            text=True,
+            shell=True,
+        )
+        print("$", command)
+        stdout_full, stderr_full = "", ""
+        while p.poll() is None:
+            assert p.stdout is not None
+            assert p.stderr is not None
+            stdout = p.stdout.readline()
+            stderr = p.stderr.readline()
+            if stdout:
+                print(stdout, end="")
+                stdout_full += stdout
+            if stderr:
+                print(stderr, end="")
+                stderr_full += stderr
+            if timeout and time.time() - start > timeout:
+                print("Timeout!")
+                p.kill()
+                raise TimeoutError()
+        print("--- Finished run ---\n")
+        return stdout_full, stderr_full, p.returncode
