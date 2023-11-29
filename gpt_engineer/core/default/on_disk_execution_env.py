@@ -26,10 +26,7 @@ class FileStore:
 
     def download(self) -> Code:
         files = {}
-        ignore = [".git"]
         for path in self.working_dir.glob("**/*"):
-            if any(path.match(i) for i in ignore):
-                continue
             if path.is_file():
                 with open(path, "r") as f:
                     try:
