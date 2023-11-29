@@ -720,8 +720,9 @@ def self_heal(ai: AI, dbs: FileRepositories):
             # the gen_entrypoint prompt inside.
             if attempts < 1:
                 messages = AI.deserialize_messages(dbs.logs[gen_entrypoint.__name__])
-                messages.append(HumanMessage(content=get_platform_info()))  # add in OS and Py version
-
+                messages.append(
+                    HumanMessage(content=get_platform_info())
+                )  # add in OS and Py version
             # append the error message
             messages.append(HumanMessage(content=f"{dbs.workspace['log.txt']}"))
 
