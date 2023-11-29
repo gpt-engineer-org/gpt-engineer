@@ -18,7 +18,7 @@ from typing import TypeVar, Callable, Union
 from pathlib import Path
 
 CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, Repository], Code])
-ExecutionType = TypeVar("ExecutionType", bound=Callable[[AI, ExecutionEnv, Code], Code])
+CodeProcessor = TypeVar("CodeProcessor", bound=Callable[[AI, ExecutionEnv, Code], Code])
 ImproveType = TypeVar("ImproveType", bound=Callable[[AI, str, Code, Repository], Code])
 
 
@@ -69,15 +69,15 @@ class CliAgent(Agent):
         execution_env: ExecutionEnv,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
-        execute_entrypoint_fn: ExecutionType = execute_entrypoint,
         improve_fn: ImproveType = improve,
+        process_code_fn: CodeProcessor = execute_entrypoint,
         preprompts_holder: PrepromptsHolder = None,
     ):
         self.memory = memory
         self.execution_env = execution_env
         self.ai = ai or AI()
         self.code_gen_fn = code_gen_fn
-        self.execute_entrypoint_fn = execute_entrypoint_fn
+        self.process_code_fn = process_code_fn
         self.improve_fn = improve_fn
         self.preprompts_holder = preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH)
 
@@ -88,8 +88,8 @@ class CliAgent(Agent):
         execution_env: OnDiskExecutionEnv,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
-        execute_entrypoint_fn: ExecutionType = execute_entrypoint,
         improve_fn: ImproveType = improve,
+        process_code_fn: CodeProcessor = execute_entrypoint,
         preprompts_holder: PrepromptsHolder = None,
     ):
         return cls(
@@ -97,7 +97,7 @@ class CliAgent(Agent):
             execution_env=execution_env,
             ai=ai,
             code_gen_fn=code_gen_fn,
-            execute_entrypoint_fn=execute_entrypoint_fn,
+            process_code_fn=process_code_fn,
             improve_fn=improve_fn,
             preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )
@@ -106,7 +106,7 @@ class CliAgent(Agent):
         code = self.code_gen_fn(self.ai, prompt, self.memory, self.preprompts_holder)
         entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
         code = Code(code | entrypoint)
-        code = self.execute_entrypoint_fn(
+        code = self.process_code_fn(
             self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder
         )
         return code
@@ -120,7 +120,7 @@ class CliAgent(Agent):
                 self.ai, code, self.memory, self.preprompts_holder
             )
             code = Code(code | entrypoint)
-        code = self.execute_entrypoint_fn(
+        code = self.process_code_fn(
             self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder
         )
         return code

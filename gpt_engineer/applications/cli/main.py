@@ -193,8 +193,8 @@ def main(
         execution_env,
         ai=ai,
         code_gen_fn=code_gen_fn,
-        execute_entrypoint_fn=execution_fn,
         improve_fn=improve_fn,
+        process_code_fn=execution_fn,
         preprompts_holder=preprompts_holder,
     )
     if improve_mode:

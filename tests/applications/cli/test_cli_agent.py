@@ -38,10 +38,7 @@ def test_init_lite_config(monkeypatch):
     version_manager = GitVersionManager(temp_dir)
     execution_env = OnDiskExecutionEnv()
     cli_agent = CliAgent.with_default_config(
-        memory,
-        execution_env,
-        ai=CachingAI(),
-        code_gen_fn=lite_gen,
+        memory, execution_env, ai=CachingAI(), code_gen_fn=lite_gen
     )
     outfile = "output.txt"
     file_path = os.path.join(temp_dir, outfile)
@@ -64,10 +61,7 @@ def test_init_clarified_gen_config(monkeypatch):
     version_manager = GitVersionManager(temp_dir)
     execution_env = OnDiskExecutionEnv()
     cli_agent = CliAgent.with_default_config(
-        memory,
-        execution_env,
-        ai=CachingAI(),
-        code_gen_fn=clarified_gen,
+        memory, execution_env, ai=CachingAI(), code_gen_fn=clarified_gen
     )
     outfile = "output.txt"
     code = cli_agent.init(
@@ -112,11 +106,7 @@ def test_improve_standard_config(monkeypatch):
     memory = OnDiskRepository(memory_path(temp_dir))
     version_manager = GitVersionManager(temp_dir)
     execution_env = OnDiskExecutionEnv()
-    cli_agent = CliAgent.with_default_config(
-        memory,
-        execution_env,
-        ai=CachingAI(),
-    )
+    cli_agent = CliAgent.with_default_config(memory, execution_env, ai=CachingAI())
     code = cli_agent.improve(
         code,
         "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",
