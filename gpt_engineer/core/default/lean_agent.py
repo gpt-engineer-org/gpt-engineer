@@ -56,7 +56,8 @@ class LeanAgent(BaseAgent):
         code = gen_code(self.ai, prompt, self.memory, self.preprompts_holder)
         entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
         code = Code(code | entrypoint)
-        self.execution_env.execute_program(code, f"bash {ENTRYPOINT_FILE}")
+        env = self.execution_env
+        env.upload(code).popen(f"bash {ENTRYPOINT_FILE}")
         return code
 
     def improve(
@@ -68,5 +69,5 @@ class LeanAgent(BaseAgent):
                 self.ai, code, self.memory, self.preprompts_holder
             )
             code = Code(code | entrypoint)
-        self.execution_env.execute_program(code, f"bash {ENTRYPOINT_FILE}")
+        self.execution_env.upload(code).popen(f"bash {ENTRYPOINT_FILE}")
         return code

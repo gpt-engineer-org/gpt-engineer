@@ -1,6 +1,5 @@
-import subprocess
 from abc import ABC, abstractmethod
-from gpt_engineer.core.code import Files, Code
+from gpt_engineer.core.code import Files
 from subprocess import Popen
 
 
@@ -45,6 +44,3 @@ class BaseExecutionEnv(ABC):
         Downloads files from the execution environment.
         """
         raise NotImplementedError
-
-    def execute_program(self, code: Code, command: str) -> subprocess.Popen:
-        return self.upload(code).popen(command)

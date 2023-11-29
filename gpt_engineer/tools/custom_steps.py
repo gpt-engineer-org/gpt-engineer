@@ -84,7 +84,7 @@ def self_heal(
             print("Ok, not executing the code.")
             return []
         print("Executing the code...")
-        process = execution_env.execute_program(code)
+        process = execution_env.upload(code).popen(command1)
         # get the result and output
         # step 2. if the return code not 0, package and send to the AI
         if process.returncode != 0:
