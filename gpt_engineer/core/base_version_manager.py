@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.code import Files
 from typing import Union
 from pathlib import Path
 
@@ -23,5 +23,5 @@ class BaseVersionManager(ABC):
         pass
 
     @abstractmethod
-    def snapshot(self, code: Code) -> str:
+    def snapshot(self, code: Files) -> str:
         pass

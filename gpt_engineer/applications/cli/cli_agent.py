@@ -1,4 +1,4 @@
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.code import Files
 from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.steps import (
@@ -17,12 +17,12 @@ from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from typing import TypeVar, Callable, Union
 from pathlib import Path
 
-CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseRepository], Code])
+CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseRepository], Files])
 ExecutionType = TypeVar(
-    "ExecutionType", bound=Callable[[AI, BaseExecutionEnv, Code], Code]
+    "ExecutionType", bound=Callable[[AI, BaseExecutionEnv, Files], Files]
 )
 ImproveType = TypeVar(
-    "ImproveType", bound=Callable[[AI, str, Code, BaseRepository], Code]
+    "ImproveType", bound=Callable[[AI, str, Files, BaseRepository], Files]
 )
 
 
@@ -54,7 +54,7 @@ class CliAgent(BaseAgent):
                 prompt (str): A string prompt that guides the code generation process.
 
             Returns:
-                Code: An instance of the `Code` class containing the generated code.
+                Files: An instance of the `Code` class containing the generated code.
 
         improve(self, prompt: str) -> Code:
             Improves an existing piece of code using the AI and step bundle based on the provided prompt.
@@ -64,7 +64,7 @@ class CliAgent(BaseAgent):
                 prompt (str): A string prompt that guides the code improvement process.
 
             Returns:
-                Code: An instance of the `Code` class containing the improved code.
+                Files: An instance of the `Code` class containing the improved code.
     """
 
     def __init__(
@@ -106,24 +106,24 @@ class CliAgent(BaseAgent):
             preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )
 
-    def init(self, prompt: str) -> Code:
+    def init(self, prompt: str) -> Files:
         code = self.code_gen_fn(self.ai, prompt, self.memory, self.preprompts_holder)
         entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
-        code = Code(code | entrypoint)
+        code = Files(code | entrypoint)
         code = self.execute_entrypoint_fn(
             self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder
         )
         return code
 
     def improve(
-        self, code: Code, prompt: str, execution_command: str = ENTRYPOINT_FILE
-    ) -> Code:
+        self, code: Files, prompt: str, execution_command: str = ENTRYPOINT_FILE
+    ) -> Files:
         code = self.improve_fn(self.ai, prompt, code, self.memory, self.preprompts_holder)
         if not execution_command in code:
             entrypoint = gen_entrypoint(
                 self.ai, code, self.memory, self.preprompts_holder
             )
-            code = Code(code | entrypoint)
+            code = Files(code | entrypoint)
         code = self.execute_entrypoint_fn(
             self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder
         )

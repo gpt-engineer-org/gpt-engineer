@@ -33,7 +33,7 @@ from dataclasses import dataclass
 from typing import List, Tuple
 
 
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.code import Files
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +89,7 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
     return files
 
 
-def overwrite_code_with_edits(chat: str, code: Code):
+def overwrite_code_with_edits(chat: str, code: Files):
     """
     Overwrite code with edits extracted from chat.
 
@@ -100,7 +100,7 @@ def overwrite_code_with_edits(chat: str, code: Code):
     ----------
     chat : str
         The chat content containing code edits.
-    code : Code
+    code : Files
         The code object to apply edits to.
     """
     edits = parse_edits(chat)
@@ -169,7 +169,7 @@ def parse_edits(chat: str):
     return edits
 
 
-def apply_edits(edits: List[Edit], code: Code):
+def apply_edits(edits: List[Edit], code: Files):
     """
     Apply a list of edits to the given code.
 
@@ -180,7 +180,7 @@ def apply_edits(edits: List[Edit], code: Code):
     ----------
     edits : List[Edit]
         A list of Edit objects representing the code edits to apply.
-    code : Code
+    code : Files
         The code object to apply edits to.
     """
     for edit in edits:

@@ -1,4 +1,4 @@
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.code import Files
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.steps import (
     gen_code,
@@ -52,21 +52,21 @@ class LeanAgent(BaseAgent):
             preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )
 
-    def init(self, prompt: str) -> Code:
+    def init(self, prompt: str) -> Files:
         code = gen_code(self.ai, prompt, self.memory, self.preprompts_holder)
         entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
-        code = Code(code | entrypoint)
+        code = Files(code | entrypoint)
         self.execution_env.execute_program(code)
         return code
 
     def improve(
-        self, code: Code, prompt: str, execution_command: str = ENTRYPOINT_FILE
-    ) -> Code:
+        self, code: Files, prompt: str, execution_command: str = ENTRYPOINT_FILE
+    ) -> Files:
         code = improve(self.ai, prompt, code, self.memory, self.preprompts_holder)
         if not execution_command in code:
             entrypoint = gen_entrypoint(
                 self.ai, code, self.memory, self.preprompts_holder
             )
-            code = Code(code | entrypoint)
+            code = Files(code | entrypoint)
         self.execution_env.execute_program(code)
         return code

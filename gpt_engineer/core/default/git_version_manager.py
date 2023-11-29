@@ -1,5 +1,5 @@
 from gpt_engineer.core.base_version_manager import BaseVersionManager
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.code import Files
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from typing import Union
 from pathlib import Path
@@ -20,7 +20,7 @@ class GitVersionManager(BaseVersionManager):
     def __init__(self, path: Union[str, Path]):
         self.path = path
 
-    def snapshot(self, code: Code) -> str:
+    def snapshot(self, code: Files) -> str:
         workspace = OnDiskRepository(self.path)
         for file_name, file_content in code.items():
             workspace[file_name] = file_content

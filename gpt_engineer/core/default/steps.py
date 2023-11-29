@@ -1,4 +1,4 @@
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.code import Files
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import (
     parse_chat,
@@ -41,19 +41,19 @@ def setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
 
 def gen_code(
     ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder
-) -> Code:
+) -> Files:
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files = parse_chat(chat)
-    code = Code({key: val for key, val in files})
+    code = Files({key: val for key, val in files})
     return code
 
 
 def gen_entrypoint(
-    ai: AI, code: Code, memory: BaseRepository, preprompts_holder: PrepromptsHolder
-) -> Code:
+    ai: AI, code: Files, memory: BaseRepository, preprompts_holder: PrepromptsHolder
+) -> Files:
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
         system=(preprompts["entrypoint"]),
@@ -64,7 +64,7 @@ def gen_entrypoint(
     chat = messages[-1].content.strip()
     regex = r"```\S*\n(.+?)```"
     matches = re.finditer(regex, chat, re.DOTALL)
-    entrypoint_code = Code(
+    entrypoint_code = Files(
         {ENTRYPOINT_FILE: "\n".join(match.group(1) for match in matches)}
     )
     memory[ENTRYPOINT_LOG_FILE] = chat
@@ -74,7 +74,7 @@ def gen_entrypoint(
 def execute_entrypoint(
     ai: AI,
     execution_env: BaseExecutionEnv,
-    code: Code,
+    code: Files,
     preprompts_holder: PrepromptsHolder = None,
 ) -> None:
     if not ENTRYPOINT_FILE in code:
@@ -131,7 +131,7 @@ def setup_sys_prompt_existing_code(
     )
 
 
-def incorrect_edit(code: Code, chat: str) -> List[str,]:
+def incorrect_edit(code: Files, chat: str) -> List[str,]:
     problems = list()
     try:
         edits = parse_edits(chat)
@@ -151,10 +151,10 @@ def incorrect_edit(code: Code, chat: str) -> List[str,]:
 def improve(
     ai: AI,
     prompt: str,
-    code: Code,
+    code: Files,
     memory: BaseRepository,
     preprompts_holder: PrepromptsHolder,
-) -> Code:
+) -> Files:
     preprompts = preprompts_holder.get_preprompts()
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),

@@ -1,7 +1,7 @@
 import subprocess
 from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.code import Files
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 
@@ -21,7 +21,7 @@ class OnDiskExecutionEnv(BaseExecutionEnv):
     def __init__(self, version_manager: GitVersionManager):
         self.version_manager = version_manager
 
-    def execute_program(self, code: Code) -> subprocess.Popen:
+    def execute_program(self, code: Files) -> subprocess.Popen:
         if not ENTRYPOINT_FILE in code:
             raise FileNotFoundError(
                 "The required entrypoint "

@@ -4,7 +4,7 @@ from pathlib import Path
 
 # class Code(MutableMapping[str | Path, str]):
 # ToDo: implement as mutable mapping, potentially holding a dict instead of being a dict.
-class Code(dict):
+class Files(dict[str | Path, str]):
     """
     A dictionary-based container for managing code files.
 
@@ -56,11 +56,11 @@ class Code(dict):
                 The formatted file string.
             """
             file_str = f"""
-{file_name}
-```
-{file_content}
-            ```
-            """
+ {file_name}
+ ```
+ {file_content}
+             ```
+             """
             return file_str
 
         return "\n".join(

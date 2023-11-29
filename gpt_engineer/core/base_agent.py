@@ -1,4 +1,4 @@
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.code import Files
 from gpt_engineer.core.base_version_manager import BaseVersionManager
 from gpt_engineer.core.ai import AI
 from abc import ABC, abstractmethod
@@ -21,11 +21,11 @@ class BaseAgent(ABC):
     """
 
     @abstractmethod
-    def init(self, prompt: str) -> Code:
+    def init(self, prompt: str) -> Files:
         pass
 
     @abstractmethod
-    def improve(self, code: Code, prompt: str, execution_command: str) -> Code:
+    def improve(self, code: Files, prompt: str, execution_command: str) -> Files:
         pass
 
     # CHANGE SIGNATURE TO CODE, PROMPT, EXECUTION_COMMAND

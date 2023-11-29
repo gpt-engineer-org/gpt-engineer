@@ -22,7 +22,7 @@ from gpt_engineer.core.default.steps import (
     setup_sys_prompt_existing_code,
 )
 from gpt_engineer.core.chat_to_files import parse_chat, overwrite_code_with_edits
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.code import Files
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
 
@@ -46,9 +46,9 @@ def get_platform_info():
 def self_heal(
     ai: AI,
     execution_env: BaseExecutionEnv,
-    code: Code,
+    code: Files,
     preprompts_holder: PrepromptsHolder = None,
-) -> Code:
+) -> Files:
     """Attempts to execute the code from the entrypoint and if it fails,
     sends the error output back to the AI with instructions to fix.
     This code will make `MAX_SELF_HEAL_ATTEMPTS` to try and fix the code
@@ -121,7 +121,7 @@ def self_heal(
         # this overwrites the existing files
         # to_files_and_memory(messages[-1].content.strip(), dbs)
         files = parse_chat(messages[-1].content.strip())
-        code = {**code, **Code({key: val for key, val in files})}
+        code = {**code, **Files({key: val for key, val in files})}
         attempts += 1
 
     return code
@@ -131,7 +131,7 @@ def self_heal(
 def vector_improve(
     ai: AI,
     prompt: str,
-    code: Code,
+    code: Files,
     memory: BaseRepository,
     preprompts_holder: PrepromptsHolder,
 ):
@@ -143,7 +143,7 @@ def vector_improve(
         temp_saver[file] = content
     code_vector_repository.load_from_directory(temp_dir)
     relevant_documents = code_vector_repository.relevent_code_chunks(prompt)
-    relevant_code = Code()
+    relevant_code = Files()
     for doc in relevant_documents:
         file_path = os.path.relpath(doc.metadata["filename"], temp_dir)
         relevant_code[file_path] = code[file_path]
@@ -169,7 +169,7 @@ def vector_improve(
 
 def clarified_gen(
     ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder
-) -> Code:
+) -> Files:
     """
     Generates code based on clarifications obtained from the user.
 
@@ -236,13 +236,13 @@ def clarified_gen(
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files = parse_chat(chat)
-    code = Code({key: val for key, val in files})
+    code = Files({key: val for key, val in files})
     return code
 
 
 def lite_gen(
     ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder
-) -> Code:
+) -> Files:
     """
     Executes the AI model using the main prompt and saves the generated results.
 
@@ -268,5 +268,5 @@ def lite_gen(
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files = parse_chat(chat)
-    code = Code({key: val for key, val in files})
+    code = Files({key: val for key, val in files})
     return code
