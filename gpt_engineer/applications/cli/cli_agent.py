@@ -7,26 +7,22 @@ from gpt_engineer.core.default.steps import (
     execute_entrypoint,
     improve,
 )
-from gpt_engineer.core.base_repository import BaseRepository
+from gpt_engineer.core.base_repository import Repository
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.base_execution_env import BaseExecutionEnv
+from gpt_engineer.core.base_execution_env import ExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 from gpt_engineer.core.default.paths import memory_path, ENTRYPOINT_FILE, PREPROMPTS_PATH
-from gpt_engineer.core.base_agent import BaseAgent
+from gpt_engineer.core.base_agent import Agent
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from typing import TypeVar, Callable, Union
 from pathlib import Path
 
-CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseRepository], Code])
-ExecutionType = TypeVar(
-    "ExecutionType", bound=Callable[[AI, BaseExecutionEnv, Code], Code]
-)
-ImproveType = TypeVar(
-    "ImproveType", bound=Callable[[AI, str, Code, BaseRepository], Code]
-)
+CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, Repository], Code])
+ExecutionType = TypeVar("ExecutionType", bound=Callable[[AI, ExecutionEnv, Code], Code])
+ImproveType = TypeVar("ImproveType", bound=Callable[[AI, str, Code, Repository], Code])
 
 
-class CliAgent(BaseAgent):
+class CliAgent(Agent):
     """
     The `Agent` class is responsible for managing the lifecycle of code generation and improvement.
 
@@ -69,8 +65,8 @@ class CliAgent(BaseAgent):
 
     def __init__(
         self,
-        memory: BaseRepository,
-        execution_env: BaseExecutionEnv,
+        memory: Repository,
+        execution_env: ExecutionEnv,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
         execute_entrypoint_fn: ExecutionType = execute_entrypoint,

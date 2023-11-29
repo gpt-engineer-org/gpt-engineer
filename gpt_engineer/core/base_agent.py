@@ -4,7 +4,7 @@ from gpt_engineer.core.ai import AI
 from abc import ABC, abstractmethod
 
 
-class BaseAgent(ABC):
+class Agent(ABC):
     """
     Abstract base class for an agent that interacts with code.
 

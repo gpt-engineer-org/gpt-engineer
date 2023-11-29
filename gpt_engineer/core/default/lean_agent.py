@@ -5,16 +5,16 @@ from gpt_engineer.core.default.steps import (
     gen_entrypoint,
     improve,
 )
-from gpt_engineer.core.base_repository import BaseRepository
+from gpt_engineer.core.base_repository import Repository
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.base_execution_env import BaseExecutionEnv
+from gpt_engineer.core.base_execution_env import ExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 from gpt_engineer.core.default.paths import memory_path, ENTRYPOINT_FILE, PREPROMPTS_PATH
-from gpt_engineer.core.base_agent import BaseAgent
+from gpt_engineer.core.base_agent import Agent
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
 
-class LeanAgent(BaseAgent):
+class LeanAgent(Agent):
     """
     An agent that uses AI to generate and improve code based on a given prompt.
 
@@ -24,14 +24,14 @@ class LeanAgent(BaseAgent):
 
     Attributes:
         memory (BaseRepository): The repository where the code and related data are stored.
-        execution_env (BaseExecutionEnv): The environment in which the code is executed.
+        execution_env (ExecutionEnv): The environment in which the code is executed.
         ai (AI): The AI model used for generating and improving code.
     """
 
     def __init__(
         self,
-        memory: BaseRepository,
-        execution_env: BaseExecutionEnv,
+        memory: Repository,
+        execution_env: ExecutionEnv,
         ai: AI = None,
         preprompts_holder: PrepromptsHolder = None,
     ):

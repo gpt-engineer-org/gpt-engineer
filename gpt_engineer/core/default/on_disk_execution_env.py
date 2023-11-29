@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 
 from gpt_engineer.core.default.git_version_manager import GitVersionManager
-from gpt_engineer.core.base_execution_env import BaseExecutionEnv
+from gpt_engineer.core.base_execution_env import ExecutionEnv
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
@@ -40,7 +40,7 @@ class FileStore:
         return Code(files)
 
 
-class OnDiskExecutionEnv(FileStore, BaseExecutionEnv):
+class OnDiskExecutionEnv(FileStore, ExecutionEnv):
     """
     An execution environment that runs code on the local file system.
 

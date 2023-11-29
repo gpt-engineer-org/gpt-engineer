@@ -3,7 +3,7 @@ from gpt_engineer.core.code import Files
 from subprocess import Popen
 
 
-class BaseExecutionEnv(ABC):
+class ExecutionEnv(ABC):
     """
     Abstract base class for an execution environment.
 

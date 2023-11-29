@@ -9,7 +9,7 @@ import tempfile
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.base_repository import BaseRepository
+from gpt_engineer.core.base_repository import Repository
 from gpt_engineer.core.default.paths import (
     ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
@@ -23,7 +23,7 @@ from gpt_engineer.core.default.steps import (
 )
 from gpt_engineer.core.chat_to_files import parse_chat, overwrite_code_with_edits
 from gpt_engineer.core.code import Code
-from gpt_engineer.core.base_execution_env import BaseExecutionEnv
+from gpt_engineer.core.base_execution_env import ExecutionEnv
 from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
 
 # Type hint for chat messages
@@ -45,7 +45,7 @@ def get_platform_info():
 
 def self_heal(
     ai: AI,
-    execution_env: BaseExecutionEnv,
+    execution_env: ExecutionEnv,
     code: Code,
     preprompts_holder: PrepromptsHolder = None,
 ) -> Code:
@@ -132,7 +132,7 @@ def vector_improve(
     ai: AI,
     prompt: str,
     code: Code,
-    memory: BaseRepository,
+    memory: Repository,
     preprompts_holder: PrepromptsHolder,
 ):
     code_vector_repository = CodeVectorRepository()
@@ -168,7 +168,7 @@ def vector_improve(
 
 
 def clarified_gen(
-    ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder
+    ai: AI, prompt: str, memory: Repository, preprompts_holder: PrepromptsHolder
 ) -> Code:
     """
     Generates code based on clarifications obtained from the user.
@@ -241,7 +241,7 @@ def clarified_gen(
 
 
 def lite_gen(
-    ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder
+    ai: AI, prompt: str, memory: Repository, preprompts_holder: PrepromptsHolder
 ) -> Code:
     """
     Executes the AI model using the main prompt and saves the generated results.
