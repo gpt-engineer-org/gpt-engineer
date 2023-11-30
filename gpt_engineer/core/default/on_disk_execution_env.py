@@ -36,14 +36,6 @@ class OnDiskExecutionEnv(ExecutionEnv):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        try:
-            p.wait()
-        except KeyboardInterrupt:
-            print()
-            print("Stopping execution.")
-            print("Execution stopped.")
-            p.kill()
-            print()
         return p
 
     def run(self, command: str, timeout: int | None = None) -> tuple[str, str, int]:
@@ -60,20 +52,29 @@ class OnDiskExecutionEnv(ExecutionEnv):
         )
         print("$", command)
         stdout_full, stderr_full = "", ""
-        while p.poll() is None:
-            assert p.stdout is not None
-            assert p.stderr is not None
-            stdout = p.stdout.readline()
-            stderr = p.stderr.readline()
-            if stdout:
-                print(stdout, end="")
-                stdout_full += stdout
-            if stderr:
-                print(stderr, end="")
-                stderr_full += stderr
-            if timeout and time.time() - start > timeout:
-                print("Timeout!")
-                p.kill()
-                raise TimeoutError()
-        print("--- Finished run ---\n")
+
+        try:
+            while p.poll() is None:
+                assert p.stdout is not None
+                assert p.stderr is not None
+                stdout = p.stdout.readline()
+                stderr = p.stderr.readline()
+                if stdout:
+                    print(stdout, end="")
+                    stdout_full += stdout
+                if stderr:
+                    print(stderr, end="")
+                    stderr_full += stderr
+                if timeout and time.time() - start > timeout:
+                    print("Timeout!")
+                    p.kill()
+                    raise TimeoutError()
+        except KeyboardInterrupt:
+            print()
+            print("Stopping execution.")
+            print("Execution stopped.")
+            p.kill()
+            print()
+            print("--- Finished run ---\n")
+
         return stdout_full, stderr_full, p.returncode
