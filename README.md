@@ -4,18 +4,18 @@
 [![GitHub Repo stars](https://img.shields.io/github/stars/AntonOsika/gpt-engineer?style=social)](https://github.com/AntonOsika/gpt-engineer)
 [![Twitter Follow](https://img.shields.io/twitter/follow/antonosika?style=social)](https://twitter.com/AntonOsika)
 
-**Specify what you want it to build, the AI asks for clarification, and then builds it.**
+**Specify what you want it to build, the AI asks for clarification and then builds it.**
 
-GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
+GPT Engineer is made to be easy to adapt and extend and to make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
 
 - [Demo](https://twitter.com/antonosika/status/1667641038104674306)
 
-## Project philosophy
+## Project Philosophy
 
 - Simple to get value
-- Flexible and easy to add new own "AI steps". See `steps.py`.
+- Flexible and easy to add new own "AI steps." See `steps.py`.
 - Incrementally build towards a user experience of:
-  1. high level prompting
+  1. high-level prompting
   2. giving feedback to the AI that it will remember over time
 - Fast handovers, back and forth, between AI and human
 - Simplicity, all computation is "resumable" and persisted to the filesystem
@@ -45,7 +45,7 @@ Choose **one** of:
 - Custom model:
     - See [docs](https://gpt-engineer.readthedocs.io/en/latest/open_models.html), supports local model, azure, etc.
 
-Check the [Windows README](./WINDOWS_README.md) for windows usage.
+Check the [Windows README](./WINDOWS_README.md) for Windows usage.
 
 **Other ways to run:**
 - Use Docker ([instructions](docker/README.md))
@@ -54,7 +54,7 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
 ## Usage
 
-There are two ways to work with GPT-engineer: new code mode (the default), and improve existing code mode (the `-i` option).
+There are two ways to work with GPT-engineer: new code mode (the default) and improving existing code mode (the `-i` option).
 
 ### Creating new code
 - Create an empty folder for your project anywhere on your computer
@@ -75,13 +75,13 @@ By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/g
 
 You can specify the "identity" of the AI agent by editing the files in the `preprompts` folder.
 
-Editing the `preprompts`, and evolving how you write the project prompt, is how you make the agent remember things between projects.
+Editing the `preprompts` and evolving how you write the project prompt is how you make the agent remember things between projects.
 
-You can also automatically copy all `preprompts` files into your project folder using the cli parameter `--use-custom-prepompts`. This way you can have custom preprompts for all of your projects without the need to edit the main files.
+You can also automatically copy all `preprompts` files into your project folder using the cli parameter `--use-custom-prepompts`. This way, you can have custom preprompts for all of your projects without editing the main files.
 
-Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
+Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder and can be rerun with `scripts/rerun_edited_message_logs.py`.
 
-You can also run with open source models, like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
+You can also run with open-source models like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
 
 ## Vision
 
