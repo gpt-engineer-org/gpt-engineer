@@ -51,12 +51,6 @@ scratchpad
 # Pyenv
 .python-version
 
-# Benchmark files
-benchmark
-!benchmark/*/prompt
-
-.gpte_consent
-
 .gpte_consent
 
 # projects folder apart from default prompt
