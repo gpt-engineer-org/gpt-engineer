@@ -42,7 +42,9 @@ from gpt_engineer.tools.custom_steps import (
     clarified_gen,
     self_heal,
 )
-from gpt_engineer.tools.experimental.experimental_steps import vector_improve
+from gpt_engineer.tools.experimental.experimental_steps import (
+    improve_automatic_file_selection,
+)
 from gpt_engineer.core.default.steps import gen_code, execute_entrypoint, improve
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
@@ -101,11 +103,10 @@ def main(
         "-i",
         help="Improve code from existing project.",
     ),
-    vector_improve_mode: bool = typer.Option(
+    improve_all_mode: bool = typer.Option(
         False,
-        "--vector-improve",
-        "-vi",
-        help="Improve code from existing project using vector store.",
+        "--improve_all_experimental",
+        help="Improve code from existing project, without manually choosing which files to improve, using vector store (EXPERIMENTAL).",
     ),
     lite_mode: bool = typer.Option(
         False,
@@ -142,7 +143,7 @@ def main(
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
     #
-    if vector_improve_mode and not improve_mode:
+    if improve_all_mode and not improve_mode:
         print("Vector improve mode implies improve mode, setting improve_mode=True")
         improve_mode = True
 
@@ -178,8 +179,8 @@ def main(
     else:
         execution_fn = execute_entrypoint
 
-    if vector_improve_mode:
-        improve_fn = vector_improve
+    if improve_all_mode:
+        improve_fn = improve_automatic_file_selection
     else:
         improve_fn = improve
 
@@ -199,7 +200,7 @@ def main(
 
     store = FileStore(project_path)
     if improve_mode:
-        if vector_improve_mode:
+        if improve_all_mode:
             code = store.download()
         else:
             code = ask_for_files(project_path)

@@ -13,7 +13,7 @@ from gpt_engineer.core.repository import Repository
 from gpt_engineer.tools.experimental.code_vector_repository import CodeVectorRepository
 
 
-def vector_improve(
+def improve_automatic_file_selection(
     ai: AI,
     prompt: str,
     code: Code,
