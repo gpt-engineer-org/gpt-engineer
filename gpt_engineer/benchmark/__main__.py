@@ -19,13 +19,13 @@ import typer
 
 
 def main(
-    benchmarks: Annotated[str, typer.Argument(help="benchmark name(s) separated by ','")],
     path_to_agent: Annotated[
         str,
         typer.Argument(
             help="python file that contains a function called 'default_config_agent'"
         ),
     ],
+    benchmarks: Annotated[str, typer.Argument(help="benchmark name(s) separated by ','")],
     task_name: Annotated[
         Optional[str], typer.Argument(help="optional task name in benchmark")
     ] = None,
