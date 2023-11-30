@@ -24,7 +24,7 @@ class CachingAI(AI):
         try:
             self.model_name = "gpt-4-1106-preview"
             self.llm = self._create_chat_model()
-        except: #Catch anything
+        except:  # Catch anything
             self.model_name = "cached_response_model"
             self.llm = None
         self.streaming = False
