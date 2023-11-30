@@ -24,7 +24,7 @@ class CachingAI(AI):
         self.azure_endpoint = ""
         self.streaming = False
         try:
-            self.model_name = self._check_model_access_and_fallback("gpt-4-1106-preview")
+            self.model_name = "gpt-4-1106-preview"
             self.llm = self._create_chat_model()
         except openai.error.AuthenticationError:
             self.model_name = "cached_response_model"
