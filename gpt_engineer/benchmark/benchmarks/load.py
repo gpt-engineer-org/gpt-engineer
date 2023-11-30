@@ -1,7 +1,10 @@
+from gpt_engineer.benchmark.benchmarks.gpteng.load import load_gpteng
+from gpt_engineer.benchmark.benchmarks.gptme.load import load_gptme
 from gpt_engineer.benchmark.types import Benchmark
 
 BENCHMARKS = {
-    "default": load_gpte_eval,
+    "gptme": load_gptme,
+    "gpteng": load_gpteng,
 }
 
 

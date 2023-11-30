@@ -1,3 +1,5 @@
+import tempfile
+
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.steps import (
@@ -73,3 +75,7 @@ class LeanAgent(Agent):
             code = Code(code | entrypoint)
         self.execution_env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
         return code
+
+
+def default_config_agent():
+    return LeanAgent.with_default_config(tempfile.mkdtemp())

@@ -132,14 +132,21 @@ def setup_sys_prompt_existing_code(
 
 
 def incorrect_edit(code: Code, chat: str) -> List[str,]:
-    problems = list()
+    problems = []
     try:
         edits = parse_edits(chat)
     except ValueError as problem:
         print("Not possible to parse chat to edits")
         problems.append(str(problem))
+        return problems
+
     for edit in edits:
-        if not edit.before in code[edit.filename]:
+        if not edit.filename in code:
+            problems.append(
+                f"A section tried to edit the file {edit.filename}, but this file does not exist in the code. Section:\n"
+                + edit.filename
+            )
+        elif not edit.before in code[edit.filename]:
             problems.append(
                 "This section, assigned to be exchanged for an edit block, does not have an exact match in the code: "
                 + edit.before

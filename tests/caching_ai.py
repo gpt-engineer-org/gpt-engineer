@@ -70,7 +70,11 @@ class CachingAI(AI):
         else:
             cache = dict()
 
-        messages_key = self.serialize_messages(messages)
+        messages_key = (
+            self.model_name,
+            self.temperature,
+            self.serialize_messages(messages),
+        )
         if messages_key not in cache:
             callbacks = []
             print("calling backoff inference")
