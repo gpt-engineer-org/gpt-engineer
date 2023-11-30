@@ -83,3 +83,5 @@ webapp/node_modules
 webapp/package-lock.json
 
 webapp/.next/
+
+.langchain.db
