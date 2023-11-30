@@ -1,6 +1,7 @@
 import importlib
-
+from typing import Optional, Annotated
 import typer
+
 from langchain.cache import SQLiteCache
 from langchain.globals import set_llm_cache
 
@@ -12,10 +13,6 @@ def get_agent(path):
     # Dynamically import the python module at path
     agent_module = importlib.import_module(path.replace("/", ".").replace(".py", ""))
     return agent_module.default_config_agent()
-
-
-from typing import List, Optional, Annotated
-import typer
 
 
 def main(
