@@ -1,7 +1,7 @@
 import pytest
 
-from llama_index import Document, ServiceContext
-from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
+from llama_index import Document
+from gpt_engineer.tools.experimental.code_vector_repository import CodeVectorRepository
 import example_snake_files
 
 

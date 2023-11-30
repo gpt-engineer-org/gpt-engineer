@@ -41,8 +41,8 @@ from gpt_engineer.tools.custom_steps import (
     lite_gen,
     clarified_gen,
     self_heal,
-    vector_improve,
 )
+from gpt_engineer.tools.experimental.experimental_steps import vector_improve
 from gpt_engineer.core.default.steps import gen_code, execute_entrypoint, improve
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review

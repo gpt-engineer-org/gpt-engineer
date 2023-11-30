@@ -1,11 +1,11 @@
 from typing import Dict, List
 
 from llama_index import VectorStoreIndex, SimpleDirectoryReader
-from llama_index import Document, ServiceContext
+from llama_index import Document
 from llama_index.schema import NodeWithScore
 from llama_index.retrievers import BM25Retriever
 
-from gpt_engineer.tools.document_chunker import DocumentChunker
+from gpt_engineer.tools.experimental.document_chunker import DocumentChunker
 
 
 class CodeVectorRepository:

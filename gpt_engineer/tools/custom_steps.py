@@ -1,30 +1,22 @@
-import os.path
 from termcolor import colored
-from pathlib import Path
 from typing import List, Union
 from platform import platform
 from sys import version_info
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
-import tempfile
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.repository import Repository
 from gpt_engineer.core.default.paths import (
     ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
-    ENTRYPOINT_LOG_FILE,
-    IMPROVE_LOG_FILE,
 )
 from gpt_engineer.core.default.steps import (
     curr_fn,
     setup_sys_prompt,
-    setup_sys_prompt_existing_code,
 )
-from gpt_engineer.core.chat_to_files import parse_chat, overwrite_code_with_edits
+from gpt_engineer.core.chat_to_files import parse_chat
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.execution_env import ExecutionEnv
-from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
 
 # Type hint for chat messages
 Message = Union[AIMessage, HumanMessage, SystemMessage]
@@ -124,46 +116,6 @@ def self_heal(
         code = {**code, **Code({key: val for key, val in files})}
         attempts += 1
 
-    return code
-
-
-# Todo: Adapt to refactor and code object
-def vector_improve(
-    ai: AI,
-    prompt: str,
-    code: Code,
-    memory: Repository,
-    preprompts_holder: PrepromptsHolder,
-):
-    code_vector_repository = CodeVectorRepository()
-    # ToDo: Replace this hacky way to get the right langchain document format
-    temp_dir = tempfile.mkdtemp()
-    temp_saver = OnDiskRepository(temp_dir)
-    for file, content in code.items():
-        temp_saver[file] = content
-    code_vector_repository.load_from_directory(temp_dir)
-    relevant_documents = code_vector_repository.relevent_code_chunks(prompt)
-    relevant_code = Code()
-    for doc in relevant_documents:
-        file_path = os.path.relpath(doc.metadata["filename"], temp_dir)
-        relevant_code[file_path] = code[file_path]
-    print(
-        "Relevant documents to be modified are: "
-        + "\n".join(sorted(relevant_code.keys()))
-    )
-    preprompts = preprompts_holder.get_preprompts()
-    messages = [
-        SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
-    ]
-    # Add files as input
-    messages.append(HumanMessage(content=f"{relevant_code.to_chat()}"))
-
-    messages.append(HumanMessage(content=f"Request: {prompt}"))
-
-    messages = ai.next(messages, step_name=curr_fn())
-    chat = messages[-1].content.strip()
-    overwrite_code_with_edits(chat, code)
-    memory[IMPROVE_LOG_FILE] = chat
     return code
 
 

@@ -3,7 +3,7 @@ from pathlib import Path
 from collections import defaultdict
 from langchain.text_splitter import TextSplitter
 from langchain.docstore.document import Document
-from gpt_engineer.tools.supported_languages import SUPPORTED_LANGUAGES
+from gpt_engineer.tools.experimental.supported_languages import SUPPORTED_LANGUAGES
 import tree_sitter_languages
 
 
