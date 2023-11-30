@@ -1,10 +1,10 @@
 from gpt_engineer.core.code import Code
-from gpt_engineer.core.base_version_manager import BaseVersionManager
+from gpt_engineer.core.version_manager import BaseVersionManager
 from gpt_engineer.core.ai import AI
 from abc import ABC, abstractmethod
 
 
-class BaseAgent(ABC):
+class Agent(ABC):
     """
     Abstract base class for an agent that interacts with code.
 
@@ -25,7 +25,7 @@ class BaseAgent(ABC):
         pass
 
     @abstractmethod
-    def improve(self, code: Code, prompt: str, execution_command: str) -> Code:
+    def improve(
+        self, code: Code, prompt: str, execution_command: str | None = None
+    ) -> Code:
         pass
-
-    # CHANGE SIGNATURE TO CODE, PROMPT, EXECUTION_COMMAND

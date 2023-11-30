@@ -69,3 +69,6 @@ class Code(dict):
                 for file_name, file_content in self.items()
             ]
         )
+
+
+Files = Code

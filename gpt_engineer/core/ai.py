@@ -49,7 +49,7 @@ class AI:
         """
         self.temperature = temperature
         self.azure_endpoint = azure_endpoint
-        self.model_name = self._check_model_access_and_fallback(model_name)
+        self.model_name = model_name
         self.streaming = streaming
         self.llm = self._create_chat_model()
         self.token_usage_log = TokenUsageLog(model_name)
@@ -205,32 +205,6 @@ class AI:
             for item in data
         ]
         return list(messages_from_dict(prevalidated_data))  # type: ignore
-
-    def _check_model_access_and_fallback(self, model_name) -> str:
-        """
-        Retrieve the specified model, or fallback to "gpt-3.5-turbo" if the model is not available.
-
-        Parameters
-        ----------
-        model : str
-            The name of the model to retrieve.
-
-        Returns
-        -------
-        str
-            The name of the retrieved model, or "gpt-3.5-turbo" if the specified model is not available.
-        """
-        try:
-            openai.Model.retrieve(model_name)
-        except openai.InvalidRequestError:
-            print(
-                f"Model {model_name} not available for provided API key. Reverting "
-                "to gpt-3.5-turbo. Sign up for the GPT-4 wait list here: "
-                "https://openai.com/waitlist/gpt-4-api\n"
-            )
-            return "gpt-3.5-turbo"
-
-        return model_name
 
     def _create_chat_model(self) -> BaseChatModel:
         """

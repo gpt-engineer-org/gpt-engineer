@@ -1,12 +1,12 @@
 import subprocess
-from gpt_engineer.core.default.git_version_manager import GitVersionManager
-from gpt_engineer.core.base_execution_env import BaseExecutionEnv
-from gpt_engineer.core.code import Code
-from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
+import time
+
+from gpt_engineer.core.execution_env import ExecutionEnv
+from gpt_engineer.core.code import Files
+from gpt_engineer.core.default.disk_store import FileStore
 
 
-class OnDiskExecutionEnv(BaseExecutionEnv):
+class OnDiskExecutionEnv(ExecutionEnv):
     """
     An execution environment that runs code on the local file system.
 
@@ -18,23 +18,21 @@ class OnDiskExecutionEnv(BaseExecutionEnv):
         path (str): The file system path where the code is located and will be executed.
     """
 
-    def __init__(self, version_manager: GitVersionManager):
-        self.version_manager = version_manager
+    def __init__(self, path: str | None = None):
+        self.store = FileStore(path)
 
-    def execute_program(self, code: Code) -> subprocess.Popen:
-        if not ENTRYPOINT_FILE in code:
-            raise FileNotFoundError(
-                "The required entrypoint "
-                + ENTRYPOINT_FILE
-                + " does not exist in the code."
-            )
-        # ToDo: The fact that execution is the de-facto way of saving the code to disk presently should change once version manager is implemented.
-        self.version_manager.snapshot(code)
+    def upload(self, files: Files) -> "OnDiskExecutionEnv":
+        self.store.upload(files)
+        return self
 
+    def download(self) -> Files:
+        return self.store.download()
+
+    def popen(self, command: str) -> subprocess.Popen:
         p = subprocess.Popen(
-            "bash " + ENTRYPOINT_FILE,
+            command,
             shell=True,
-            cwd=self.version_manager.path,
+            cwd=self.store.working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
@@ -47,3 +45,35 @@ class OnDiskExecutionEnv(BaseExecutionEnv):
             p.kill()
             print()
         return p
+
+    def run(self, command: str, timeout: int | None = None) -> tuple[str, str, int]:
+        start = time.time()
+        print("\n--- Start of run ---")
+        # while running, also print the stdout and stderr
+        p = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=self.store.working_dir,
+            text=True,
+            shell=True,
+        )
+        print("$", command)
+        stdout_full, stderr_full = "", ""
+        while p.poll() is None:
+            assert p.stdout is not None
+            assert p.stderr is not None
+            stdout = p.stdout.readline()
+            stderr = p.stderr.readline()
+            if stdout:
+                print(stdout, end="")
+                stdout_full += stdout
+            if stderr:
+                print(stderr, end="")
+                stderr_full += stderr
+            if timeout and time.time() - start > timeout:
+                print("Timeout!")
+                p.kill()
+                raise TimeoutError()
+        print("--- Finished run ---\n")
+        return stdout_full, stderr_full, p.returncode

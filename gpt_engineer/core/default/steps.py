@@ -14,8 +14,8 @@ from gpt_engineer.core.default.paths import (
 )
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.base_repository import BaseRepository
-from gpt_engineer.core.base_execution_env import BaseExecutionEnv
+from gpt_engineer.core.repository import Repository
+from gpt_engineer.core.execution_env import ExecutionEnv
 
 from typing import Union, MutableMapping, List
 from pathlib import Path
@@ -40,7 +40,7 @@ def setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
 
 
 def gen_code(
-    ai: AI, prompt: str, memory: BaseRepository, preprompts_holder: PrepromptsHolder
+    ai: AI, prompt: str, memory: Repository, preprompts_holder: PrepromptsHolder
 ) -> Code:
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
@@ -52,7 +52,7 @@ def gen_code(
 
 
 def gen_entrypoint(
-    ai: AI, code: Code, memory: BaseRepository, preprompts_holder: PrepromptsHolder
+    ai: AI, code: Code, memory: Repository, preprompts_holder: PrepromptsHolder
 ) -> Code:
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
@@ -73,7 +73,7 @@ def gen_entrypoint(
 
 def execute_entrypoint(
     ai: AI,
-    execution_env: BaseExecutionEnv,
+    execution_env: ExecutionEnv,
     code: Code,
     preprompts_holder: PrepromptsHolder = None,
 ) -> None:
@@ -110,7 +110,7 @@ def execute_entrypoint(
     print("You can press ctrl+c *once* to stop the execution.")
     print()
 
-    process = execution_env.execute_program(code)
+    process = execution_env.upload(code).popen(f"bash {ENTRYPOINT_FILE}")
     stdout, stderr = process.communicate()
 
     # stdout and stderr are bytes, decode them to string if needed
@@ -152,7 +152,7 @@ def improve(
     ai: AI,
     prompt: str,
     code: Code,
-    memory: BaseRepository,
+    memory: Repository,
     preprompts_holder: PrepromptsHolder,
 ) -> Code:
     preprompts = preprompts_holder.get_preprompts()

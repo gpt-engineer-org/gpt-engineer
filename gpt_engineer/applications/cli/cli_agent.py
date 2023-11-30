@@ -1,5 +1,6 @@
 from gpt_engineer.core.code import Code
-from gpt_engineer.core.default.git_version_manager import GitVersionManager
+
+# from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.steps import (
     gen_code,
@@ -7,26 +8,22 @@ from gpt_engineer.core.default.steps import (
     execute_entrypoint,
     improve,
 )
-from gpt_engineer.core.base_repository import BaseRepository
+from gpt_engineer.core.repository import Repository
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.base_execution_env import BaseExecutionEnv
+from gpt_engineer.core.execution_env import ExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 from gpt_engineer.core.default.paths import memory_path, ENTRYPOINT_FILE, PREPROMPTS_PATH
-from gpt_engineer.core.base_agent import BaseAgent
+from gpt_engineer.core.agent import Agent
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from typing import TypeVar, Callable, Union
 from pathlib import Path
 
-CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseRepository], Code])
-ExecutionType = TypeVar(
-    "ExecutionType", bound=Callable[[AI, BaseExecutionEnv, Code], Code]
-)
-ImproveType = TypeVar(
-    "ImproveType", bound=Callable[[AI, str, Code, BaseRepository], Code]
-)
+CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, Repository], Code])
+CodeProcessor = TypeVar("CodeProcessor", bound=Callable[[AI, ExecutionEnv, Code], Code])
+ImproveType = TypeVar("ImproveType", bound=Callable[[AI, str, Code, Repository], Code])
 
 
-class CliAgent(BaseAgent):
+class CliAgent(Agent):
     """
     The `Agent` class is responsible for managing the lifecycle of code generation and improvement.
 
@@ -69,19 +66,19 @@ class CliAgent(BaseAgent):
 
     def __init__(
         self,
-        memory: BaseRepository,
-        execution_env: BaseExecutionEnv,
+        memory: Repository,
+        execution_env: ExecutionEnv,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
-        execute_entrypoint_fn: ExecutionType = execute_entrypoint,
         improve_fn: ImproveType = improve,
+        process_code_fn: CodeProcessor = execute_entrypoint,
         preprompts_holder: PrepromptsHolder = None,
     ):
         self.memory = memory
         self.execution_env = execution_env
         self.ai = ai or AI()
         self.code_gen_fn = code_gen_fn
-        self.execute_entrypoint_fn = execute_entrypoint_fn
+        self.process_code_fn = process_code_fn
         self.improve_fn = improve_fn
         self.preprompts_holder = preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH)
 
@@ -92,8 +89,8 @@ class CliAgent(BaseAgent):
         execution_env: OnDiskExecutionEnv,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
-        execute_entrypoint_fn: ExecutionType = execute_entrypoint,
         improve_fn: ImproveType = improve,
+        process_code_fn: CodeProcessor = execute_entrypoint,
         preprompts_holder: PrepromptsHolder = None,
     ):
         return cls(
@@ -101,7 +98,7 @@ class CliAgent(BaseAgent):
             execution_env=execution_env,
             ai=ai,
             code_gen_fn=code_gen_fn,
-            execute_entrypoint_fn=execute_entrypoint_fn,
+            process_code_fn=process_code_fn,
             improve_fn=improve_fn,
             preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )
@@ -110,21 +107,21 @@ class CliAgent(BaseAgent):
         code = self.code_gen_fn(self.ai, prompt, self.memory, self.preprompts_holder)
         entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
         code = Code(code | entrypoint)
-        code = self.execute_entrypoint_fn(
+        code = self.process_code_fn(
             self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder
         )
         return code
 
     def improve(
-        self, code: Code, prompt: str, execution_command: str = ENTRYPOINT_FILE
+        self, code: Code, prompt: str, execution_command: str | None = None
     ) -> Code:
         code = self.improve_fn(self.ai, prompt, code, self.memory, self.preprompts_holder)
-        if not execution_command in code:
+        if not execution_command and ENTRYPOINT_FILE not in code:
             entrypoint = gen_entrypoint(
                 self.ai, code, self.memory, self.preprompts_holder
             )
             code = Code(code | entrypoint)
-        code = self.execute_entrypoint_fn(
+        code = self.process_code_fn(
             self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder
         )
         return code

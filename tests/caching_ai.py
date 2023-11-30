@@ -19,18 +19,8 @@ Message = Union[AIMessage, HumanMessage, SystemMessage]
 
 
 class CachingAI(AI):
-    def __init__(self):
-        self.temperature = 0.1
-        self.azure_endpoint = ""
-        self.streaming = False
-        try:
-            self.model_name = self._check_model_access_and_fallback("gpt-4-1106-preview")
-            self.llm = self._create_chat_model()
-        except openai.error.AuthenticationError:
-            self.model_name = "cached_response_model"
-            self.llm = None
-        self.streaming = False
-        self.token_usage_log = TokenUsageLog("gpt-4-1106-preview")
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.cache_file = Path(__file__).parent / "ai_cache.json"
 
     def next(
@@ -75,7 +65,14 @@ class CachingAI(AI):
         messages_key = self.serialize_messages(messages)
         if messages_key not in cache:
             callbacks = []
+            print("calling backoff inference")
             response = self.backoff_inference(messages, callbacks)
+            self.token_usage_log.update_log(
+                messages=messages, answer=response.content, step_name=step_name
+            )
+            print("called backoff inference")
+            print("cost in usd:", self.token_usage_log.usage_cost())
+
             messages.append(response)
             cache[messages_key] = self.serialize_messages(messages)
             with open(self.cache_file, "w") as cache_file:

@@ -32,6 +32,7 @@ import openai
 import typer
 from dotenv import load_dotenv
 
+from gpt_engineer.core.default.disk_store import FileStore
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
@@ -42,7 +43,6 @@ from gpt_engineer.tools.custom_steps import (
     self_heal,
     vector_improve,
 )
-from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.default.steps import gen_code, execute_entrypoint, improve
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
@@ -186,28 +186,28 @@ def main(
     preprompts_path = get_preprompts_path(use_custom_preprompts, Path(project_path))
     preprompts_holder = PrepromptsHolder(preprompts_path)
     memory = OnDiskRepository(memory_path(project_path))
-    version_manager = GitVersionManager(project_path)
-    execution_env = OnDiskExecutionEnv(version_manager)
+    execution_env = OnDiskExecutionEnv()
     agent = CliAgent.with_default_config(
         memory,
         execution_env,
         ai=ai,
         code_gen_fn=code_gen_fn,
-        execute_entrypoint_fn=execution_fn,
         improve_fn=improve_fn,
+        process_code_fn=execution_fn,
         preprompts_holder=preprompts_holder,
     )
+
+    store = FileStore(project_path)
     if improve_mode:
         if vector_improve_mode:
-            code = get_all_code(project_path)
+            code = store.download()
         else:
             code = ask_for_files(project_path)
         code = agent.improve(code, prompt)
     else:
         code = agent.init(prompt)
 
-    # make snapshot of code
-    version_manager.snapshot(code)
+    store.upload(code)
 
     # collect user feedback if user consents
     config = (code_gen_fn.__name__, execution_fn.__name__)
