@@ -2,7 +2,8 @@ import unittest
 
 from gpt_engineer.core.code import Files
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
-from gpt_engineer.core.default.git_version_manager import GitVersionManager
+
+# from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
 import tempfile
 from unittest.mock import patch, MagicMock

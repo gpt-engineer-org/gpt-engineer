@@ -1,5 +1,6 @@
 from gpt_engineer.core.code import Code
-from gpt_engineer.core.default.git_version_manager import GitVersionManager
+
+# from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.steps import (
     gen_code,
@@ -7,12 +8,12 @@ from gpt_engineer.core.default.steps import (
     execute_entrypoint,
     improve,
 )
-from gpt_engineer.core.base_repository import Repository
+from gpt_engineer.core.repository import Repository
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.base_execution_env import ExecutionEnv
+from gpt_engineer.core.execution_env import ExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 from gpt_engineer.core.default.paths import memory_path, ENTRYPOINT_FILE, PREPROMPTS_PATH
-from gpt_engineer.core.base_agent import Agent
+from gpt_engineer.core.agent import Agent
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from typing import TypeVar, Callable, Union
 from pathlib import Path

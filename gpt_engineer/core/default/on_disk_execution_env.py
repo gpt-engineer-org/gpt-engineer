@@ -1,7 +1,7 @@
 import subprocess
 import time
 
-from gpt_engineer.core.base_execution_env import ExecutionEnv
+from gpt_engineer.core.execution_env import ExecutionEnv
 from gpt_engineer.core.code import Files
 from gpt_engineer.core.default.disk_store import FileStore
 

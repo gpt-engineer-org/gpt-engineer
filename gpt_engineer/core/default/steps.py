@@ -14,8 +14,8 @@ from gpt_engineer.core.default.paths import (
 )
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.base_repository import Repository
-from gpt_engineer.core.base_execution_env import ExecutionEnv
+from gpt_engineer.core.repository import Repository
+from gpt_engineer.core.execution_env import ExecutionEnv
 
 from typing import Union, MutableMapping, List
 from pathlib import Path

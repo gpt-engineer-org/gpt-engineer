@@ -9,7 +9,7 @@ import tempfile
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.base_repository import Repository
+from gpt_engineer.core.repository import Repository
 from gpt_engineer.core.default.paths import (
     ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
@@ -23,7 +23,7 @@ from gpt_engineer.core.default.steps import (
 )
 from gpt_engineer.core.chat_to_files import parse_chat, overwrite_code_with_edits
 from gpt_engineer.core.code import Code
-from gpt_engineer.core.base_execution_env import ExecutionEnv
+from gpt_engineer.core.execution_env import ExecutionEnv
 from gpt_engineer.tools.code_vector_repository import CodeVectorRepository
 
 # Type hint for chat messages

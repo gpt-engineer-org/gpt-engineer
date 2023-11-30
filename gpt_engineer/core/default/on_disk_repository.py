@@ -31,7 +31,7 @@ import datetime
 import json
 import shutil
 
-from gpt_engineer.core.base_repository import Repository
+from gpt_engineer.core.repository import Repository
 from pathlib import Path
 from typing import Any, Optional, Union, Iterator, Dict
 from gpt_engineer.tools.supported_languages import SUPPORTED_LANGUAGES
