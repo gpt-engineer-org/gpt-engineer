@@ -41,7 +41,7 @@ def main(
         agent = get_agent(path_to_agent)
 
         results = run(agent, benchmark, task_name, verbose=verbose)
-        print(f"\n--- Results for {benchmark_name} by agent at {path_to_agent} ---")
+        print(f"\n--- Results for agent {path_to_agent}, benchmark: {benchmark_name} ---")
         print_results(results)
         print()
 
