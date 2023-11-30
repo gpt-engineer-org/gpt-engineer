@@ -2,10 +2,11 @@ import subprocess
 import time
 
 from gpt_engineer.core.base_execution_env import ExecutionEnv
+from gpt_engineer.core.code import Files
 from gpt_engineer.core.default.disk_store import FileStore
 
 
-class OnDiskExecutionEnv(FileStore, ExecutionEnv):
+class OnDiskExecutionEnv(ExecutionEnv):
     """
     An execution environment that runs code on the local file system.
 
@@ -17,11 +18,21 @@ class OnDiskExecutionEnv(FileStore, ExecutionEnv):
         path (str): The file system path where the code is located and will be executed.
     """
 
+    def __init__(self, path: str | None = None):
+        self.store = FileStore(path)
+
+    def upload(self, files: Files) -> "OnDiskExecutionEnv":
+        self.store.upload(files)
+        return self
+
+    def download(self) -> Files:
+        return self.store.download()
+
     def popen(self, command: str) -> subprocess.Popen:
         p = subprocess.Popen(
             command,
             shell=True,
-            cwd=self.working_dir,
+            cwd=self.store.working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
@@ -43,7 +54,7 @@ class OnDiskExecutionEnv(FileStore, ExecutionEnv):
             command,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=self.working_dir,
+            cwd=self.store.working_dir,
             text=True,
             shell=True,
         )
