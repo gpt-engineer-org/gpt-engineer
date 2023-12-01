@@ -76,10 +76,10 @@ def self_heal(
             print("Ok, not executing the code.")
             return code
         print("Executing the code...")
-        process = execution_env.upload(code).popen(f"bash {ENTRYPOINT_FILE}")
+        stdout_full, stderr_full, returncode = execution_env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
         # get the result and output
         # step 2. if the return code not 0, package and send to the AI
-        if process.returncode != 0:
+        if returncode != 0:
             print("run.sh failed.  Let's fix it.")
 
             # pack results in an AI prompt
@@ -88,19 +88,10 @@ def self_heal(
             # the gen_entrypoint prompt inside.
             if attempts < 1:
                 messages: List[Message] = [SystemMessage(content=code.to_chat())]
-                # messages.append(ai.fuser(get_platform_info()))  # add in OS and Py version WHAT IS ai.fuser()???
                 messages.append(SystemMessage(content=get_platform_info()))
-                # append the error message
-            # Wait for the process to terminate and get stdout and stderr
-            stdout, stderr = process.communicate()
 
-            # stdout and stderr are bytes, decode them to string if needed
-            output = stdout.decode("utf-8")
-            error = stderr.decode("utf-8")
-            print("stdout: " + output)
-            print(colored("stderr: " + error, "red"))
 
-            messages.append(SystemMessage(content=output + "\n " + error))
+            messages.append(SystemMessage(content=stdout_full + "\n " + stderr_full))
 
             messages = ai.next(
                 messages, preprompts["file_format_fix"], step_name=curr_fn()

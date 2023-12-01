@@ -63,7 +63,7 @@ class LeanAgent(Agent):
         self,
         code: Code,
         prompt: str,
-        execution_command: str = None,
+        execution_command: str | None = None,
     ) -> Code:
         code = improve(self.ai, prompt, code, self.memory, self.preprompts_holder)
         return code

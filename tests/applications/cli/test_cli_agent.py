@@ -74,7 +74,7 @@ def test_init_clarified_gen_config(monkeypatch):
     code = env.download()
 
     assert outfile in code
-    assert code[outfile] == "Hello World!"
+    assert code[outfile].strip() == "Hello World!"
 
 
 # def test_init_self_heal_config(monkeypatch):

@@ -26,6 +26,6 @@ class Agent(ABC):
 
     @abstractmethod
     def improve(
-        self, code: Code, prompt: str, execution_command: str | None = None
+        self, code: Code, prompt: str
     ) -> Code:
         pass

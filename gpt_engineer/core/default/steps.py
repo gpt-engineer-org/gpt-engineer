@@ -76,7 +76,7 @@ def execute_entrypoint(
     execution_env: ExecutionEnv,
     code: Code,
     preprompts_holder: PrepromptsHolder = None,
-) -> None:
+) -> Code:
     if not ENTRYPOINT_FILE in code:
         raise FileNotFoundError(
             "The required entrypoint " + ENTRYPOINT_FILE + " does not exist in the code."
@@ -110,14 +110,7 @@ def execute_entrypoint(
     print("You can press ctrl+c *once* to stop the execution.")
     print()
 
-    process = execution_env.upload(code).popen(f"bash {ENTRYPOINT_FILE}")
-    stdout, stderr = process.communicate()
-
-    # stdout and stderr are bytes, decode them to string if needed
-    output = stdout.decode("utf-8")
-    error = stderr.decode("utf-8")
-    print("stdout: " + output)
-    print("stderr: " + error)
+    execution_env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
     return code
 
 
