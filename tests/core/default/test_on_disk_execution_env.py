@@ -49,9 +49,11 @@ class TestOnDiskExecutionEnv(unittest.TestCase):
         }
         with patch("subprocess.Popen") as mock_popen:
             mock_process = MagicMock()
-            mock_process.wait.side_effect = KeyboardInterrupt
+            mock_process.poll.side_effect = KeyboardInterrupt
             mock_popen.return_value = mock_process
-            self.env.upload(Files(code)).popen(f"bash {ENTRYPOINT_FILE}")
+            stdout_full, stderr_full, returncode = self.env.upload(Files(code)).run(
+                f"bash {ENTRYPOINT_FILE}"
+            )
             mock_process.kill.assert_called_once()
 
     def test_execution_with_output(self):
