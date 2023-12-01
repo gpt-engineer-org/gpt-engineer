@@ -76,7 +76,9 @@ def self_heal(
             print("Ok, not executing the code.")
             return code
         print("Executing the code...")
-        stdout_full, stderr_full, returncode = execution_env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
+        stdout_full, stderr_full, returncode = execution_env.upload(code).run(
+            f"bash {ENTRYPOINT_FILE}"
+        )
         # get the result and output
         # step 2. if the return code not 0, package and send to the AI
         if returncode != 0:
@@ -89,7 +91,6 @@ def self_heal(
             if attempts < 1:
                 messages: List[Message] = [SystemMessage(content=code.to_chat())]
                 messages.append(SystemMessage(content=get_platform_info()))
-
 
             messages.append(SystemMessage(content=stdout_full + "\n " + stderr_full))
 
