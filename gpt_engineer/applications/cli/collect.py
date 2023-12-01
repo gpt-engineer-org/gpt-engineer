@@ -1,12 +1,12 @@
 """
-This module provides functionalities to handle and send learning tools to RudderStack
-for the purpose of analysis and to improve the gpt-engineer system. The tools is sent
+This module provides functionalities to handle and send learning data to RudderStack
+for the purpose of analysis and to improve the gpt-engineer system. The data is sent
 only when the user gives consent to share.
 
 The module provides the following main functions:
 
-- `send_learning`: Directly send a learning tools to RudderStack.
-- `collect_learnings`: Extract, possibly adjust, and send the learning tools based on
+- `send_learning`: Directly send a learning data to RudderStack.
+- `collect_learnings`: Extract, possibly adjust, and send the learning data based on
   provided input parameters.
 - `steps_file_hash`: Computes the SHA-256 hash of the steps file, which might be used
   for identifying the exact version or changes in the steps.
@@ -15,7 +15,7 @@ Dependencies:
 - hashlib: For generating SHA-256 hash.
 - typing: For type annotations.
 - gpt_engineer.core: Core functionalities of gpt-engineer.
-- gpt_engineer.cli.learning: Handles the extraction of learning tools.
+- gpt_engineer.cli.learning: Handles the extraction of learning data.
 
 Note:
     Data sent to RudderStack is not shared with third parties and is used solely to
@@ -38,10 +38,10 @@ from gpt_engineer.applications.cli.learning import (
 
 def send_learning(learning: Learning):
     """
-    Send the learning tools to RudderStack for analysis.
+    Send the learning data to RudderStack for analysis.
 
     Note:
-    This function is only called if consent is given to share tools.
+    This function is only called if consent is given to share data.
     Data is not shared to a third party. It is used with the sole purpose of
     improving gpt-engineer, and letting it handle more use cases.
     Consent logic is in gpt_engineer/learning.py
@@ -49,7 +49,7 @@ def send_learning(learning: Learning):
     Parameters
     ----------
     learning : Learning
-        The learning tools to send.
+        The learning data to send.
     """
     import rudderstack.analytics as rudder_analytics
 
@@ -72,7 +72,7 @@ def collect_learnings(
     review: Review,
 ):
     """
-    Collect the learning tools and send it to RudderStack for analysis.
+    Collect the learning data and send it to RudderStack for analysis.
 
     Parameters
     ----------
@@ -156,7 +156,7 @@ def collect_and_send_human_review(
     Notes:
     - It's assumed that the `human_review_input` function handles all the interactions with the user to
       gather feedback and returns either the feedback or None if no feedback was provided.
-    - Ensure that the database's memory has enough space or is set up correctly to store the serialized review tools.
+    - Ensure that the database's memory has enough space or is set up correctly to store the serialized review data.
     """
 
     """Collects and stores human review of the code"""
