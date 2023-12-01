@@ -1,3 +1,5 @@
+import tempfile
+
 from gpt_engineer.core.code import Code
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.steps import (
@@ -9,7 +11,7 @@ from gpt_engineer.core.repository import Repository
 from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
 from gpt_engineer.core.execution_env import ExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
-from gpt_engineer.core.default.paths import memory_path, ENTRYPOINT_FILE, PREPROMPTS_PATH
+from gpt_engineer.core.default.paths import memory_path, PREPROMPTS_PATH
 from gpt_engineer.core.agent import Agent
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
@@ -55,8 +57,6 @@ class LeanAgent(Agent):
         code = gen_code(self.ai, prompt, self.memory, self.preprompts_holder)
         entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
         code = Code(code | entrypoint)
-        env = self.execution_env
-        env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
         return code
 
     def improve(
@@ -66,10 +66,8 @@ class LeanAgent(Agent):
         execution_command: str = None,
     ) -> Code:
         code = improve(self.ai, prompt, code, self.memory, self.preprompts_holder)
-        if not execution_command and ENTRYPOINT_FILE not in code:
-            entrypoint = gen_entrypoint(
-                self.ai, code, self.memory, self.preprompts_holder
-            )
-            code = Code(code | entrypoint)
-        self.execution_env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
         return code
+
+
+def default_config_agent():
+    return LeanAgent.with_default_config(tempfile.mkdtemp())
