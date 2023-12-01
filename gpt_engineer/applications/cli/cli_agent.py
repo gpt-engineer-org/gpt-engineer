@@ -19,7 +19,9 @@ from typing import TypeVar, Callable, Union
 from pathlib import Path
 
 CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseMemory], Code])
-CodeProcessor = TypeVar("CodeProcessor", bound=Callable[[AI, BaseExecutionEnv, Code], Code])
+CodeProcessor = TypeVar(
+    "CodeProcessor", bound=Callable[[AI, BaseExecutionEnv, Code], Code]
+)
 ImproveType = TypeVar("ImproveType", bound=Callable[[AI, str, Code, BaseMemory], Code])
 
 
