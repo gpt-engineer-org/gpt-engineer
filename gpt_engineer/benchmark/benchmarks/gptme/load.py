@@ -1,6 +1,6 @@
 from gpt_engineer.benchmark.types import Benchmark, Task
 from gpt_engineer.core.code import Code
-from gpt_engineer.core.execution_env import ExecutionEnv
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 
 
 def load_gptme():

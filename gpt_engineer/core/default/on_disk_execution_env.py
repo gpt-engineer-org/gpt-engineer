@@ -1,12 +1,12 @@
 import subprocess
 import time
 
-from gpt_engineer.core.execution_env import ExecutionEnv
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.code import Files
 from gpt_engineer.core.default.disk_store import FileStore
 
 
-class OnDiskExecutionEnv(ExecutionEnv):
+class OnDiskExecutionEnv(BaseExecutionEnv):
     """
     An execution environment that runs code on the local file system.
 

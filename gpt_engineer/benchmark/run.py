@@ -3,12 +3,12 @@ import time
 import typer
 
 from gpt_engineer.benchmark.types import Assertable, Benchmark, TaskResult
-from gpt_engineer.core.agent import Agent
+from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 
 
 def run(
-    agent: Agent, benchmark: Benchmark, task_name: str | None = None, verbose=False
+    agent: BaseAgent, benchmark: Benchmark, task_name: str | None = None, verbose=False
 ) -> list[TaskResult]:
     task_results = []
     for task in benchmark.tasks:

@@ -3,7 +3,7 @@ from subprocess import Popen
 from typing import Callable
 
 from gpt_engineer.core.code import Code
-from gpt_engineer.core.execution_env import ExecutionEnv
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 
 
 @dataclass
@@ -13,14 +13,14 @@ class Assertable:
 
     Attributes:
         files (Code): The code files involved in the assertion.
-        env (ExecutionEnv): The execution environment in which the code is run.
+        env (BaseExecutionEnv): The execution environment in which the code is run.
         process (Popen): The subprocess in which the code is run.
         stdout (str): The standard output from the code execution.
         stderr (str): The standard error from the code execution.
     """
 
     files: Code
-    env: ExecutionEnv
+    env: BaseExecutionEnv
     process: Popen | None
     stdout: str | None
     stderr: str | None

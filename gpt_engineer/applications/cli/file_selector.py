@@ -47,7 +47,7 @@ import tkinter.filedialog as fd
 from pathlib import Path
 from typing import List, Union
 
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
+from gpt_engineer.core.default.on_disk_memory import OnDiskMemory
 from gpt_engineer.core.default.paths import metadata_path
 from gpt_engineer.core.code import Code
 
@@ -334,7 +334,7 @@ def ask_for_files(project_path: Union[str, Path]) -> Code:
     Returns:
         dict[str, str]: Dictionary where key = file name and value = file path
     """
-    metadata_db = OnDiskRepository(metadata_path(project_path))
+    metadata_db = OnDiskMemory(metadata_path(project_path))
     if FILE_LIST_NAME in metadata_db:
         print(
             f"File list detected at {metadata_db.path / FILE_LIST_NAME}. "

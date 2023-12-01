@@ -5,7 +5,7 @@ from sys import version_info
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
-from gpt_engineer.core.repository import Repository
+from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.core.default.paths import (
     ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
@@ -16,7 +16,7 @@ from gpt_engineer.core.default.steps import (
 )
 from gpt_engineer.core.chat_to_files import parse_chat
 from gpt_engineer.core.code import Code
-from gpt_engineer.core.execution_env import ExecutionEnv
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 
 # Type hint for chat messages
 Message = Union[AIMessage, HumanMessage, SystemMessage]
@@ -37,7 +37,7 @@ def get_platform_info():
 
 def self_heal(
     ai: AI,
-    execution_env: ExecutionEnv,
+    execution_env: BaseExecutionEnv,
     code: Code,
     preprompts_holder: PrepromptsHolder = None,
 ) -> Code:
@@ -112,7 +112,7 @@ def self_heal(
 
 
 def clarified_gen(
-    ai: AI, prompt: str, memory: Repository, preprompts_holder: PrepromptsHolder
+    ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder
 ) -> Code:
     """
     Generates code based on clarifications obtained from the user.
@@ -185,7 +185,7 @@ def clarified_gen(
 
 
 def lite_gen(
-    ai: AI, prompt: str, memory: Repository, preprompts_holder: PrepromptsHolder
+    ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder
 ) -> Code:
     """
     Executes the AI model using the main prompt and saves the generated results.
