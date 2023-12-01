@@ -30,14 +30,14 @@ Imports:
 import json
 import shutil
 
-from gpt_engineer.core.repository import Repository
+from gpt_engineer.core.base_memory import BaseMemory
 from pathlib import Path
 from typing import Any, Optional, Union, Iterator, Dict
 from gpt_engineer.tools.experimental.supported_languages import SUPPORTED_LANGUAGES
 
 
 # This class represents a simple database that stores its tools as files in a directory.
-class OnDiskRepository(Repository):
+class OnDiskMemory(BaseMemory):
     """
     A file-based key-value store where keys correspond to filenames and values to file contents.
 

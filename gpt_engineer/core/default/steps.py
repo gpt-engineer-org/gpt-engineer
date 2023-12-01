@@ -13,9 +13,9 @@ from gpt_engineer.core.default.paths import (
     PREPROMPTS_PATH,
 )
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.repository import Repository
-from gpt_engineer.core.execution_env import ExecutionEnv
+from gpt_engineer.core.default.on_disk_memory import OnDiskMemory
+from gpt_engineer.core.base_memory import BaseMemory
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 
 from typing import Union, MutableMapping, List
 from pathlib import Path
@@ -40,7 +40,7 @@ def setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
 
 
 def gen_code(
-    ai: AI, prompt: str, memory: Repository, preprompts_holder: PrepromptsHolder
+    ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder
 ) -> Code:
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
@@ -52,7 +52,7 @@ def gen_code(
 
 
 def gen_entrypoint(
-    ai: AI, code: Code, memory: Repository, preprompts_holder: PrepromptsHolder
+    ai: AI, code: Code, memory: BaseMemory, preprompts_holder: PrepromptsHolder
 ) -> Code:
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
@@ -73,7 +73,7 @@ def gen_entrypoint(
 
 def execute_entrypoint(
     ai: AI,
-    execution_env: ExecutionEnv,
+    execution_env: BaseExecutionEnv,
     code: Code,
     preprompts_holder: PrepromptsHolder = None,
 ) -> Code:
@@ -152,7 +152,7 @@ def improve(
     ai: AI,
     prompt: str,
     code: Code,
-    memory: Repository,
+    memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
 ) -> Code:
     preprompts = preprompts_holder.get_preprompts()

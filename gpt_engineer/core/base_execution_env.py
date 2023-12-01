@@ -3,7 +3,7 @@ from gpt_engineer.core.code import Files
 from subprocess import Popen
 
 
-class ExecutionEnv(ABC):
+class BaseExecutionEnv(ABC):
     """
     Abstract base class for an execution environment.
 
@@ -32,7 +32,7 @@ class ExecutionEnv(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def upload(self, files: Files) -> "ExecutionEnv":
+    def upload(self, files: Files) -> "BaseExecutionEnv":
         """
         Uploads files to the execution environment.
         """

@@ -33,7 +33,7 @@ import typer
 from dotenv import load_dotenv
 
 from gpt_engineer.core.default.disk_store import FileStore
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
+from gpt_engineer.core.default.on_disk_memory import OnDiskMemory
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.applications.cli.file_selector import ask_for_files, get_all_code
@@ -64,7 +64,7 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def load_prompt(input_repo: OnDiskRepository, improve_mode):
+def load_prompt(input_repo: OnDiskMemory, improve_mode):
     if input_repo.get("prompt"):
         return input_repo.get("prompt")
 
@@ -171,7 +171,7 @@ def main(
     # )  # resolve the string to a valid path (eg "a/b/../c" to "a/c")
     path = Path(project_path)  # .absolute()
     print("Running gpt-engineer in", path.absolute(), "\n")
-    prompt = load_prompt(OnDiskRepository(path), improve_mode)
+    prompt = load_prompt(OnDiskMemory(path), improve_mode)
     # configure generation function
     if clarify_mode:
         code_gen_fn = clarified_gen
@@ -192,7 +192,7 @@ def main(
 
     preprompts_path = get_preprompts_path(use_custom_preprompts, Path(project_path))
     preprompts_holder = PrepromptsHolder(preprompts_path)
-    memory = OnDiskRepository(memory_path(project_path))
+    memory = OnDiskMemory(memory_path(project_path))
     execution_env = OnDiskExecutionEnv()
     agent = CliAgent.with_default_config(
         memory,

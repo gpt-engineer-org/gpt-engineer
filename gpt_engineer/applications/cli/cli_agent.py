@@ -8,22 +8,22 @@ from gpt_engineer.core.default.steps import (
     execute_entrypoint,
     improve,
 )
-from gpt_engineer.core.repository import Repository
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.execution_env import ExecutionEnv
+from gpt_engineer.core.base_memory import BaseMemory
+from gpt_engineer.core.default.on_disk_memory import OnDiskMemory
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
 from gpt_engineer.core.default.paths import memory_path, ENTRYPOINT_FILE, PREPROMPTS_PATH
-from gpt_engineer.core.agent import Agent
+from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from typing import TypeVar, Callable, Union
 from pathlib import Path
 
-CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, Repository], Code])
-CodeProcessor = TypeVar("CodeProcessor", bound=Callable[[AI, ExecutionEnv, Code], Code])
-ImproveType = TypeVar("ImproveType", bound=Callable[[AI, str, Code, Repository], Code])
+CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseMemory], Code])
+CodeProcessor = TypeVar("CodeProcessor", bound=Callable[[AI, BaseExecutionEnv, Code], Code])
+ImproveType = TypeVar("ImproveType", bound=Callable[[AI, str, Code, BaseMemory], Code])
 
 
-class CliAgent(Agent):
+class CliAgent(BaseAgent):
     """
     The `Agent` class is responsible for managing the lifecycle of code generation and improvement.
 
@@ -66,8 +66,8 @@ class CliAgent(Agent):
 
     def __init__(
         self,
-        memory: Repository,
-        execution_env: ExecutionEnv,
+        memory: BaseMemory,
+        execution_env: BaseExecutionEnv,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
         improve_fn: ImproveType = improve,
@@ -85,7 +85,7 @@ class CliAgent(Agent):
     @classmethod
     def with_default_config(
         cls,
-        memory: OnDiskRepository,
+        memory: OnDiskMemory,
         execution_env: OnDiskExecutionEnv,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
