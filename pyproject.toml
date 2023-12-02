@@ -98,18 +98,3 @@ lines-between-types = 1
 line-length = 90
 target-version = ["py311"]
 include = '\.pyi?$'
-exclude = '''
-(
-  /(
-      \.direnv
-    | \.eggs
-    | \.git
-    | \.tox
-    | \.venv
-    | _build
-    | build
-    | dist
-    | venv
-  )/
-)
-'''
