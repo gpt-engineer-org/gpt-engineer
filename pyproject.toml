@@ -75,23 +75,6 @@ line-length = 100
 show-fixes = false
 target-version = "py311"
 task-tags = ["TODO", "FIXME"]
-exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "venv",
-]
 
 [project.urls]
 "Homepage" = "https://github.com/AntonOsika/gpt-engineer"
