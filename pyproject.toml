@@ -9,7 +9,6 @@ readme = "README.md"
 requires-python = ">=3.8, <4.0"
 dependencies = [
   'black == 23.3.0',
-  'click >= 8.0.0',
   'mypy == 1.3.0',
   'openai == 0.28',
   'pre-commit == 3.3.3',
@@ -76,23 +75,6 @@ line-length = 100
 show-fixes = false
 target-version = "py311"
 task-tags = ["TODO", "FIXME"]
-exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "venv",
-]
 
 [project.urls]
 "Homepage" = "https://github.com/AntonOsika/gpt-engineer"
@@ -116,18 +98,3 @@ lines-between-types = 1
 line-length = 90
 target-version = ["py311"]
 include = '\.pyi?$'
-exclude = '''
-(
-  /(
-      \.direnv
-    | \.eggs
-    | \.git
-    | \.tox
-    | \.venv
-    | _build
-    | build
-    | dist
-    | venv
-  )/
-)
-'''

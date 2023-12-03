@@ -141,6 +141,12 @@ def main(
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
+    """
+    Generates a project from a prompt in PROJECT_PATH/prompt,
+    or improves an existing project (with -i) in PROJECT_PATH.
+
+    See README.md for more details.
+    """
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
     #
     if improve_all_mode and not improve_mode:
