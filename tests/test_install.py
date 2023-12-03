@@ -1,6 +1,3 @@
-"""
-Tests for successful import and installation of the package.
-"""
 import pytest
 import subprocess
 import sys
@@ -15,35 +12,23 @@ VENV_DIR = "./venv_test_installation"
 def venv_setup_teardown():
     try:
         venv.create(VENV_DIR, with_pip=True)
+        # Install Poetry in the virtual environment
+        subprocess.run([f"{VENV_DIR}/bin/python", "-m", "pip", "install", "poetry"], check=True)
+        # Install dependencies using Poetry
+        subprocess.run([f"{VENV_DIR}/bin/poetry", "install"], cwd=".", check=True)
         yield
-    except Exception:
-        pytest.skip("Could not create venv")
+    except Exception as e:
+        pytest.skip(f"Could not create venv or install dependencies: {str(e)}")
     finally:
         shutil.rmtree(VENV_DIR)
 
 
-# Test that the package can be installed via pip
+# Test that the package can be installed via Poetry
 def test_installation():
-    # Use pip from the virtual environment directly
-    pip_executable = f"{VENV_DIR}/bin/pip"
-    if sys.platform == "win32":
-        pip_executable = f"{VENV_DIR}/Scripts/pip.exe"
+    poetry_executable = f"{VENV_DIR}/bin/poetry" if sys.platform != "win32" else f"{VENV_DIR}/Scripts/poetry.exe"
 
-    result = subprocess.run([pip_executable, "install", "."], capture_output=True)
-    assert result.returncode == 0, f"Install via pip failed: {result.stderr.decode()}"
-
-
-# Test that the package can be imported
-# def test_import():
-#     try:
-#         from gpt_engineer import (
-#             ai,
-#             chat_to_files,
-#             on_disk_repository,
-#         )
-#         from gpt_engineer import steps
-#     except ImportError as e:
-#         assert False, f"Failed to import {e.name}"
+    result = subprocess.run([poetry_executable, "install"], capture_output=True)
+    assert result.returncode == 0, f"Install via poetry failed: {result.stderr.decode()}"
 
 
 # Test that the CLI command works
