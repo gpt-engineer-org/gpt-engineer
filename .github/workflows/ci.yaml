@@ -1,4 +1,4 @@
-name: Pip install and pytest
+name: Poetry install and pytest
 on:
   pull_request:
     branches: [ main ]
@@ -22,13 +22,27 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
-          cache: pip
+          # Update to use Poetry's cache
+          cache: 'poetry'
 
-      - name: Install package
-        run: pip install -e .
+      # Install Poetry
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
 
-      - name: Install test runner
-        run: pip install pytest pytest-cov
+      # Cache Poetry's dependencies based on the lock file
+      - name: Set up Poetry cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
 
+      # Install dependencies using Poetry
+      - name: Install dependencies
+        run: poetry install
+
+      # Run unit tests using Poetry
       - name: Run unit tests
-        run: pytest --cov=gpt_engineer
+        run: poetry run pytest --cov=gpt_engineer
