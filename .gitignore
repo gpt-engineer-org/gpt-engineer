@@ -72,6 +72,9 @@ docs/steps/
 docs/db
 docs/db/
 
+# poetry
+poetry.lock
+
 # coding assistants
 .aider*
 .gpteng
