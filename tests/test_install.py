@@ -10,6 +10,7 @@ import shutil
 # Define the directory for the virtual environment.
 VENV_DIR = "./venv_test_installation"
 
+
 @pytest.fixture(scope="module", autouse=True)
 def venv_setup_teardown():
     """
@@ -27,7 +28,9 @@ def venv_setup_teardown():
         venv.create(VENV_DIR, with_pip=True)
 
         # Install Poetry in the virtual environment.
-        subprocess.run([f"{VENV_DIR}/bin/python", "-m", "pip", "install", "poetry"], check=True)
+        subprocess.run(
+            [f"{VENV_DIR}/bin/python", "-m", "pip", "install", "poetry"], check=True
+        )
 
         # Install the package and its dependencies using Poetry.
         subprocess.run([f"{VENV_DIR}/bin/poetry", "install"], cwd=".", check=True)
@@ -47,7 +50,11 @@ def test_installation():
     Test to ensure that the package can be installed using Poetry in the virtual environment.
     """
     # Determine the correct Poetry executable path based on the operating system.
-    poetry_executable = f"{VENV_DIR}/bin/poetry" if sys.platform != "win32" else f"{VENV_DIR}/Scripts/poetry.exe"
+    poetry_executable = (
+        f"{VENV_DIR}/bin/poetry"
+        if sys.platform != "win32"
+        else f"{VENV_DIR}/Scripts/poetry.exe"
+    )
 
     # Run Poetry install and capture its output.
     result = subprocess.run([poetry_executable, "install"], capture_output=True)
@@ -67,4 +74,6 @@ def test_cli_execution():
     )
 
     # Assert that the CLI command executed successfully.
-    assert result.returncode == 0, f"gpt-engineer command failed with message: {result.stderr}"
+    assert (
+        result.returncode == 0
+    ), f"gpt-engineer command failed with message: {result.stderr}"
