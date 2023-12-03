@@ -22,6 +22,8 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 
 ## Setup
 
+This project supports Python 3.8 - 3.11.
+
 Choose either **stable** or **development**.
 
 For **stable** release:
@@ -31,8 +33,8 @@ For **stable** release:
 For **development**:
 - `git clone https://github.com/AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
-- `python -m pip install -e .`
-  - (or: `make install && source venv/bin/activate` for a venv)
+- `poetry install`
+- `poetry shell` to activate the virtual environment
 
 **API Key**
 
