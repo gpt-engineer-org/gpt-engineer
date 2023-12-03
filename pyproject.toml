@@ -64,6 +64,9 @@ bench = 'gpt_engineer.benchmark.__main__:main'
 [tool.poetry.extras]
 test = ["pytest"]
 
+[tool.poetry.group.dev.dependencies]
+pytest-cov = "^4.1.0"
+
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
 line-length = 100
