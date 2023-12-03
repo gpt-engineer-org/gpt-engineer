@@ -85,6 +85,3 @@ webapp/package-lock.json
 webapp/.next/
 
 .langchain.db
-
-# TODO files
-/!todo*
