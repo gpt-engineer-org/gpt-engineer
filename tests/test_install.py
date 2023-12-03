@@ -1,5 +1,5 @@
 """
-Tests for successful import and installation of the package.
+Tests for successful installation of the package.
 """
 import pytest
 import subprocess
