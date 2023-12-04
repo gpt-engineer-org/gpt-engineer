@@ -1,7 +1,7 @@
 import tempfile
 from pathlib import Path
 
-from gpt_engineer.core.filesdict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict
 
 
 class FileStore:

@@ -33,7 +33,7 @@ from dataclasses import dataclass
 from typing import List, Tuple
 
 
-from gpt_engineer.core.filesdict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict
 
 logger = logging.getLogger(__name__)
 

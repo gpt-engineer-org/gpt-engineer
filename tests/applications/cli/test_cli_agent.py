@@ -3,7 +3,7 @@ import tempfile
 from tests.caching_ai import CachingAI
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.tools.custom_steps import self_heal, lite_gen, clarified_gen
-from gpt_engineer.core.filesdict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
 

@@ -1,4 +1,4 @@
-from gpt_engineer.core.filesdict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict
 
 # from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.ai import AI

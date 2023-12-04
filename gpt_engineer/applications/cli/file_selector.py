@@ -49,7 +49,7 @@ from typing import List, Union
 
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import metadata_path
-from gpt_engineer.core.filesdict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict
 
 IGNORE_FOLDERS = {"site-packages", "node_modules", "venv"}
 FILE_LIST_NAME = "file_list.txt"

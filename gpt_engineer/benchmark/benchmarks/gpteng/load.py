@@ -4,7 +4,7 @@ from gpt_engineer.benchmark.benchmarks.gpteng.eval_tools import check_evaluation
 from gpt_engineer.benchmark.types import Benchmark, Task, Assertable
 from gpt_engineer.core import chat_to_files
 from gpt_engineer.core.chat_to_files import parse_chat
-from gpt_engineer.core.filesdict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict
 
 evaluations = [
     {

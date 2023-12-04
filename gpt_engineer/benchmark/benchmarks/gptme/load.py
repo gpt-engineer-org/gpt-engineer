@@ -1,5 +1,5 @@
 from gpt_engineer.benchmark.types import Benchmark, Task
-from gpt_engineer.core.filesdict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 
 

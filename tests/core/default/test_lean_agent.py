@@ -2,7 +2,7 @@ import pytest
 import tempfile
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.simple_agent import SimpleAgent
-from gpt_engineer.core.filesdict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict
 import os
 
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv

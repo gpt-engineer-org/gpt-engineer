@@ -17,7 +17,7 @@ import yaml
 
 from tabulate import tabulate
 
-from gpt_engineer.core.filesdict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict
 
 EVAL_LIST_NAME = "evaluations"  # the top level list in the YAML file
 

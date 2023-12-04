@@ -1,4 +1,4 @@
-from gpt_engineer.core.filesdict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import (
     parse_chat,

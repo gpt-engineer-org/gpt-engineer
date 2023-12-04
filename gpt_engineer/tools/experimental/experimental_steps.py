@@ -4,7 +4,7 @@ from langchain.schema import SystemMessage, HumanMessage
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import overwrite_code_with_edits
-from gpt_engineer.core.filesdict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import IMPROVE_LOG_FILE
 from gpt_engineer.core.default.steps import setup_sys_prompt_existing_code, curr_fn

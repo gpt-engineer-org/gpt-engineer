@@ -15,7 +15,7 @@ from gpt_engineer.core.default.steps import (
     setup_sys_prompt,
 )
 from gpt_engineer.core.chat_to_files import parse_chat
-from gpt_engineer.core.filesdict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 
 # Type hint for chat messages

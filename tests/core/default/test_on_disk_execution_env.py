@@ -1,6 +1,6 @@
 import unittest
 
-from gpt_engineer.core.filesdict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 
 # from gpt_engineer.core.default.git_version_manager import GitVersionManager
