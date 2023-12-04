@@ -101,12 +101,12 @@ def main(
         False,
         "--improve",
         "-i",
-        help="Improve code from existing project.",
+        help="Improve files_dict from existing project.",
     ),
     improve_all_mode: bool = typer.Option(
         False,
         "--improve_all_experimental",
-        help="Improve code from existing project, without manually choosing which files to improve, using vector store (EXPERIMENTAL).",
+        help="Improve files_dict from existing project, without manually choosing which files to improve, using vector store (EXPERIMENTAL).",
     ),
     lite_mode: bool = typer.Option(
         False,
@@ -207,14 +207,14 @@ def main(
     store = FileStore(project_path)
     if improve_mode:
         if improve_all_mode:
-            code = store.download()
+            files_dict = store.download()
         else:
-            code = ask_for_files(project_path)
-        code = agent.improve(code, prompt)
+            files_dict = ask_for_files(project_path)
+        files_dict = agent.improve(files_dict, prompt)
     else:
-        code = agent.init(prompt)
+        files_dict = agent.init(prompt)
 
-    store.upload(code)
+    store.upload(files_dict)
 
     # collect user feedback if user consents
     config = (code_gen_fn.__name__, execution_fn.__name__)

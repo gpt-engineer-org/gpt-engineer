@@ -13,11 +13,11 @@ def run(
     task_results = []
     for task in benchmark.tasks:
         t0 = time.time()
-        code = agent.improve(task.initial_code, task.prompt, task.command)
+        files_dict = agent.improve(task.initial_code, task.prompt, task.command)
         t1 = time.time()
 
         env = DiskExecutionEnv()
-        env.upload(code)
+        env.upload(files_dict)
 
         if task.command:
             p = env.popen(task.command)
@@ -26,7 +26,7 @@ def run(
         else:
             p, stdout, stderr = None, None, None
         exec_result = Assertable(
-            files=code,
+            files=files_dict,
             env=env,
             process=p,
             stdout=stdout,

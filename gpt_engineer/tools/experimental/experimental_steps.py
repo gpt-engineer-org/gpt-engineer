@@ -4,7 +4,7 @@ from langchain.schema import SystemMessage, HumanMessage
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import overwrite_code_with_edits
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.filesdict import FilesDict
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import IMPROVE_LOG_FILE
 from gpt_engineer.core.default.steps import setup_sys_prompt_existing_code, curr_fn
@@ -16,7 +16,7 @@ from gpt_engineer.tools.experimental.code_vector_repository import CodeVectorRep
 def improve_automatic_file_selection(
     ai: AI,
     prompt: str,
-    code: Code,
+    code: FilesDict,
     memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
 ):
@@ -28,7 +28,7 @@ def improve_automatic_file_selection(
         temp_saver[file] = content
     code_vector_repository.load_from_directory(temp_dir)
     relevant_documents = code_vector_repository.relevent_code_chunks(prompt)
-    relevant_code = Code()
+    relevant_code = FilesDict()
     for doc in relevant_documents:
         file_path = os.path.relpath(doc.metadata["filename"], temp_dir)
         relevant_code[file_path] = code[file_path]

@@ -1,4 +1,4 @@
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.filesdict import FilesDict
 
 # from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.ai import AI
@@ -18,11 +18,11 @@ from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from typing import TypeVar, Callable, Union
 from pathlib import Path
 
-CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseMemory], Code])
+CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseMemory], FilesDict])
 CodeProcessor = TypeVar(
-    "CodeProcessor", bound=Callable[[AI, BaseExecutionEnv, Code], Code]
+    "CodeProcessor", bound=Callable[[AI, BaseExecutionEnv, FilesDict], FilesDict]
 )
-ImproveType = TypeVar("ImproveType", bound=Callable[[AI, str, Code, BaseMemory], Code])
+ImproveType = TypeVar("ImproveType", bound=Callable[[AI, str, FilesDict, BaseMemory], FilesDict])
 
 
 class CliAgent(BaseAgent):
@@ -53,7 +53,7 @@ class CliAgent(BaseAgent):
                 prompt (str): A string prompt that guides the code generation process.
 
             Returns:
-                Code: An instance of the `Code` class containing the generated code.
+                FilesDict: An instance of the `Code` class containing the generated code.
 
         improve(self, prompt: str) -> Code:
             Improves an existing piece of code using the AI and step bundle based on the provided prompt.
@@ -63,7 +63,7 @@ class CliAgent(BaseAgent):
                 prompt (str): A string prompt that guides the code improvement process.
 
             Returns:
-                Code: An instance of the `Code` class containing the improved code.
+                FilesDict: An instance of the `Code` class containing the improved code.
     """
 
     def __init__(
@@ -105,25 +105,25 @@ class CliAgent(BaseAgent):
             preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )
 
-    def init(self, prompt: str) -> Code:
-        code = self.code_gen_fn(self.ai, prompt, self.memory, self.preprompts_holder)
-        entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
-        code = Code(code | entrypoint)
-        code = self.process_code_fn(
-            self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder
+    def init(self, prompt: str) -> FilesDict:
+        files_dict = self.code_gen_fn(self.ai, prompt, self.memory, self.preprompts_holder)
+        entrypoint = gen_entrypoint(self.ai, files_dict, self.memory, self.preprompts_holder)
+        files_dict = FilesDict(files_dict | entrypoint)
+        files_dict = self.process_code_fn(
+            self.ai, self.execution_env, files_dict, preprompts_holder=self.preprompts_holder
         )
-        return code
+        return files_dict
 
     def improve(
-        self, code: Code, prompt: str, execution_command: str | None = None
-    ) -> Code:
-        code = self.improve_fn(self.ai, prompt, code, self.memory, self.preprompts_holder)
-        if not execution_command and ENTRYPOINT_FILE not in code:
+        self, files_dict: FilesDict, prompt: str, execution_command: str | None = None
+    ) -> FilesDict:
+        files_dict = self.improve_fn(self.ai, prompt, files_dict, self.memory, self.preprompts_holder)
+        if not execution_command and ENTRYPOINT_FILE not in files_dict:
             entrypoint = gen_entrypoint(
-                self.ai, code, self.memory, self.preprompts_holder
+                self.ai, files_dict, self.memory, self.preprompts_holder
             )
-            code = Code(code | entrypoint)
-        code = self.process_code_fn(
-            self.ai, self.execution_env, code, preprompts_holder=self.preprompts_holder
+            files_dict = FilesDict(files_dict | entrypoint)
+        files_dict = self.process_code_fn(
+            self.ai, self.execution_env, files_dict, preprompts_holder=self.preprompts_holder
         )
-        return code
+        return files_dict

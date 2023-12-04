@@ -3,7 +3,7 @@ import tempfile
 from tests.caching_ai import CachingAI
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.tools.custom_steps import self_heal, lite_gen, clarified_gen
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.filesdict import FilesDict
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
 
@@ -97,7 +97,7 @@ def test_init_clarified_gen_config(monkeypatch):
 def test_improve_standard_config(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda: "y")
     temp_dir = tempfile.mkdtemp()
-    code = Code(
+    code = FilesDict(
         {
             "main.py": "def write_hello_world_to_file(filename):\n    \"\"\"\n    Writes 'Hello World!' to the specified file.\n    \n    :param filename: The name of the file to write to.\n    \"\"\"\n    with open(filename, 'w') as file:\n        file.write('Hello World!')\n\nif __name__ == \"__main__\":\n    output_filename = 'output.txt'\n    write_hello_world_to_file(output_filename)",
             "requirements.txt": "# No dependencies required",

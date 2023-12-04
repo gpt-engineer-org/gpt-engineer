@@ -1,6 +1,6 @@
 import tempfile
 
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.filesdict import FilesDict
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.steps import (
     gen_code,
@@ -53,20 +53,20 @@ class SimpleAgent(BaseAgent):
             preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )
 
-    def init(self, prompt: str) -> Code:
-        code = gen_code(self.ai, prompt, self.memory, self.preprompts_holder)
-        entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
-        code = Code(code | entrypoint)
-        return code
+    def init(self, prompt: str) -> FilesDict:
+        files_dict = gen_code(self.ai, prompt, self.memory, self.preprompts_holder)
+        entrypoint = gen_entrypoint(self.ai, files_dict, self.memory, self.preprompts_holder)
+        files_dict = FilesDict(files_dict | entrypoint)
+        return files_dict
 
     def improve(
         self,
-        code: Code,
+        files_dict: FilesDict,
         prompt: str,
         execution_command: str | None = None,
-    ) -> Code:
-        code = improve(self.ai, prompt, code, self.memory, self.preprompts_holder)
-        return code
+    ) -> FilesDict:
+        files_dict = improve(self.ai, prompt, files_dict, self.memory, self.preprompts_holder)
+        return files_dict
 
 
 def default_config_agent():
