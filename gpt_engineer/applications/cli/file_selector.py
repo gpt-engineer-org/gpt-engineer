@@ -424,13 +424,15 @@ def gui_file_selector(input_path: str) -> List[str]:
     root = tk.Tk()
     root.withdraw()
     root.call("wm", "attributes", ".", "-topmost", True)
-    return list(
+    file_list = list(
         fd.askopenfilenames(
             parent=root,
             initialdir=input_path,
             title="Select files to improve (or give context):",
         )
     )
+    # ensure right path type
+    return [str(path) for path in file_list]
 
 
 def terminal_file_selector(input_path: str, all: bool = False) -> List[str]:
@@ -439,4 +441,5 @@ def terminal_file_selector(input_path: str, all: bool = False) -> List[str]:
     """
     file_selector = TerminalFileSelector(Path(input_path))
     file_selector.display()
-    return file_selector.ask_for_selection(all=all)
+    file_list = file_selector.ask_for_selection(all=all)
+    return [str(path) for path in file_list]
