@@ -55,7 +55,9 @@ class SimpleAgent(BaseAgent):
 
     def init(self, prompt: str) -> FilesDict:
         files_dict = gen_code(self.ai, prompt, self.memory, self.preprompts_holder)
-        entrypoint = gen_entrypoint(self.ai, files_dict, self.memory, self.preprompts_holder)
+        entrypoint = gen_entrypoint(
+            self.ai, files_dict, self.memory, self.preprompts_holder
+        )
         files_dict = FilesDict(files_dict | entrypoint)
         return files_dict
 
@@ -65,7 +67,9 @@ class SimpleAgent(BaseAgent):
         prompt: str,
         execution_command: str | None = None,
     ) -> FilesDict:
-        files_dict = improve(self.ai, prompt, files_dict, self.memory, self.preprompts_holder)
+        files_dict = improve(
+            self.ai, prompt, files_dict, self.memory, self.preprompts_holder
+        )
         return files_dict
 
 

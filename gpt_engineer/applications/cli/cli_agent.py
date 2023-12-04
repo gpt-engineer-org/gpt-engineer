@@ -22,7 +22,9 @@ CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseMemory], Files
 CodeProcessor = TypeVar(
     "CodeProcessor", bound=Callable[[AI, BaseExecutionEnv, FilesDict], FilesDict]
 )
-ImproveType = TypeVar("ImproveType", bound=Callable[[AI, str, FilesDict, BaseMemory], FilesDict])
+ImproveType = TypeVar(
+    "ImproveType", bound=Callable[[AI, str, FilesDict, BaseMemory], FilesDict]
+)
 
 
 class CliAgent(BaseAgent):
@@ -106,24 +108,36 @@ class CliAgent(BaseAgent):
         )
 
     def init(self, prompt: str) -> FilesDict:
-        files_dict = self.code_gen_fn(self.ai, prompt, self.memory, self.preprompts_holder)
-        entrypoint = gen_entrypoint(self.ai, files_dict, self.memory, self.preprompts_holder)
+        files_dict = self.code_gen_fn(
+            self.ai, prompt, self.memory, self.preprompts_holder
+        )
+        entrypoint = gen_entrypoint(
+            self.ai, files_dict, self.memory, self.preprompts_holder
+        )
         files_dict = FilesDict(files_dict | entrypoint)
         files_dict = self.process_code_fn(
-            self.ai, self.execution_env, files_dict, preprompts_holder=self.preprompts_holder
+            self.ai,
+            self.execution_env,
+            files_dict,
+            preprompts_holder=self.preprompts_holder,
         )
         return files_dict
 
     def improve(
         self, files_dict: FilesDict, prompt: str, execution_command: str | None = None
     ) -> FilesDict:
-        files_dict = self.improve_fn(self.ai, prompt, files_dict, self.memory, self.preprompts_holder)
+        files_dict = self.improve_fn(
+            self.ai, prompt, files_dict, self.memory, self.preprompts_holder
+        )
         if not execution_command and ENTRYPOINT_FILE not in files_dict:
             entrypoint = gen_entrypoint(
                 self.ai, files_dict, self.memory, self.preprompts_holder
             )
             files_dict = FilesDict(files_dict | entrypoint)
         files_dict = self.process_code_fn(
-            self.ai, self.execution_env, files_dict, preprompts_holder=self.preprompts_holder
+            self.ai,
+            self.execution_env,
+            files_dict,
+            preprompts_holder=self.preprompts_holder,
         )
         return files_dict
