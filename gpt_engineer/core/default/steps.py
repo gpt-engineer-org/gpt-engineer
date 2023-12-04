@@ -13,7 +13,7 @@ from gpt_engineer.core.default.paths import (
     PREPROMPTS_PATH,
 )
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
-from gpt_engineer.core.default.on_disk_memory import OnDiskMemory
+from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 

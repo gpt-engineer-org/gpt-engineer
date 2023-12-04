@@ -27,7 +27,7 @@ import hashlib
 
 from typing import List, Tuple
 
-from gpt_engineer.core.default.on_disk_memory import OnDiskMemory
+from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.applications.cli.learning import (
     Learning,
     extract_learning,
@@ -68,7 +68,7 @@ def collect_learnings(
     model: str,
     temperature: float,
     config: any,
-    memory: OnDiskMemory,
+    memory: DiskMemory,
     review: Review,
 ):
     """
@@ -134,7 +134,7 @@ def collect_and_send_human_review(
     model: str,
     temperature: float,
     config: Tuple[str, ...],
-    memory: OnDiskMemory,
+    memory: DiskMemory,
 ):
     """
     Collects human feedback on the code and stores it in memory.

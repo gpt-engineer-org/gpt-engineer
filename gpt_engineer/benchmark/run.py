@@ -4,7 +4,7 @@ import typer
 
 from gpt_engineer.benchmark.types import Assertable, Benchmark, TaskResult
 from gpt_engineer.core.base_agent import BaseAgent
-from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
+from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 
 
 def run(
@@ -16,7 +16,7 @@ def run(
         code = agent.improve(task.initial_code, task.prompt, task.command)
         t1 = time.time()
 
-        env = OnDiskExecutionEnv()
+        env = DiskExecutionEnv()
         env.upload(code)
 
         if task.command:

@@ -37,7 +37,7 @@ from gpt_engineer.tools.experimental.supported_languages import SUPPORTED_LANGUA
 
 
 # This class represents a simple database that stores its tools as files in a directory.
-class OnDiskMemory(BaseMemory):
+class DiskMemory(BaseMemory):
     """
     A file-based key-value store where keys correspond to filenames and values to file contents.
 

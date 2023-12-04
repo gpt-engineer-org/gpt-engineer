@@ -8,15 +8,15 @@ from gpt_engineer.core.default.steps import (
     improve,
 )
 from gpt_engineer.core.base_memory import BaseMemory
-from gpt_engineer.core.default.on_disk_memory import OnDiskMemory
+from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
-from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
+from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.paths import memory_path, PREPROMPTS_PATH
 from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
 
-class LeanAgent(BaseAgent):
+class SimpleAgent(BaseAgent):
     """
     An agent that uses AI to generate and improve code based on a given prompt.
 
@@ -47,8 +47,8 @@ class LeanAgent(BaseAgent):
         cls, path: str, ai: AI = None, preprompts_holder: PrepromptsHolder = None
     ):
         return cls(
-            memory=OnDiskMemory(memory_path(path)),
-            execution_env=OnDiskExecutionEnv(),
+            memory=DiskMemory(memory_path(path)),
+            execution_env=DiskExecutionEnv(),
             ai=ai,
             preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )
@@ -70,4 +70,4 @@ class LeanAgent(BaseAgent):
 
 
 def default_config_agent():
-    return LeanAgent.with_default_config(tempfile.mkdtemp())
+    return SimpleAgent.with_default_config(tempfile.mkdtemp())

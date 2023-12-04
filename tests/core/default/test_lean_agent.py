@@ -1,11 +1,11 @@
 import pytest
 import tempfile
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.default.lean_agent import LeanAgent
+from gpt_engineer.core.default.lean_agent import SimpleAgent
 from gpt_engineer.core.code import Code
 import os
 
-from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
+from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
 from tests.caching_ai import CachingAI
 
@@ -17,13 +17,13 @@ import logging
 def test_init():
     temp_dir = tempfile.mkdtemp()
 
-    lean_agent = LeanAgent.with_default_config(temp_dir, CachingAI())
+    lean_agent = SimpleAgent.with_default_config(temp_dir, CachingAI())
     outfile = "output.txt"
     code = lean_agent.init(
         f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
     )
 
-    env = OnDiskExecutionEnv()
+    env = DiskExecutionEnv()
     env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
     code = env.download()
 
@@ -40,14 +40,14 @@ def test_improve():
             "run.sh": "python3 main.py\n",
         }
     )
-    lean_agent = LeanAgent.with_default_config(temp_dir, CachingAI())
+    lean_agent = SimpleAgent.with_default_config(temp_dir, CachingAI())
     lean_agent.improve(
         code,
         "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",
         f"bash {ENTRYPOINT_FILE}",
     )
 
-    env = OnDiskExecutionEnv()
+    env = DiskExecutionEnv()
     env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
     code = env.download()
 

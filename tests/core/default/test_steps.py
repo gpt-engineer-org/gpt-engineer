@@ -9,7 +9,7 @@ from gpt_engineer.core.default.paths import (
 )
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
-from gpt_engineer.core.default.on_disk_memory import OnDiskMemory
+from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.steps import (
     gen_code,
     curr_fn,
@@ -87,7 +87,7 @@ class TestGenCode:
         ai = MockAI()
         prompt = "Write a function that calculates the factorial of a number."
 
-        memory = OnDiskMemory(tempfile.mkdtemp())
+        memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         code = gen_code(ai, prompt, memory, preprompts_holder)
 
@@ -105,7 +105,7 @@ class TestGenCode:
 
         ai = MockAI()
         prompt = "Write a function that calculates the factorial of a number."
-        memory = OnDiskMemory(tempfile.mkdtemp())
+        memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         code = gen_code(ai, prompt, memory, preprompts_holder)
 
@@ -123,7 +123,7 @@ class TestGenCode:
 
         ai = MockAI()
         prompt = "Write a function that calculates the factorial of a number."
-        memory = OnDiskMemory(tempfile.mkdtemp())
+        memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         with pytest.raises(TypeError):
             code = gen_code(ai, prompt, memory, preprompts_holder)
@@ -138,7 +138,7 @@ class TestGenCode:
 
         ai = MockAI()
         prompt = "Write a function that calculates the factorial of a number."
-        memory = OnDiskMemory(tempfile.mkdtemp())
+        memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         with pytest.raises(TypeError):
             code = gen_code(ai, prompt, memory, preprompts_holder)
@@ -153,7 +153,7 @@ class TestGenCode:
 
         ai = MockAI()
         prompt = "Write a function that calculates the factorial of a number."
-        memory = OnDiskMemory(tempfile.mkdtemp())
+        memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         with pytest.raises(KeyError):
             code = gen_code(ai, prompt, memory, preprompts_holder)
@@ -213,7 +213,7 @@ class TestGenEntrypoint:
         ai_mock = TestGenEntrypoint.MockAI(factorial_entrypoint)
         code = Code()
         tempdir = tempfile.mkdtemp()
-        memory = OnDiskMemory(tempdir)
+        memory = DiskMemory(tempdir)
         # Act
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         entrypoint_code = gen_entrypoint(ai_mock, code, memory, preprompts_holder)
@@ -240,7 +240,7 @@ pytest test_factorial.py
 
         code = Code()
         tempdir = tempfile.mkdtemp()
-        memory = OnDiskMemory(tempdir)
+        memory = DiskMemory(tempdir)
 
         # Act
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
@@ -282,7 +282,7 @@ main.py
         )
 
         # Create a BaseRepository object for memory
-        memory = OnDiskMemory(tmp_path)
+        memory = DiskMemory(tmp_path)
 
         # Define the user prompt
         prompt = (

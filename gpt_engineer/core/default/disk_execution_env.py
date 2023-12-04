@@ -3,10 +3,10 @@ import time
 
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.code import Files
-from gpt_engineer.core.default.disk_store import FileStore
+from gpt_engineer.core.default.file_store import FileStore
 
 
-class OnDiskExecutionEnv(BaseExecutionEnv):
+class DiskExecutionEnv(BaseExecutionEnv):
     """
     An execution environment that runs code on the local file system.
 
@@ -21,7 +21,7 @@ class OnDiskExecutionEnv(BaseExecutionEnv):
     def __init__(self, path: str | None = None):
         self.store = FileStore(path)
 
-    def upload(self, files: Files) -> "OnDiskExecutionEnv":
+    def upload(self, files: Files) -> "DiskExecutionEnv":
         self.store.upload(files)
         return self
 

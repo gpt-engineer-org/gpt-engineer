@@ -5,7 +5,7 @@ from langchain.schema import SystemMessage, HumanMessage
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import overwrite_code_with_edits
 from gpt_engineer.core.code import Code
-from gpt_engineer.core.default.on_disk_memory import OnDiskMemory
+from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import IMPROVE_LOG_FILE
 from gpt_engineer.core.default.steps import setup_sys_prompt_existing_code, curr_fn
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
@@ -23,7 +23,7 @@ def improve_automatic_file_selection(
     code_vector_repository = CodeVectorRepository()
     # ToDo: Replace this hacky way to get the right langchain document format
     temp_dir = tempfile.mkdtemp()
-    temp_saver = OnDiskMemory(temp_dir)
+    temp_saver = DiskMemory(temp_dir)
     for file, content in code.items():
         temp_saver[file] = content
     code_vector_repository.load_from_directory(temp_dir)
