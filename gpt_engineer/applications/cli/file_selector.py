@@ -47,9 +47,9 @@ import tkinter.filedialog as fd
 from pathlib import Path
 from typing import List, Union
 
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
+from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import metadata_path
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.files_dict import FilesDict
 
 IGNORE_FOLDERS = {"site-packages", "node_modules", "venv"}
 FILE_LIST_NAME = "file_list.txt"
@@ -326,7 +326,7 @@ def is_in_ignoring_extensions(path: Path) -> bool:
     return is_hidden and is_pycache
 
 
-def ask_for_files(project_path: Union[str, Path]) -> Code:
+def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
     """
     Ask user to select files to improve.
     It can be done by terminal, gui, or using the old selection.
@@ -334,7 +334,7 @@ def ask_for_files(project_path: Union[str, Path]) -> Code:
     Returns:
         dict[str, str]: Dictionary where key = file name and value = file path
     """
-    metadata_db = OnDiskRepository(metadata_path(project_path))
+    metadata_db = DiskMemory(metadata_path(project_path))
     if FILE_LIST_NAME in metadata_db:
         print(
             f"File list detected at {metadata_db.path / FILE_LIST_NAME}. "
@@ -399,10 +399,10 @@ def ask_for_files(project_path: Union[str, Path]) -> Code:
         for file in file_list:
             with open(os.path.join(project_path, file.strip()), "r") as content:
                 content_dict[file.strip()] = content.read()
-    return Code(content_dict)
+    return FilesDict(content_dict)
 
 
-def get_all_code(project_path: str) -> Code:
+def get_all_code(project_path: str) -> FilesDict:
     file_selection = terminal_file_selector(project_path, all=True)
     # ToDO: Replace this hack that makes all file_path relative to the right thing
     file_selection = [
@@ -414,7 +414,7 @@ def get_all_code(project_path: str) -> Code:
     for file in file_selection:
         with open(os.path.join(project_path, file.strip()), "r") as content:
             content_dict[file.strip()] = content.read()
-    return Code(content_dict)
+    return FilesDict(content_dict)
 
 
 def gui_file_selector(input_path: str) -> List[str]:

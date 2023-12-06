@@ -32,8 +32,8 @@ import openai
 import typer
 from dotenv import load_dotenv
 
-from gpt_engineer.core.default.disk_store import FileStore
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
+from gpt_engineer.core.default.file_store import FileStore
+from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.applications.cli.file_selector import ask_for_files, get_all_code
@@ -49,7 +49,7 @@ from gpt_engineer.core.default.steps import gen_code, execute_entrypoint, improv
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
-from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
+from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 import logging
 
 app = typer.Typer()  # creates a CLI app
@@ -64,7 +64,7 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def load_prompt(input_repo: OnDiskRepository, improve_mode):
+def load_prompt(input_repo: DiskMemory, improve_mode):
     if input_repo.get("prompt"):
         return input_repo.get("prompt")
 
@@ -101,12 +101,12 @@ def main(
         False,
         "--improve",
         "-i",
-        help="Improve code from existing project.",
+        help="Improve files_dict from existing project.",
     ),
     improve_all_mode: bool = typer.Option(
         False,
         "--improve_all_experimental",
-        help="Improve code from existing project, without manually choosing which files to improve, using vector store (EXPERIMENTAL).",
+        help="Improve files_dict from existing project, without manually choosing which files to improve, using vector store (EXPERIMENTAL).",
     ),
     lite_mode: bool = typer.Option(
         False,
@@ -171,7 +171,7 @@ def main(
     # )  # resolve the string to a valid path (eg "a/b/../c" to "a/c")
     path = Path(project_path)  # .absolute()
     print("Running gpt-engineer in", path.absolute(), "\n")
-    prompt = load_prompt(OnDiskRepository(path), improve_mode)
+    prompt = load_prompt(DiskMemory(path), improve_mode)
     # configure generation function
     if clarify_mode:
         code_gen_fn = clarified_gen
@@ -192,8 +192,8 @@ def main(
 
     preprompts_path = get_preprompts_path(use_custom_preprompts, Path(project_path))
     preprompts_holder = PrepromptsHolder(preprompts_path)
-    memory = OnDiskRepository(memory_path(project_path))
-    execution_env = OnDiskExecutionEnv()
+    memory = DiskMemory(memory_path(project_path))
+    execution_env = DiskExecutionEnv()
     agent = CliAgent.with_default_config(
         memory,
         execution_env,
@@ -207,14 +207,14 @@ def main(
     store = FileStore(project_path)
     if improve_mode:
         if improve_all_mode:
-            code = store.download()
+            files_dict = store.download()
         else:
-            code = ask_for_files(project_path)
-        code = agent.improve(code, prompt)
+            files_dict = ask_for_files(project_path)
+        files_dict = agent.improve(files_dict, prompt)
     else:
-        code = agent.init(prompt)
+        files_dict = agent.init(prompt)
 
-    store.upload(code)
+    store.upload(files_dict)
 
     # collect user feedback if user consents
     config = (code_gen_fn.__name__, execution_fn.__name__)

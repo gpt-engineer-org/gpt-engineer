@@ -1,10 +1,10 @@
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.version_manager import BaseVersionManager
 from gpt_engineer.core.ai import AI
 from abc import ABC, abstractmethod
 
 
-class Agent(ABC):
+class BaseAgent(ABC):
     """
     Abstract base class for an agent that interacts with code.
 
@@ -21,9 +21,9 @@ class Agent(ABC):
     """
 
     @abstractmethod
-    def init(self, prompt: str) -> Code:
+    def init(self, prompt: str) -> FilesDict:
         pass
 
     @abstractmethod
-    def improve(self, code: Code, prompt: str) -> Code:
+    def improve(self, files_dict: FilesDict, prompt: str) -> FilesDict:
         pass

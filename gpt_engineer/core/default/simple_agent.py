@@ -1,22 +1,22 @@
 import tempfile
 
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.steps import (
     gen_code,
     gen_entrypoint,
     improve,
 )
-from gpt_engineer.core.repository import Repository
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.execution_env import ExecutionEnv
-from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
+from gpt_engineer.core.base_memory import BaseMemory
+from gpt_engineer.core.default.disk_memory import DiskMemory
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
+from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.paths import memory_path, PREPROMPTS_PATH
-from gpt_engineer.core.agent import Agent
+from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
 
-class LeanAgent(Agent):
+class SimpleAgent(BaseAgent):
     """
     An agent that uses AI to generate and improve code based on a given prompt.
 
@@ -26,14 +26,14 @@ class LeanAgent(Agent):
 
     Attributes:
         memory (BaseRepository): The repository where the code and related data are stored.
-        execution_env (ExecutionEnv): The environment in which the code is executed.
+        execution_env (BaseExecutionEnv): The environment in which the code is executed.
         ai (AI): The AI model used for generating and improving code.
     """
 
     def __init__(
         self,
-        memory: Repository,
-        execution_env: ExecutionEnv,
+        memory: BaseMemory,
+        execution_env: BaseExecutionEnv,
         ai: AI = None,
         preprompts_holder: PrepromptsHolder = None,
     ):
@@ -47,27 +47,31 @@ class LeanAgent(Agent):
         cls, path: str, ai: AI = None, preprompts_holder: PrepromptsHolder = None
     ):
         return cls(
-            memory=OnDiskRepository(memory_path(path)),
-            execution_env=OnDiskExecutionEnv(),
+            memory=DiskMemory(memory_path(path)),
+            execution_env=DiskExecutionEnv(),
             ai=ai,
             preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )
 
-    def init(self, prompt: str) -> Code:
-        code = gen_code(self.ai, prompt, self.memory, self.preprompts_holder)
-        entrypoint = gen_entrypoint(self.ai, code, self.memory, self.preprompts_holder)
-        code = Code(code | entrypoint)
-        return code
+    def init(self, prompt: str) -> FilesDict:
+        files_dict = gen_code(self.ai, prompt, self.memory, self.preprompts_holder)
+        entrypoint = gen_entrypoint(
+            self.ai, files_dict, self.memory, self.preprompts_holder
+        )
+        files_dict = FilesDict(files_dict | entrypoint)
+        return files_dict
 
     def improve(
         self,
-        code: Code,
+        files_dict: FilesDict,
         prompt: str,
         execution_command: str | None = None,
-    ) -> Code:
-        code = improve(self.ai, prompt, code, self.memory, self.preprompts_holder)
-        return code
+    ) -> FilesDict:
+        files_dict = improve(
+            self.ai, prompt, files_dict, self.memory, self.preprompts_holder
+        )
+        return files_dict
 
 
 def default_config_agent():
-    return LeanAgent.with_default_config(tempfile.mkdtemp())
+    return SimpleAgent.with_default_config(tempfile.mkdtemp())

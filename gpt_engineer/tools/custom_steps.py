@@ -5,7 +5,7 @@ from sys import version_info
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
-from gpt_engineer.core.repository import Repository
+from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.core.default.paths import (
     ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
@@ -15,8 +15,8 @@ from gpt_engineer.core.default.steps import (
     setup_sys_prompt,
 )
 from gpt_engineer.core.chat_to_files import parse_chat
-from gpt_engineer.core.code import Code
-from gpt_engineer.core.execution_env import ExecutionEnv
+from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 
 # Type hint for chat messages
 Message = Union[AIMessage, HumanMessage, SystemMessage]
@@ -37,10 +37,10 @@ def get_platform_info():
 
 def self_heal(
     ai: AI,
-    execution_env: ExecutionEnv,
-    code: Code,
+    execution_env: BaseExecutionEnv,
+    files_dict: FilesDict,
     preprompts_holder: PrepromptsHolder = None,
-) -> Code:
+) -> FilesDict:
     """Attempts to execute the code from the entrypoint and if it fails,
     sends the error output back to the AI with instructions to fix.
     This code will make `MAX_SELF_HEAL_ATTEMPTS` to try and fix the code
@@ -51,7 +51,7 @@ def self_heal(
 
     # step 1. execute the entrypoint
     # log_path = dbs.workspace.path / "log.txt"
-    if not ENTRYPOINT_FILE in code:
+    if not ENTRYPOINT_FILE in files_dict:
         raise FileNotFoundError(
             "The required entrypoint " + ENTRYPOINT_FILE + " does not exist in the code."
         )
@@ -62,7 +62,7 @@ def self_heal(
         raise AssertionError("Prepromptsholder required for self-heal")
     preprompts = preprompts_holder.get_preprompts()
     while attempts < MAX_SELF_HEAL_ATTEMPTS:
-        command = code[ENTRYPOINT_FILE]
+        command = files_dict[ENTRYPOINT_FILE]
         print(
             colored(
                 "Do you want to execute this code? (Y/n)",
@@ -74,9 +74,9 @@ def self_heal(
         print()
         if input().lower() not in ["", "y", "yes"]:
             print("Ok, not executing the code.")
-            return code
+            return files_dict
         print("Executing the code...")
-        stdout_full, stderr_full, returncode = execution_env.upload(code).run(
+        stdout_full, stderr_full, returncode = execution_env.upload(files_dict).run(
             f"bash {ENTRYPOINT_FILE}"
         )
         # get the result and output
@@ -89,7 +89,7 @@ def self_heal(
             # Using the log from the previous step has all the code and
             # the gen_entrypoint prompt inside.
             if attempts < 1:
-                messages: List[Message] = [SystemMessage(content=code.to_chat())]
+                messages: List[Message] = [SystemMessage(content=files_dict.to_chat())]
                 messages.append(SystemMessage(content=get_platform_info()))
 
             messages.append(SystemMessage(content=stdout_full + "\n " + stderr_full))
@@ -98,22 +98,22 @@ def self_heal(
                 messages, preprompts["file_format_fix"], step_name=curr_fn()
             )
         else:  # the process did not fail, we are done here.
-            return code
+            return files_dict
 
         # log_file.close()
 
         # this overwrites the existing files
         # to_files_and_memory(messages[-1].content.strip(), dbs)
         files = parse_chat(messages[-1].content.strip())
-        code = {**code, **Code({key: val for key, val in files})}
+        files_dict = {**files_dict, **FilesDict({key: val for key, val in files})}
         attempts += 1
 
-    return code
+    return files_dict
 
 
 def clarified_gen(
-    ai: AI, prompt: str, memory: Repository, preprompts_holder: PrepromptsHolder
-) -> Code:
+    ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder
+) -> FilesDict:
     """
     Generates code based on clarifications obtained from the user.
 
@@ -180,13 +180,13 @@ def clarified_gen(
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files = parse_chat(chat)
-    code = Code({key: val for key, val in files})
-    return code
+    files_dict = FilesDict({key: val for key, val in files})
+    return files_dict
 
 
 def lite_gen(
-    ai: AI, prompt: str, memory: Repository, preprompts_holder: PrepromptsHolder
-) -> Code:
+    ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder
+) -> FilesDict:
     """
     Executes the AI model using the main prompt and saves the generated results.
 
@@ -212,5 +212,5 @@ def lite_gen(
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files = parse_chat(chat)
-    code = Code({key: val for key, val in files})
-    return code
+    files_dict = FilesDict({key: val for key, val in files})
+    return files_dict

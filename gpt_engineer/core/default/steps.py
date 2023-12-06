@@ -1,4 +1,4 @@
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import (
     parse_chat,
@@ -13,9 +13,9 @@ from gpt_engineer.core.default.paths import (
     PREPROMPTS_PATH,
 )
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
-from gpt_engineer.core.repository import Repository
-from gpt_engineer.core.execution_env import ExecutionEnv
+from gpt_engineer.core.default.disk_memory import DiskMemory
+from gpt_engineer.core.base_memory import BaseMemory
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 
 from typing import Union, MutableMapping, List
 from pathlib import Path
@@ -40,31 +40,31 @@ def setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
 
 
 def gen_code(
-    ai: AI, prompt: str, memory: Repository, preprompts_holder: PrepromptsHolder
-) -> Code:
+    ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder
+) -> FilesDict:
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files = parse_chat(chat)
-    code = Code({key: val for key, val in files})
-    return code
+    files_dict = FilesDict({key: val for key, val in files})
+    return files_dict
 
 
 def gen_entrypoint(
-    ai: AI, code: Code, memory: Repository, preprompts_holder: PrepromptsHolder
-) -> Code:
+    ai: AI, files_dict: FilesDict, memory: BaseMemory, preprompts_holder: PrepromptsHolder
+) -> FilesDict:
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
         system=(preprompts["entrypoint"]),
-        user="Information about the codebase:\n\n" + code.to_chat(),
+        user="Information about the codebase:\n\n" + files_dict.to_chat(),
         step_name=curr_fn(),
     )
     print()
     chat = messages[-1].content.strip()
     regex = r"```\S*\n(.+?)```"
     matches = re.finditer(regex, chat, re.DOTALL)
-    entrypoint_code = Code(
+    entrypoint_code = FilesDict(
         {ENTRYPOINT_FILE: "\n".join(match.group(1) for match in matches)}
     )
     memory[ENTRYPOINT_LOG_FILE] = chat
@@ -73,16 +73,16 @@ def gen_entrypoint(
 
 def execute_entrypoint(
     ai: AI,
-    execution_env: ExecutionEnv,
-    code: Code,
+    execution_env: BaseExecutionEnv,
+    files_dict: FilesDict,
     preprompts_holder: PrepromptsHolder = None,
-) -> Code:
-    if not ENTRYPOINT_FILE in code:
+) -> FilesDict:
+    if not ENTRYPOINT_FILE in files_dict:
         raise FileNotFoundError(
             "The required entrypoint " + ENTRYPOINT_FILE + " does not exist in the code."
         )
 
-    command = code[ENTRYPOINT_FILE]
+    command = files_dict[ENTRYPOINT_FILE]
 
     print()
     print(
@@ -110,8 +110,8 @@ def execute_entrypoint(
     print("You can press ctrl+c *once* to stop the execution.")
     print()
 
-    execution_env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
-    return code
+    execution_env.upload(files_dict).run(f"bash {ENTRYPOINT_FILE}")
+    return files_dict
 
 
 def setup_sys_prompt_existing_code(
@@ -124,7 +124,7 @@ def setup_sys_prompt_existing_code(
     )
 
 
-def incorrect_edit(code: Code, chat: str) -> List[str,]:
+def incorrect_edit(files_dict: FilesDict, chat: str) -> List[str,]:
     problems = []
     try:
         edits = parse_edits(chat)
@@ -134,12 +134,12 @@ def incorrect_edit(code: Code, chat: str) -> List[str,]:
         return problems
 
     for edit in edits:
-        if not edit.filename in code:
+        if not edit.filename in files_dict:
             problems.append(
                 f"A section tried to edit the file {edit.filename}, but this file does not exist in the code. Section:\n"
                 + edit.filename
             )
-        elif not edit.before in code[edit.filename]:
+        elif not edit.before in files_dict[edit.filename]:
             problems.append(
                 "This section, assigned to be exchanged for an edit block, does not have an exact match in the code: "
                 + edit.before
@@ -151,16 +151,16 @@ def incorrect_edit(code: Code, chat: str) -> List[str,]:
 def improve(
     ai: AI,
     prompt: str,
-    code: Code,
-    memory: Repository,
+    files_dict: FilesDict,
+    memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
-) -> Code:
+) -> FilesDict:
     preprompts = preprompts_holder.get_preprompts()
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]
     # Add files as input
-    messages.append(HumanMessage(content=f"{code.to_chat()}"))
+    messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=f"Request: {prompt}"))
     problems = [""]
     # check edit correctness
@@ -168,7 +168,7 @@ def improve(
     while len(problems) > 0 and edit_refinements <= MAX_EDIT_REFINEMENT_STEPS:
         messages = ai.next(messages, step_name=curr_fn())
         chat = messages[-1].content.strip()
-        problems = incorrect_edit(code, chat)
+        problems = incorrect_edit(files_dict, chat)
         if len(problems) > 0:
             messages.append(
                 HumanMessage(
@@ -178,6 +178,6 @@ def improve(
                 )
             )
         edit_refinements += 1
-    overwrite_code_with_edits(chat, code)
+    overwrite_code_with_edits(chat, files_dict)
     memory[IMPROVE_LOG_FILE] = chat
-    return code
+    return files_dict

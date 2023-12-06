@@ -3,21 +3,21 @@ import time
 import typer
 
 from gpt_engineer.benchmark.types import Assertable, Benchmark, TaskResult
-from gpt_engineer.core.agent import Agent
-from gpt_engineer.core.default.on_disk_execution_env import OnDiskExecutionEnv
+from gpt_engineer.core.base_agent import BaseAgent
+from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 
 
 def run(
-    agent: Agent, benchmark: Benchmark, task_name: str | None = None, verbose=False
+    agent: BaseAgent, benchmark: Benchmark, task_name: str | None = None, verbose=False
 ) -> list[TaskResult]:
     task_results = []
     for task in benchmark.tasks:
         t0 = time.time()
-        code = agent.improve(task.initial_code, task.prompt, task.command)
+        files_dict = agent.improve(task.initial_code, task.prompt, task.command)
         t1 = time.time()
 
-        env = OnDiskExecutionEnv()
-        env.upload(code)
+        env = DiskExecutionEnv()
+        env.upload(files_dict)
 
         if task.command:
             p = env.popen(task.command)
@@ -26,7 +26,7 @@ def run(
         else:
             p, stdout, stderr = None, None, None
         exec_result = Assertable(
-            files=code,
+            files=files_dict,
             env=env,
             process=p,
             stdout=stdout,

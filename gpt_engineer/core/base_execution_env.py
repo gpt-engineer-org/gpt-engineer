@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from gpt_engineer.core.code import Files
+from gpt_engineer.core.files_dict import FilesDict
 from subprocess import Popen
 
 
-class ExecutionEnv(ABC):
+class BaseExecutionEnv(ABC):
     """
     Abstract base class for an execution environment.
 
@@ -32,14 +32,14 @@ class ExecutionEnv(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def upload(self, files: Files) -> "ExecutionEnv":
+    def upload(self, files: FilesDict) -> "BaseExecutionEnv":
         """
         Uploads files to the execution environment.
         """
         raise NotImplementedError
 
     @abstractmethod
-    def download(self) -> Files:
+    def download(self) -> FilesDict:
         """
         Downloads files from the execution environment.
         """
