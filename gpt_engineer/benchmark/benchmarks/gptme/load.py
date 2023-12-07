@@ -1,6 +1,6 @@
 from gpt_engineer.benchmark.types import Benchmark, Task
-from gpt_engineer.core.code import Code
-from gpt_engineer.core.execution_env import ExecutionEnv
+from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 
 
 def load_gptme():
@@ -9,7 +9,7 @@ def load_gptme():
         tasks=[
             Task(
                 name="hello",
-                initial_code=Code({"hello.py": "print('Hello, world!')"}),
+                initial_code=FilesDict({"hello.py": "print('Hello, world!')"}),
                 command="python hello.py",
                 prompt="Change the code in hello.py to print 'Hello, human!'",
                 assertions={
@@ -23,7 +23,7 @@ def load_gptme():
             ),
             Task(
                 name="hello-patch",
-                initial_code=Code({"hello.py": "print('Hello, world!')"}),
+                initial_code=FilesDict({"hello.py": "print('Hello, world!')"}),
                 command="python hello.py",
                 prompt="Patch the code in hello.py to print 'Hello, human!'",
                 assertions={
@@ -37,7 +37,7 @@ def load_gptme():
             ),
             Task(
                 name="hello-ask",
-                initial_code=Code({"hello.py": "print('Hello, world!')"}),
+                initial_code=FilesDict({"hello.py": "print('Hello, world!')"}),
                 command="echo 'Erik' | python hello.py",
                 prompt="modify hello.py to ask the user for their name and print 'Hello, <name>!'. don't try to execute it",
                 assertions={
@@ -47,7 +47,7 @@ def load_gptme():
             ),
             Task(
                 name="prime100",
-                initial_code=Code(
+                initial_code=FilesDict(
                     {}
                 ),  # Empty dictionary since no initial code is provided
                 command="python prime.py",
@@ -59,7 +59,7 @@ def load_gptme():
             ),
             Task(
                 name="init-git",
-                initial_code=Code(
+                initial_code=FilesDict(
                     {}
                 ),  # Empty dictionary since no initial code is provided
                 command="git status",

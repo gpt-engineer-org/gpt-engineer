@@ -10,8 +10,8 @@ import pytest
 import rudderstack.analytics as rudder_analytics
 
 from gpt_engineer.applications.cli.collect import collect_learnings
-from gpt_engineer.core.default.on_disk_repository import (
-    OnDiskRepository,
+from gpt_engineer.core.default.disk_memory import (
+    DiskMemory,
 )
 from gpt_engineer.applications.cli.learning import extract_learning
 

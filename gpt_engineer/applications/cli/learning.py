@@ -52,7 +52,7 @@ from typing import List, Optional, Tuple
 from dataclasses_json import dataclass_json
 from termcolor import colored
 
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
+from gpt_engineer.core.default.disk_memory import DiskMemory
 
 
 @dataclass_json
@@ -188,7 +188,7 @@ def extract_learning(
     model: str,
     temperature: float,
     config: Tuple[str, ...],
-    memory: OnDiskRepository,
+    memory: DiskMemory,
     review: Review,
 ) -> Learning:
     """

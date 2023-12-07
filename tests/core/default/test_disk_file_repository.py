@@ -1,7 +1,7 @@
 import pytest
 
-from gpt_engineer.core.default.on_disk_repository import (
-    OnDiskRepository,
+from gpt_engineer.core.default.disk_memory import (
+    DiskMemory,
 )
 
 import unittest
@@ -9,7 +9,7 @@ import unittest
 
 def test_DB_operations(tmp_path):
     # Test initialization
-    db = OnDiskRepository(tmp_path)
+    db = DiskMemory(tmp_path)
 
     # Test __setitem__
     db["test_key"] = "test_value"
@@ -23,7 +23,7 @@ def test_DB_operations(tmp_path):
 
 
 def test_large_files(tmp_path):
-    db = OnDiskRepository(tmp_path)
+    db = DiskMemory(tmp_path)
     large_content = "a" * (10**6)  # 1MB of tools
 
     # Test write large files
@@ -36,7 +36,7 @@ def test_large_files(tmp_path):
 def test_concurrent_access(tmp_path):
     import threading
 
-    db = OnDiskRepository(tmp_path)
+    db = DiskMemory(tmp_path)
 
     num_threads = 10
     num_writes = 1000
@@ -64,7 +64,7 @@ def test_concurrent_access(tmp_path):
 
 
 def test_error_messages(tmp_path):
-    db = OnDiskRepository(tmp_path)
+    db = DiskMemory(tmp_path)
 
     # Test error on getting non-existent key
     with pytest.raises(KeyError):
@@ -84,7 +84,7 @@ import pytest
 class TestOnDiskRepository:
     #  can set and get a value for a key
     def test_set_and_get_value(self, tmp_path):
-        db = OnDiskRepository(tmp_path)
+        db = DiskMemory(tmp_path)
         db["test_key"] = "test_value"
 
         assert (tmp_path / "test_key").is_file()
@@ -94,7 +94,7 @@ class TestOnDiskRepository:
 
     #  can check if a key exists in the database
     def test_key_exists(self, tmp_path):
-        db = OnDiskRepository(tmp_path)
+        db = DiskMemory(tmp_path)
         db["test_key"] = "test_value"
 
         assert "test_key" in db
@@ -102,14 +102,14 @@ class TestOnDiskRepository:
 
     #  can fetch a default value if a key does not exist
     def test_fetch_default_value(self, tmp_path):
-        db = OnDiskRepository(tmp_path)
+        db = DiskMemory(tmp_path)
         default_val = "default_value"
 
         assert db.get("nonexistent_key", default_val) == default_val
 
     #  can delete a file or directory in the database
     def test_delete_file_or_directory(self, tmp_path):
-        db = OnDiskRepository(tmp_path)
+        db = DiskMemory(tmp_path)
         db["test_file"] = "test_content"
         db["test_directory/test_file"] = "test_content"
 
@@ -121,7 +121,7 @@ class TestOnDiskRepository:
 
     #  can iterate over all files in the database
     def test_iterate_files(self, tmp_path):
-        db = OnDiskRepository(tmp_path)
+        db = DiskMemory(tmp_path)
         db["file1.txt"] = "content1"
         db["file2.txt"] = "content2"
         db["directory/file3.txt"] = "content3"
@@ -135,28 +135,28 @@ class TestOnDiskRepository:
 
     #  raises a KeyError if a non-existent key is accessed
     def test_key_error(self, tmp_path):
-        db = OnDiskRepository(tmp_path)
+        db = DiskMemory(tmp_path)
 
         with pytest.raises(KeyError):
             _ = db["nonexistent_key"]
 
     #  raises a ValueError if a file name attempts to access parent path
     def test_value_error(self, tmp_path):
-        db = OnDiskRepository(tmp_path)
+        db = DiskMemory(tmp_path)
 
         with pytest.raises(ValueError):
             db["../file.txt"] = "content"
 
     #  raises a TypeError if a non-string value is set for a key
     def test_type_error(self, tmp_path):
-        db = OnDiskRepository(tmp_path)
+        db = DiskMemory(tmp_path)
 
         with pytest.raises(TypeError):
             db["test_key"] = 123
 
     #  can handle large file contents
     def test_large_file_contents(self, tmp_path):
-        db = OnDiskRepository(tmp_path)
+        db = DiskMemory(tmp_path)
         large_content = "a" * (10**6)  # 1MB of tools
         db["large_file"] = large_content
 

@@ -1,5 +1,10 @@
 import pytest
-from gpt_engineer.core.chat_to_files import parse_chat, Edit, parse_edits, apply_edits
+from gpt_engineer.core.chat_to_files import (
+    chat_to_files_dict,
+    Edit,
+    parse_edits,
+    apply_edits,
+)
 from gpt_engineer.core.chat_to_files import logger as parse_logger
 import logging
 
@@ -18,17 +23,17 @@ def add(a, b):
     return a + b
 ```
     """
-    expected = [
-        ("file1.py", 'print("Hello, World!")'),
-        ("file2.py", "def add(a, b):\n    return a + b"),
-    ]
-    assert parse_chat(chat) == expected
+    expected = {
+        "file1.py": 'print("Hello, World!")',
+        "file2.py": "def add(a, b):\n    return a + b",
+    }
+    assert chat_to_files_dict(chat) == expected
 
 
 def test_no_code_blocks():
     chat = "Just some regular chat without code."
-    expected = []
-    assert parse_chat(chat) == expected
+    expected = {}
+    assert chat_to_files_dict(chat) == expected
 
 
 def test_special_characters_in_filename():
@@ -43,8 +48,8 @@ def test_special_characters_in_filename():
     print("File 2")
     ```
     """
-    expected = [("file[1].py", 'print("File 1")'), ("file`2`.py", 'print("File 2")')]
-    parsed = parse_chat(chat)
+    expected = {"file[1].py": 'print("File 1")', "file`2`.py": 'print("File 2")'}
+    parsed = chat_to_files_dict(chat)
     assert parsed == expected
 
 
@@ -54,8 +59,8 @@ def test_empty_code_blocks():
     ```
     ```
     """
-    expected = [("empty.py", "")]
-    assert parse_chat(chat) == expected
+    expected = {"empty.py": ""}
+    assert chat_to_files_dict(chat) == expected
 
 
 def test_mixed_content():
@@ -70,8 +75,8 @@ def test_mixed_content():
     print("World")
     ```
     """
-    expected = [("script.sh", 'echo "Hello"'), ("script.py", 'print("World")')]
-    assert parse_chat(chat) == expected
+    expected = {"script.sh": 'echo "Hello"', "script.py": 'print("World")'}
+    assert chat_to_files_dict(chat) == expected
 
 
 def test_filename_line_break():
@@ -82,8 +87,8 @@ def test_filename_line_break():
     print("Hello, World!")
     ```
     """
-    expected = [("file1.py", 'print("Hello, World!")')]
-    assert parse_chat(chat) == expected
+    expected = {"file1.py": 'print("Hello, World!")'}
+    assert chat_to_files_dict(chat) == expected
 
 
 def test_filename_in_backticks():
@@ -93,8 +98,8 @@ def test_filename_in_backticks():
     print("Hello, World!")
     ```
     """
-    expected = [("file1.py", 'print("Hello, World!")')]
-    assert parse_chat(chat) == expected
+    expected = {"file1.py": 'print("Hello, World!")'}
+    assert chat_to_files_dict(chat) == expected
 
 
 def test_filename_with_file_tag():
@@ -104,8 +109,8 @@ def test_filename_with_file_tag():
     print("Hello, World!")
     ```
     """
-    expected = [("file1.py", 'print("Hello, World!")')]
-    assert parse_chat(chat) == expected
+    expected = {"file1.py": 'print("Hello, World!")'}
+    assert chat_to_files_dict(chat) == expected
 
 
 def test_filename_with_different_extension():
@@ -115,8 +120,8 @@ def test_filename_with_different_extension():
     console.log("Hello, World!")
     ```
     """
-    expected = [("[id].jsx", 'console.log("Hello, World!")')]
-    assert parse_chat(chat) == expected
+    expected = {"[id].jsx": 'console.log("Hello, World!")'}
+    assert chat_to_files_dict(chat) == expected
 
 
 # Helper function to capture log messages

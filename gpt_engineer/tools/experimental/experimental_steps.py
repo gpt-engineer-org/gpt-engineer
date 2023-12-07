@@ -4,31 +4,31 @@ from langchain.schema import SystemMessage, HumanMessage
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import overwrite_code_with_edits
-from gpt_engineer.core.code import Code
-from gpt_engineer.core.default.on_disk_repository import OnDiskRepository
+from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import IMPROVE_LOG_FILE
 from gpt_engineer.core.default.steps import setup_sys_prompt_existing_code, curr_fn
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
-from gpt_engineer.core.repository import Repository
+from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.tools.experimental.code_vector_repository import CodeVectorRepository
 
 
 def improve_automatic_file_selection(
     ai: AI,
     prompt: str,
-    code: Code,
-    memory: Repository,
+    code: FilesDict,
+    memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
 ):
     code_vector_repository = CodeVectorRepository()
     # ToDo: Replace this hacky way to get the right langchain document format
     temp_dir = tempfile.mkdtemp()
-    temp_saver = OnDiskRepository(temp_dir)
+    temp_saver = DiskMemory(temp_dir)
     for file, content in code.items():
         temp_saver[file] = content
     code_vector_repository.load_from_directory(temp_dir)
     relevant_documents = code_vector_repository.relevent_code_chunks(prompt)
-    relevant_code = Code()
+    relevant_code = FilesDict()
     for doc in relevant_documents:
         file_path = os.path.relpath(doc.metadata["filename"], temp_dir)
         relevant_code[file_path] = code[file_path]

@@ -32,13 +32,12 @@ import logging
 from dataclasses import dataclass
 from typing import List, Tuple
 
-
-from gpt_engineer.core.code import Code
+from gpt_engineer.core.files_dict import FilesDict
 
 logger = logging.getLogger(__name__)
 
 
-def parse_chat(chat) -> List[Tuple[str, str]]:
+def chat_to_files_dict(chat) -> FilesDict:
     """
     Extracts all code blocks from a chat and returns them
     as a list of (filename, codeblock) tuples.
@@ -57,7 +56,7 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
     regex = r"(\S+)\n\s*```[^\n]*\n(.+?)```"
     matches = re.finditer(regex, chat, re.DOTALL)
 
-    files = []
+    files_dict = FilesDict()
     for match in matches:
         # Strip the filename of any non-allowed characters and convert / to \
         path = re.sub(r'[\:<>"|?*]', "", match.group(1))
@@ -72,24 +71,15 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
         path = re.sub(r"[\]\:]$", "", path)
 
         # Get the code
-        code = match.group(2)
-
-        # strip blanks etc
-        code = code.strip()
+        content = match.group(2)
 
         # Add the file to the list
-        files.append((path, code))
+        files_dict[path.strip()] = content.strip()
 
-    # Get all the text before the first ``` block
-    # readme = chat.split("```")[0]
-    # files.append(("README.md", readme))
-
-    # Return the files
-    # ToDo: Directly return code object
-    return files
+    return FilesDict(files_dict)
 
 
-def overwrite_code_with_edits(chat: str, code: Code):
+def overwrite_code_with_edits(chat: str, files_dict: FilesDict):
     """
     Overwrite code with edits extracted from chat.
 
@@ -100,11 +90,11 @@ def overwrite_code_with_edits(chat: str, code: Code):
     ----------
     chat : str
         The chat content containing code edits.
-    code : Code
+    files_dict : FilesDict
         The code object to apply edits to.
     """
     edits = parse_edits(chat)
-    apply_edits(edits, code)
+    apply_edits(edits, files_dict)
 
 
 @dataclass
@@ -169,7 +159,7 @@ def parse_edits(chat: str):
     return edits
 
 
-def apply_edits(edits: List[Edit], code: Code):
+def apply_edits(edits: List[Edit], files_dict: FilesDict):
     """
     Apply a list of edits to the given code.
 
@@ -180,19 +170,19 @@ def apply_edits(edits: List[Edit], code: Code):
     ----------
     edits : List[Edit]
         A list of Edit objects representing the code edits to apply.
-    code : Code
+    files_dict : FilesDict
         The code object to apply edits to.
     """
     for edit in edits:
         filename = edit.filename
         if edit.before == "":
-            if filename in code:
+            if filename in files_dict:
                 logger.warning(
                     f"The edit to be applied wants to create a new file `{filename}`, but that already exists. The file will be overwritten. See `.gpteng/memory` for previous version."
                 )
-            code[filename] = edit.after  # new file
+            files_dict[filename] = edit.after  # new file
         else:
-            occurrences_cnt = code[filename].count(edit.before)
+            occurrences_cnt = files_dict[filename].count(edit.before)
             if occurrences_cnt == 0:
                 logger.warning(
                     f"While applying an edit to `{filename}`, the code block to be replaced was not found. No instances will be replaced."
@@ -201,6 +191,6 @@ def apply_edits(edits: List[Edit], code: Code):
                 logger.warning(
                     f"While applying an edit to `{filename}`, the code block to be replaced was found multiple times. All instances will be replaced."
                 )
-            code[filename] = code[filename].replace(
+            files_dict[filename] = files_dict[filename].replace(
                 edit.before, edit.after
             )  # existing file

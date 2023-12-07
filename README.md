@@ -64,16 +64,20 @@ There are two ways to work with GPT-engineer: new code mode (the default), and i
 ### Creating new code
 - Create an empty folder for your project anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions
-- Run `gpt-engineer <project_dir>` with a relative path to your folder
-  - For example: `gpt-engineer projects/my-new-project` from the gpt-engineer directory root with your new folder in `projects/`
+- Run `gpte <project_dir>` with a relative path to your folder
+  - For example: `gpte projects/my-new-project` from the gpt-engineer directory root with your new folder in `projects/`
 
 ### Improving Existing Code
 - Locate a folder with code which you want to improve anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions for how you want to improve the code
-- Run `gpt-engineer <project_dir> -i` with a relative path to your folder
-  - For example: `gpt-engineer projects/my-old-project` from the gpt-engineer directory root with your folder in `projects/`
+- Run `gpte <project_dir> -i` with a relative path to your folder
+  - For example: `gpte projects/my-old-project` from the gpt-engineer directory root with your folder in `projects/`
 
 By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
+
+### Note
+
+- To run this tool, the new command `gpte` is recommended for better user experience. However, the earlier default commands `gpt-engineer` and `ge` are also supported.
 
 
 ## Features

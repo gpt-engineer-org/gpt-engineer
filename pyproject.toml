@@ -62,6 +62,7 @@ tree_sitter_languages = ">=1.8.0"
 [tool.poetry.scripts]
 gpt-engineer = 'gpt_engineer.applications.cli.main:app'
 ge = 'gpt_engineer.applications.cli.main:app'
+gpte = 'gpt_engineer.applications.cli.main:app'
 bench = 'gpt_engineer.benchmark.__main__:main'
 
 [tool.poetry.extras]
