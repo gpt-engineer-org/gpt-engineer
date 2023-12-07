@@ -1,7 +1,7 @@
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.chat_to_files import (
-    parse_chat,
+    chat_to_files_dict,
     overwrite_code_with_edits,
     parse_edits,
 )
@@ -46,8 +46,7 @@ def gen_code(
     messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
-    files = parse_chat(chat)
-    files_dict = FilesDict({key: val for key, val in files})
+    files_dict = chat_to_files_dict(chat)
     return files_dict
 
 

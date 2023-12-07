@@ -14,7 +14,7 @@ from gpt_engineer.core.default.steps import (
     curr_fn,
     setup_sys_prompt,
 )
-from gpt_engineer.core.chat_to_files import parse_chat
+from gpt_engineer.core.chat_to_files import chat_to_files_dict
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 
@@ -100,12 +100,7 @@ def self_heal(
         else:  # the process did not fail, we are done here.
             return files_dict
 
-        # log_file.close()
-
-        # this overwrites the existing files
-        # to_files_and_memory(messages[-1].content.strip(), dbs)
-        files = parse_chat(messages[-1].content.strip())
-        files_dict = {**files_dict, **FilesDict({key: val for key, val in files})}
+        files_dict = {**files_dict, **chat_to_files_dict(messages[-1].content.strip())}
         attempts += 1
 
     return files_dict
@@ -179,8 +174,7 @@ def clarified_gen(
     print()
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
-    files = parse_chat(chat)
-    files_dict = FilesDict({key: val for key, val in files})
+    files_dict = chat_to_files_dict(chat)
     return files_dict
 
 
@@ -211,6 +205,5 @@ def lite_gen(
     messages = ai.start(prompt, preprompts["file_format"], step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
-    files = parse_chat(chat)
-    files_dict = FilesDict({key: val for key, val in files})
+    files_dict = chat_to_files_dict(chat)
     return files_dict

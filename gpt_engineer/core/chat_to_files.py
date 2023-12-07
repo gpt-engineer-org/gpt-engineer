@@ -32,13 +32,12 @@ import logging
 from dataclasses import dataclass
 from typing import List, Tuple
 
-
 from gpt_engineer.core.files_dict import FilesDict
 
 logger = logging.getLogger(__name__)
 
 
-def parse_chat(chat) -> List[Tuple[str, str]]:
+def chat_to_files_dict(chat) -> FilesDict:
     """
     Extracts all code blocks from a chat and returns them
     as a list of (filename, codeblock) tuples.
@@ -57,7 +56,7 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
     regex = r"(\S+)\n\s*```[^\n]*\n(.+?)```"
     matches = re.finditer(regex, chat, re.DOTALL)
 
-    files = []
+    files_dict = FilesDict()
     for match in matches:
         # Strip the filename of any non-allowed characters and convert / to \
         path = re.sub(r'[\:<>"|?*]', "", match.group(1))
@@ -74,19 +73,10 @@ def parse_chat(chat) -> List[Tuple[str, str]]:
         # Get the code
         content = match.group(2)
 
-        # strip blanks etc
-        content = content.strip()
-
         # Add the file to the list
-        files.append((path, content))
+        files_dict[path.strip()] = content.strip()
 
-    # Get all the text before the first ``` block
-    # readme = chat.split("```")[0]
-    # files.append(("README.md", readme))
-
-    # Return the files
-    # ToDo: Directly return code object
-    return files
+    return FilesDict(files_dict)
 
 
 def overwrite_code_with_edits(chat: str, files_dict: FilesDict):
