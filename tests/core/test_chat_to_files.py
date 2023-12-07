@@ -1,5 +1,10 @@
 import pytest
-from gpt_engineer.core.chat_to_files import chat_to_files_dict, Edit, parse_edits, apply_edits
+from gpt_engineer.core.chat_to_files import (
+    chat_to_files_dict,
+    Edit,
+    parse_edits,
+    apply_edits,
+)
 from gpt_engineer.core.chat_to_files import logger as parse_logger
 import logging
 
@@ -18,7 +23,10 @@ def add(a, b):
     return a + b
 ```
     """
-    expected = {"file1.py": 'print("Hello, World!")', "file2.py": "def add(a, b):\n    return a + b"}
+    expected = {
+        "file1.py": 'print("Hello, World!")',
+        "file2.py": "def add(a, b):\n    return a + b",
+    }
     assert chat_to_files_dict(chat) == expected
 
 

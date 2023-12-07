@@ -9,7 +9,12 @@ from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
 from tests.caching_ai import CachingAI
 
-from gpt_engineer.core.chat_to_files import chat_to_files_dict, Edit, parse_edits, apply_edits
+from gpt_engineer.core.chat_to_files import (
+    chat_to_files_dict,
+    Edit,
+    parse_edits,
+    apply_edits,
+)
 from gpt_engineer.core.chat_to_files import logger as parse_logger
 import logging
 
