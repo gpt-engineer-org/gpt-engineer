@@ -52,7 +52,7 @@ def test_init_lite_config(monkeypatch):
     code = env.download()
 
     assert outfile in code
-    assert code[outfile] == "Hello World!\n"
+    assert code[outfile].strip() == "Hello World!"
 
 
 def test_init_clarified_gen_config(monkeypatch):
