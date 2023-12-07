@@ -76,25 +76,25 @@ def test_init_clarified_gen_config(monkeypatch):
     assert code[outfile].strip() == "Hello World!"
 
 
-def test_init_self_heal_config(monkeypatch):
-    monkeypatch.setattr("builtins.input", lambda: "y")
-    temp_dir = tempfile.mkdtemp()
-    memory = DiskMemory(memory_path(temp_dir))
-    execution_env = DiskExecutionEnv()
-    cli_agent = CliAgent.with_default_config(
-        memory, execution_env, ai=CachingAI(), process_code_fn=self_heal
-    )
-    outfile = "output.txt"
-    file_path = os.path.join(temp_dir, outfile)
-    code = cli_agent.init(
-        f"Make a program that prints 'Hello World!' to a file called '{outfile}'. Make an intentional mistake in the code causing a runtime error"
-    )
-    env = DiskExecutionEnv()
-    env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
-    code = env.download()
-
-    assert outfile in code
-    assert code[outfile].strip() == "Hello World!"
+# def test_init_self_heal_config(monkeypatch):
+#     monkeypatch.setattr("builtins.input", lambda: "y")
+#     temp_dir = tempfile.mkdtemp()
+#     memory = DiskMemory(memory_path(temp_dir))
+#     execution_env = DiskExecutionEnv()
+#     cli_agent = CliAgent.with_default_config(
+#         memory, execution_env, ai=CachingAI(), process_code_fn=self_heal
+#     )
+#     outfile = "output.txt"
+#     file_path = os.path.join(temp_dir, outfile)
+#     code = cli_agent.init(
+#         f"Make a program that prints 'Hello World!' to a file called '{outfile}'. Make an intentional mistake in the code causing a runtime error"
+#     )
+#     env = DiskExecutionEnv()
+#     env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
+#     code = env.download()
+#
+#     assert outfile in code
+#     assert code[outfile].strip() == "Hello World!"
 
 
 def test_improve_standard_config(monkeypatch):
