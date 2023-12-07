@@ -36,6 +36,9 @@ For **development**:
 - `poetry install`
 - `poetry shell` to activate the virtual environment
 
+We have experimental support for [llama-index](https://github.com/run-llama/llama_index), [rank_bm25](https://github.com/dorianbrown/rank_bm25), and [tree_sitter_languages](https://github.com/grantjenks/py-tree-sitter-languages).
+- `poetry install --extras experimental`
+
 **API Key**
 
 Choose **one** of:

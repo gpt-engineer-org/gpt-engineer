@@ -34,9 +34,6 @@ tiktoken = ">=0.0.4"
 tabulate = "0.9.0"
 python-dotenv = ">=0.21.0"
 langchain = ">=0.0.335"
-llama-index = ">=0.8.49"
-rank-bm25 = ">=0.2.2"
-tree_sitter_languages = ">=1.8.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.3.1"
@@ -57,6 +54,11 @@ sphinx-copybutton = ">=0.5.1"
 markdown-include = ">=0.6.0"
 sphinx_copybutton = ">=0.5.2"
 
+[tool.poetry.group.experimental.dependencies]
+llama-index = ">=0.8.49"
+rank-bm25 = ">=0.2.2"
+tree_sitter_languages = ">=1.8.0"
+
 [tool.poetry.scripts]
 gpt-engineer = 'gpt_engineer.applications.cli.main:app'
 ge = 'gpt_engineer.applications.cli.main:app'
@@ -65,7 +67,7 @@ bench = 'gpt_engineer.benchmark.__main__:main'
 [tool.poetry.extras]
 test = ["pytest", "pytest-cov"]
 doc = ["autodoc_pydantic", "myst_parser", "nbsphinx", "sphinx", "sphinx-autobuild", "sphinx_book_theme", "sphinx_rtd_theme", "sphinx-typlog-theme", "sphinx-panels", "toml", "myst-nb", "linkchecker", "sphinx-copybutton", "markdown-include", "sphinx_copybutton"]
-
+experimental = ["llama-index", "rank-bm25", "tree_sitter_languages"]
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
