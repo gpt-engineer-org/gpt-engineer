@@ -19,27 +19,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install Poetry
+        run: |
+          pipx install poetry
+
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
-
-      # Install Poetry
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-
-      # Add Poetry to PATH
-      - name: Add Poetry to PATH
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      # Cache Poetry's dependencies based on the lock file
-      - name: Set up Poetry cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pypoetry
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-poetry-
+          cache: 'poetry'
 
       # Install dependencies using Poetry
       - name: Install dependencies
