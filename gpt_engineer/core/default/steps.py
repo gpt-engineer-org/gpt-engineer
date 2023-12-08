@@ -95,7 +95,7 @@ def execute_entrypoint(
     print()
     if input().lower() not in ["", "y", "yes"]:
         print("Ok, not executing the code.")
-        return []
+        return files_dict
     print("Executing the code...")
     print()
     print(
