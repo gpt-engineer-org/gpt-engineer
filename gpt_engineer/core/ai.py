@@ -1,26 +1,3 @@
-"""
-This module provides an interface to interact with AI models.
-It leverages the OpenAI GPT models and allows for integration with Azure-based instances of the same.
-The AI class encapsulates the chat functionalities, allowing to start, advance, and manage a conversation with the model.
-
-Key Features:
-- Integration with Azure-based OpenAI instances through the LangChain AzureChatOpenAI class.
-- Token usage logging to monitor the number of tokens consumed during a conversation.
-- Seamless fallback to default models in case the desired model is unavailable.
-- Serialization and deserialization of chat messages for easier transmission and storage.
-
-Classes:
-- AI: Main class providing chat functionalities.
-
-Dependencies:
-- langchain: For chat models and message schemas.
-- openai: For the core GPT models interaction.
-- backoff: For handling rate limits and retries.
-- typing: For type hints.
-
-For more specific details, refer to the docstrings within each class and function.
-"""
-
 from __future__ import annotations
 
 import json
@@ -53,43 +30,13 @@ logger = logging.getLogger(__name__)
 
 
 class AI:
-    """
-    A class to interface with a language model for chat-based interactions.
-
-    This class provides methods to initiate and maintain conversations using
-    a specified language model. It handles token counting, message creation,
-    serialization and deserialization of chat messages, and interfaces with
-    the language model to get AI-generated responses.
-
-    Attributes
-    ----------
-    temperature : float
-        The temperature setting for the model, affecting the randomness of the output.
-    azure_endpoint : str
-        The Azure endpoint URL, if applicable.
-    model_name : str
-        The name of the model being used.
-    llm : Any
-        The chat model instance.
-    token_usage_log : Any
-        The token usage log used to store cumulitive tokens used during the lifetime of the ai class
-
-    Methods
-    -------
-    start(system, user, step_name) -> List[Message]:
-        Start the conversation with a system and user message.
-    next(messages, prompt, step_name) -> List[Message]:
-        Advance the conversation by interacting with the language model.
-    backoff_inference(messages, callbacks) -> Any:
-        Interact with the model using an exponential backoff strategy in case of rate limits.
-    serialize_messages(messages) -> str:
-        Serialize a list of messages to a JSON string.
-    deserialize_messages(jsondictstr) -> List[Message]:
-        Deserialize a JSON string into a list of messages.
-
-    """
-
-    def __init__(self, model_name="gpt-4", temperature=0.1, azure_endpoint=""):
+    def __init__(
+        self,
+        model_name="gpt-4-1106-preview",
+        temperature=0.1,
+        azure_endpoint="",
+        streaming=True,
+    ):
         """
         Initialize the AI class.
 
@@ -102,8 +49,8 @@ class AI:
         """
         self.temperature = temperature
         self.azure_endpoint = azure_endpoint
-        self.model_name = self._check_model_access_and_fallback(model_name)
-
+        self.model_name = model_name
+        self.streaming = streaming
         self.llm = self._create_chat_model()
         self.token_usage_log = TokenUsageLog(model_name)
 
@@ -254,35 +201,10 @@ class AI:
         # Modify implicit is_chunk property to ALWAYS false
         # since Langchain's Message schema is stricter
         prevalidated_data = [
-            {**item, "data": {**item["data"], "is_chunk": False}} for item in data
+            {**item, "tools": {**item.get("tools", {}), "is_chunk": False}}
+            for item in data
         ]
         return list(messages_from_dict(prevalidated_data))  # type: ignore
-
-    def _check_model_access_and_fallback(self, model_name) -> str:
-        """
-        Retrieve the specified model, or fallback to "gpt-3.5-turbo" if the model is not available.
-
-        Parameters
-        ----------
-        model : str
-            The name of the model to retrieve.
-
-        Returns
-        -------
-        str
-            The name of the retrieved model, or "gpt-3.5-turbo" if the specified model is not available.
-        """
-        try:
-            openai.Model.retrieve(model_name)
-        except openai.InvalidRequestError:
-            print(
-                f"Model {model_name} not available for provided API key. Reverting "
-                "to gpt-3.5-turbo. Sign up for the GPT-4 wait list here: "
-                "https://openai.com/waitlist/gpt-4-api\n"
-            )
-            return "gpt-3.5-turbo"
-
-        return model_name
 
     def _create_chat_model(self) -> BaseChatModel:
         """
@@ -306,40 +228,16 @@ class AI:
                 openai_api_version=os.getenv("OPENAI_API_VERSION", "2023-05-15"),
                 deployment_name=self.model_name,
                 openai_api_type="azure",
-                streaming=True,
+                streaming=self.streaming,
             )
 
         return ChatOpenAI(
             model=self.model_name,
             temperature=self.temperature,
-            streaming=True,
+            streaming=self.streaming,
             client=openai.ChatCompletion,
         )
 
 
 def serialize_messages(messages: List[Message]) -> str:
-    """
-    Serialize a list of chat messages into a JSON-formatted string.
-
-    This function acts as a wrapper around the `AI.serialize_messages` method,
-    providing a more straightforward access to message serialization.
-
-    Parameters
-    ----------
-    messages : List[Message]
-        A list of chat messages to be serialized. Each message should be an
-        instance of the `Message` type (which includes `AIMessage`, `HumanMessage`,
-        and `SystemMessage`).
-
-    Returns
-    -------
-    str
-        A JSON-formatted string representation of the input messages.
-
-    Example
-    -------
-    >>> msgs = [SystemMessage(content="Hello"), HumanMessage(content="Hi, AI!")]
-    >>> serialize_messages(msgs)
-    '[{"type": "system", "content": "Hello"}, {"type": "human", "content": "Hi, AI!"}]'
-    """
     return AI.serialize_messages(messages)

@@ -51,13 +51,13 @@ scratchpad
 # Pyenv
 .python-version
 
-# Benchmark files
-benchmark
-!benchmark/*/prompt
-
 .gpte_consent
 
-.gpte_consent
+# projects folder apart from default prompt
+
+projects
+!projects/example/prompt
+!projects/example-improve
 
 # docs
 
@@ -72,8 +72,17 @@ docs/steps/
 docs/db
 docs/db/
 
-# poetry
-
-poetry.lock
+# coding assistants
 .aider*
 .gpteng
+
+# webapp specific
+webapp/node_modules
+webapp/package-lock.json
+
+webapp/.next/
+
+.langchain.db
+
+# TODO files
+/!todo*

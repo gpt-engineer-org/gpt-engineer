@@ -22,6 +22,8 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 
 ## Setup
 
+This project supports Python 3.8 - 3.11.
+
 Choose either **stable** or **development**.
 
 For **stable** release:
@@ -31,8 +33,11 @@ For **stable** release:
 For **development**:
 - `git clone https://github.com/AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
-- `python -m pip install -e .`
-  - (or: `make install && source venv/bin/activate` for a venv)
+- `poetry install`
+- `poetry shell` to activate the virtual environment
+
+We have experimental support for [llama-index](https://github.com/run-llama/llama_index), [rank_bm25](https://github.com/dorianbrown/rank_bm25), and [tree_sitter_languages](https://github.com/grantjenks/py-tree-sitter-languages).
+- `poetry install --extras experimental`
 
 **API Key**
 
@@ -59,16 +64,20 @@ There are two ways to work with GPT-engineer: new code mode (the default), and i
 ### Creating new code
 - Create an empty folder for your project anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions
-- Run `gpt-engineer <project_dir>` with a relative path to your folder
-  - For example: `gpt-engineer projects/my-new-project` from the gpt-engineer directory root with your new folder in `projects/`
+- Run `gpte <project_dir>` with a relative path to your folder
+  - For example: `gpte projects/my-new-project` from the gpt-engineer directory root with your new folder in `projects/`
 
 ### Improving Existing Code
 - Locate a folder with code which you want to improve anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions for how you want to improve the code
-- Run `gpt-engineer <project_dir> -i` with a relative path to your folder
-  - For example: `gpt-engineer projects/my-old-project` from the gpt-engineer directory root with your folder in `projects/`
+- Run `gpte <project_dir> -i` with a relative path to your folder
+  - For example: `gpte projects/my-old-project` from the gpt-engineer directory root with your folder in `projects/`
 
 By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
+
+### Note
+
+- To run this tool, the new command `gpte` is recommended for better user experience. However, the earlier default commands `gpt-engineer` and `ge` are also supported.
 
 
 ## Features

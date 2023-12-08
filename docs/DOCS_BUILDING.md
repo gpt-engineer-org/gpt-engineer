@@ -27,14 +27,13 @@ development environment.
 This project has a standard readthedocs layout which is built by Read the Docs almost the same way that you would build it
 locally (on your own laptop!).
 
-You can build and view this documentation project locally - we recommend that you activate a `poetry` or your choice of `venv`
-and dependency management tool.
+You can build and view this documentation project locally - we recommend that you activate a `poetry shell`.
 
 Update `repository_stats.md` file under `docs/intro`
 
 ```console
 # Install required Python dependencies (MkDocs etc.)
-pip install -e .[doc]
+poetry install
 cd docs/
 # Create the `api_reference.rst`
 python create_api_rst.py

@@ -29,8 +29,8 @@ For **development**:
 
 - `git clone git@github.com:AntonOsika/gpt-engineer.git`
 - `cd gpt-engineer`
-- `pip install -e .`
-  - (or: `make install && source venv/bin/activate` for a venv)
+- `poetry install`
+- `poetry shell` to activate the virtual environment
 
 ### Setup
 

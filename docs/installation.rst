@@ -39,7 +39,8 @@ Once you have a copy of the source, you can install it with:
 .. code-block:: console
 
     $ cd gpt-engineer
-    $ pip install -e .
+    $ poetry install
+    $ poetry shell
 
 
 .. _Github repo: https://github.com/AntonOsika/gpt-engineer.git

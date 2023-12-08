@@ -21,24 +21,21 @@ Please make sure to follow the established code style guidelines for this projec
 
 To enforce this we use [`pre-commit`](https://pre-commit.com/) to run [`black`](https://black.readthedocs.io/en/stable/index.html) and [`ruff`](https://beta.ruff.rs/docs/) on every commit.
 
-`pre-commit` is part of our `requirements.txt` file so you should already have it installed. If you don't, you can install the library via pip with:
+To install gpt-engineer as a developer, clone the repository and install the dependencies with:
 
 ```bash
-$ pip install -e .
+$ poetry install
+$ poetry shell
+```
 
-# For docs building, install doc dependencies too
+And then install the `pre-commit` hooks with:
 
-$ pip install -e .[doc]
-
-# And then install the `pre-commit` hooks with:
-
+```bash
 $ pre-commit install
 
 # output:
 pre-commit installed at .git/hooks/pre-commit
 ```
-
-Or you could just run `make dev-install` to install the dependencies and the hooks.
 
 If you are not familiar with the concept of [git hooks](https://git-scm.com/docs/githooks) and/or [`pre-commit`](https://pre-commit.com/) please read the documentation to understand how they work.
 

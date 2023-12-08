@@ -1,4 +1,4 @@
-name: Pip install and pytest
+name: Poetry install and pytest
 on:
   pull_request:
     branches: [ main ]
@@ -19,16 +19,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install Poetry
+        run: |
+          pipx install poetry
+
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
-          cache: pip
+          cache: 'poetry'
 
-      - name: Install package
-        run: pip install -e .
+      # Install dependencies using Poetry
+      - name: Install dependencies
+        run: poetry install
 
-      - name: Install test runner
-        run: pip install pytest pytest-cov
-
+      # Run unit tests using Poetry
       - name: Run unit tests
-        run: pytest --cov=gpt_engineer
+        run: poetry run pytest --cov=gpt_engineer
