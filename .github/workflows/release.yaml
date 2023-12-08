@@ -19,14 +19,16 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          # Update to use Poetry's cache
-          cache: 'poetry'
+          # Removed the cache line that was here
 
-      # Install Poetry and add it to PATH
+      # Install Poetry
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      # Add Poetry to PATH
+      - name: Add Poetry to PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       # Cache Poetry's dependencies based on the lock file
       - name: Set up Poetry cache
@@ -60,8 +62,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - name: Collect packages to release
-        uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v3
         with:
           name: package
           path: dist/
