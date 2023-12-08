@@ -22,10 +22,11 @@ jobs:
           # Update to use Poetry's cache
           cache: 'poetry'
 
-      # Install Poetry
+      # Install Poetry and add it to PATH
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       # Cache Poetry's dependencies based on the lock file
       - name: Set up Poetry cache
