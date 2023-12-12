@@ -53,7 +53,9 @@ def self_heal(
     # log_path = dbs.workspace.path / "log.txt"
     if not ENTRYPOINT_FILE in files_dict:
         raise FileNotFoundError(
-            "The required entrypoint " + ENTRYPOINT_FILE + " does not exist in the code."
+            "The required entrypoint "
+            + ENTRYPOINT_FILE
+            + " does not exist in the code."
         )
 
     attempts = 0

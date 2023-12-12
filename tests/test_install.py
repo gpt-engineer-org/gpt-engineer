@@ -60,7 +60,9 @@ def test_installation():
     result = subprocess.run([poetry_executable, "install"], capture_output=True)
 
     # Assert that the installation was successful.
-    assert result.returncode == 0, f"Install via poetry failed: {result.stderr.decode()}"
+    assert (
+        result.returncode == 0
+    ), f"Install via poetry failed: {result.stderr.decode()}"
 
 
 def test_cli_execution():

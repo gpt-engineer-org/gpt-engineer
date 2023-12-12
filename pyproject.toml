@@ -82,7 +82,6 @@ task-tags = ["TODO", "FIXME"]
 
 [tool.black]
 target-version = ["py311"]
-include = '\\.pyi?$'
 
 [tool.ruff.isort]
 known-first-party = []

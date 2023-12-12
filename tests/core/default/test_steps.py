@@ -174,7 +174,9 @@ class TestStepUtilities:
         # Assert
         assert actual_name == expected_name
 
-    def test_constructs_system_prompt_with_predefined_instructions_and_philosophies(self):
+    def test_constructs_system_prompt_with_predefined_instructions_and_philosophies(
+        self,
+    ):
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         preprompts = preprompts_holder.get_preprompts()
         sys_prompt = setup_sys_prompt(preprompts)

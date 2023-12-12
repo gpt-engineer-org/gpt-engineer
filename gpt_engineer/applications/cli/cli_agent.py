@@ -12,7 +12,11 @@ from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
-from gpt_engineer.core.default.paths import memory_path, ENTRYPOINT_FILE, PREPROMPTS_PATH
+from gpt_engineer.core.default.paths import (
+    memory_path,
+    ENTRYPOINT_FILE,
+    PREPROMPTS_PATH,
+)
 from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from typing import TypeVar, Callable, Union

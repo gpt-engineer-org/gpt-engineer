@@ -202,7 +202,9 @@ def test_apply_edit_multiple_matches(log_capture):
     code = {"file.py": "repeat repeat repeat"}
     apply_edits(edits, code)
     assert code == {"file.py": "new new new"}
-    assert "code block to be replaced was found multiple times" in log_capture.messages[0]
+    assert (
+        "code block to be replaced was found multiple times" in log_capture.messages[0]
+    )
 
 
 if __name__ == "__main__":

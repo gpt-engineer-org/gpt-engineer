@@ -35,7 +35,9 @@ class CodeSplitter(TextSplitter):
                     new_chunks.append(current_chunk)
                 current_chunk = ""
                 new_chunks.extend(self._chunk_node(child, text, last_end))
-            elif len(current_chunk) + child.end_byte - child.start_byte > self.max_chars:
+            elif (
+                len(current_chunk) + child.end_byte - child.start_byte > self.max_chars
+            ):
                 # Child would make the current chunk too big, so start a new chunk
                 new_chunks.append(current_chunk)
                 current_chunk = text[last_end : child.end_byte]
@@ -112,7 +114,9 @@ def _sort_documents_by_programming_language_or_other(
             if extension in lang["extensions"]:
                 doc.metadata["is_code"] = True
                 doc.metadata["code_language"] = lang["name"]
-                doc.metadata["code_language_tree_sitter_name"] = lang["tree_sitter_name"]
+                doc.metadata["code_language_tree_sitter_name"] = lang[
+                    "tree_sitter_name"
+                ]
                 docs_to_split[lang["tree_sitter_name"]].append(doc)
                 language_found = True
                 break

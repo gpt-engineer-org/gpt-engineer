@@ -100,7 +100,8 @@ def collect_learnings(
         remove_length = overflow + len(f"[REMOVED {overflow} CHARACTERS]") + 100
 
         learnings.logs = (
-            learnings.logs[:-remove_length] + f"\n\n[REMOVED {remove_length} CHARACTERS]"
+            learnings.logs[:-remove_length]
+            + f"\n\n[REMOVED {remove_length} CHARACTERS]"
         )
 
         print(

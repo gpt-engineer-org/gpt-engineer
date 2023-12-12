@@ -51,7 +51,10 @@ def gen_code(
 
 
 def gen_entrypoint(
-    ai: AI, files_dict: FilesDict, memory: BaseMemory, preprompts_holder: PrepromptsHolder
+    ai: AI,
+    files_dict: FilesDict,
+    memory: BaseMemory,
+    preprompts_holder: PrepromptsHolder,
 ) -> FilesDict:
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
@@ -78,7 +81,9 @@ def execute_entrypoint(
 ) -> FilesDict:
     if not ENTRYPOINT_FILE in files_dict:
         raise FileNotFoundError(
-            "The required entrypoint " + ENTRYPOINT_FILE + " does not exist in the code."
+            "The required entrypoint "
+            + ENTRYPOINT_FILE
+            + " does not exist in the code."
         )
 
     command = files_dict[ENTRYPOINT_FILE]

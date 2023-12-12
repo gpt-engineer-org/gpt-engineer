@@ -67,7 +67,9 @@ def print_results(results: list[TaskResult]):
         )
         for task_result in results
     )
-    total_assertions = sum(len(task_result.assertion_results) for task_result in results)
+    total_assertions = sum(
+        len(task_result.assertion_results) for task_result in results
+    )
     print(f"Total correct assertions: {correct_assertions}/{total_assertions}")
 
     correct_tasks = sum(

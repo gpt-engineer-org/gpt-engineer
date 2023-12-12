@@ -66,6 +66,8 @@ class CodeVectorRepository:
             raise ValueError("Index has not been loaded yet.")
 
         if self._retriever is None:
-            self._retriever = BM25Retriever.from_defaults(self._index, similarity_top_k=2)
+            self._retriever = BM25Retriever.from_defaults(
+                self._index, similarity_top_k=2
+            )
 
         return self._retriever.retrieve(query_string)
