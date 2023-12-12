@@ -26,7 +26,7 @@ def venv_setup_teardown():
     """
     try:
         # Create a virtual environment with pip available.
-        venv.create(VENV_DIR, with_pip=True)
+        venv.create(VENV_DIR, with_pip=True, clear=True)
 
         # Install Poetry in the virtual environment.
         subprocess.run(
