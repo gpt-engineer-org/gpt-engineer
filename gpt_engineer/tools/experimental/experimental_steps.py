@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 from langchain.schema import HumanMessage, SystemMessage
