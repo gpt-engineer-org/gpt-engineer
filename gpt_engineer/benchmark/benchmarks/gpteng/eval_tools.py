@@ -9,13 +9,9 @@ The scope will bre relatively limited to a few languages but this could
 be expanded.
 """
 
-import subprocess
 
-from datetime import datetime
 
-import yaml
 
-from tabulate import tabulate
 
 from gpt_engineer.core.files_dict import FilesDict
 

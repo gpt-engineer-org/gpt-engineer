@@ -23,17 +23,16 @@ Note:
     Consent logic is in gpt_engineer/learning.py.
 
 """
-import hashlib
 
-from typing import List, Tuple
+from typing import Tuple
 
-from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.applications.cli.learning import (
     Learning,
+    Review,
     extract_learning,
     human_review_input,
-    Review,
 )
+from gpt_engineer.core.default.disk_memory import DiskMemory
 
 
 def send_learning(learning: Learning):
@@ -88,7 +87,7 @@ def collect_learnings(
     learnings = extract_learning(prompt, model, temperature, config, memory, review)
     try:
         send_learning(learnings)
-    except RuntimeError as e:
+    except RuntimeError:
         # try to remove some parts of learning that might be too big
         # rudderstack max event size is 32kb
         max_size = 32 << 10  # 32KB in bytes
@@ -110,7 +109,7 @@ def collect_learnings(
         )
         try:
             send_learning(learnings)
-        except RuntimeError as e:
+        except RuntimeError:
             print(
                 "Sending learnings crashed despite truncation. Progressing without saving learnings."
             )

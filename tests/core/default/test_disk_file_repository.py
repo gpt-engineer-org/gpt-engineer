@@ -1,10 +1,7 @@
+
 import pytest
 
-from gpt_engineer.core.default.disk_memory import (
-    DiskMemory,
-)
-
-import unittest
+from gpt_engineer.core.default.disk_memory import DiskMemory
 
 
 def test_DB_operations(tmp_path):

@@ -1,12 +1,13 @@
+import tempfile
 import unittest
 
-from gpt_engineer.core.files_dict import FilesDict
+from unittest.mock import MagicMock, patch
+
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 
 # from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
-import tempfile
-from unittest.mock import patch, MagicMock
+from gpt_engineer.core.files_dict import FilesDict
 
 
 class TestOnDiskExecutionEnv(unittest.TestCase):

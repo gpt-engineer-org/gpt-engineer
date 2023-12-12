@@ -9,8 +9,6 @@ from typing import List, Optional, Union
 import backoff
 import openai
 
-from gpt_engineer.core.token_usage import TokenUsageLog
-
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
@@ -21,6 +19,8 @@ from langchain.schema import (
     messages_from_dict,
     messages_to_dict,
 )
+
+from gpt_engineer.core.token_usage import TokenUsageLog
 
 # Type hint for a chat message
 Message = Union[AIMessage, HumanMessage, SystemMessage]

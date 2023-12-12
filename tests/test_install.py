@@ -1,11 +1,12 @@
 """
 Tests for successful installation of the package.
 """
-import pytest
+import shutil
 import subprocess
 import sys
 import venv
-import shutil
+
+import pytest
 
 # Define the directory for the virtual environment.
 VENV_DIR = "./venv_test_installation"

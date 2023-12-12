@@ -1,8 +1,9 @@
+import example_snake_files
 import pytest
 
 from llama_index import Document
+
 from gpt_engineer.tools.experimental.code_vector_repository import CodeVectorRepository
-import example_snake_files
 
 
 def mock_load_documents_from_directory(self, directory_name):

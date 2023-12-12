@@ -1,12 +1,14 @@
-import pytest
-from gpt_engineer.core.chat_to_files import (
-    chat_to_files_dict,
-    Edit,
-    parse_edits,
-    apply_edits,
-)
-from gpt_engineer.core.chat_to_files import logger as parse_logger
 import logging
+
+import pytest
+
+from gpt_engineer.core.chat_to_files import (
+    Edit,
+    apply_edits,
+    chat_to_files_dict,
+    logger as parse_logger,
+    parse_edits,
+)
 
 
 def test_standard_input():

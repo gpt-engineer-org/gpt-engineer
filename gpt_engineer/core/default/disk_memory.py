@@ -30,9 +30,10 @@ Imports:
 import json
 import shutil
 
-from gpt_engineer.core.base_memory import BaseMemory
 from pathlib import Path
-from typing import Any, Optional, Union, Iterator, Dict
+from typing import Any, Dict, Iterator, Optional, Union
+
+from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.tools.experimental.supported_languages import SUPPORTED_LANGUAGES
 
 

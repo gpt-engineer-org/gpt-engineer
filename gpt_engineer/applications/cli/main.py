@@ -25,32 +25,30 @@ Notes:
 
 """
 
+import logging
 import os
+
 from pathlib import Path
 
 import openai
 import typer
+
 from dotenv import load_dotenv
 
-from gpt_engineer.core.default.file_store import FileStore
-from gpt_engineer.core.default.disk_memory import DiskMemory
+from gpt_engineer.applications.cli.cli_agent import CliAgent
+from gpt_engineer.applications.cli.collect import collect_and_send_human_review
+from gpt_engineer.applications.cli.file_selector import ask_for_files
 from gpt_engineer.core.ai import AI
+from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
+from gpt_engineer.core.default.disk_memory import DiskMemory
+from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
-from gpt_engineer.applications.cli.file_selector import ask_for_files, get_all_code
-from gpt_engineer.tools.custom_steps import (
-    lite_gen,
-    clarified_gen,
-    self_heal,
-)
+from gpt_engineer.core.default.steps import execute_entrypoint, gen_code, improve
+from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
 from gpt_engineer.tools.experimental.experimental_steps import (
     improve_automatic_file_selection,
 )
-from gpt_engineer.core.default.steps import gen_code, execute_entrypoint, improve
-from gpt_engineer.applications.cli.cli_agent import CliAgent
-from gpt_engineer.applications.cli.collect import collect_and_send_human_review
-from gpt_engineer.core.preprompts_holder import PrepromptsHolder
-from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
-import logging
 
 app = typer.Typer()  # creates a CLI app
 

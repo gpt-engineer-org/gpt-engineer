@@ -1,10 +1,13 @@
-from typing import Any, List, Dict, NamedTuple
-from pathlib import Path
 from collections import defaultdict
-from langchain.text_splitter import TextSplitter
-from langchain.docstore.document import Document
-from gpt_engineer.tools.experimental.supported_languages import SUPPORTED_LANGUAGES
+from pathlib import Path
+from typing import Any, Dict, List, NamedTuple
+
 import tree_sitter_languages
+
+from langchain.docstore.document import Document
+from langchain.text_splitter import TextSplitter
+
+from gpt_engineer.tools.experimental.supported_languages import SUPPORTED_LANGUAGES
 
 
 class CodeSplitter(TextSplitter):

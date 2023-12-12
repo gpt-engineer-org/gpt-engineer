@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import TypeVar, MutableMapping
-from abc import ABC
+from typing import MutableMapping
 
 BaseMemory = MutableMapping[str | Path, str]

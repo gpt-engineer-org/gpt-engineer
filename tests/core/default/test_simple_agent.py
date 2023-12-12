@@ -1,22 +1,12 @@
-import pytest
 import tempfile
-from gpt_engineer.core.ai import AI
-from gpt_engineer.core.default.simple_agent import SimpleAgent
-from gpt_engineer.core.files_dict import FilesDict
-import os
+
+import pytest
 
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
+from gpt_engineer.core.default.simple_agent import SimpleAgent
+from gpt_engineer.core.files_dict import FilesDict
 from tests.caching_ai import CachingAI
-
-from gpt_engineer.core.chat_to_files import (
-    chat_to_files_dict,
-    Edit,
-    parse_edits,
-    apply_edits,
-)
-from gpt_engineer.core.chat_to_files import logger as parse_logger
-import logging
 
 
 def test_init():

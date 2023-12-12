@@ -1,28 +1,28 @@
-from gpt_engineer.core.files_dict import FilesDict
+import inspect
+import re
+
+from pathlib import Path
+from typing import List, MutableMapping, Union
+
+from langchain.schema import HumanMessage, SystemMessage
+from termcolor import colored
+
 from gpt_engineer.core.ai import AI
+from gpt_engineer.core.base_execution_env import BaseExecutionEnv
+from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.core.chat_to_files import (
     chat_to_files_dict,
     overwrite_code_with_edits,
     parse_edits,
 )
+from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.paths import (
-    ENTRYPOINT_FILE,
     CODE_GEN_LOG_FILE,
+    ENTRYPOINT_FILE,
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE,
-    PREPROMPTS_PATH,
 )
-from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
-from gpt_engineer.core.default.disk_memory import DiskMemory
-from gpt_engineer.core.base_memory import BaseMemory
-from gpt_engineer.core.base_execution_env import BaseExecutionEnv
-
-from typing import Union, MutableMapping, List
-from pathlib import Path
-from langchain.schema import HumanMessage, SystemMessage
-import inspect
-import re
-from termcolor import colored
+from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
 
@@ -79,7 +79,7 @@ def execute_entrypoint(
     files_dict: FilesDict,
     preprompts_holder: PrepromptsHolder = None,
 ) -> FilesDict:
-    if not ENTRYPOINT_FILE in files_dict:
+    if ENTRYPOINT_FILE not in files_dict:
         raise FileNotFoundError(
             "The required entrypoint "
             + ENTRYPOINT_FILE
@@ -138,12 +138,12 @@ def incorrect_edit(files_dict: FilesDict, chat: str) -> List[str,]:
         return problems
 
     for edit in edits:
-        if not edit.filename in files_dict:
+        if edit.filename not in files_dict:
             problems.append(
                 f"A section tried to edit the file {edit.filename}, but this file does not exist in the code. Section:\n"
                 + edit.filename
             )
-        elif not edit.before in files_dict[edit.filename]:
+        elif edit.before not in files_dict[edit.filename]:
             problems.append(
                 "This section, assigned to be exchanged for an edit block, does not have an exact match in the code: "
                 + edit.before
@@ -176,7 +176,7 @@ def improve(
         if len(problems) > 0:
             messages.append(
                 HumanMessage(
-                    content=f"Some previously produced edits were not on the requested format, or the HEAD part was not found in the code. Details: "
+                    content="Some previously produced edits were not on the requested format, or the HEAD part was not found in the code. Details: "
                     + "\n".join(problems)
                     + "\n Please provide ALL the edits again, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
                 )

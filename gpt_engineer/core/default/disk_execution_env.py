@@ -2,8 +2,8 @@ import subprocess
 import time
 
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
-from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.default.file_store import FileStore
+from gpt_engineer.core.files_dict import FilesDict
 
 
 class DiskExecutionEnv(BaseExecutionEnv):

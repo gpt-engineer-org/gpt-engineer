@@ -26,11 +26,11 @@ Functions:
 - apply_edits: Applies file edits to a workspace.
 """
 
-import re
 import logging
+import re
 
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List
 
 from gpt_engineer.core.files_dict import FilesDict
 

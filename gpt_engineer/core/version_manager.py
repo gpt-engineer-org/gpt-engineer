@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from gpt_engineer.core.files_dict import FilesDict
-from typing import Union
 from pathlib import Path
+from typing import Union
+
+from gpt_engineer.core.files_dict import FilesDict
 
 
 class BaseVersionManager(ABC):
