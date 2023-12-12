@@ -79,6 +79,7 @@ select = ["F", "E", "W", "I001"]
 show-fixes = false
 target-version = "py311"
 task-tags = ["TODO", "FIXME"]
+extend-ignore = ["E501"]
 
 [tool.black]
 target-version = ["py311"]
