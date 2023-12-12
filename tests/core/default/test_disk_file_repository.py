@@ -1,4 +1,3 @@
-
 import pytest
 
 from gpt_engineer.core.default.disk_memory import DiskMemory
