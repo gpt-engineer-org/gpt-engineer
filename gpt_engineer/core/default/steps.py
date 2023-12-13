@@ -138,12 +138,7 @@ def incorrect_edit(files_dict: FilesDict, chat: str) -> List[str,]:
         return problems
 
     for edit in edits:
-        if edit.filename not in files_dict:
-            problems.append(
-                f"A section tried to edit the file {edit.filename}, but this file does not exist in the code. Section:\n"
-                + edit.filename
-            )
-        elif edit.before not in files_dict[edit.filename]:
+        if edit.before not in files_dict[edit.filename]:
             problems.append(
                 "This section, assigned to be exchanged for an edit block, does not have an exact match in the code: "
                 + edit.before
