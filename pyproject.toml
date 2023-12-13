@@ -58,8 +58,11 @@ sphinx-copybutton = ">=0.5.1"
 markdown-include = ">=0.6.0"
 sphinx_copybutton = ">=0.5.2"
 
+[tool.poetry.group.experimental]
+optional = true
+
 [tool.poetry.group.experimental.dependencies]
-llama-index = ">=0.8.49"
+llama-index = ">=0.8"
 rank-bm25 = ">=0.2.2"
 tree_sitter_languages = ">=1.8.0"
 
