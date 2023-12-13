@@ -28,11 +28,13 @@ Notes:
 import logging
 import os
 
-from pathlib import Path
 from importlib.util import find_spec
+from pathlib import Path
+
 import openai
-import typer
 import toml
+import typer
+
 from dotenv import load_dotenv
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
@@ -46,7 +48,6 @@ from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.core.default.steps import execute_entrypoint, gen_code, improve
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
-
 
 # Load the names of the optional dependencies from the pyprojecct file and determine whether
 # they can be imported
