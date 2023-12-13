@@ -29,10 +29,10 @@ import logging
 import os
 
 from pathlib import Path
-
+from importlib.util import find_spec
 import openai
 import typer
-
+import toml
 from dotenv import load_dotenv
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
@@ -46,8 +46,16 @@ from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.core.default.steps import execute_entrypoint, gen_code, improve
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
-from gpt_engineer.tools.experimental.experimental_steps import (
-    improve_automatic_file_selection,
+
+
+# Load the names of the optional dependencies from the pyprojecct file and determine whether
+# they can be imported
+with open("pyproject.toml", "r") as file:
+    pyproject = toml.load(file)
+
+dependency_group = pyproject["tool"]["poetry"]["group"]["experimental"]["dependencies"]
+optional_deps_importable = all(
+    [find_spec(dep_name.replace("-", "_")) is not None for dep_name in dependency_group]
 )
 
 app = typer.Typer()  # creates a CLI app
@@ -103,7 +111,7 @@ def main(
     ),
     improve_all_mode: bool = typer.Option(
         False,
-        "--improve_all_experimental",
+        "--improve-all-experimental",
         help="Improve files_dict from existing project, without manually choosing which files to improve, using vector store (EXPERIMENTAL).",
     ),
     lite_mode: bool = typer.Option(
@@ -183,8 +191,16 @@ def main(
     else:
         execution_fn = execute_entrypoint
 
-    if improve_all_mode:
+    if improve_all_mode and optional_deps_importable:
+        from gpt_engineer.tools.experimental.experimental_steps import (
+            improve_automatic_file_selection,
+        )
+
         improve_fn = improve_automatic_file_selection
+    elif improve_all_mode:
+        raise ImportError(
+            "The experimental improve_all_mode is selected, but the optional dependencies to use it are not installed. Please run 'poetry install --with experimental'"
+        )
     else:
         improve_fn = improve
 
