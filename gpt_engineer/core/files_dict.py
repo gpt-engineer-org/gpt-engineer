@@ -1,4 +1,3 @@
-from typing import MutableMapping
 from pathlib import Path
 
 

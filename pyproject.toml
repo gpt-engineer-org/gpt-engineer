@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gpt-engineer"
-version = "0.2.1"
+version = "0.2.2"
 description = "Specify what you want it to build, the AI asks for clarification, and then builds it."
 authors = ["Anton Osika <anton.osika@gmail.com>"]
 license = "MIT"
@@ -58,8 +58,11 @@ sphinx-copybutton = ">=0.5.1"
 markdown-include = ">=0.6.0"
 sphinx_copybutton = ">=0.5.2"
 
+[tool.poetry.group.experimental]
+optional = true
+
 [tool.poetry.group.experimental.dependencies]
-llama-index = ">=0.8.49"
+llama-index = ">=0.8"
 rank-bm25 = ">=0.2.2"
 tree_sitter_languages = ">=1.8.0"
 
@@ -76,15 +79,13 @@ experimental = ["llama-index", "rank-bm25", "tree_sitter_languages"]
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
-line-length = 100
 show-fixes = false
 target-version = "py311"
 task-tags = ["TODO", "FIXME"]
+extend-ignore = ["E501", "E722"]
 
 [tool.black]
-line-length = 90
 target-version = ["py311"]
-include = '\\.pyi?$'
 
 [tool.ruff.isort]
 known-first-party = []

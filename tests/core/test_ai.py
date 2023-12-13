@@ -1,6 +1,7 @@
-from gpt_engineer.core.ai import AI
-from langchain.chat_models.fake import FakeListChatModel
 from langchain.chat_models.base import BaseChatModel
+from langchain.chat_models.fake import FakeListChatModel
+
+from gpt_engineer.core.ai import AI
 
 
 def mock_create_chat_model(self) -> BaseChatModel:

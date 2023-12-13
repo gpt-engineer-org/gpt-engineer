@@ -1,7 +1,10 @@
 import csv
+
 from io import StringIO
-from gpt_engineer.core.token_usage import TokenUsageLog, TokenUsage
-from langchain.schema import AIMessage, HumanMessage, SystemMessage
+
+from langchain.schema import HumanMessage, SystemMessage
+
+from gpt_engineer.core.token_usage import TokenUsageLog
 
 
 def test_format_log():

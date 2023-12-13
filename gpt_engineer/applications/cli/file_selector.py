@@ -119,7 +119,9 @@ class DisplayablePath(object):
         return self.path.name
 
     @classmethod
-    def make_tree(cls, root: Union[str, Path], parent=None, is_last=False, criteria=None):
+    def make_tree(
+        cls, root: Union[str, Path], parent=None, is_last=False, criteria=None
+    ):
         """
         Generate a tree of DisplayablePath objects.
 

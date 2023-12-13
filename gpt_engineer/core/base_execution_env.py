@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from gpt_engineer.core.files_dict import FilesDict
 from subprocess import Popen
+
+from gpt_engineer.core.files_dict import FilesDict
 
 
 class BaseExecutionEnv(ABC):

@@ -1,16 +1,13 @@
+import json
 import os.path
+
+from pathlib import Path
+from typing import List, Optional, Union
+
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.token_usage import TokenUsageLog
-from pathlib import Path
-import json
-from typing import List, Optional, Union
-
-from langchain.schema import (
-    AIMessage,
-    HumanMessage,
-    SystemMessage,
-)
 
 # Type hint for a chat message
 Message = Union[AIMessage, HumanMessage, SystemMessage]

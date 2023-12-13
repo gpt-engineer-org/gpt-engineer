@@ -1,11 +1,12 @@
 """
 Tests for successful installation of the package.
 """
-import pytest
+import shutil
 import subprocess
 import sys
 import venv
-import shutil
+
+import pytest
 
 # Define the directory for the virtual environment.
 VENV_DIR = "./venv_test_installation"
@@ -25,7 +26,7 @@ def venv_setup_teardown():
     """
     try:
         # Create a virtual environment with pip available.
-        venv.create(VENV_DIR, with_pip=True)
+        venv.create(VENV_DIR, with_pip=True, clear=True)
 
         # Install Poetry in the virtual environment.
         subprocess.run(
@@ -60,7 +61,9 @@ def test_installation():
     result = subprocess.run([poetry_executable, "install"], capture_output=True)
 
     # Assert that the installation was successful.
-    assert result.returncode == 0, f"Install via poetry failed: {result.stderr.decode()}"
+    assert (
+        result.returncode == 0
+    ), f"Install via poetry failed: {result.stderr.decode()}"
 
 
 def test_cli_execution():

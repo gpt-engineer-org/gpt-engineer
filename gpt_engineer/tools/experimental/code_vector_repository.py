@@ -1,9 +1,8 @@
 from typing import Dict, List
 
-from llama_index import VectorStoreIndex, SimpleDirectoryReader
-from llama_index import Document
-from llama_index.schema import NodeWithScore
+from llama_index import Document, SimpleDirectoryReader, VectorStoreIndex
 from llama_index.retrievers import BM25Retriever
+from llama_index.schema import NodeWithScore
 
 from gpt_engineer.tools.experimental.document_chunker import DocumentChunker
 
@@ -66,6 +65,8 @@ class CodeVectorRepository:
             raise ValueError("Index has not been loaded yet.")
 
         if self._retriever is None:
-            self._retriever = BM25Retriever.from_defaults(self._index, similarity_top_k=2)
+            self._retriever = BM25Retriever.from_defaults(
+                self._index, similarity_top_k=2
+            )
 
         return self._retriever.retrieve(query_string)

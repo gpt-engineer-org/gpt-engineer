@@ -1,11 +1,15 @@
 """
 Tests for the revised data collection consent mechanism in the cli/learning module.
 """
-import pytest
-from unittest.mock import patch
 from pathlib import Path
-from gpt_engineer.applications.cli.learning import ask_collection_consent
-from gpt_engineer.applications.cli.learning import check_collection_consent
+from unittest.mock import patch
+
+import pytest
+
+from gpt_engineer.applications.cli.learning import (
+    ask_collection_consent,
+    check_collection_consent,
+)
 
 
 # Use a fixture to clean up created files after each test
@@ -27,25 +31,25 @@ Test the following 4 scenarios for check_collection_consent():
 
 def test_check_consent_file_exists_and_true(cleanup):
     Path(".gpte_consent").write_text("true")
-    assert check_collection_consent() == True
+    assert check_collection_consent() is True
 
 
 def test_check_consent_file_exists_and_false(cleanup):
     Path(".gpte_consent").write_text("false")
     with patch("builtins.input", side_effect=["n"]):
-        assert check_collection_consent() == False
+        assert check_collection_consent() is False
 
 
 def test_check_consent_file_not_exists_and_user_says_yes(cleanup):
     with patch("builtins.input", side_effect=["y"]):
-        assert check_collection_consent() == True
+        assert check_collection_consent() is True
     assert Path(".gpte_consent").exists()
     assert Path(".gpte_consent").read_text() == "true"
 
 
 def test_check_consent_file_not_exists_and_user_says_no(cleanup):
     with patch("builtins.input", side_effect=["n"]):
-        assert check_collection_consent() == False
+        assert check_collection_consent() is False
     assert not Path(".gpte_consent").exists()
 
 
@@ -73,14 +77,14 @@ def test_ask_collection_consent_yes(cleanup):
         result = ask_collection_consent()
     assert Path(".gpte_consent").exists()
     assert Path(".gpte_consent").read_text() == "true"
-    assert result == True
+    assert result is True
 
 
 def test_ask_collection_consent_no(cleanup):
     with patch("builtins.input", side_effect=["n"]):
         result = ask_collection_consent()
     assert not Path(".gpte_consent").exists()
-    assert result == False
+    assert result is False
 
 
 def test_ask_collection_consent_invalid_then_yes(cleanup):
@@ -88,11 +92,11 @@ def test_ask_collection_consent_invalid_then_yes(cleanup):
         result = ask_collection_consent()
     assert Path(".gpte_consent").exists()
     assert Path(".gpte_consent").read_text() == "true"
-    assert result == True
+    assert result is True
 
 
 def test_ask_collection_consent_invalid_then_no(cleanup):
     with patch("builtins.input", side_effect=["invalid", "n"]):
         result = ask_collection_consent()
     assert not Path(".gpte_consent").exists()
-    assert result == False
+    assert result is False

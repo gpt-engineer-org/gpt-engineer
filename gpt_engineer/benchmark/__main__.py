@@ -1,5 +1,7 @@
 import importlib
-from typing import Optional, Annotated
+
+from typing import Annotated, Optional
+
 import typer
 
 from langchain.cache import SQLiteCache
@@ -22,7 +24,9 @@ def main(
             help="python file that contains a function called 'default_config_agent'"
         ),
     ],
-    benchmarks: Annotated[str, typer.Argument(help="benchmark name(s) separated by ','")],
+    benchmarks: Annotated[
+        str, typer.Argument(help="benchmark name(s) separated by ','")
+    ],
     task_name: Annotated[
         Optional[str], typer.Argument(help="optional task name in benchmark")
     ] = None,
@@ -38,7 +42,9 @@ def main(
         agent = get_agent(path_to_agent)
 
         results = run(agent, benchmark, task_name, verbose=verbose)
-        print(f"\n--- Results for agent {path_to_agent}, benchmark: {benchmark_name} ---")
+        print(
+            f"\n--- Results for agent {path_to_agent}, benchmark: {benchmark_name} ---"
+        )
         print_results(results)
         print()
 

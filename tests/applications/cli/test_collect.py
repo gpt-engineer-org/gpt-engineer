@@ -2,19 +2,8 @@
 Tests the collect_learnings function in the cli/collect module.
 """
 
-import json
-
-from unittest.mock import MagicMock
 
 import pytest
-import rudderstack.analytics as rudder_analytics
-
-from gpt_engineer.applications.cli.collect import collect_learnings
-from gpt_engineer.core.default.disk_memory import (
-    DiskMemory,
-)
-from gpt_engineer.applications.cli.learning import extract_learning
-
 
 # def test_collect_learnings(monkeypatch):
 #     monkeypatch.setattr(rudder_analytics, "track", MagicMock())

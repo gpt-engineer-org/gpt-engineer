@@ -1,15 +1,17 @@
-import pytest
+import os
 import tempfile
-from tests.caching_ai import CachingAI
+
+import pytest
+
 from gpt_engineer.applications.cli.cli_agent import CliAgent
-from gpt_engineer.tools.custom_steps import self_heal, lite_gen, clarified_gen
-from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
 
 # from gpt_engineer.core.default.git_version_manager import GitVersionManager
-from gpt_engineer.core.default.paths import memory_path, ENTRYPOINT_FILE
-import os
+from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, memory_path
+from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen
+from tests.caching_ai import CachingAI
 
 
 def test_init_standard_config(monkeypatch):
@@ -19,7 +21,7 @@ def test_init_standard_config(monkeypatch):
     execution_env = DiskExecutionEnv()
     cli_agent = CliAgent.with_default_config(memory, execution_env, ai=CachingAI())
     outfile = "output.txt"
-    file_path = os.path.join(temp_dir, outfile)
+    os.path.join(temp_dir, outfile)
     code = cli_agent.init(
         f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
     )
@@ -42,7 +44,7 @@ def test_init_lite_config(monkeypatch):
         memory, execution_env, ai=CachingAI(), code_gen_fn=lite_gen
     )
     outfile = "output.txt"
-    file_path = os.path.join(temp_dir, outfile)
+    os.path.join(temp_dir, outfile)
     code = cli_agent.init(
         f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
     )

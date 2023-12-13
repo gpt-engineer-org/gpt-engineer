@@ -1,7 +1,6 @@
-from gpt_engineer.core.files_dict import FilesDict
-from gpt_engineer.core.version_manager import BaseVersionManager
-from gpt_engineer.core.ai import AI
 from abc import ABC, abstractmethod
+
+from gpt_engineer.core.files_dict import FilesDict
 
 
 class BaseAgent(ABC):

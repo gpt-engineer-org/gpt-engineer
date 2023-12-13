@@ -1,15 +1,16 @@
+import os
 import tempfile
 
-from langchain.schema import SystemMessage, HumanMessage
+from langchain.schema import HumanMessage, SystemMessage
 
 from gpt_engineer.core.ai import AI
+from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.core.chat_to_files import overwrite_code_with_edits
-from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import IMPROVE_LOG_FILE
-from gpt_engineer.core.default.steps import setup_sys_prompt_existing_code, curr_fn
+from gpt_engineer.core.default.steps import curr_fn, setup_sys_prompt_existing_code
+from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
-from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.tools.experimental.code_vector_repository import CodeVectorRepository
 
 

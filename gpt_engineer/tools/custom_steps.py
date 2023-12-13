@@ -1,22 +1,18 @@
-from termcolor import colored
-from typing import List, Union
 from platform import platform
 from sys import version_info
-from langchain.schema import SystemMessage, HumanMessage, AIMessage
+from typing import List, Union
+
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from termcolor import colored
+
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.preprompts_holder import PrepromptsHolder
-from gpt_engineer.core.base_memory import BaseMemory
-from gpt_engineer.core.default.paths import (
-    ENTRYPOINT_FILE,
-    CODE_GEN_LOG_FILE,
-)
-from gpt_engineer.core.default.steps import (
-    curr_fn,
-    setup_sys_prompt,
-)
-from gpt_engineer.core.chat_to_files import chat_to_files_dict
-from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
+from gpt_engineer.core.base_memory import BaseMemory
+from gpt_engineer.core.chat_to_files import chat_to_files_dict
+from gpt_engineer.core.default.paths import CODE_GEN_LOG_FILE, ENTRYPOINT_FILE
+from gpt_engineer.core.default.steps import curr_fn, setup_sys_prompt
+from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
 # Type hint for chat messages
 Message = Union[AIMessage, HumanMessage, SystemMessage]
@@ -51,9 +47,11 @@ def self_heal(
 
     # step 1. execute the entrypoint
     # log_path = dbs.workspace.path / "log.txt"
-    if not ENTRYPOINT_FILE in files_dict:
+    if ENTRYPOINT_FILE not in files_dict:
         raise FileNotFoundError(
-            "The required entrypoint " + ENTRYPOINT_FILE + " does not exist in the code."
+            "The required entrypoint "
+            + ENTRYPOINT_FILE
+            + " does not exist in the code."
         )
 
     attempts = 0

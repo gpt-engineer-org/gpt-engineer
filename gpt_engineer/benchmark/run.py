@@ -1,7 +1,5 @@
 import time
 
-import typer
-
 from gpt_engineer.benchmark.types import Assertable, Benchmark, TaskResult
 from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
@@ -67,7 +65,9 @@ def print_results(results: list[TaskResult]):
         )
         for task_result in results
     )
-    total_assertions = sum(len(task_result.assertion_results) for task_result in results)
+    total_assertions = sum(
+        len(task_result.assertion_results) for task_result in results
+    )
     print(f"Total correct assertions: {correct_assertions}/{total_assertions}")
 
     correct_tasks = sum(
