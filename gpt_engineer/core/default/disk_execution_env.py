@@ -1,6 +1,6 @@
 import subprocess
 import time
-
+from pathlib import Path
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.files_dict import FilesDict
@@ -18,7 +18,7 @@ class DiskExecutionEnv(BaseExecutionEnv):
         path (str): The file system path where the code is located and will be executed.
     """
 
-    def __init__(self, path: str | None = None):
+    def __init__(self, path: str | Path | None = None):
         self.store = FileStore(path)
 
     def upload(self, files: FilesDict) -> "DiskExecutionEnv":

@@ -15,7 +15,7 @@ from tests.caching_ai import CachingAI
 
 
 def test_init_standard_config(monkeypatch):
-    monkeypatch.setattr("builtins.input", lambda: "y")
+    monkeypatch.setattr("builtins.input", lambda _: "y")
     temp_dir = tempfile.mkdtemp()
     memory = DiskMemory(memory_path(temp_dir))
     execution_env = DiskExecutionEnv()
@@ -35,7 +35,7 @@ def test_init_standard_config(monkeypatch):
 
 
 def test_init_lite_config(monkeypatch):
-    monkeypatch.setattr("builtins.input", lambda: "y")
+    monkeypatch.setattr("builtins.input", lambda _: "y")
     temp_dir = tempfile.mkdtemp()
     memory = DiskMemory(memory_path(temp_dir))
     # version_manager = GitVersionManager(temp_dir)
@@ -58,7 +58,7 @@ def test_init_lite_config(monkeypatch):
 
 
 def test_init_clarified_gen_config(monkeypatch):
-    monkeypatch.setattr("builtins.input", lambda: "y")
+    monkeypatch.setattr("builtins.input", lambda _: "y")
     temp_dir = tempfile.mkdtemp()
     memory = DiskMemory(memory_path(temp_dir))
     execution_env = DiskExecutionEnv()
@@ -79,7 +79,7 @@ def test_init_clarified_gen_config(monkeypatch):
 
 
 # def test_init_self_heal_config(monkeypatch):
-#     monkeypatch.setattr("builtins.input", lambda: "y")
+#     monkeypatch.setattr("builtins.input", lambda _: "y")
 #     temp_dir = tempfile.mkdtemp()
 #     memory = DiskMemory(memory_path(temp_dir))
 #     execution_env = DiskExecutionEnv()
@@ -100,7 +100,7 @@ def test_init_clarified_gen_config(monkeypatch):
 
 
 def test_improve_standard_config(monkeypatch):
-    monkeypatch.setattr("builtins.input", lambda: "y")
+    monkeypatch.setattr("builtins.input", lambda _: "y")
     temp_dir = tempfile.mkdtemp()
     code = FilesDict(
         {

@@ -70,7 +70,7 @@ def self_heal(
         print()
         print(command)
         print()
-        if input().lower() not in ["", "y", "yes"]:
+        if input("").lower() not in ["", "y", "yes"]:
             print("Ok, not executing the code.")
             return files_dict
         print("Executing the code...")
@@ -138,7 +138,7 @@ def clarified_gen(
             break
 
         print('(answer in text, or "c" to move on)\n')
-        user_input = input()
+        user_input = input("")
         print()
 
         if not user_input or user_input == "c":
