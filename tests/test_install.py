@@ -86,24 +86,8 @@ def test_cli_execution():
 
 def test_installed_main_execution(tmp_path):
     """
-    Tests the execution of the main function in a virtual environment.
-    Verifies the output of the 'gpte_test_application' execution.
-    temporary project directory, writing a prompt into a file, and then running the main function.
-    The test verifies the output contains the expected result for the prompt.
-
-    Parameters
-    ----------
-    tmp_path : pathlib.Path
-        A temporary directory provided by the pytest fixture for file operations.
-
-    Setup
-    -----
-    A project directory is created within the temporary path. A prompt is written to a file
-    in the project directory.
-
-    Teardown
-    -------
-    Standard pytest temporary directory teardown automatically handles the cleanup.
+    This test function checks the execution of the main function in a virtual environment. 
+    It uses a temporary directory for file operations and creates a project directory within it.
     """
     tmp_path = Path(tmp_path)
     p = tmp_path / "projects/example"
