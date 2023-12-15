@@ -4,8 +4,8 @@ Tests for successful installation of the package.
 import shutil
 import subprocess
 import sys
-import uuid
 import venv
+
 from pathlib import Path
 
 import pytest

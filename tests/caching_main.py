@@ -1,7 +1,7 @@
-from tests.caching_ai import CachingAI
-from gpt_engineer.applications.cli.main import main
 import typer
 
+from gpt_engineer.applications.cli.main import main
+from tests.caching_ai import CachingAI
 
 main.__globals__["AI"] = CachingAI
 app = typer.Typer()
