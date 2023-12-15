@@ -4,7 +4,9 @@ Tests for successful installation of the package.
 import shutil
 import subprocess
 import sys
+import uuid
 import venv
+from pathlib import Path
 
 import pytest
 
@@ -80,3 +82,22 @@ def test_cli_execution():
     assert (
         result.returncode == 0
     ), f"gpt-engineer command failed with message: {result.stderr}"
+
+
+def test_installed_main_execution(tmp_path):
+    tmp_path = Path(tmp_path)
+    p = tmp_path / "projects/example"
+    p.mkdir(parents=True)
+    (p / "prompt").write_text("make a program that prints the outcome of 4+4")
+    proc = subprocess.Popen(
+        ["gpte_test_application", str(p)],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        text=True,
+        cwd=tmp_path,
+    )
+
+    inputs = "Y\nn"
+    output, _ = proc.communicate(inputs)
+
+    assert "8" in output
