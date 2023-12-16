@@ -1,4 +1,4 @@
 from pathlib import Path
-from typing import MutableMapping
+from typing import MutableMapping, Union
 
-BaseMemory = MutableMapping[str | Path, str]
+BaseMemory = MutableMapping[Union[str, Path], str]

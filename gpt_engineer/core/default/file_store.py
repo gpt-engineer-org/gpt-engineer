@@ -1,12 +1,13 @@
 import tempfile
 
 from pathlib import Path
+from typing import Union
 
 from gpt_engineer.core.files_dict import FilesDict
 
 
 class FileStore:
-    def __init__(self, path: str | Path | None = None):
+    def __init__(self, path: Union[str, Path, None] = None):
         if path is None:
             path = Path(tempfile.mkdtemp(prefix="gpt-engineer-"))
 

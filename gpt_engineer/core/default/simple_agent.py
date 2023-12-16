@@ -1,5 +1,7 @@
 import tempfile
 
+from typing import Optional
+
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
@@ -61,7 +63,7 @@ class SimpleAgent(BaseAgent):
         self,
         files_dict: FilesDict,
         prompt: str,
-        execution_command: str | None = None,
+        execution_command: Optional[str] = None,
     ) -> FilesDict:
         files_dict = improve(
             self.ai, prompt, files_dict, self.memory, self.preprompts_holder
