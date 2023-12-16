@@ -1,4 +1,4 @@
-from typing import Callable, TypeVar, Optional
+from typing import Callable, Optional, TypeVar
 
 # from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.ai import AI
@@ -123,7 +123,10 @@ class CliAgent(BaseAgent):
         return files_dict
 
     def improve(
-        self, files_dict: FilesDict, prompt: str, execution_command: Optional[str] = None
+        self,
+        files_dict: FilesDict,
+        prompt: str,
+        execution_command: Optional[str] = None,
     ) -> FilesDict:
         files_dict = self.improve_fn(
             self.ai, prompt, files_dict, self.memory, self.preprompts_holder
