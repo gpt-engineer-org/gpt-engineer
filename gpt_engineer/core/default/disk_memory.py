@@ -247,7 +247,7 @@ class DiskMemory(BaseMemory):
         else:
             return self._all_files()
 
-    def to_dict(self) -> Dict[str | Path, str]:
+    def to_dict(self) -> Dict[Union[str, Path], str]:
         return {file_path: self[file_path] for file_path in self}
 
     def to_json(self) -> str:

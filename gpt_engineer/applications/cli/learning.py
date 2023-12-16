@@ -89,7 +89,7 @@ TERM_CHOICES = (
 )
 
 
-def human_review_input() -> Review | None:
+def human_review_input() -> Optional[Review]:
     """
     Ask the user to review the generated code and return their review.
 
