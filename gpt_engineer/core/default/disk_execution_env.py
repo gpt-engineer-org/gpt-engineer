@@ -2,6 +2,7 @@ import subprocess
 import time
 
 from pathlib import Path
+from typing import Union, Optional
 
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.file_store import FileStore
@@ -20,7 +21,7 @@ class DiskExecutionEnv(BaseExecutionEnv):
         path (str): The file system path where the code is located and will be executed.
     """
 
-    def __init__(self, path: str | Path | None = None):
+    def __init__(self, path: Union[str, Path, None] = None):
         self.store = FileStore(path)
 
     def upload(self, files: FilesDict) -> "DiskExecutionEnv":
@@ -40,7 +41,7 @@ class DiskExecutionEnv(BaseExecutionEnv):
         )
         return p
 
-    def run(self, command: str, timeout: int | None = None) -> tuple[str, str, int]:
+    def run(self, command: str, timeout: Optional[int] = None) -> tuple[str, str, int]:
         start = time.time()
         print("\n--- Start of run ---")
         # while running, also print the stdout and stderr

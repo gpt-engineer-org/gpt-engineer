@@ -31,7 +31,7 @@ class FilesDict(dict):
         value : str
             The code content to associate with the filename.
         """
-        if not isinstance(key, str | Path):
+        if not isinstance(key, (str, Path)):
             raise TypeError("Keys must be strings or Path's")
         if not isinstance(value, str):
             raise TypeError("Values must be strings")
