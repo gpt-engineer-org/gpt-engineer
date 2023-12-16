@@ -2,7 +2,7 @@ import subprocess
 import time
 
 from pathlib import Path
-from typing import Union, Optional
+from typing import Optional, Union
 
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.file_store import FileStore
