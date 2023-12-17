@@ -2,7 +2,7 @@ import subprocess
 import time
 
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.file_store import FileStore
@@ -41,7 +41,7 @@ class DiskExecutionEnv(BaseExecutionEnv):
         )
         return p
 
-    def run(self, command: str, timeout: Optional[int] = None) -> tuple[str, str, int]:
+    def run(self, command: str, timeout: Optional[int] = None) -> Tuple[str, str, int]:
         start = time.time()
         print("\n--- Start of run ---")
         # while running, also print the stdout and stderr

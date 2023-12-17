@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from subprocess import Popen
-from typing import Optional
+from typing import Optional, Tuple
 
 from gpt_engineer.core.files_dict import FilesDict
 
@@ -20,7 +20,7 @@ class BaseExecutionEnv(ABC):
     """
 
     @abstractmethod
-    def run(self, command: str, timeout: Optional[int] = None) -> tuple[str, str, int]:
+    def run(self, command: str, timeout: Optional[int] = None) -> Tuple[str, str, int]:
         """
         Runs a command in the execution environment.
         """
