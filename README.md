@@ -21,7 +21,7 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 
 ## Setup
 
-This project supports Python 3.8 - 3.11.
+This project supports Python 3.10 - 3.11.
 
 Choose either **stable** or **development**.
 
