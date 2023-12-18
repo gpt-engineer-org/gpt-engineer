@@ -1,17 +1,9 @@
 name: Poetry install and pytest
 on:
-  pull_request:
-    branches: [ main ]
-    paths:
-      - "**.py"
-      - "**.yaml"
-      - "**.yml"
   push:
     branches: [ main ]
-    paths:
-      - "**.py"
-      - "**.yaml"
-      - "**.yml"
+  pull_request:
+    branches: [ main ]
 
 jobs:
   test:
