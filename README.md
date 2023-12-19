@@ -1,12 +1,15 @@
-# GPT Engineer
+# GPT-Engineer
 
 [![Discord Follow](https://dcbadge.vercel.app/api/server/8tcDQ89Ej2?style=flat)](https://discord.gg/8tcDQ89Ej2)
 [![GitHub Repo stars](https://img.shields.io/github/stars/AntonOsika/gpt-engineer?style=social)](https://github.com/AntonOsika/gpt-engineer)
 [![Twitter Follow](https://img.shields.io/twitter/follow/antonosika?style=social)](https://twitter.com/AntonOsika)
 
-**Specify what software you want to build — the AI builds it for you.**
+GPT-engineer lets you:
+- Specify a software in natural language
+- Sit back and watch as an AI writes and executes the code
+- Ask the AI to implement improvements
 
-- [Demo](https://twitter.com/antonosika/status/1667641038104674306)
+**Specify what software you want to build — the AI builds it for you.**
 
 ## Setup
 
@@ -20,7 +23,7 @@ For **development**:
 - `poetry install`
 - `poetry shell` to activate the virtual environment
 
-TWe actively support Python 3.10 - 3.11.
+We actively support Python 3.10 - 3.11.
 
 **API Key**
 
