@@ -62,7 +62,7 @@ By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/g
 - To run this tool, the new command `gpte` is recommended for better user experience. However, the earlier default commands `gpt-engineer` and `ge` are also supported.
 
 ## Relation to [gptengineer.app](https://github.com/gpteng-org/gptengineer.app/)
-[gptengineer.app](https://github.com/gpteng-org/gptengineer.app/) is a commercial product for automatic generation of web-apps, emerging from the open source project gpt-engineer. gptengineer.app gives back to the gpt-engineer open source community by financing crucial maintenance.
+[gptengineer.app](https://github.com/gpteng-org/gptengineer.app/) is a closed source tool for automatic generation of web-apps. It emerged from gpt-engineer and is committed to giving back to the open source community by financing crucial maintenance.
 
 
 ## Features
