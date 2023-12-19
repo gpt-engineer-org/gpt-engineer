@@ -1,29 +1,17 @@
-# GPT Engineer
+# GPT-Engineer
 
 [![Discord Follow](https://dcbadge.vercel.app/api/server/8tcDQ89Ej2?style=flat)](https://discord.gg/8tcDQ89Ej2)
 [![GitHub Repo stars](https://img.shields.io/github/stars/AntonOsika/gpt-engineer?style=social)](https://github.com/AntonOsika/gpt-engineer)
 [![Twitter Follow](https://img.shields.io/twitter/follow/antonosika?style=social)](https://twitter.com/AntonOsika)
 
-**Specify what you want it to build, the AI asks for clarification, and then builds it.**
+GPT-engineer lets you:
+- Specify a software in natural language
+- Sit back and watch as an AI writes and executes the code
+- Ask the AI to implement improvements
 
-GPT Engineer is made to be easy to adapt, extend, and make your agent learn how you want your code to look. It generates an entire codebase based on a prompt.
+## Getting Started
 
-- [Demo](https://twitter.com/antonosika/status/1667641038104674306)
-
-## Project philosophy
-
-- Simple to get value
-- Incrementally build towards a user experience of:
-  1. high level prompting
-  2. giving feedback to the AI that it will remember over time
-- Fast handovers, back and forth, between AI and human
-- Simplicity, all computation is "resumable" and persisted to the filesystem
-
-## Setup
-
-This project supports Python 3.10 - 3.11.
-
-Choose either **stable** or **development**.
+### Install gpt-engineer
 
 For **stable** release:
 
@@ -35,10 +23,9 @@ For **development**:
 - `poetry install`
 - `poetry shell` to activate the virtual environment
 
-We have experimental support for [llama-index](https://github.com/run-llama/llama_index), [rank_bm25](https://github.com/dorianbrown/rank_bm25), and [tree_sitter_languages](https://github.com/grantjenks/py-tree-sitter-languages).
-- `poetry install --extras experimental`
+We actively support Python 3.10 - 3.11.
 
-**API Key**
+### Setup API Key
 
 Choose **one** of:
 - Export env variable (you can add this to .bashrc so that you don't have to do it each time you start the terminal)
@@ -56,11 +43,7 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 - Do everything in your browser:
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
 
-## Usage
-
-There are two ways to work with GPT-engineer: new code mode (the default), and improve existing code mode (the `-i` option).
-
-### Creating new code
+### Creating new code (defualt usage)
 - Create an empty folder for your project anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions
 - Run `gpte <project_dir>` with a relative path to your folder
@@ -78,6 +61,9 @@ By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/g
 
 - To run this tool, the new command `gpte` is recommended for better user experience. However, the earlier default commands `gpt-engineer` and `ge` are also supported.
 
+## Relation to gptengineer.app
+[gptengineer.app](https://gptengineer.app/) is a commercial project for automatic generation of web-apps. It emerged from gpt-engineer and is committed to giving back to the open source community.  A portion of gptengineer.app’s revenue will fund a full-time role and infrastructure for maintaining open-source tools for code generation.
+
 
 ## Features
 
@@ -87,22 +73,19 @@ Editing the `preprompts`, and evolving how you write the project prompt, is how 
 
 You can also automatically copy all `preprompts` files into your project folder using the cli parameter `--use-custom-prepompts`. This way you can have custom preprompts for all of your projects without the need to edit the main files.
 
-Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
-
 You can also run with open source models, like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
 
-## Vision
+## Mission
 
-The gpt-engineer community is building the **open platform for devs to tinker with and build their personal code-generation toolbox**.
+The gpt-engineer community mission is to **maintain tools that coding agent builders can use and facilitate collaboration in the open source community**.
 
-If you are interested in contributing to this, we would be interested in having you.
+If you are interested in contributing to this, we are interested in having you.
 
 If you want to see our broader ambitions, check out the [roadmap](https://github.com/AntonOsika/gpt-engineer/blob/main/ROADMAP.md), and join
 [discord](https://discord.gg/8tcDQ89Ej2)
 to get input on how you can [contribute](.github/CONTRIBUTING.md) to it.
 
-We are currently looking for more maintainers and community organizers. Email anton.osika@gmail.com if you are interested in an official role.
-
+gpt-engineer is [governed](https://github.com/AntonOsika/gpt-engineer/blob/main/GOVERNANCE.md) by a board of long term contributors. If you contribute routinely and have an interest in shaping the future of gpt-engineer, you will be considered for the board.
 
 ## Example
 
