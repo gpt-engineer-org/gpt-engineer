@@ -10,10 +10,6 @@
 
 ## Setup
 
-This project supports Python 3.10 - 3.11.
-
-Choose either **stable** or **development**.
-
 For **stable** release:
 
 - `python -m pip install gpt-engineer`
@@ -24,8 +20,7 @@ For **development**:
 - `poetry install`
 - `poetry shell` to activate the virtual environment
 
-We have experimental support for [llama-index](https://github.com/run-llama/llama_index), [rank_bm25](https://github.com/dorianbrown/rank_bm25), and [tree_sitter_languages](https://github.com/grantjenks/py-tree-sitter-languages).
-- `poetry install --extras experimental`
+TWe actively support Python 3.10 - 3.11.
 
 **API Key**
 
