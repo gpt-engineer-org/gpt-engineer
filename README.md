@@ -9,9 +9,9 @@ GPT-engineer lets you:
 - Sit back and watch as an AI writes and executes the code
 - Ask the AI to implement improvements
 
-**Specify what software you want to build — the AI builds it for you.**
+## Getting Started
 
-## Setup
+### Install gpt-engineer
 
 For **stable** release:
 
@@ -25,7 +25,7 @@ For **development**:
 
 We actively support Python 3.10 - 3.11.
 
-**API Key**
+### Setup API Key
 
 Choose **one** of:
 - Export env variable (you can add this to .bashrc so that you don't have to do it each time you start the terminal)
@@ -43,11 +43,7 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 - Do everything in your browser:
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
 
-## Usage
-
-There are two ways to work with GPT-engineer: new code mode (the default), and improve existing code mode (the `-i` option).
-
-### Creating new code
+### Creating new code (defualt usage)
 - Create an empty folder for your project anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions
 - Run `gpte <project_dir>` with a relative path to your folder
