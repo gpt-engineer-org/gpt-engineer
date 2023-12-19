@@ -62,7 +62,7 @@ By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/g
 - To run this tool, the new command `gpte` is recommended for better user experience. However, the earlier default commands `gpt-engineer` and `ge` are also supported.
 
 ## Relation to gptengineer.app
-[gptengineer.app](https://gptengineer.app/) is a closed source tool for automatic generation of web-apps. It emerged from gpt-engineer and is committed to giving back to the open source community.  A portion of gptengineer.app’s revenue will fund a full-time role and infrastructure for maintaining open-source tools for code generation.
+[gptengineer.app](https://gptengineer.app/) is a commercial project for automatic generation of web-apps. It emerged from gpt-engineer and is committed to giving back to the open source community.  A portion of gptengineer.app’s revenue will fund a full-time role and infrastructure for maintaining open-source tools for code generation.
 
 
 ## Features
@@ -75,7 +75,7 @@ You can also automatically copy all `preprompts` files into your project folder 
 
 You can also run with open source models, like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
 
-## Vision
+## Mission
 
 The gpt-engineer community mission is to **maintain tools that coding agent builders can use and facilitate collaboration in the open source community**.
 
