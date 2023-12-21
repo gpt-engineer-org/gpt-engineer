@@ -71,7 +71,7 @@ You can specify the "identity" of the AI agent by editing the files in the `prep
 
 Editing the `preprompts`, and evolving how you write the project prompt, is how you make the agent remember things between projects.
 
-You can also automatically copy all `preprompts` files into your project folder using the cli parameter `--use-custom-prepompts`. This way you can have custom preprompts for all of your projects without the need to edit the main files.
+You can also automatically copy all `preprompts` files into your project folder using the cli parameter `--use-custom-preprompts`. This way you can have custom preprompts for all of your projects without the need to edit the main files.
 
 You can also run with open source models, like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
 
