@@ -5,8 +5,19 @@ from typing import List, Union
 
 import tiktoken
 
-from langchain.callbacks.openai_info import get_openai_token_cost_for_model
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
+
+# workaround for function moved in:
+# https://github.com/langchain-ai/langchain/blob/535db72607c4ae308566ede4af65295967bb33a8/libs/community/langchain_community/callbacks/openai_info.py
+try:
+    from langchain.callbacks.openai_info import (
+        get_openai_token_cost_for_model,  # fmt: skip
+    )
+except ImportError:
+    from langchain_community.callbacks.openai_info import (
+        get_openai_token_cost_for_model,  # fmt: skip
+    )
+
 
 Message = Union[AIMessage, HumanMessage, SystemMessage]
 
