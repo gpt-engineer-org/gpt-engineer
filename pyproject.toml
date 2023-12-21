@@ -65,6 +65,7 @@ optional = true
 llama-index = ">=0.8"
 rank-bm25 = ">=0.2.2"
 tree_sitter_languages = ">=1.8.0"
+langsmith = "^0.0.73"
 
 [tool.poetry.scripts]
 gpt-engineer = 'gpt_engineer.applications.cli.main:app'
