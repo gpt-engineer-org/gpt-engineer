@@ -43,7 +43,7 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 - Do everything in your browser:
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
 
-### Creating new code (defualt usage)
+### Creating new code (default usage)
 - Create an empty folder for your project anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions
 - Run `gpte <project_dir>` with a relative path to your folder
