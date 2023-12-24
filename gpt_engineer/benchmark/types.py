@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from subprocess import Popen
-from typing import Callable
+from typing import Callable, Dict, Optional
 
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.files_dict import FilesDict
@@ -21,9 +21,9 @@ class Assertable:
 
     files: FilesDict
     env: BaseExecutionEnv
-    process: Popen | None
-    stdout: str | None
-    stderr: str | None
+    process: Optional[Popen]
+    stdout: Optional[str]
+    stderr: Optional[str]
 
 
 Assertion = Callable[[Assertable], bool]
@@ -32,10 +32,10 @@ Assertion = Callable[[Assertable], bool]
 @dataclass
 class Task:
     name: str
-    initial_code: FilesDict | None
-    command: str | None
+    initial_code: Optional[FilesDict]
+    command: Optional[str]
     prompt: str
-    assertions: dict[str, Assertion] | None
+    assertions: Optional[Dict[str, Assertion]]
 
 
 @dataclass
@@ -44,7 +44,7 @@ class Benchmark:
 
     name: str
     tasks: list[Task]
-    timeout: int | None = None
+    timeout: Optional[int] = None
 
 
 @dataclass

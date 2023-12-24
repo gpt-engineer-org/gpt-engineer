@@ -56,7 +56,8 @@ class SimpleAgent(BaseAgent):
         entrypoint = gen_entrypoint(
             self.ai, files_dict, self.memory, self.preprompts_holder
         )
-        files_dict = FilesDict(files_dict | entrypoint)
+        combined_dict = {**files_dict, **entrypoint}
+        files_dict = FilesDict(combined_dict)
         return files_dict
 
     def improve(
