@@ -10,7 +10,7 @@ By participating in this project, you agree to abide by the [code of conduct](CO
 
 ## Merge Policy for Pull Requests
 Code that is likely to introduce breaking changes, or significantly change the user experience for users and developers, require [board approval](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/GOVERNANCE.md) to be merged. Smaller code changes can be merged directly.
-As a rule, cosmetic pull requests, for example rephrasing the readme or introducing more compact syntax, that do not yield clear practical improvements are not merged. Such pull requests are generally discouraged, both to save time for the maintainers and to keep a lower bar for becoming a contributor.
+As a rule, cosmetic pull requests, for example rephrasing the readme or introducing more compact syntax, that do not yield clear practical improvements are not merged. Such pull requests are generally discouraged, both to save time for the maintainers and to establish a lower bar for becoming a contributor.
 
 ## Getting Started with Pull Requests to GPT-engineer
 
