@@ -1,8 +1,18 @@
-# Contributing to GPT Engineer
+# Contributing to GPT-engineer
+
+GPT-engineer is a community project and lives from your contributions - they are warmly appreciated. The main contribution avenues are:
+- Git bug report: Report when something in GPT-engineer doesn't work. Do not report errors in programs written _by_ GPT-engineer.
+- Git feature request: Provide a detailed sketch about something you want to have implemented in GPT-engineer. There is no guarantee that features will be implemented.
+- Git discussion: Raise awareness of a potential improvement. This is often a good starting point before making a detailed feature request.
+- Git pull request: Implement code and have it reviewed and potentially merged by the maintainers. Implementations of existing feature requests or fixes to bug reports are likely to be merged.
 
 By participating in this project, you agree to abide by the [code of conduct](CODE_OF_CONDUCT.md).
 
-## Getting Started
+## Merge Policy for Pull Requests
+Code that is likely to introduce breaking changes or significant changes to the user experience for users and developers require [board approval](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/GOVERNANCE.md) to be merged. Smaller code changes can be merged directly, assuming responsible and sound consideration by the maintainers.
+As a rule, cosmetic pull requests, for example rephrasing the readme or introducing more compact syntax, that do not yield clear practical improvements are not merged. Such pull requests are generally discouraged, both to save time for the maintainers and to keep a lower bar for becoming a contributor.
+
+## Getting Started with Pull Requests to GPT-engineer
 
 To get started with contributing, please follow these steps:
 
@@ -102,9 +112,6 @@ Now your file has been committed and you can push your changes.
 
 At the beginning this might seem like a tedious process (having to add the file again after `black` and `ruff` have modified it) but it is actually very useful. It allows you to see what changes `black` and `ruff` have made to your files and make sure that they are correct before you commit them.
 
-## Issue Tracker
-
-If you encounter any bugs, issues, or have feature requests, please [create a new issue](https://github.com/AntonOsika/gpt-engineer/issues/new) on the project's GitHub repository. Provide a clear and descriptive title along with relevant details to help us address the problem or understand your request.
 
 ## Licensing
 
