@@ -1,10 +1,10 @@
 # Contributing to GPT-engineer
 
 GPT-engineer is a community project and lives from your contributions - they are warmly appreciated. The main contribution avenues are:
-- Git bug report: Report when something in GPT-engineer doesn't work. Do not report errors in programs written _by_ GPT-engineer.
-- Git feature request: Provide a detailed sketch about something you want to have implemented in GPT-engineer. There is no guarantee that features will be implemented.
-- Git discussion: Raise awareness of a potential improvement. This is often a good starting point before making a detailed feature request.
-- Git pull request: Implement code and have it reviewed and potentially merged by the maintainers. Implementations of existing feature requests or fixes to bug reports are likely to be merged.
+- Bug report: report when something in GPT-engineer doesn't work. Do not report errors in programs written _by_ GPT-engineer.
+- Feature request: provide a detailed sketch about something you want to have implemented in GPT-engineer. There is no guarantee that features will be implemented.
+- Discussion: raise awareness of a potential improvement. This is often a good starting point before making a detailed feature request.
+- Pull request: implement code and have it reviewed and potentially merged by the maintainers. Implementations of existing feature requests or fixes to bug reports are likely to be merged.
 
 By participating in this project, you agree to abide by the [code of conduct](CODE_OF_CONDUCT.md).
 
