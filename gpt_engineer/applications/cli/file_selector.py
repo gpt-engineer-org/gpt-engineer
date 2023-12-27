@@ -40,12 +40,15 @@ Note:
 
 import os
 import re
+import subprocess
 import sys
-import tkinter as tk
-import tkinter.filedialog as fd
 
 from pathlib import Path
 from typing import List, Union
+
+# import tkinter as tk
+# import tkinter.filedialog as fd
+import toml
 
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import metadata_path
@@ -356,7 +359,7 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
             [
                 "How do you want to select the files?",
                 "",
-                "1. Use File explorer.",
+                "1. Edit Selection in Default Editor",
                 "2. Use Command-Line.",
                 use_last_string if len(use_last_string) > 1 else "",
                 f"Select option and press Enter (default={selection_number}): ",
@@ -374,7 +377,8 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
 
         if selection_number == 1:
             # Open GUI selection
-            file_path_list = gui_file_selector(project_path)
+            # file_path_list = gui_file_selector(project_path)
+            file_path_list = tree_style_file_selector(project_path)
         elif selection_number == 2:
             # Open terminal selection
             file_path_list = terminal_file_selector(project_path)
@@ -419,22 +423,80 @@ def get_all_code(project_path: str) -> FilesDict:
     return FilesDict(content_dict)
 
 
-def gui_file_selector(input_path: str) -> List[str]:
+# def gui_file_selector(input_path: str) -> List[str]:
+#     """
+#     Display a tkinter file selection window to select context files.
+#     """
+#     root = tk.Tk()
+#     root.withdraw()
+#     root.call("wm", "attributes", ".", "-topmost", True)
+#     file_list = list(
+#         fd.askopenfilenames(
+#             parent=root,
+#             initialdir=input_path,
+#             title="Select files to improve (or give context):",
+#         )
+#     )
+#     # ensure right path type
+#     return [str(path) for path in file_list]
+
+
+def open_with_default_editor(file_path):
+    try:
+        # Try to get the system's default editor, fallback to vim/notepad if not set
+        editor = os.environ.get("EDITOR", "vim" if os.name != "nt" else "notepad")
+        subprocess.run([editor, file_path])
+    except Exception as e:
+        print(f"An error occurred while trying to open the file: {e}")
+
+
+def tree_style_file_selector(input_path: str) -> List[str]:
     """
-    Display a tkinter file selection window to select context files.
+    Display a tree-style file selection to select context files.
+    Generates a tree representation in a .toml file and allows users to edit it.
+    Users can comment out files to ignore them.
     """
-    root = tk.Tk()
-    root.withdraw()
-    root.call("wm", "attributes", ".", "-topmost", True)
-    file_list = list(
-        fd.askopenfilenames(
-            parent=root,
-            initialdir=input_path,
-            title="Select files to improve (or give context):",
-        )
+    root_path = Path(input_path)
+    tree_dict = {"files": {}}
+
+    for path in DisplayablePath.make_tree(root_path):
+        if path.path.is_dir():
+            continue  # Skipping directories for brevity
+        relative_path = os.path.relpath(path.path, input_path)
+        tree_dict["files"][relative_path] = {
+            "selected": True
+        }  # Default all files as selected
+
+    toml_file = root_path / "file_selection.toml"
+    with open(toml_file, "w") as f:
+        toml.dump(tree_dict, f)
+
+    print(
+        "Please select(true) and deselect(false) files, save it, and close it to continue..."
     )
-    # ensure right path type
-    return [str(path) for path in file_list]
+    open_with_default_editor(toml_file)
+
+    selected_files = []
+    edited_tree = toml.load(toml_file)
+    for file, properties in edited_tree["files"].items():
+        if properties.get("selected", False):
+            selected_files.append(str(Path(input_path).joinpath(file).resolve()))
+
+    if selected_files:
+        print("\nYou have selected the following files:\n")
+        all_paths = set()
+        for selected in selected_files:
+            all_paths.add(selected)
+            all_paths.update(str(Path(selected).parent.resolve()))
+
+        for path in DisplayablePath.make_tree(Path(input_path)):
+            full_path = str(path.path.resolve())
+            if full_path in all_paths:
+                print(path.displayable())
+    else:
+        print("No files were selected.")
+    print("\n")
+    return selected_files
 
 
 def terminal_file_selector(input_path: str, all: bool = False) -> List[str]:
