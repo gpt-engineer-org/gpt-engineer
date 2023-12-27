@@ -442,6 +442,18 @@ def get_all_code(project_path: str) -> FilesDict:
 
 
 def open_with_default_editor(file_path):
+    """
+    Opens the specified file using the system's default text editor or a common fallback.
+
+    Parameters:
+    - file_path (str): The path to the file to be opened.
+
+    The function first tries to use the preferred editor specified in the 'EDITOR' environment variable.
+    If none is set or the specified editor isn't available, it cycles through a list of common editors
+    ('vim', 'nano', 'notepad', 'gedit') and uses the first one found. If all attempts fail, it prompts
+    the user to manually open the file.
+    """
+
     editors = ["vim", "nano", "notepad", "gedit"]  # A list of common editors
     chosen_editor = os.environ.get("EDITOR")  # Get the preferred editor if set
 
@@ -450,16 +462,14 @@ def open_with_default_editor(file_path):
             subprocess.run([chosen_editor, file_path])
             return
         except Exception:
-            pass  # If preferred editor fails, proceed to try common editors
+            pass
 
     for editor in editors:
         try:
-            # Attempt to open the file with each editor
             subprocess.run([editor, file_path])
-            return  # Exit if successful
+            return
         except Exception:
-            continue  # Try the next editor if current one fails
-
+            continue
     print("No suitable text editor found. Please edit the file manually.")
 
 
