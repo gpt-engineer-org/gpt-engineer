@@ -442,12 +442,25 @@ def get_all_code(project_path: str) -> FilesDict:
 
 
 def open_with_default_editor(file_path):
-    try:
-        # Try to get the system's default editor, fallback to vim/notepad if not set
-        editor = os.environ.get("EDITOR", "vim" if os.name != "nt" else "notepad")
-        subprocess.run([editor, file_path])
-    except Exception as e:
-        print(f"An error occurred while trying to open the file: {e}")
+    editors = ["vim", "nano", "notepad", "gedit"]  # A list of common editors
+    chosen_editor = os.environ.get("EDITOR")  # Get the preferred editor if set
+
+    if chosen_editor:
+        try:
+            subprocess.run([chosen_editor, file_path])
+            return
+        except Exception:
+            pass  # If preferred editor fails, proceed to try common editors
+
+    for editor in editors:
+        try:
+            # Attempt to open the file with each editor
+            subprocess.run([editor, file_path])
+            return  # Exit if successful
+        except Exception:
+            continue  # Try the next editor if current one fails
+
+    print("No suitable text editor found. Please edit the file manually.")
 
 
 def tree_style_file_selector(input_path: str) -> List[str]:
@@ -461,11 +474,9 @@ def tree_style_file_selector(input_path: str) -> List[str]:
 
     for path in DisplayablePath.make_tree(root_path):
         if path.path.is_dir():
-            continue  # Skipping directories for brevity
+            continue
         relative_path = os.path.relpath(path.path, input_path)
-        tree_dict["files"][relative_path] = {
-            "selected": True
-        }  # Default all files as selected
+        tree_dict["files"][relative_path] = {"selected": False}  # Set default as False
 
     toml_file = root_path / "file_selection.toml"
     with open(toml_file, "w") as f:
