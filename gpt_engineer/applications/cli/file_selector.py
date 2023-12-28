@@ -55,7 +55,7 @@ from gpt_engineer.core.default.paths import metadata_path
 from gpt_engineer.core.files_dict import FilesDict
 
 IGNORE_FOLDERS = {"site-packages", "node_modules", "venv"}
-FILE_LIST_NAME = "file_list.txt"
+FILE_LIST_NAME = "file_selection.toml"
 
 
 class DisplayablePath(object):
@@ -488,7 +488,7 @@ def tree_style_file_selector(input_path: str) -> List[str]:
         relative_path = os.path.relpath(path.path, input_path)
         tree_dict["files"][relative_path] = {"selected": False}  # Set default as False
 
-    toml_file = root_path / "file_selection.toml"
+    toml_file = DiskMemory(metadata_path(input_path)).path / "file_selection.toml"
     with open(toml_file, "w") as f:
         toml.dump(tree_dict, f)
 
