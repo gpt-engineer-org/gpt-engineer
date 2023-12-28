@@ -473,6 +473,25 @@ def open_with_default_editor(file_path):
     print("No suitable text editor found. Please edit the file manually.")
 
 
+def is_utf8(file_path):
+    """
+    Determines if a file is UTF-8 encoded by attempting to decode it.
+
+    Parameters:
+    - file_path (str): Path to the file.
+
+    Returns:
+    - bool: True if file is UTF-8 encoded, False otherwise.
+    """
+    try:
+        with open(file_path, "rb") as file:
+            data = file.read()
+            data.decode("utf-8")
+            return True
+    except UnicodeDecodeError:
+        return False
+
+
 def tree_style_file_selector(input_path: str) -> List[str]:
     """
     Display a tree-style file selection to select context files.
@@ -483,10 +502,10 @@ def tree_style_file_selector(input_path: str) -> List[str]:
     tree_dict = {"files": {}}
 
     for path in DisplayablePath.make_tree(root_path):
-        if path.path.is_dir():
+        if path.path.is_dir() or not is_utf8(path.path):
             continue
         relative_path = os.path.relpath(path.path, input_path)
-        tree_dict["files"][relative_path] = {"selected": False}  # Set default as False
+        tree_dict["files"][relative_path] = {"selected": False}
 
     toml_file = DiskMemory(metadata_path(input_path)).path / "file_selection.toml"
     with open(toml_file, "w") as f:
