@@ -39,9 +39,7 @@ Note:
 """
 
 import os
-import re
 import subprocess
-import sys
 
 from pathlib import Path
 from typing import List, Union
@@ -259,62 +257,6 @@ class TerminalFileSelector:
         self.file_path_list = file_path_list
         self.selectable_file_paths = file_path_enumeration
 
-    def ask_for_selection(self, all: bool = False) -> List[str]:
-        """
-        Prompts the user to select files by providing a series of index numbers, ranges, or 'all' to select everything.
-
-        Returns:
-            List[str]: A list of selected file paths based on user's input.
-
-        Notes:
-            - Users can select files by entering index numbers separated by commas or spaces.
-            - Ranges can be specified using a dash.
-            - Example input: 1,2,3-5,7,9,13-15,18,20
-            - Users can also input 'all' to select all displayed files.
-        """
-        if all:
-            user_input = "all"
-        else:
-            user_input = input(
-                "\n".join(
-                    [
-                        "Select files by entering the numbers separated by commas/spaces or",
-                        "specify range with a dash. ",
-                        "Example: 1,2,3-5,7,9,13-15,18,20 (enter 'all' to select everything)",
-                        "\n\nSelect files:",
-                    ]
-                )
-            )
-        selected_paths = []
-        regex = r"\d+(-\d+)?([, ]\d+(-\d+)?)*"
-
-        if user_input.lower() == "all":
-            selected_paths = self.file_path_list
-        elif re.match(regex, user_input):
-            try:
-                user_input = (
-                    user_input.replace(" ", ",") if " " in user_input else user_input
-                )
-                selected_files = user_input.split(",")
-                for file_number_str in selected_files:
-                    if "-" in file_number_str:
-                        start_str, end_str = file_number_str.split("-")
-                        start = int(start_str)
-                        end = int(end_str)
-                        for num in range(start, end + 1):
-                            selected_paths.append(str(self.selectable_file_paths[num]))
-                    else:
-                        num = int(file_number_str)
-                        selected_paths.append(str(self.selectable_file_paths[num]))
-
-            except ValueError:
-                pass
-        else:
-            print("Please use a valid number/series of numbers.\n")
-            sys.exit(1)
-
-        return selected_paths
-
 
 def is_in_ignoring_extensions(path: Path) -> bool:
     """
@@ -348,61 +290,6 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
         selected_files = tree_style_file_selector(project_path, False)
     else:
         selected_files = tree_style_file_selector(project_path, True)
-        # use_last_string = ""
-        # if FILE_LIST_NAME in metadata_db:
-        #     use_last_string = (
-        #         "3. Use previous file list (available at "
-        #         + f"{os.path.join(metadata_db.path, FILE_LIST_NAME)})\n"
-        #     )
-        #     selection_number = 3
-        # else:
-        #     selection_number = 1
-        #     selection_str = "\n".join(
-        #     [
-        #         "How do you want to select the files?",
-        #         "",
-        #         "1. Edit Selection in Default Editor",
-        #         "2. Use Command-Line.",
-        #         use_last_string if len(use_last_string) > 1 else "",
-        #         f"Select option and press Enter (default={selection_number}): ",
-        #     ]
-        # )
-
-        # file_path_list = []
-        # selected_number_str = input(selection_str)
-        # if selected_number_str:
-        #     try:
-        #         selection_number = int(selected_number_str)
-        #     except ValueError:
-        #         print("Invalid number. Select a number from the list above.\n")
-        #         sys.exit(1)
-        # if selection_number == 1:
-        #     file_path_list = tree_style_file_selector(project_path)
-        # elif selection_number == 2:
-        #     file_path_list = terminal_file_selector(project_path)
-        # if (
-        #     selection_number <= 0
-        #     or selection_number > 3
-        #     or (selection_number == 3 and not use_last_string)
-        # ):
-        #     print("Invalid number. Select a number from the list above.\n")
-        #     sys.exit(1)
-
-    #     # ToDO: Replace this hack that makes all file_path relative to the right thing
-    #     file_path_list = [
-    #         os.path.relpath(file_path.strip(), project_path)
-    #         for file_path in file_path_list
-    #     ]
-    #
-    #     # if not selection_number == 3:
-    #     metadata_db[FILE_LIST_NAME] = "\n".join(
-    #         str(file_path) for file_path in file_path_list
-    #     )
-    # content_dict = dict()
-    # with open(metadata_db.path / FILE_LIST_NAME, "r") as file_list:
-    #     for file in file_list:
-    #         with open(os.path.join(project_path, file.strip()), "r") as content:
-    #             content_dict[file.strip()] = content.read()
     content_dict = {}
     for file_path in selected_files:
         file_path = Path(file_path)
@@ -512,13 +399,3 @@ def tree_style_file_selector(input_path: str, init: bool = True) -> List[str]:
         print("No files were selected.")
     print("\n")
     return selected_files
-
-
-# def terminal_file_selector(input_path: str, all: bool = False) -> List[str]:
-#     """
-#     Display a terminal file selection to select context files.
-#     """
-#     file_selector = TerminalFileSelector(Path(input_path))
-#     file_selector.display()
-#     file_list = file_selector.ask_for_selection(all=all)
-#     return [str(path) for path in file_list]
