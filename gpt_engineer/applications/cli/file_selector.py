@@ -405,7 +405,7 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
     #             content_dict[file.strip()] = content.read()
     content_dict = {}
     for file_path in selected_files:
-        file_path = Path(file_path)  # Ensure file_path is a Path object
+        file_path = Path(file_path)
         try:
             with open(file_path, "r") as content:
                 content_dict[str(file_path)] = content.read()
