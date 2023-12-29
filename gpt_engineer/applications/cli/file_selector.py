@@ -345,100 +345,73 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
             f"File list detected at {metadata_db.path / FILE_LIST_NAME}. "
             "Edit or delete it if you want to select new files."
         )
+        selected_files = tree_style_file_selector(project_path, False)
     else:
-        use_last_string = ""
-        if FILE_LIST_NAME in metadata_db:
-            use_last_string = (
-                "3. Use previous file list (available at "
-                + f"{os.path.join(metadata_db.path, FILE_LIST_NAME)})\n"
-            )
-            selection_number = 3
-        else:
-            selection_number = 1
-        selection_str = "\n".join(
-            [
-                "How do you want to select the files?",
-                "",
-                "1. Edit Selection in Default Editor",
-                "2. Use Command-Line.",
-                use_last_string if len(use_last_string) > 1 else "",
-                f"Select option and press Enter (default={selection_number}): ",
-            ]
-        )
+        selected_files = tree_style_file_selector(project_path, True)
+        # use_last_string = ""
+        # if FILE_LIST_NAME in metadata_db:
+        #     use_last_string = (
+        #         "3. Use previous file list (available at "
+        #         + f"{os.path.join(metadata_db.path, FILE_LIST_NAME)})\n"
+        #     )
+        #     selection_number = 3
+        # else:
+        #     selection_number = 1
+        #     selection_str = "\n".join(
+        #     [
+        #         "How do you want to select the files?",
+        #         "",
+        #         "1. Edit Selection in Default Editor",
+        #         "2. Use Command-Line.",
+        #         use_last_string if len(use_last_string) > 1 else "",
+        #         f"Select option and press Enter (default={selection_number}): ",
+        #     ]
+        # )
 
-        file_path_list = []
-        selected_number_str = input(selection_str)
-        if selected_number_str:
-            try:
-                selection_number = int(selected_number_str)
-            except ValueError:
-                print("Invalid number. Select a number from the list above.\n")
-                sys.exit(1)
+        # file_path_list = []
+        # selected_number_str = input(selection_str)
+        # if selected_number_str:
+        #     try:
+        #         selection_number = int(selected_number_str)
+        #     except ValueError:
+        #         print("Invalid number. Select a number from the list above.\n")
+        #         sys.exit(1)
+        # if selection_number == 1:
+        #     file_path_list = tree_style_file_selector(project_path)
+        # elif selection_number == 2:
+        #     file_path_list = terminal_file_selector(project_path)
+        # if (
+        #     selection_number <= 0
+        #     or selection_number > 3
+        #     or (selection_number == 3 and not use_last_string)
+        # ):
+        #     print("Invalid number. Select a number from the list above.\n")
+        #     sys.exit(1)
 
-        if selection_number == 1:
-            # Open GUI selection
-            # file_path_list = gui_file_selector(project_path)
-            file_path_list = tree_style_file_selector(project_path)
-        elif selection_number == 2:
-            # Open terminal selection
-            file_path_list = terminal_file_selector(project_path)
-        if (
-            selection_number <= 0
-            or selection_number > 3
-            or (selection_number == 3 and not use_last_string)
-        ):
-            print("Invalid number. Select a number from the list above.\n")
-            sys.exit(1)
-
-        # ToDO: Replace this hack that makes all file_path relative to the right thing
-        file_path_list = [
-            os.path.relpath(file_path.strip(), project_path)
-            for file_path in file_path_list
-        ]
-
-        if not selection_number == 3:
-            metadata_db[FILE_LIST_NAME] = "\n".join(
-                str(file_path) for file_path in file_path_list
-            )
-    content_dict = dict()
-    with open(metadata_db.path / FILE_LIST_NAME, "r") as file_list:
-        for file in file_list:
-            with open(os.path.join(project_path, file.strip()), "r") as content:
-                content_dict[file.strip()] = content.read()
+    #     # ToDO: Replace this hack that makes all file_path relative to the right thing
+    #     file_path_list = [
+    #         os.path.relpath(file_path.strip(), project_path)
+    #         for file_path in file_path_list
+    #     ]
+    #
+    #     # if not selection_number == 3:
+    #     metadata_db[FILE_LIST_NAME] = "\n".join(
+    #         str(file_path) for file_path in file_path_list
+    #     )
+    # content_dict = dict()
+    # with open(metadata_db.path / FILE_LIST_NAME, "r") as file_list:
+    #     for file in file_list:
+    #         with open(os.path.join(project_path, file.strip()), "r") as content:
+    #             content_dict[file.strip()] = content.read()
+    content_dict = {}
+    for file_path in selected_files:
+        file_path = Path(file_path)  # Ensure file_path is a Path object
+        try:
+            with open(file_path, "r") as content:
+                content_dict[str(file_path)] = content.read()
+        except FileNotFoundError:
+            print(f"Warning: File not found {file_path}")
     return FilesDict(content_dict)
-
-
-def get_all_code(project_path: str) -> FilesDict:
-    file_selection = terminal_file_selector(project_path, all=True)
-    # ToDO: Replace this hack that makes all file_path relative to the right thing
-    file_selection = [
-        os.path.relpath(str(file_path).strip(), project_path)
-        for file_path in file_selection
-    ]
-    content_dict = dict()
-
-    for file in file_selection:
-        with open(os.path.join(project_path, file.strip()), "r") as content:
-            content_dict[file.strip()] = content.read()
-    return FilesDict(content_dict)
-
-
-# def gui_file_selector(input_path: str) -> List[str]:
-#     """
-#     Display a tkinter file selection window to select context files.
-#     """
-#     root = tk.Tk()
-#     root.withdraw()
-#     root.call("wm", "attributes", ".", "-topmost", True)
-#     file_list = list(
-#         fd.askopenfilenames(
-#             parent=root,
-#             initialdir=input_path,
-#             title="Select files to improve (or give context):",
-#         )
-#     )
-#     # ensure right path type
-#     return [str(path) for path in file_list]
 
 
 def open_with_default_editor(file_path):
@@ -492,7 +465,7 @@ def is_utf8(file_path):
         return False
 
 
-def tree_style_file_selector(input_path: str) -> List[str]:
+def tree_style_file_selector(input_path: str, init: bool = True) -> List[str]:
     """
     Display a tree-style file selection to select context files.
     Generates a tree representation in a .toml file and allows users to edit it.
@@ -500,16 +473,18 @@ def tree_style_file_selector(input_path: str) -> List[str]:
     """
     root_path = Path(input_path)
     tree_dict = {"files": {}}
-
-    for path in DisplayablePath.make_tree(root_path):
-        if path.path.is_dir() or not is_utf8(path.path):
-            continue
-        relative_path = os.path.relpath(path.path, input_path)
-        tree_dict["files"][relative_path] = {"selected": False}
-
     toml_file = DiskMemory(metadata_path(input_path)).path / "file_selection.toml"
-    with open(toml_file, "w") as f:
-        toml.dump(tree_dict, f)
+    if init:
+        for path in DisplayablePath.make_tree(root_path):
+            if path.path.is_dir() or not is_utf8(path.path):
+                continue
+            relative_path = os.path.relpath(path.path, input_path)
+            tree_dict["files"][relative_path] = {"selected": False}
+
+        comment = "# Select or Deselect files for processing by setting 'selected' to true or false.\n\n"
+        with open(toml_file, "w") as f:
+            f.write(comment)
+            toml.dump(tree_dict, f)
 
     print(
         "Please select(true) and deselect(false) files, save it, and close it to continue..."
@@ -539,11 +514,11 @@ def tree_style_file_selector(input_path: str) -> List[str]:
     return selected_files
 
 
-def terminal_file_selector(input_path: str, all: bool = False) -> List[str]:
-    """
-    Display a terminal file selection to select context files.
-    """
-    file_selector = TerminalFileSelector(Path(input_path))
-    file_selector.display()
-    file_list = file_selector.ask_for_selection(all=all)
-    return [str(path) for path in file_list]
+# def terminal_file_selector(input_path: str, all: bool = False) -> List[str]:
+#     """
+#     Display a terminal file selection to select context files.
+#     """
+#     file_selector = TerminalFileSelector(Path(input_path))
+#     file_selector.display()
+#     file_list = file_selector.ask_for_selection(all=all)
+#     return [str(path) for path in file_list]
