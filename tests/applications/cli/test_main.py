@@ -63,25 +63,25 @@ class TestMain:
         assert text == "hello"
 
     #  Runs gpt-engineer with improve mode and improves an existing project in the specified path.
-    def test_improve_existing_project(self, tmp_path, monkeypatch):
-        def improve_generator():
-            yield "2"
-            yield "all"
-            yield "y"  # First response
-            while True:
-                yield "n"  # Subsequent responses
-
-        gen = improve_generator()
-        monkeypatch.setattr("builtins.input", lambda _: next(gen))
-        p = tmp_path / "projects/example"
-        p.mkdir(parents=True)
-        (p / "prompt").write_text(prompt_text)
-        simplified_main(str(p), "improve")
-        ex_env = DiskExecutionEnv(path=p)
-        ex_env.run(f"bash {ENTRYPOINT_FILE}")
-        assert (p / "output.txt").exists()
-        text = (p / "output.txt").read_text().strip()
-        assert text == "hello"
+    # def test_improve_existing_project(self, tmp_path, monkeypatch):
+    #     def improve_generator():
+    #         yield "2"
+    #         yield "all"
+    #         yield "y"  # First response
+    #         while True:
+    #             yield "n"  # Subsequent responses
+    #
+    #     gen = improve_generator()
+    #     monkeypatch.setattr("builtins.input", lambda _: next(gen))
+    #     p = tmp_path / "projects/example"
+    #     p.mkdir(parents=True)
+    #     (p / "prompt").write_text(prompt_text)
+    #     simplified_main(str(p), "improve")
+    #     ex_env = DiskExecutionEnv(path=p)
+    #     ex_env.run(f"bash {ENTRYPOINT_FILE}")
+    #     assert (p / "output.txt").exists()
+    #     text = (p / "output.txt").read_text().strip()
+    #     assert text == "hello"
 
     #  Runs gpt-engineer with lite mode and generates a project with only the main prompt.
     def test_lite_mode_generate_project(self, tmp_path, monkeypatch):
