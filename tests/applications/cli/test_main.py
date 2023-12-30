@@ -63,34 +63,40 @@ class TestMain:
         assert text == "hello"
 
     #  Runs gpt-engineer with improve mode and improves an existing project in the specified path.
-    def test_improve_existing_project(self, tmp_path, monkeypatch):
-        def mock_editor_file_selector(input_path, init=True):
-            # Mock behavior for file selection
-            selected_files = [
-                str(tmp_path / "projects/example/output.txt")
-            ]  # Example selected file
-            return selected_files
 
-        monkeypatch.setattr(
-            "gpt_engineer.applications.cli.file_selector.editor_file_selector",
-            mock_editor_file_selector,
-        )
+    def test_improve_existing_project(tmp_path, monkeypatch):
+        import toml
 
-        p = tmp_path / "projects/example"
-        p.mkdir(parents=True)
-        (p / "prompt").write_text("Hello world")  # or whatever content is needed
+        # Setup: Create a dummy file selection toml with one file marked as selected
+        dummy_file = tmp_path / "projects/example/output.txt"
+        dummy_file.parent.mkdir(parents=True, exist_ok=True)
+        dummy_file.write_text("Hello world")
 
-        # Mock the function that normally opens an editor
+        # Define the content of the toml file as if user selected the dummy_file
+        selection = {"files": {str(dummy_file): {"selected": True}}}
+
+        toml_file_path = tmp_path / "file_selection.toml"
+        with open(toml_file_path, "w") as toml_file:
+            toml.dump(selection, toml_file)
+
+        # Mock the editor opening function to do nothing
         monkeypatch.setattr(
             "gpt_engineer.applications.cli.file_selector.open_with_default_editor",
             lambda x: None,
         )
 
-        # Call the function under test with the project path and "improve" action
-        simplified_main(str(p), "improve")
+        # Mock the editor file selector to return the path of the selected dummy file
+        monkeypatch.setattr(
+            "gpt_engineer.applications.cli.file_selector.editor_file_selector",
+            lambda *args, **kwargs: [str(dummy_file)],
+        )
 
-        assert (p / "output.txt").exists()
-        text = (p / "output.txt").read_text().strip()
+        # Proceed with the rest of the test assuming the user has selected the dummy_file
+        simplified_main(str(tmp_path / "projects/example"), "improve")
+
+        # Assertions remain the same...
+        assert dummy_file.exists()
+        text = dummy_file.read_text().strip()
         assert text == "hello"
 
     #  Runs gpt-engineer with lite mode and generates a project with only the main prompt.
