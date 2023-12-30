@@ -1,13 +1,12 @@
 """
-This module provides functionalities for selecting files from both a graphical file
-explorer and terminal-based file explorer.
+This module provides functionalities for selecting files from an editor file explorer.
 
 It allows the user to choose files for the purpose of context improvement. This module
 provides a tree-based display in the terminal to enable file selection with support for
 navigating through directories and ignoring specified directories.
 
 Features:
-    - Supports both graphical (using `tkinter`) and terminal-based file selection.
+    - Supports editor file selection.
     - Provides a tree-based display of directories and files.
     - Allows for custom filtering of displayed files and directories.
     - Support to reuse a previous file selection list.
@@ -16,20 +15,17 @@ Features:
 Classes:
     - DisplayablePath: Represents a displayable path in a file explorer, allowing for a
       tree structure display in the terminal.
-    - TerminalFileSelector: Enables terminal-based file selection.
+    - file_selector: Enables terminal-based file selection.
 
 Functions:
     - is_in_ignoring_extensions: Checks if a path should be ignored based on predefined rules.
-    - ask_for_files: Asks user to select files from either GUI or terminal or uses a previous
-      file list.
-    - gui_file_selector: Displays a GUI for file selection.
-    - terminal_file_selector: Displays a terminal interface for file selection.
+    - ask_for_files: Asks user to select files or uses a previous file list.
+    - editor_file_selector: Displays a GUI for file selection.
 
 Dependencies:
     - os
     - re
     - sys
-    - tkinter
     - pathlib
     - typing
 
@@ -44,8 +40,6 @@ import subprocess
 from pathlib import Path
 from typing import List, Union
 
-# import tkinter as tk
-# import tkinter.filedialog as fd
 import toml
 
 from gpt_engineer.core.default.disk_memory import DiskMemory
@@ -199,7 +193,7 @@ class DisplayablePath(object):
         return "".join(reversed(parts))
 
 
-class TerminalFileSelector:
+class FileSelector:
     """
     A terminal-based file selector for navigating and selecting files from a specified root folder.
 
@@ -287,9 +281,9 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
             f"File list detected at {metadata_db.path / FILE_LIST_NAME}. "
             "Edit or delete it if you want to select new files."
         )
-        selected_files = tree_style_file_selector(project_path, False)
+        selected_files = editor_file_selector(project_path, False)
     else:
-        selected_files = tree_style_file_selector(project_path, True)
+        selected_files = editor_file_selector(project_path, True)
     content_dict = {}
     for file_path in selected_files:
         file_path = Path(file_path)
@@ -308,10 +302,6 @@ def open_with_default_editor(file_path):
     Parameters:
     - file_path (str): The path to the file to be opened.
 
-    The function first tries to use the preferred editor specified in the 'EDITOR' environment variable.
-    If none is set or the specified editor isn't available, it cycles through a list of common editors
-    ('vim', 'nano', 'notepad', 'gedit') and uses the first one found. If all attempts fail, it prompts
-    the user to manually open the file.
     """
 
     editors = ["vim", "nano", "notepad", "gedit"]  # A list of common editors
@@ -352,9 +342,9 @@ def is_utf8(file_path):
         return False
 
 
-def tree_style_file_selector(input_path: str, init: bool = True) -> List[str]:
+def editor_file_selector(input_path: str, init: bool = True) -> List[str]:
     """
-    Display a tree-style file selection to select context files.
+    Display an editor file selection to select context files.
     Generates a tree representation in a .toml file and allows users to edit it.
     Users can comment out files to ignore them.
     """
@@ -395,7 +385,7 @@ def tree_style_file_selector(input_path: str, init: bool = True) -> List[str]:
             "No files were selected. Please select at least one file to proceed."
         )
 
-    print("\nYou have selected the following files:\n")
+    print(f"\nYou have selected the following files:\n{input_path}")
     all_paths = set()
     for selected in selected_files:
         all_paths.add(selected)
