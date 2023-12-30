@@ -368,7 +368,13 @@ def tree_style_file_selector(input_path: str, init: bool = True) -> List[str]:
             relative_path = os.path.relpath(path.path, input_path)
             tree_dict["files"][relative_path] = {"selected": False}
 
-        comment = "# Select or Deselect files for processing by setting 'selected' to true or false.\n\n"
+        comment = (
+            "# Change 'selected' from false to true to include files in the edit. "
+            "GPT-engineer can only read and edit the files that set to true. "
+            "Including irrelevant files will degrade coding performance, "
+            "cost additional tokens and potentially lead to violations "
+            "of the token limit, resulting in runtime errors.\n\n"
+        )
         with open(toml_file, "w") as f:
             f.write(comment)
             toml.dump(tree_dict, f)
@@ -384,18 +390,21 @@ def tree_style_file_selector(input_path: str, init: bool = True) -> List[str]:
         if properties.get("selected", False):
             selected_files.append(str(Path(input_path).joinpath(file).resolve()))
 
-    if selected_files:
-        print("\nYou have selected the following files:\n")
-        all_paths = set()
-        for selected in selected_files:
-            all_paths.add(selected)
-            all_paths.update(str(Path(selected).parent.resolve()))
+    if not selected_files:
+        raise Exception(
+            "No files were selected. Please select at least one file to proceed."
+        )
 
-        for path in DisplayablePath.make_tree(Path(input_path)):
-            full_path = str(path.path.resolve())
-            if full_path in all_paths:
-                print(path.displayable())
-    else:
-        print("No files were selected.")
+    print("\nYou have selected the following files:\n")
+    all_paths = set()
+    for selected in selected_files:
+        all_paths.add(selected)
+        all_paths.update(str(Path(selected).parent.resolve()))
+
+    for path in DisplayablePath.make_tree(Path(input_path)):
+        full_path = str(path.path.resolve())
+        if full_path in all_paths:
+            print(path.displayable())
+
     print("\n")
     return selected_files
