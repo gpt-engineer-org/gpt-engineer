@@ -63,25 +63,35 @@ class TestMain:
         assert text == "hello"
 
     #  Runs gpt-engineer with improve mode and improves an existing project in the specified path.
-    # def test_improve_existing_project(self, tmp_path, monkeypatch):
-    #     def improve_generator():
-    #         yield "2"
-    #         yield "all"
-    #         yield "y"  # First response
-    #         while True:
-    #             yield "n"  # Subsequent responses
-    #
-    #     gen = improve_generator()
-    #     monkeypatch.setattr("builtins.input", lambda _: next(gen))
-    #     p = tmp_path / "projects/example"
-    #     p.mkdir(parents=True)
-    #     (p / "prompt").write_text(prompt_text)
-    #     simplified_main(str(p), "improve")
-    #     ex_env = DiskExecutionEnv(path=p)
-    #     ex_env.run(f"bash {ENTRYPOINT_FILE}")
-    #     assert (p / "output.txt").exists()
-    #     text = (p / "output.txt").read_text().strip()
-    #     assert text == "hello"
+    def test_improve_existing_project(self, tmp_path, monkeypatch):
+        def mock_editor_file_selector(input_path, init=True):
+            # Mock behavior for file selection
+            selected_files = [
+                str(tmp_path / "projects/example/output.txt")
+            ]  # Example selected file
+            return selected_files
+
+        monkeypatch.setattr(
+            "gpt_engineer.applications.cli.file_selector.editor_file_selector",
+            mock_editor_file_selector,
+        )
+
+        p = tmp_path / "projects/example"
+        p.mkdir(parents=True)
+        (p / "prompt").write_text("Hello world")  # or whatever content is needed
+
+        # Mock the function that normally opens an editor
+        monkeypatch.setattr(
+            "gpt_engineer.applications.cli.file_selector.open_with_default_editor",
+            lambda x: None,
+        )
+
+        # Call the function under test with the project path and "improve" action
+        simplified_main(str(p), "improve")
+
+        assert (p / "output.txt").exists()
+        text = (p / "output.txt").read_text().strip()
+        assert text == "hello"
 
     #  Runs gpt-engineer with lite mode and generates a project with only the main prompt.
     def test_lite_mode_generate_project(self, tmp_path, monkeypatch):
