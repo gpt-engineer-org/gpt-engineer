@@ -275,15 +275,22 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
     Returns:
         dict[str, str]: Dictionary where key = file name and value = file path
     """
+
     metadata_db = DiskMemory(metadata_path(project_path))
-    if FILE_LIST_NAME in metadata_db:
-        print(
-            f"File list detected at {metadata_db.path / FILE_LIST_NAME}. "
-            "Edit or delete it if you want to select new files."
-        )
-        selected_files = editor_file_selector(project_path, False)
+    if os.getenv("TEST_MODE"):
+        print("Test mode: Simulating file selection")
+        resolved_path = Path(project_path).resolve()
+        all_files = list(resolved_path.glob("**/*"))
+        selected_files = [file for file in all_files if file.is_file()]
     else:
-        selected_files = editor_file_selector(project_path, True)
+        if FILE_LIST_NAME in metadata_db:
+            print(
+                f"File list detected at {metadata_db.path / FILE_LIST_NAME}. "
+                "Edit or delete it if you want to select new files."
+            )
+            selected_files = editor_file_selector(project_path, False)
+        else:
+            selected_files = editor_file_selector(project_path, True)
     content_dict = {}
     for file_path in selected_files:
         file_path = Path(file_path)
