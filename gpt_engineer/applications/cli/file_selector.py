@@ -277,11 +277,15 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
     """
 
     metadata_db = DiskMemory(metadata_path(project_path))
-    if os.getenv("TEST_MODE"):
-        print("Test mode: Simulating file selection")
-        resolved_path = Path(project_path).resolve()
-        all_files = list(resolved_path.glob("**/*"))
-        selected_files = [file for file in all_files if file.is_file()]
+    if os.getenv("GPTE_TEST_MODE"):
+        assert FILE_LIST_NAME in metadata_db
+        selected_files = get_files_from_toml(
+            project_path, metadata_db.path / FILE_LIST_NAME
+        )
+        # print("Test mode: Simulating file selection")
+        # resolved_path = Path(project_path).resolve()
+        # all_files = list(resolved_path.glob("**/*"))
+        # selected_files = [file for file in all_files if file.is_file()]
     else:
         if FILE_LIST_NAME in metadata_db:
             print(
@@ -293,9 +297,11 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
             selected_files = editor_file_selector(project_path, True)
     content_dict = {}
     for file_path in selected_files:
+        # selected files contains paths that are relative to the project path
         file_path = Path(file_path)
         try:
-            with open(file_path, "r") as content:
+            # to open the file we need the path from the cwd
+            with open(Path(project_path) / file_path, "r") as content:
                 content_dict[str(file_path)] = content.read()
         except FileNotFoundError:
             print(f"Warning: File not found {file_path}")
@@ -381,11 +387,15 @@ def editor_file_selector(input_path: str, init: bool = True) -> List[str]:
     )
     open_with_default_editor(toml_file)
 
+    return get_files_from_toml(input_path, toml_file)
+
+
+def get_files_from_toml(input_path, toml_file):
     selected_files = []
     edited_tree = toml.load(toml_file)
     for file, properties in edited_tree["files"].items():
         if properties.get("selected", False):
-            selected_files.append(str(Path(input_path).joinpath(file).resolve()))
+            selected_files.append(file)
 
     if not selected_files:
         raise Exception(
