@@ -4,7 +4,7 @@ import os
 import gpt_engineer.applications.cli.main as main
 
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
-from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
+from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, META_DATA_REL_PATH
 from tests.caching_ai import CachingAI
 
 main.AI = CachingAI
@@ -66,7 +66,7 @@ class TestMain:
     #  Runs gpt-engineer with improve mode and improves an existing project in the specified path.
     def test_improve_existing_project(self, tmp_path, monkeypatch):
         def improve_generator():
-            yield "y"  # First response
+            yield "y"
             while True:
                 yield "n"  # Subsequent responses
 
@@ -75,14 +75,23 @@ class TestMain:
         p = tmp_path / "projects/example"
         p.mkdir(parents=True)
         (p / "prompt").write_text(prompt_text)
-        os.environ["TEST_MODE"] = "True"
+        (p / "main.py").write_text("The program will be written in this file")
+        meta_p = p / META_DATA_REL_PATH
+        meta_p.mkdir(parents=True)
+        (meta_p / "file_selection.toml").write_text(
+            """
+        [files."main.py"]
+        selected = true
+                    """
+        )
+        os.environ["GPTE_TEST_MODE"] = "True"
         simplified_main(str(p), "improve")
         ex_env = DiskExecutionEnv(path=p)
         ex_env.run(f"bash {ENTRYPOINT_FILE}")
         assert (p / "output.txt").exists()
         text = (p / "output.txt").read_text().strip()
         assert text == "hello"
-        del os.environ["TEST_MODE"]
+        del os.environ["GPTE_TEST_MODE"]
 
     #  Runs gpt-engineer with lite mode and generates a project with only the main prompt.
     def test_lite_mode_generate_project(self, tmp_path, monkeypatch):
