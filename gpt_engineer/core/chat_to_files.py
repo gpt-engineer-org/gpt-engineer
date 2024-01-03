@@ -94,6 +94,13 @@ def overwrite_code_with_edits(chat: str, files_dict: FilesDict):
         The code object to apply edits to.
     """
     edits = parse_edits(chat)
+    for edit in edits:
+        filename = edit.filename
+        if filename not in files_dict:
+            # Log a verbose error message and return gracefully rather than failing
+            logger.error(f"File '{filename}' not found in files_dict. Cannot apply edits from chat.")
+            return
+    edits = parse_edits(chat)
     apply_edits(edits, files_dict)
 
 
