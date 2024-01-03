@@ -70,18 +70,17 @@ class DisplayablePath(object):
         """
         Initialize a DisplayablePath object.
         """
-        self.depth: int = 0
+        self.depth = 0
         self.path = Path(str(path))
         self.parent = parent_path
         self.is_last = is_last
         if self.parent:
-            self.depth = self.parent.depth + 1
+            self.depth = self.parent.depth + 1  # Increment depth if it has a parent
 
     @property
     def display_name(self) -> str:
         """
         Get the display name of the file or directory.
-
         """
         if self.path.is_dir():
             return self.path.name + "/"
@@ -92,7 +91,7 @@ class DisplayablePath(object):
         cls, root: Union[str, Path], parent=None, is_last=False, criteria=None
     ):
         """
-        Generate a tree of DisplayablePath objects..
+        Generate a tree of DisplayablePath objects.
         """
         root = Path(str(root))
         criteria = criteria or cls._default_criteria
@@ -145,7 +144,7 @@ class DisplayablePath(object):
             )
             parent = parent.parent
 
-        return "".join(reversed(parts))
+        return "".join(reversed(parts))  # Assemble the parts into the final string
 
 
 def is_in_ignoring_extensions(path: Path) -> bool:
@@ -163,14 +162,15 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
     Asks the user to select files for the purpose of context improvement.
     It supports selection from the terminal or using a previously saved list.
     """
-
     metadata_db = DiskMemory(metadata_path(project_path))
     if os.getenv("GPTE_TEST_MODE"):
+        # In test mode, retrieve files from a predefined TOML configuration
         assert FILE_LIST_NAME in metadata_db
         selected_files = get_files_from_toml(
             project_path, metadata_db.path / FILE_LIST_NAME
         )
     else:
+        # Otherwise, use the editor file selector for interactive selection
         if FILE_LIST_NAME in metadata_db:
             print(
                 f"File list detected at {metadata_db.path / FILE_LIST_NAME}. "
@@ -182,9 +182,7 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
 
     content_dict = {}
     for file_path in selected_files:
-        file_path = Path(
-            file_path
-        )  # selected files contains paths that are relative to the project path
+        # selected files contains paths that are relative to the project path
         try:
             # to open the file we need the path from the cwd
             with open(Path(project_path) / file_path, "r") as content:
@@ -198,9 +196,10 @@ def open_with_default_editor(file_path):
     """
     Attempts to open the specified file using the system's default text editor or a common fallback editor.
     """
-    editors = ["vim", "nano", "notepad", "gedit"]  # A list of common editors
-    chosen_editor = os.environ.get("EDITOR")  # Get the preferred editor if set
+    editors = ["vim", "nano", "notepad", "gedit"]  # List of fallback editors
+    chosen_editor = os.environ.get("EDITOR")
 
+    # Try the preferred editor first, then fallback to common editors
     if chosen_editor:
         try:
             subprocess.run([chosen_editor, file_path])
@@ -224,8 +223,7 @@ def is_utf8(file_path):
     """
     try:
         with open(file_path, "rb") as file:
-            data = file.read()
-            data.decode("utf-8")
+            file.read().decode("utf-8")
             return True
     except UnicodeDecodeError:
         return False
@@ -237,16 +235,26 @@ def editor_file_selector(input_path: str, init: bool = True) -> List[str]:
     Allows users to select or deselect files for the context improvement process.
     """
     root_path = Path(input_path)
-    tree_dict = {"files": {}}
-    toml_file = DiskMemory(metadata_path(input_path)).path / "file_selection.toml"
+    tree_dict = {"files": {}}  # Initialize the dictionary to hold file selection state
+    toml_file = (
+        DiskMemory(metadata_path(input_path)).path / "file_selection.toml"
+    )  # Define the toml file path
 
+    # Initialize .toml file with file tree if in initial state
     if init:
-        for path in DisplayablePath.make_tree(root_path):
+        for path in DisplayablePath.make_tree(
+            root_path
+        ):  # Create a tree structure from the root path
             if path.path.is_dir() or not is_utf8(path.path):
                 continue
-            relative_path = os.path.relpath(path.path, input_path)
-            tree_dict["files"][relative_path] = {"selected": False}
+            relative_path = os.path.relpath(
+                path.path, input_path
+            )  # Get the relative path of the file
+            tree_dict["files"][relative_path] = {
+                "selected": False
+            }  # Initialize file selection as False
 
+        # Write instructions and file selection states to .toml file
         comment = (
             "# Change 'selected' from false to true to include files in the edit. "
             "GPT-engineer can only read and edit the files that set to true. "
@@ -261,8 +269,12 @@ def editor_file_selector(input_path: str, init: bool = True) -> List[str]:
     print(
         "Please select(true) and deselect(false) files, save it, and close it to continue..."
     )
-    open_with_default_editor(toml_file)
-    return get_files_from_toml(input_path, toml_file)
+    open_with_default_editor(
+        toml_file
+    )  # Open the .toml file in the default editor for user modification
+    return get_files_from_toml(
+        input_path, toml_file
+    )  # Return the list of selected files after user edits
 
 
 def get_files_from_toml(input_path, toml_file):
@@ -271,11 +283,14 @@ def get_files_from_toml(input_path, toml_file):
     This function parses the .toml file and returns the list of selected files.
     """
     selected_files = []
-    edited_tree = toml.load(toml_file)
+    edited_tree = toml.load(toml_file)  # Load the edited .toml file
+
+    # Iterate through the files in the .toml and append selected files to the list
     for file, properties in edited_tree["files"].items():
-        if properties.get("selected", False):
+        if properties.get("selected", False):  # Check if the file is selected
             selected_files.append(file)
 
+    # Ensure that at least one file is selected, or raise an exception
     if not selected_files:
         raise Exception(
             "No files were selected. Please select at least one file to proceed."
@@ -287,6 +302,7 @@ def get_files_from_toml(input_path, toml_file):
         all_paths.add(selected)
         all_paths.update(str(Path(selected).parent.resolve()))
 
+    # Display the tree structure of the selected paths
     for path in DisplayablePath.make_tree(Path(input_path)):
         full_path = str(path.path.resolve())
         if full_path in all_paths:
