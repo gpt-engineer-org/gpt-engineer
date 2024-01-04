@@ -196,7 +196,14 @@ def open_with_default_editor(file_path):
     """
     Attempts to open the specified file using the system's default text editor or a common fallback editor.
     """
-    editors = ["vim", "nano", "notepad", "gedit"]  # List of fallback editors
+    editors = [
+        "gedit",
+        "notepad",
+        "write",
+        "nano",
+        "vim",
+        "emacs",
+    ]  # Putting the beginner-friendly text editor forward
     chosen_editor = os.environ.get("EDITOR")
 
     # Try the preferred editor first, then fallback to common editors
