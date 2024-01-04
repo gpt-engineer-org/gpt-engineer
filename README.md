@@ -1,8 +1,8 @@
 # GPT-Engineer
 
 [![Discord Follow](https://dcbadge.vercel.app/api/server/8tcDQ89Ej2?style=flat)](https://discord.gg/8tcDQ89Ej2)
-[![GitHub Repo stars](https://img.shields.io/github/stars/AntonOsika/gpt-engineer?style=social)](https://github.com/AntonOsika/gpt-engineer)
-[![Twitter Follow](https://img.shields.io/twitter/follow/antonosika?style=social)](https://twitter.com/AntonOsika)
+[![GitHub Repo stars](https://img.shields.io/github/stars/gpt-engineer-org/gpt-engineer?style=social)](https://github.com/gpt-engineer-org/gpt-engineer)
+[![Twitter Follow](https://img.shields.io/twitter/follow/antonosika?style=social)](https://twitter.com/antonosika)
 
 GPT-engineer lets you:
 - Specify a software in natural language
@@ -18,7 +18,7 @@ For **stable** release:
 - `python -m pip install gpt-engineer`
 
 For **development**:
-- `git clone https://github.com/AntonOsika/gpt-engineer.git`
+- `git clone https://github.com/gpt-engineer-org/gpt-engineer.git`
 - `cd gpt-engineer`
 - `poetry install`
 - `poetry shell` to activate the virtual environment
@@ -41,7 +41,7 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 **Other ways to run:**
 - Use Docker ([instructions](docker/README.md))
 - Do everything in your browser:
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/gpt-engineer-org/gpt-engineer/codespaces)
 
 ### Creating new code (default usage)
 - Create an empty folder for your project anywhere on your computer
@@ -55,7 +55,7 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 - Run `gpte <project_dir> -i` with a relative path to your folder
   - For example: `gpte projects/my-old-project` from the gpt-engineer directory root with your folder in `projects/`
 
-By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
+By running gpt-engineer you agree to our [terms](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
 ### Note
 
@@ -81,14 +81,14 @@ The gpt-engineer community mission is to **maintain tools that coding agent buil
 
 If you are interested in contributing to this, we are interested in having you.
 
-If you want to see our broader ambitions, check out the [roadmap](https://github.com/AntonOsika/gpt-engineer/blob/main/ROADMAP.md), and join
+If you want to see our broader ambitions, check out the [roadmap](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/ROADMAP.md), and join
 [discord](https://discord.gg/8tcDQ89Ej2)
 to get input on how you can [contribute](.github/CONTRIBUTING.md) to it.
 
-gpt-engineer is [governed](https://github.com/AntonOsika/gpt-engineer/blob/main/GOVERNANCE.md) by a board of long term contributors. If you contribute routinely and have an interest in shaping the future of gpt-engineer, you will be considered for the board.
+gpt-engineer is [governed](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/GOVERNANCE.md) by a board of long term contributors. If you contribute routinely and have an interest in shaping the future of gpt-engineer, you will be considered for the board.
 
 ## Example
 
 
 
-https://github.com/AntonOsika/gpt-engineer/assets/4467025/40d0a9a8-82d0-4432-9376-136df0d57c99
+https://github.com/gpt-engineer-org/gpt-engineer/assets/4467025/40d0a9a8-82d0-4432-9376-136df0d57c99
