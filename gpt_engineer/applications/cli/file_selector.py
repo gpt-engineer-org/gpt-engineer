@@ -185,26 +185,7 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
             print(
                 f"File list detected at {toml_path}. Edit or delete it if you want to select new files."
             )
-
-            # Load existing files from the .toml configuration
-            with open(toml_path, "r") as toml_file:
-                existing_files = toml.load(toml_file)
-                merged_files = merge_file_lists(
-                    existing_files["files"], get_current_files(project_path)
-                )
-
-            # Write the merged list back to the .toml for user review and modification
-            with open(toml_path, "w") as toml_file:
-                toml_file.write(COMMENT)  # Ensure to write the comment
-                toml.dump({"files": merged_files}, toml_file)
-
-            # Open the .toml file with the default editor for user modification
-            open_with_default_editor(toml_path)
-
-            # After the editor is closed, read the .toml file again to get the final list of selected files
-            with open(toml_path, "r") as toml_file:
-                final_selection = toml.load(toml_file)
-                selected_files = final_selection["files"]
+            selected_files = editor_file_selector(project_path, False)
         else:
             selected_files = editor_file_selector(project_path, True)
 
@@ -218,42 +199,6 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
         except FileNotFoundError:
             print(f"Warning: File not found {file_path}")
     return FilesDict(content_dict)
-
-
-def get_current_files(project_path: Union[str, Path]) -> Dict[str, Any]:
-    """
-    Generates a dictionary of all files in the project directory
-    with their selection status set to False by default.
-    """
-    all_files = {}
-    project_path = Path(project_path).resolve()  # Ensure path is absolute and resolved
-
-    for path in project_path.glob("**/*"):  # Recursively list all files
-        if path.is_file():
-            # Normalize and compare each part of the path
-            if not any(
-                part in IGNORE_FOLDERS for part in path.relative_to(project_path).parts
-            ) and not path.name.startswith("."):
-                relative_path = str(
-                    path.relative_to(project_path)
-                )  # Store relative paths
-                all_files[relative_path] = {"selected": False}
-    return all_files
-
-
-def merge_file_lists(
-    existing_files: Dict[str, Any], new_files: Dict[str, Any]
-) -> Dict[str, Any]:
-    """
-    Merges the new files list with the existing one, preserving the selection status.
-    """
-    # Update the existing files with any new files or changes
-    for file, properties in new_files.items():
-        if file not in existing_files:
-            existing_files[file] = properties  # Add new files as unselected
-        # If you want to update other properties of existing files, you can do so here
-
-    return existing_files
 
 
 def open_with_default_editor(file_path):
@@ -307,9 +252,8 @@ def editor_file_selector(input_path: str, init: bool = True) -> List[str]:
     """
     root_path = Path(input_path)
     tree_dict = {"files": {}}  # Initialize the dictionary to hold file selection state
-    toml_file = (
-        DiskMemory(metadata_path(input_path)).path / "file_selection.toml"
-    )  # Define the toml file path
+    toml_file = DiskMemory(metadata_path(input_path)).path / "file_selection.toml"
+    # Define the toml file path
 
     # Initialize .toml file with file tree if in initial state
     if init:
@@ -330,6 +274,26 @@ def editor_file_selector(input_path: str, init: bool = True) -> List[str]:
         with open(toml_file, "w") as f:
             f.write(COMMENT)
             toml.dump(tree_dict, f)
+    else:
+        # Load existing files from the .toml configuration
+        with open(toml_file, "r") as file:
+            existing_files = toml.load(file)
+            merged_files = merge_file_lists(
+                existing_files["files"], get_current_files(root_path)
+            )
+
+        # Write the merged list back to the .toml for user review and modification
+        with open(toml_file, "w") as file:
+            file.write(COMMENT)  # Ensure to write the comment
+            toml.dump({"files": merged_files}, file)
+
+        # Open the .toml file with the default editor for user modification
+        # open_with_default_editor(toml_file)
+        #
+        # # After the editor is closed, read the .toml file again to get the final list of selected files
+        # with open(toml_file, "r") as toml_file:
+        #     final_selection = toml.load(toml_file)
+        #     return final_selection["files"]
 
     print(
         "Please select(true) and deselect(false) files, save it, and close it to continue..."
@@ -375,3 +339,39 @@ def get_files_from_toml(input_path, toml_file):
 
     print("\n")
     return selected_files
+
+
+def merge_file_lists(
+    existing_files: Dict[str, Any], new_files: Dict[str, Any]
+) -> Dict[str, Any]:
+    """
+    Merges the new files list with the existing one, preserving the selection status.
+    """
+    # Update the existing files with any new files or changes
+    for file, properties in new_files.items():
+        if file not in existing_files:
+            existing_files[file] = properties  # Add new files as unselected
+        # If you want to update other properties of existing files, you can do so here
+
+    return existing_files
+
+
+def get_current_files(project_path: Union[str, Path]) -> Dict[str, Any]:
+    """
+    Generates a dictionary of all files in the project directory
+    with their selection status set to False by default.
+    """
+    all_files = {}
+    project_path = Path(project_path).resolve()  # Ensure path is absolute and resolved
+
+    for path in project_path.glob("**/*"):  # Recursively list all files
+        if path.is_file():
+            # Normalize and compare each part of the path
+            if not any(
+                part in IGNORE_FOLDERS for part in path.relative_to(project_path).parts
+            ) and not path.name.startswith("."):
+                relative_path = str(
+                    path.relative_to(project_path)
+                )  # Store relative paths
+                all_files[relative_path] = {"selected": False}
+    return all_files
