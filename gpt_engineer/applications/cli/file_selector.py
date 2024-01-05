@@ -98,31 +98,25 @@ class DisplayablePath(object):
         cls, root: Union[str, Path], parent=None, is_last=False, criteria=None
     ):
         """
-        Generate a tree of DisplayablePath objects.
+        Generate a tree of DisplayablePath objects, ensure it's only called on directories.
         """
-        root = Path(str(root))
+        root = Path(str(root))  # Ensure root is a Path object
         criteria = criteria or cls._default_criteria
         displayable_root = cls(root, parent, is_last)
         yield displayable_root
 
-        children = sorted(
-            list(path for path in root.iterdir() if criteria(path)),
-            key=lambda s: str(s).lower(),
-        )
-        count = 1
-        for path in children:
-            is_last = count == len(children)
-            if (
-                path.is_file()
-                and not any(folder in IGNORE_FOLDERS for folder in path.parts)
-                and not path.name.startswith(".")
-            ):
+        if root.is_dir():  # Check if root is a directory before iterating
+            children = sorted(
+                list(path for path in root.iterdir() if criteria(path)),
+                key=lambda s: str(s).lower(),
+            )
+            count = 1
+            for path in children:
+                is_last = count == len(children)
                 yield from cls.make_tree(
                     path, parent=displayable_root, is_last=is_last, criteria=criteria
                 )
-            else:
-                yield cls(path, displayable_root, is_last)
-            count += 1
+                count += 1
 
     @classmethod
     def _default_criteria(cls, path: Path) -> bool:
@@ -286,14 +280,6 @@ def editor_file_selector(input_path: str, init: bool = True) -> List[str]:
         with open(toml_file, "w") as file:
             file.write(COMMENT)  # Ensure to write the comment
             toml.dump({"files": merged_files}, file)
-
-        # Open the .toml file with the default editor for user modification
-        # open_with_default_editor(toml_file)
-        #
-        # # After the editor is closed, read the .toml file again to get the final list of selected files
-        # with open(toml_file, "r") as toml_file:
-        #     final_selection = toml.load(toml_file)
-        #     return final_selection["files"]
 
     print(
         "Please select(true) and deselect(false) files, save it, and close it to continue..."
