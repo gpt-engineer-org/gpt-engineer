@@ -86,3 +86,6 @@ webapp/.next/
 
 # TODO files
 /!todo*
+
+#ignore tox files
+.tox
