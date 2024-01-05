@@ -37,7 +37,7 @@ from dotenv import load_dotenv
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
-from gpt_engineer.applications.cli.file_selector import ask_for_files
+from gpt_engineer.applications.cli.file_selector import FileSelector
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
@@ -190,7 +190,8 @@ def main(
 
     store = FileStore(project_path)
     if improve_mode:
-        files_dict = ask_for_files(project_path)
+        fileselector = FileSelector(project_path)
+        files_dict = fileselector.ask_for_files()
         files_dict = agent.improve(files_dict, prompt)
     else:
         files_dict = agent.init(prompt)
