@@ -312,18 +312,18 @@ def get_files_from_toml(input_path, toml_file):
             "No files were selected. Please select at least one file to proceed."
         )
 
-    print(f"\nYou have selected the following files:\n{input_path}")
-
-    project_path = Path(input_path).resolve()
-    all_paths = set(
-        Path(project_path).joinpath(file).resolve() for file in selected_files
-    )
-
-    for displayable_path in DisplayablePath.make_tree(project_path):
-        if displayable_path.path.resolve() in all_paths:
-            print(displayable_path.displayable())
-
-    print("\n")
+    # print(f"\nYou have selected the following files:\n{input_path}")
+    #
+    # project_path = Path(input_path).resolve()
+    # all_paths = set(
+    #     Path(project_path).joinpath(file).resolve() for file in selected_files
+    # )
+    #
+    # for displayable_path in DisplayablePath.make_tree(project_path):
+    #     if displayable_path.path.resolve() in all_paths:
+    #         print(displayable_path.displayable())
+    #
+    # print("\n")
     return selected_files
 
 
