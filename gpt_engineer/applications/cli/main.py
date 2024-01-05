@@ -57,6 +57,8 @@ def load_env_if_needed():
         # if there is no .env file, try to load from the current working directory
         load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
     openai.api_key = os.getenv("OPENAI_API_KEY")
+    if os.getenv("OPENAI_BASE_URL") is not None:
+        openai.api_base = os.getenv("OPENAI_BASE_URL")
 
 
 def load_prompt(input_repo: DiskMemory, improve_mode):
