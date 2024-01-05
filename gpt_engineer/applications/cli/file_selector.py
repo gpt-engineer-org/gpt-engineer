@@ -41,7 +41,7 @@ import os
 import subprocess
 
 from pathlib import Path
-from typing import List, Union
+from typing import Any, Dict, List, Union
 
 import toml
 
@@ -49,8 +49,15 @@ from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import metadata_path
 from gpt_engineer.core.files_dict import FilesDict
 
-IGNORE_FOLDERS = {"site-packages", "node_modules", "venv"}
+IGNORE_FOLDERS = {"site-packages", "node_modules", "venv", ".gpteng"}
 FILE_LIST_NAME = "file_selection.toml"
+COMMENT = (
+    "# Change 'selected' from false to true to include files in the edit. "
+    "GPT-engineer can only read and edit the files that set to true. "
+    "Including irrelevant files will degrade coding performance, "
+    "cost additional tokens and potentially lead to violations "
+    "of the token limit, resulting in runtime errors.\n\n"
+)
 
 
 class DisplayablePath(object):
@@ -105,7 +112,11 @@ class DisplayablePath(object):
         count = 1
         for path in children:
             is_last = count == len(children)
-            if path.is_dir() and path.name not in IGNORE_FOLDERS:
+            if (
+                path.is_file()
+                and not any(folder in IGNORE_FOLDERS for folder in path.parts)
+                and not path.name.startswith(".")
+            ):
                 yield from cls.make_tree(
                     path, parent=displayable_root, is_last=is_last, criteria=criteria
                 )
@@ -163,20 +174,37 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
     It supports selection from the terminal or using a previously saved list.
     """
     metadata_db = DiskMemory(metadata_path(project_path))
+    toml_path = metadata_db.path / FILE_LIST_NAME
     if os.getenv("GPTE_TEST_MODE"):
         # In test mode, retrieve files from a predefined TOML configuration
         assert FILE_LIST_NAME in metadata_db
-        selected_files = get_files_from_toml(
-            project_path, metadata_db.path / FILE_LIST_NAME
-        )
+        selected_files = get_files_from_toml(project_path, toml_path)
     else:
         # Otherwise, use the editor file selector for interactive selection
         if FILE_LIST_NAME in metadata_db:
             print(
-                f"File list detected at {metadata_db.path / FILE_LIST_NAME}. "
-                "Edit or delete it if you want to select new files."
+                f"File list detected at {toml_path}. Edit or delete it if you want to select new files."
             )
-            selected_files = editor_file_selector(project_path, False)
+
+            # Load existing files from the .toml configuration
+            with open(toml_path, "r") as toml_file:
+                existing_files = toml.load(toml_file)
+                merged_files = merge_file_lists(
+                    existing_files["files"], get_current_files(project_path)
+                )
+
+            # Write the merged list back to the .toml for user review and modification
+            with open(toml_path, "w") as toml_file:
+                toml_file.write(COMMENT)  # Ensure to write the comment
+                toml.dump({"files": merged_files}, toml_file)
+
+            # Open the .toml file with the default editor for user modification
+            open_with_default_editor(toml_path)
+
+            # After the editor is closed, read the .toml file again to get the final list of selected files
+            with open(toml_path, "r") as toml_file:
+                final_selection = toml.load(toml_file)
+                selected_files = final_selection["files"]
         else:
             selected_files = editor_file_selector(project_path, True)
 
@@ -190,6 +218,42 @@ def ask_for_files(project_path: Union[str, Path]) -> FilesDict:
         except FileNotFoundError:
             print(f"Warning: File not found {file_path}")
     return FilesDict(content_dict)
+
+
+def get_current_files(project_path: Union[str, Path]) -> Dict[str, Any]:
+    """
+    Generates a dictionary of all files in the project directory
+    with their selection status set to False by default.
+    """
+    all_files = {}
+    project_path = Path(project_path).resolve()  # Ensure path is absolute and resolved
+
+    for path in project_path.glob("**/*"):  # Recursively list all files
+        if path.is_file():
+            # Normalize and compare each part of the path
+            if not any(
+                part in IGNORE_FOLDERS for part in path.relative_to(project_path).parts
+            ) and not path.name.startswith("."):
+                relative_path = str(
+                    path.relative_to(project_path)
+                )  # Store relative paths
+                all_files[relative_path] = {"selected": False}
+    return all_files
+
+
+def merge_file_lists(
+    existing_files: Dict[str, Any], new_files: Dict[str, Any]
+) -> Dict[str, Any]:
+    """
+    Merges the new files list with the existing one, preserving the selection status.
+    """
+    # Update the existing files with any new files or changes
+    for file, properties in new_files.items():
+        if file not in existing_files:
+            existing_files[file] = properties  # Add new files as unselected
+        # If you want to update other properties of existing files, you can do so here
+
+    return existing_files
 
 
 def open_with_default_editor(file_path):
@@ -262,15 +326,9 @@ def editor_file_selector(input_path: str, init: bool = True) -> List[str]:
             }  # Initialize file selection as False
 
         # Write instructions and file selection states to .toml file
-        comment = (
-            "# Change 'selected' from false to true to include files in the edit. "
-            "GPT-engineer can only read and edit the files that set to true. "
-            "Including irrelevant files will degrade coding performance, "
-            "cost additional tokens and potentially lead to violations "
-            "of the token limit, resulting in runtime errors.\n\n"
-        )
+
         with open(toml_file, "w") as f:
-            f.write(comment)
+            f.write(COMMENT)
             toml.dump(tree_dict, f)
 
     print(
