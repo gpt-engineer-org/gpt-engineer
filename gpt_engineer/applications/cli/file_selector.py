@@ -312,16 +312,15 @@ def get_files_from_toml(input_path, toml_file):
         )
 
     print(f"\nYou have selected the following files:\n{input_path}")
-    all_paths = set()
-    for selected in selected_files:
-        all_paths.add(selected)
-        all_paths.update(str(Path(selected).parent.resolve()))
 
-    # Display the tree structure of the selected paths
-    for path in DisplayablePath.make_tree(Path(input_path)):
-        full_path = str(path.path.resolve())
-        if full_path in all_paths:
-            print(path.displayable())
+    project_path = Path(input_path).resolve()
+    all_paths = set(
+        Path(project_path).joinpath(file).resolve() for file in selected_files
+    )
+
+    for displayable_path in DisplayablePath.make_tree(project_path):
+        if displayable_path.path.resolve() in all_paths:
+            print(displayable_path.displayable())
 
     print("\n")
     return selected_files
