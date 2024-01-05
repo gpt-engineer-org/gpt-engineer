@@ -1,41 +1,42 @@
 """
-This module provides functionalities for selecting files from an editor file explorer.
-
-It allows the user to choose files for the purpose of context improvement. This module
-provides a tree-based display in the terminal to enable file selection with support for
-navigating through directories and ignoring specified directories.
+This module, file_selector.py, offers an enhanced, class-based approach for
+selecting and managing file contexts within a GPT-Engineer environment.
+Leveraging a terminal-based, tree-structured display, users can navigate,
+select, and filter files efficiently. The module integrates tightly with
+the system's default text editor for direct file editing and supports
+persisting file selections for future reuse.
 
 Features:
-    - Supports editor file selection.
-    - Provides a tree-based display of directories and files.
-    - Allows for custom filtering of displayed files and directories.
-    - Support to reuse a previous file selection list.
-    - Option to ignore specific directories (e.g. "site-packages", "node_modules", "venv").
+  - Interactive terminal-based file selection with a tree-structured display.
+  - Customizable filtering for files and directories, allowing for a tailored selection process.
+  - Reusability of file selections through TOML configuration, enhancing user experience across sessions.
+  - Direct integration with system's default text editor, providing a seamless editing workflow.
+  - Support for ignoring specific directories to streamline the selection process.
 
 Classes:
-    - DisplayablePath: Represents a displayable path in a file explorer, allowing for a
-      tree structure display in the terminal.
-    - FileSelector: Enables terminal-based file selection.
+  - FileSelector: Core class facilitating file selection, storing user preferences, and handling file operations.
+  - DisplayablePath: Utility class to represent and display file paths in a tree-like structure for easy navigation.
 
 Functions:
-    - is_in_ignoring_extensions: Checks if a path should be ignored based on predefined rules.
-    - ask_for_files: Asks user to select files or uses a previous file list.
-    - editor_file_selector: Displays a GUI for file selection.
-    - open_with_default_editor: Opens a file in the default system editor or a common fallback.
-    - is_utf8: Checks if a file is UTF-8 encoded.
-    - get_files_from_toml: Retrieves selected files from a TOML configuration.
+  - ask_for_files: Main method to initiate file selection process, supporting both new and existing selections.
+  - editor_file_selector: Handles the creation or modification of file selection through user interaction.
+  - open_with_default_editor: Opens files in the system's default text editor for quick editing.
+  - is_utf8: Validates if a file's encoding is UTF-8, ensuring compatibility.
+  - get_files_from_toml: Extracts and returns user's file selections from a TOML file.
+  - merge_file_lists: Combines existing file selections with new ones, maintaining user choices.
+  - get_current_files: Generates a list of all files in the directory, applying user-defined filters.
 
 Dependencies:
-    - os
-    - subprocess
-    - pathlib
-    - typing
-    - toml
+  - os: For interacting with the operating system.
+  - subprocess: To call out system's default editor.
+  - pathlib: For file and path operations.
+  - typing: For type hinting.
+  - toml: For reading and writing TOML files.
 
 Note:
-    This module is built on top of `gpt_engineer.core.db` and assumes existence and
-    functionalities provided by DB and DBs classes.
+  This module is built to integrate with `gpt_engineer.core.db` and other related functionalities of the GPT-Engineer ecosystem.
 """
+
 
 import os
 import subprocess
