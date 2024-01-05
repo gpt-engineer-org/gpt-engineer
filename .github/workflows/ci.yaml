@@ -1,4 +1,5 @@
-name: Poetry install and pytest
+name: Python package continuous integration
+
 on:
   push:
     branches: [ main ]
@@ -8,22 +9,21 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9, 3.10]
+
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - name: Install Poetry
-        run: |
-          pipx install poetry
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip' #Note that pip is for the tox level. Poetry is still used for installing the specific environments (tox.ini)
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-          cache: 'poetry'
+    - name: Install tox
+      run: pip install tox
 
-      # Install dependencies using Poetry
-      - name: Install dependencies
-        run: poetry install
-
-      # Run unit tests using Poetry
-      - name: Run unit tests
-        run: poetry run pytest --cov=gpt_engineer
+    - name: Run tox
+      run: tox -p

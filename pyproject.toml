@@ -36,6 +36,7 @@ black = "23.3.0"
 mypy = "1.3.0"
 ruff = ">=0.0.272"
 pre-commit = "3.3.3"
+tox = ">=3.0.0"
 
 # docs
 autodoc_pydantic = ">=1.8.0"
