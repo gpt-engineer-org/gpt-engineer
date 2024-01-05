@@ -183,12 +183,19 @@ Ending text.
     assert parsed == expected
 
 
+def test_apply_overwrite_existing_file(log_capture):
+    edits = [Edit("existing_file.py", "", "print('Hello, World!')")]
+    code = {"existing_file.py": "some content"}
+    apply_edits(edits, code)
+    assert code == {"existing_file.py": "print('Hello, World!')"}
+    assert "file will be overwritten" in log_capture.messages[0]
+
+
 def test_apply_edit_new_file(log_capture):
     edits = [Edit("new_file.py", "", "print('Hello, World!')")]
-    code = {"new_file.py": "some content"}
+    code = {}
     apply_edits(edits, code)
     assert code == {"new_file.py": "print('Hello, World!')"}
-    assert "file will be overwritten" in log_capture.messages[0]
 
 
 def test_apply_edit_no_match(log_capture):
