@@ -122,39 +122,42 @@ def parse_edits(chat: str):
         A list of Edit objects representing the parsed code edits.
     """
 
-    def parse_one_edit(lines):
-        HEAD = "<<<<<<< HEAD"
-        DIVIDER = "\n=======\n"
-        UPDATE = ">>>>>>> updated"
-
-        filename = lines.pop(0)
-        text = "\n".join(lines)
-        splits = text.split(DIVIDER)
-        if len(splits) != 2:
-            raise ValueError(f"Could not parse following text as code edit: \n{text}")
-        before, after = splits
-
-        before = before.replace(HEAD, "").strip()
-        after = after.replace(UPDATE, "").strip()
-
-        return Edit(filename, before, after)
+    def parse_one_edit(edit_lines):
+        before, after = [], []
+        is_before = True  # Flag to track before/after status
+        for line in edit_lines:
+            if line.startswith("-"):
+                if is_before:
+                    before.append(line[4:].strip())  # Skip '- ' and line number
+                else:
+                    # Switch to parsing 'after' lines
+                    is_before = False
+                    after.append(line[4:].strip())  # Skip '+ ' and line number
+            elif line.startswith("+"):
+                is_before = False
+                after.append(line[4:].strip())
+        return "\n".join(before), "\n".join(after)
 
     edits = []
     current_edit = []
-    in_fence = False
-
+    filename = ""
     for line in chat.split("\n"):
-        if line.startswith("```") and in_fence:
-            edits.append(parse_one_edit(current_edit))
-            current_edit = []
-            in_fence = False
-            continue
-        elif line.startswith("```") and not in_fence:
-            in_fence = True
-            continue
-
-        if in_fence:
+        if line.startswith("File:"):
+            if current_edit:
+                before, after = parse_one_edit(current_edit)
+                edits.append(Edit(filename, before, after))
+                current_edit = []
+            filename = line.split(":")[1].strip()
+        elif line and not line.startswith("```"):
             current_edit.append(line)
+        elif not line and current_edit:
+            before, after = parse_one_edit(current_edit)
+            edits.append(Edit(filename, before, after))
+            current_edit = []
+
+    if current_edit:  # Handle the last edit block
+        before, after = parse_one_edit(current_edit)
+        edits.append(Edit(filename, before, after))
 
     return edits
 
