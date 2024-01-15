@@ -124,18 +124,21 @@ def parse_edits(chat: str):
 
     def parse_one_edit(edit_lines):
         before, after = [], []
-        is_before = True  # Flag to track before/after status
         for line in edit_lines:
-            if line.startswith("-"):
-                if is_before:
-                    before.append(line[4:].strip())  # Skip '- ' and line number
-                else:
-                    # Switch to parsing 'after' lines
-                    is_before = False
-                    after.append(line[4:].strip())  # Skip '+ ' and line number
-            elif line.startswith("+"):
-                is_before = False
-                after.append(line[4:].strip())
+            # Check if line starts with a number followed by '-' or '+'
+            match = re.match(r"^\d{1,10} ([-+]) (.*)", line)
+
+            if match:
+                symbol, content = match.groups()
+                if symbol == "-":
+                    before.append(content.strip())
+                elif symbol == "+":
+                    after.append(content.strip())
+            else:
+                print(f"Skipped line: {line}")  # Debug statement
+
+        print(f"Before edit: {before}")  # Debug statement
+        print(f"After edit: {after}")  # Debug statement
         return "\n".join(before), "\n".join(after)
 
     edits = []
@@ -143,19 +146,25 @@ def parse_edits(chat: str):
     filename = ""
     for line in chat.split("\n"):
         if line.startswith("File:"):
-            if current_edit:
+            if (
+                current_edit and filename and filename != "prompt"
+            ):  # Check if filename is not "prompt"
                 before, after = parse_one_edit(current_edit)
                 edits.append(Edit(filename, before, after))
                 current_edit = []
             filename = line.split(":")[1].strip()
         elif line and not line.startswith("```"):
             current_edit.append(line)
-        elif not line and current_edit:
+        elif (
+            not line and current_edit and filename and filename != "prompt"
+        ):  # Check if filename is not "prompt"
             before, after = parse_one_edit(current_edit)
             edits.append(Edit(filename, before, after))
             current_edit = []
 
-    if current_edit:  # Handle the last edit block
+    if (
+        current_edit and filename and filename != "prompt"
+    ):  # Check if filename is not "prompt"
         before, after = parse_one_edit(current_edit)
         edits.append(Edit(filename, before, after))
 
