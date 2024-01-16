@@ -100,109 +100,61 @@ def overwrite_code_with_edits(chat: str, files_dict: FilesDict):
 @dataclass
 class Edit:
     filename: str
-    before: str
-    after: str
+    line_number: int
+    content: str
+    is_before: bool
 
 
 def parse_edits(chat: str):
     """
-    Parse edits from a chat string.
-
-    This function extracts code edits from a chat string and returns them as a list
-    of Edit objects.
-
-    Parameters
-    ----------
-    chat : str
-        The chat content containing code edits.
-
-    Returns
-    -------
-    List[Edit]
-        A list of Edit objects representing the parsed code edits.
+    Parse edits from a chat string, preserving indentation.
     """
-
-    def parse_one_edit(edit_lines):
-        before, after = [], []
-        for line in edit_lines:
-            # Check if line starts with a number followed by '-' or '+'
-            match = re.match(r"^\d{1,10} ([-+]) (.*)", line)
-
-            if match:
-                symbol, content = match.groups()
-                if symbol == "-":
-                    before.append(content.strip())
-                elif symbol == "+":
-                    after.append(content.strip())
-            else:
-                print(f"Skipped line: {line}")  # Debug statement
-
-        print(f"Before edit: {before}")  # Debug statement
-        print(f"After edit: {after}")  # Debug statement
-        return "\n".join(before), "\n".join(after)
-
     edits = []
-    current_edit = []
+    lines = chat.split("\n")
     filename = ""
-    for line in chat.split("\n"):
+    for line in lines:
         if line.startswith("File:"):
-            if (
-                current_edit and filename and filename != "prompt"
-            ):  # Check if filename is not "prompt"
-                before, after = parse_one_edit(current_edit)
-                edits.append(Edit(filename, before, after))
-                current_edit = []
             filename = line.split(":")[1].strip()
-        elif line and not line.startswith("```"):
-            current_edit.append(line)
-        elif (
-            not line and current_edit and filename and filename != "prompt"
-        ):  # Check if filename is not "prompt"
-            before, after = parse_one_edit(current_edit)
-            edits.append(Edit(filename, before, after))
-            current_edit = []
+        else:
+            # Modified regex to capture leading spaces (indentation)
+            match = re.match(r"(\d+) ([-+]) (.*\S.*)", line)
+            if match:
+                line_number, symbol, content = match.groups()
+                line_number = int(line_number)
+                is_before = symbol == "-"
+                edits.append(Edit(filename, line_number, content, is_before))
 
-    if (
-        current_edit and filename and filename != "prompt"
-    ):  # Check if filename is not "prompt"
-        before, after = parse_one_edit(current_edit)
-        edits.append(Edit(filename, before, after))
-
+    # Sort edits such that 'before' edits come before 'after' edits
+    edits.sort(key=lambda edit: (edit.filename, edit.line_number, not edit.is_before))
     return edits
 
 
 def apply_edits(edits: List[Edit], files_dict: FilesDict):
-    """
-    Apply a list of edits to the given code.
+    # Step 1: Sort edits by original line number
+    edits.sort(key=lambda edit: edit.line_number)
 
-    This function takes a list of Edit objects and applies each edit to the code object.
-    It handles the creation of new files and the modification of existing files based on the edits.
-
-    Parameters
-    ----------
-    edits : List[Edit]
-        A list of Edit objects representing the code edits to apply.
-    files_dict : FilesDict
-        The code object to apply edits to.
-    """
+    # Step 2: Apply edits while tracking line number shifts with a standard dictionary
+    line_shifts = {}  # Standard dictionary to track line number shifts
     for edit in edits:
         filename = edit.filename
-        if edit.before == "":
-            if filename in files_dict:
-                logger.warning(
-                    f"The edit to be applied wants to create a new file `{filename}`, but that already exists. The file will be overwritten. See `.gpteng/memory` for previous version."
-                )
-            files_dict[filename] = edit.after  # new file
+        original_line_index = edit.line_number - 1
+        adjusted_line_index = original_line_index + line_shifts.get(filename, 0)
+
+        lines = files_dict[filename].split("\n")
+        if adjusted_line_index < len(lines):
+            # Modify existing line
+            lines[adjusted_line_index] = edit.content
+            print(
+                f"Modified line {adjusted_line_index + 1} in {filename}: '{edit.content}'"
+            )
         else:
-            occurrences_cnt = files_dict[filename].count(edit.before)
-            if occurrences_cnt == 0:
-                logger.warning(
-                    f"While applying an edit to `{filename}`, the code block to be replaced was not found. No instances will be replaced."
-                )
-            if occurrences_cnt > 1:
-                logger.warning(
-                    f"While applying an edit to `{filename}`, the code block to be replaced was found multiple times. All instances will be replaced."
-                )
-            files_dict[filename] = files_dict[filename].replace(
-                edit.before, edit.after
-            )  # existing file
+            # Append new line
+            lines.append(edit.content)
+            print(
+                f"Added line {adjusted_line_index + 1} in {filename}: '{edit.content}'"
+            )
+            line_shifts[filename] = (
+                line_shifts.get(filename, 0) + 1
+            )  # Update line shift for this file
+
+        files_dict[filename] = "\n".join(lines)

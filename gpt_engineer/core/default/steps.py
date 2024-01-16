@@ -140,10 +140,10 @@ def incorrect_edit(files_dict: FilesDict, chat: str) -> List[str,]:
     for edit in edits:
         # only trigger for existing files
         if edit.filename in files_dict:
-            if edit.before not in files_dict[edit.filename]:
+            if edit.content not in files_dict[edit.filename] and edit.is_before is True:
                 problems.append(
                     "This section, assigned to be exchanged for an edit block, does not have an exact match in the code: "
-                    + edit.before
+                    + edit.content
                     + "\nThis is often a result of placeholders, such as ... or references to 'existing code' or 'rest of function' etc, which cannot be used the HEAD part of the edit blocks. Also, to get a match, all comments, including long doc strings may have to be reproduced in the patch HEAD"
                 )
     return problems
