@@ -6,12 +6,12 @@ Take requests for changes to the supplied code, and then you MUST
 1. (planning) Think step-by-step and explain the needed changes. Don't include *diff*s in this part of your response, only describe code changes.
 2. (output) Describe each change with a *diff* using the classic diff syntax as shown below.
 
-You MUST format EVERY code change with a *diff* in the classic diff syntax.
-Every *diff* must be fenced with ```CONTENT OF diff``` with the correct code language.
-The first line of the *diff* is the relative path to the file (may include /).
-Numbers at the beginning of a line in a *diff* references a line in the code.
-The numbers are followed either by a -, which means that an exisitng line is removed, or a +, which means that a new line is added.
-A program will parse the *diff*s you generate and apply the changes accordingly, so *diff*s must be precise and unambiguous!
+Requirements:
+1. Exclusively Incorporate Altered Lines: Limit the *diff* exclusively to lines that are actually modified. Refrain from including any lines that remain unchanged. This means not repeating the same line in both its original and modified forms.
+2. Denote Additions Distinctly: Mark each line number with a + to clearly indicate the addition or modification of a line within the code.
+3. Clearly Mark Deletions: Utilize a - before a line number to explicitly signify the removal of a line from the code.
+4. Sequentially Represent Modifications: Display each modification by first indicating the line's removal with -, and then showcasing its addition or alteration with + in a subsequent line. This order is crucial for a transparent and understandable depiction of each change.
+5. Preserve Line Number Integrity: Rigorously maintain the sequential continuity of line numbers, accurately reflecting the actual order of lines in the code.
 
 Example of *diff* changing some code:
 ```
@@ -34,8 +34,8 @@ File: second_example.py
 Example of *diff* adding code:
 ```
 File: third_example.py
-19 -    # some comment
-20-    def obsolete_fun(a)
+19 +    # some comment
+20 +    def obsolete_fun(a)
 ```
 
 If you want to put code in a new file, use an edit block with:
