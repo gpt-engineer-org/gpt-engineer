@@ -130,39 +130,46 @@ def parse_edits(chat: str):
 
 
 def apply_edits(edits: List[Edit], files_dict: FilesDict):
-    # Separate edits into deletions and additions
-    deletions = [edit for edit in edits if edit.is_before]
-    additions = [edit for edit in edits if not edit.is_before]
+    # Process each edit
+    for edit in edits:
+        filename = edit.filename
 
-    # Process deletions
-    for edit in deletions:
-        lines = files_dict[edit.filename].split("\n")
-        if 0 <= edit.line_number - 1 < len(lines):
-            original_line = lines[edit.line_number - 1]
-            lines[edit.line_number - 1] = " " * len(
-                original_line
-            )  # Replace with spaces to maintain indentation
-            print(
-                f"Deleted from {edit.filename}, line {edit.line_number}: '{original_line.strip()}'"
-            )
-        files_dict[edit.filename] = "\n".join(lines)
+        # Check if file exists, create a new file if not
+        if filename not in files_dict:
+            files_dict[filename] = ""
+            print(f"Created new file: {filename}")
 
-    # Process additions
-    for edit in additions:
-        lines = files_dict[edit.filename].split("\n")
-        if 0 <= edit.line_number - 1 < len(lines):
-            lines[edit.line_number - 1] = edit.content
-            print(
-                f"Added to {edit.filename}, line {edit.line_number}: '{edit.content.strip()}'"
-            )
-        else:
-            lines.append(edit.content)
-            print(
-                f"Added to {edit.filename}, line {len(lines)}: '{edit.content.strip()}'"
-            )
-        files_dict[edit.filename] = "\n".join(lines)
+        lines = files_dict[filename].split("\n")
 
-    # Remove blank lines
+        # Adjust the line number for file length
+        line_number = min(edit.line_number - 1, len(lines))
+
+        # Process deletion or addition
+        if edit.is_before:  # Deletion
+            if line_number < len(lines):
+                original_line = lines[line_number]
+                lines[line_number] = " " * len(
+                    original_line
+                )  # Replace with spaces to maintain indentation
+                print(
+                    f"Deleted from {filename}, line {edit.line_number}: '{original_line.strip()}'"
+                )
+        else:  # Addition
+            if line_number < len(lines):
+                lines[line_number] = edit.content
+                print(
+                    f"Added to {filename}, line {edit.line_number}: '{edit.content.strip()}'"
+                )
+            else:
+                lines.append(edit.content)
+                print(
+                    f"Added to {filename}, line {len(lines)}: '{edit.content.strip()}'"
+                )
+
+        # Reassemble the file content
+        files_dict[filename] = "\n".join(lines)
+
+    # Remove blank lines from each file
     for filename in files_dict.keys():
         lines = files_dict[filename].split("\n")
         lines = [line for line in lines if line.strip() != ""]
