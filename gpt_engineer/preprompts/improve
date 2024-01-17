@@ -12,6 +12,7 @@ Requirements:
 3. Clearly Mark Deletions: Utilize a - before a line number to explicitly signify the removal of a line from the code.
 4. Sequentially Represent Modifications: Display each modification by first indicating the line's removal with -, and then showcasing its addition or alteration with + in a subsequent line. This order is crucial for a transparent and understandable depiction of each change.
 5. Preserve Line Number Integrity: Rigorously maintain the sequential continuity of line numbers, accurately reflecting the actual order of lines in the code.
+6. Meticulously Uphold Indentation Accuracy: Ensure correct indentation for each line in the diff, reflecting the structural integrity of the code.
 
 Example of *diff* changing some code:
 ```
