@@ -32,17 +32,16 @@ from gpt_engineer.core.files_dict import FilesDict
 
 
 class FileSelector:
-    def __init__(self, project_path: Union[str, Path]):
-        self.IGNORE_FOLDERS = {"site-packages", "node_modules", "venv", ".gpteng"}
-        self.FILE_LIST_NAME = "file_selection.toml"
-        self.COMMENT = (
-            "# Change 'selected' from false to true to include files in the edit. "
-            "GPT-engineer can only read and edit the files that set to true. "
-            "Including irrelevant files will degrade coding performance, "
-            "cost additional tokens and potentially lead to violations "
-            "of the token limit, resulting in runtime errors.\n\n"
-        )
+    IGNORE_FOLDERS = {"site-packages", "node_modules", "venv", "__pycache__"}
+    FILE_LIST_NAME = "file_selection.toml"
+    COMMENT = (
+        "# Remove '#' to select a file.\n\n"
+        "# gpt-engineer can only read selected files. "
+        "Including irrelevant files will degrade performance, "
+        "cost additional tokens and potentially overflow token limit.\n\n"
+    )
 
+    def __init__(self, project_path: Union[str, Path]):
         self.project_path = project_path
         self.metadata_db = DiskMemory(metadata_path(self.project_path))
         self.toml_path = self.metadata_db.path / self.FILE_LIST_NAME
@@ -77,52 +76,62 @@ class FileSelector:
                 print(f"Warning: File not found {file_path}")
         return FilesDict(content_dict)
 
-    def editor_file_selector(self, input_path: str, init: bool = True) -> List[str]:
+    def editor_file_selector(
+        self, input_path: str | Path, init: bool = True
+    ) -> List[str]:
         """
         Provides an interactive file selection interface by generating a tree representation in a .toml file.
         Allows users to select or deselect files for the context improvement process.
         """
         root_path = Path(input_path)
-        tree_dict = {
-            "files": {}
-        }  # Initialize the dictionary to hold file selection state
+        tree_dict = {}
         toml_file = DiskMemory(metadata_path(input_path)).path / "file_selection.toml"
         # Define the toml file path
 
         # Initialize .toml file with file tree if in initial state
         if init:
-            for path in DisplayablePath.make_tree(
-                root_path
-            ):  # Create a tree structure from the root path
-                if path.path.is_dir() or not self.is_utf8(path.path):
-                    continue
-                relative_path = os.path.relpath(
-                    path.path, input_path
-                )  # Get the relative path of the file
-                tree_dict["files"][relative_path] = {
-                    "selected": False
-                }  # Initialize file selection as False
+            tree_dict = {x: "selected" for x in self.get_current_files(root_path)}
 
-            # Write instructions and file selection states to .toml file
+            s = toml.dumps({"files": tree_dict})
 
+            # add comments on all lines that match = "selected"
+            s = "\n".join(
+                [
+                    "# " + line if line.endswith(' = "selected"') else line
+                    for line in s.split("\n")
+                ]
+            )
+            # Write to the toml file
             with open(toml_file, "w") as f:
                 f.write(self.COMMENT)
-                toml.dump(tree_dict, f)
+                f.write(s)
+
         else:
             # Load existing files from the .toml configuration
+            all_files = self.get_current_files(root_path)
+            s = toml.dumps({"files": {x: "selected" for x in all_files}})
+
             with open(toml_file, "r") as file:
-                existing_files = toml.load(file)
-                merged_files = self.merge_file_lists(
-                    existing_files["files"], self.get_current_files(root_path)
-                )
+                selected_files = toml.load(file)
+
+            lines = s.split("\n")
+            s = "\n".join(
+                lines[:1]
+                + [
+                    line
+                    if line.split(" = ")[0].strip('"') in selected_files["files"]
+                    else "# " + line
+                    for line in lines[1:]
+                ]
+            )
 
             # Write the merged list back to the .toml for user review and modification
             with open(toml_file, "w") as file:
                 file.write(self.COMMENT)  # Ensure to write the comment
-                toml.dump({"files": merged_files}, file)
+                file.write(s)
 
         print(
-            "Please select(true) and deselect(false) files, save it, and close it to continue..."
+            "Please select and deselect (add # in front) files, save it, and close it to continue..."
         )
         self.open_with_default_editor(
             toml_file
@@ -138,6 +147,7 @@ class FileSelector:
         editors = [
             "gedit",
             "notepad",
+            "nvim",
             "write",
             "nano",
             "vim",
@@ -182,9 +192,8 @@ class FileSelector:
         edited_tree = toml.load(toml_file)  # Load the edited .toml file
 
         # Iterate through the files in the .toml and append selected files to the list
-        for file, properties in edited_tree["files"].items():
-            if properties.get("selected", False):  # Check if the file is selected
-                selected_files.append(file)
+        for file, _ in edited_tree["files"].items():
+            selected_files.append(file)
 
         # Ensure that at least one file is selected, or raise an exception
         if not selected_files:
@@ -212,7 +221,7 @@ class FileSelector:
         return selected_files
 
     def merge_file_lists(
-        self, existing_files: Dict[str, Any], new_files: Dict[str, Any]
+        self, existing_files: list[str], new_files: list[str]
     ) -> Dict[str, Any]:
         """
         Merges the new files list with the existing one, preserving the selection status.
@@ -225,27 +234,28 @@ class FileSelector:
 
         return existing_files
 
-    def get_current_files(self, project_path: Union[str, Path]) -> Dict[str, Any]:
+    def get_current_files(self, project_path: Union[str, Path]) -> list[str]:
         """
         Generates a dictionary of all files in the project directory
         with their selection status set to False by default.
         """
-        all_files = {}
+        all_files = []
         project_path = Path(
             project_path
         ).resolve()  # Ensure path is absolute and resolved
 
         for path in project_path.glob("**/*"):  # Recursively list all files
             if path.is_file():
-                # Normalize and compare each part of the path
-                if not any(
-                    part in self.IGNORE_FOLDERS
-                    for part in path.relative_to(project_path).parts
-                ) and not path.name.startswith("."):
-                    relative_path = str(
-                        path.relative_to(project_path)
-                    )  # Store relative paths
-                    all_files[relative_path] = {"selected": False}
+                relpath = path.relative_to(project_path)
+
+                parts = relpath.parts
+                if any(part.startswith(".") for part in parts):
+                    continue  # Skip hidden fileso
+                if any(part in self.IGNORE_FOLDERS for part in parts):
+                    continue
+
+                all_files.append(str(relpath))
+
         return all_files
 
     def is_in_ignoring_extensions(self, path: Path) -> bool:
