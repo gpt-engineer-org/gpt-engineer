@@ -10,7 +10,6 @@ import backoff
 import openai
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import (
     AIMessage,
@@ -19,6 +18,7 @@ from langchain.schema import (
     messages_from_dict,
     messages_to_dict,
 )
+from langchain_community.chat_models import AzureChatOpenAI, ChatOpenAI
 
 from gpt_engineer.core.token_usage import TokenUsageLog
 
@@ -163,7 +163,7 @@ class AI:
         >>> callbacks = [some_logging_callback]
         >>> response = backoff_inference(messages, callbacks)
         """
-        return self.llm(messages, callbacks=callbacks)  # type: ignore
+        return self.llm.invoke(messages, callbacks=callbacks)  # type: ignore
 
     @staticmethod
     def serialize_messages(messages: List[Message]) -> str:

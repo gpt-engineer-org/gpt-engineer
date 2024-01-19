@@ -191,12 +191,11 @@ def main(
         files_dict = agent.improve(files_dict, prompt)
     else:
         files_dict = agent.init(prompt)
+        # collect user feedback if user consents
+        config = (code_gen_fn.__name__, execution_fn.__name__)
+        collect_and_send_human_review(prompt, model, temperature, config, agent.memory)
 
     store.upload(files_dict)
-
-    # collect user feedback if user consents
-    config = (code_gen_fn.__name__, execution_fn.__name__)
-    collect_and_send_human_review(prompt, model, temperature, config, agent.memory)
 
     print("Total api cost: $ ", ai.token_usage_log.usage_cost())
 

@@ -1,5 +1,5 @@
 from langchain.chat_models.base import BaseChatModel
-from langchain.chat_models.fake import FakeListChatModel
+from langchain_community.chat_models.fake import FakeListChatModel
 
 from gpt_engineer.core.ai import AI
 
