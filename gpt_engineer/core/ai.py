@@ -10,7 +10,6 @@ import backoff
 import openai
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import (
     AIMessage,
@@ -19,6 +18,7 @@ from langchain.schema import (
     messages_from_dict,
     messages_to_dict,
 )
+from langchain_community.chat_models import AzureChatOpenAI, ChatOpenAI
 
 from gpt_engineer.core.token_usage import TokenUsageLog
 
@@ -115,8 +115,7 @@ class AI:
 
         logger.debug(f"Creating a new chat completion: {messages}")
 
-        callbacks = [StreamingStdOutCallbackHandler()]
-        response = self.backoff_inference(messages, callbacks)
+        response = self.backoff_inference(messages)
 
         self.token_usage_log.update_log(
             messages=messages, answer=response.content, step_name=step_name
@@ -129,7 +128,7 @@ class AI:
     @backoff.on_exception(
         backoff.expo, openai.error.RateLimitError, max_tries=7, max_time=45
     )
-    def backoff_inference(self, messages, callbacks):
+    def backoff_inference(self, messages):
         """
         Perform inference using the language model while implementing an exponential backoff strategy.
 
@@ -160,10 +159,9 @@ class AI:
         Example
         -------
         >>> messages = [SystemMessage(content="Hello"), HumanMessage(content="How's the weather?")]
-        >>> callbacks = [some_logging_callback]
-        >>> response = backoff_inference(messages, callbacks)
+        >>> response = backoff_inference(messages)
         """
-        return self.llm(messages, callbacks=callbacks)  # type: ignore
+        return self.llm.invoke(messages)  # type: ignore
 
     @staticmethod
     def serialize_messages(messages: List[Message]) -> str:
@@ -229,6 +227,7 @@ class AI:
                 deployment_name=self.model_name,
                 openai_api_type="azure",
                 streaming=self.streaming,
+                callbacks=[StreamingStdOutCallbackHandler()],
             )
 
         return ChatOpenAI(
@@ -236,6 +235,7 @@ class AI:
             temperature=self.temperature,
             streaming=self.streaming,
             client=openai.ChatCompletion,
+            callbacks=[StreamingStdOutCallbackHandler()],
         )
 
 

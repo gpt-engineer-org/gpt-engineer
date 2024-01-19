@@ -1,14 +1,12 @@
 """
-This module provides a CLI tool to interact with the GPT Engineer application,
-enabling users to use OpenAI's models and define various parameters for the
-project they want to generate, improve or interact with.
+Entrypoint for the CLI tool.
 
 Main Functionality:
 ---------------------
 - Load environment variables needed to work with OpenAI.
 - Allow users to specify parameters such as:
   - Project path
-  - Model type (default to GPT-4)
+  - LLM
   - Temperature
   - Step configurations
   - Code improvement mode
@@ -153,12 +151,10 @@ def main(
         azure_endpoint=azure_endpoint,
     )
 
-    # project_path = os.path.abspath(
-    #     project_path
-    # )  # resolve the string to a valid path (eg "a/b/../c" to "a/c")
-    path = Path(project_path)  # .absolute()
+    path = Path(project_path)
     print("Running gpt-engineer in", path.absolute(), "\n")
     prompt = load_prompt(DiskMemory(path), improve_mode)
+
     # configure generation function
     if clarify_mode:
         code_gen_fn = clarified_gen
@@ -195,12 +191,11 @@ def main(
         files_dict = agent.improve(files_dict, prompt)
     else:
         files_dict = agent.init(prompt)
+        # collect user feedback if user consents
+        config = (code_gen_fn.__name__, execution_fn.__name__)
+        collect_and_send_human_review(prompt, model, temperature, config, agent.memory)
 
     store.upload(files_dict)
-
-    # collect user feedback if user consents
-    config = (code_gen_fn.__name__, execution_fn.__name__)
-    collect_and_send_human_review(prompt, model, temperature, config, agent.memory)
 
     print("Total api cost: $ ", ai.token_usage_log.usage_cost())
 
