@@ -130,6 +130,10 @@ def parse_edits(chat: str):
 
 
 def apply_edits(edits: List[Edit], files_dict: FilesDict):
+    # Helper function to compare strings ignoring spaces
+    def is_similar(str1, str2):
+        return sorted(str1.replace(" ", "")) == sorted(str2.replace(" ", ""))
+
     # Process each edit
     for edit in edits:
         filename = edit.filename
@@ -137,40 +141,43 @@ def apply_edits(edits: List[Edit], files_dict: FilesDict):
         # Check if file exists, create a new file if not
         if filename not in files_dict:
             files_dict[filename] = ""
-            print(f"Created new file: {filename}")
+            logger.warning(f"Created new file: {filename}")
 
         lines = files_dict[filename].split("\n")
 
         # Adjust the line number for file length
         line_number = min(edit.line_number - 1, len(lines))
 
-        # Process deletion or addition
-        if edit.is_before:  # Deletion
-            if line_number < len(lines):
-                original_line = lines[line_number]
-                lines[line_number] = " " * len(
-                    original_line
-                )  # Replace with spaces to maintain indentation
-                print(
-                    f"Deleted from {filename}, line {edit.line_number}: '{original_line.strip()}'"
-                )
-        else:  # Addition
-            if line_number < len(lines):
-                lines[line_number] = edit.content
-                print(
-                    f"Added to {filename}, line {edit.line_number}: '{edit.content.strip()}'"
-                )
-            else:
+        # Check if the line number is within the range of existing lines
+        if line_number < len(lines):
+            # Process deletion or addition
+            if edit.is_before:  # Deletion
+                if is_similar(lines[line_number], edit.content):
+                    lines[line_number] = "# Line deleted line by GPT"
+                    logger.warning(
+                        f"Deleted from {filename}, line {edit.line_number}: '{edit.content}'"
+                    )
+                else:
+                    logger.warning(
+                        f"line {edit.line_number}: '{edit.content}' not found in {filename} where should be '{lines[line_number]}'"
+                    )
+            else:  # Addition
+                if lines[line_number] == "# Line deleted line by GPT":
+                    lines[line_number] = edit.content
+                    logger.warning(
+                        f"Added to {filename}, line {edit.line_number}: '{edit.content.strip()}'"
+                    )
+                else:
+                    logger.warning(
+                        f"The addition of {edit.content} is discarded for wrong line number"
+                    )
+        else:
+            # For additions beyond the current file length
+            if not edit.is_before:
                 lines.append(edit.content)
-                print(
-                    f"Added to {filename}, line {len(lines)}: '{edit.content.strip()}'"
+                logger.warning(
+                    f"Added to {filename}, line {edit.line_number}: '{edit.content.strip()}'"
                 )
 
         # Reassemble the file content
-        files_dict[filename] = "\n".join(lines)
-
-    # Remove blank lines from each file
-    for filename in files_dict.keys():
-        lines = files_dict[filename].split("\n")
-        lines = [line for line in lines if line.strip() != ""]
         files_dict[filename] = "\n".join(lines)
