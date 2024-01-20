@@ -117,7 +117,7 @@ def parse_edits(chat: str):
             filename = line.split(":")[1].strip()
         else:
             # Modified regex to capture leading spaces (indentation)
-            match = re.match(r"(\d+) ([-+]) (.*\S.*)", line)
+            match = re.match(r"(\d+) ([-+])\s?(.*\S.*)", line)
             if match:
                 line_number, symbol, content = match.groups()
                 line_number = int(line_number)

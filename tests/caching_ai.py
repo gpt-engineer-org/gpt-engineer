@@ -71,7 +71,7 @@ class CachingAI(AI):
         if messages_key not in cache:
             callbacks = []
             print("calling backoff inference")
-            response = self.backoff_inference(messages, callbacks)
+            response = self.backoff_inference(messages)
             self.token_usage_log.update_log(
                 messages=messages, answer=response.content, step_name=step_name
             )

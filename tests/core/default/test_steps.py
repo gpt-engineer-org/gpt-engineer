@@ -266,15 +266,12 @@ class TestImprove:
         # Mock the AI class
         ai_patch = """
 Some introductory text.
-
 ```python
-main.py
-<<<<<<< HEAD
-    print('Hello, World!')
-=======
-    print('Goodbye, World!')
->>>>>>> updated
-```"""
+File: main.py
+1 -print('Hello, World!')
+1 +print('Goodbye, World!')
+```
+"""
         ai_mock = MagicMock(spec=AI)
         ai_mock.next.return_value = [SystemMessage(content=ai_patch)]
 
