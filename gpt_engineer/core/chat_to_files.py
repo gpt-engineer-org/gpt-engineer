@@ -162,7 +162,11 @@ def apply_edits(edits: List[Edit], files_dict: FilesDict):
                         f"line {edit.line_number}: '{edit.content}' not found in {filename} where should be '{lines[line_number]}'"
                     )
             else:  # Addition
-                if lines[line_number] == "# Line deleted line by GPT":
+                # Modify condition and creat new file condition
+                if (
+                    lines[line_number] == "# Line deleted line by GPT"
+                    or len(files_dict[filename]) == 0
+                ):
                     lines[line_number] = edit.content
                     logger.warning(
                         f"Added to {filename}, line {edit.line_number}: '{edit.content.strip()}'"
