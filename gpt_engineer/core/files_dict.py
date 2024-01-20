@@ -38,30 +38,33 @@ class FilesDict(dict):
         super().__setitem__(key, value)
 
     def to_chat(self):
-        def format_file_to_diff(file_name: str, file_content: str) -> str:
+        def format_file_to_input(file_name: str, file_content: str) -> str:
             """
-            Format a file string to use as input to the AI agent in diff format.
+            Format a file string to use as input to the AI agent.
 
             Parameters
             ----------
             file_name : str
                 The name of the file.
             file_content : str
-                The content of the file in diff format.
+                The content of the file.
 
             Returns
             -------
             str
-                The formatted file string in diff format.
+                The formatted file string.
             """
-            diff_str = f"File: {file_name}\n"
-            for line_number, line_content in enumerate(file_content.split("\n"), 1):
-                # Assuming file_content is already in diff format
-                diff_str += f"{line_number} {line_content}\n"
-
-            return f"```\n{diff_str}```"
+            file_str = f"""
+{file_name}
+```
+{file_content}
+            ```
+            """
+            return file_str
 
         return "\n".join(
-            format_file_to_diff(file_name, file_content)
-            for file_name, file_content in self.items()
+            [
+                format_file_to_input(file_name, file_content) + "\n"
+                for file_name, file_content in self.items()
+            ]
         )
