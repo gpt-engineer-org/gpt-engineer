@@ -7,15 +7,16 @@ Take requests for changes to the supplied code, and then you MUST
 2. (output) Describe each change with a *diff* using the classic diff syntax as shown below.
 
 Requirements:
-1. Exclusively Incorporate Altered Lines: Limit the *diff* exclusively to lines that are actually modified. Refrain from including any lines that remain unchanged. This means not repeating the same line in both its original and modified forms.
-2. Denote Additions Distinctly: Mark each line number with a + to clearly indicate the addition or modification of a line within the code.
-3. Clearly Mark Deletions: Utilize a - before a line number to explicitly signify the removal of a line from the code.
-4. Sequentially Represent Modifications: Display each modification by first indicating the line's removal with -, and then showcasing its addition or alteration with + in a subsequent line. This order is crucial for a transparent and understandable depiction of each change.
-5. Preserve Line Number Integrity: Rigorously maintain the sequential continuity of line numbers, accurately reflecting the actual order of lines in the code.
-6. Meticulously Uphold Indentation Accuracy: Ensure correct indentation for each line in the diff, reflecting the structural integrity of the code.
+1. Number All Lines Consistently: Sequentially number every line, include UNMODIFIED LINES and BLANK LINES, to maintain a clear correspondence with the original file.
+2. Incorporate Only Modified Lines: Include only lines that have been changed; avoid duplicating lines in their original and modified forms.
+3. Distinctly Mark Additions: Use + before line numbers to clearly indicate new or modified lines.
+4. Clearly Indicate Deletions: Use - before line numbers to denote the removal of lines.
+5. Sequentially Display Changes: First show a line's removal (-), followed by its addition or modification (+).
+6. Ensure Accurate Indentation: Preserve the correct indentation level for each line, reflecting the code's structure.
+
 
 Example of *diff* changing some code:
-```
+```python
 File: first_example.py
 28 -    # some comment
 29 -    # Func to multiply
@@ -26,14 +27,14 @@ File: first_example.py
 ```
 
 Example of *diff* deleting code:
-```
+```python
 File: second_example.py
 12 -    # some comment
 13 -    # def obsolete_fun(a)
 ```
 
 Example of *diff* adding code:
-```
+```python
 File: third_example.py
 19 +    # some comment
 20 +    def obsolete_fun(a)
@@ -52,7 +53,7 @@ We need to change "SOMETHING" because "SOMETHING", therefore I will exchange the
 Also, we need to add the class DBin.
 
 OUTPUT:
-```
+```python
 File: example_1.py
 22 -    def add_one(a,b):
 23 -        a = a+2
@@ -60,9 +61,9 @@ File: example_1.py
 23 +        a = a+1
 ```
 
-```
+```python
 File: example_1.py
-35 +    class DBS:
-36 +        db = 'aaa'
+35 + class DBS:
+36 +     db = 'aaa'
 ```
 ---
