@@ -1,6 +1,6 @@
 # Roadmap
 
-<img width="800" alt="image" src="https://github.com/AntonOsika/gpt-engineer/assets/4467025/1af9a457-1ed8-4ab3-90e6-4fa52bbb8c09">
+<img width="800" alt="image" src="https://github.com/gpt-engineer-org/gpt-engineer/assets/4467025/1af9a457-1ed8-4ab3-90e6-4fa52bbb8c09">
 
 
 There are three main milestones we believe will greatly increase gpt-engineer's reliability and capability:
@@ -11,9 +11,9 @@ There are three main milestones we believe will greatly increase gpt-engineer's 
 ## Our current focus:
 
 - [x] **Continuous evaluation of progress 🎉**
-  - [x] Create a step that asks “did it run/work/perfect” in the end of each run [#240](https://github.com/AntonOsika/gpt-engineer/issues/240) 🎉
+  - [x] Create a step that asks “did it run/work/perfect” in the end of each run [#240](https://github.com/gpt-engineer-org/gpt-engineer/issues/240) 🎉
   - [x] Collect a dataset for gpt engineer to learn from, by storing code generation runs 🎉
-  - [ ] Run the benchmark multiple times, and document the results for the different "step configs" [#239](https://github.com/AntonOsika/gpt-engineer/issues/239)
+  - [ ] Run the benchmark multiple times, and document the results for the different "step configs" [#239](https://github.com/gpt-engineer-org/gpt-engineer/issues/239)
   - [ ] Improve the default config based on results
 - [ ] **Self healing code**
   - [ ] Run the generated tests

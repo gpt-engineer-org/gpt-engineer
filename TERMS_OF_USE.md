@@ -1,6 +1,6 @@
 # Terms of Use
 
-Welcome to gpt-engineer! By utilizing this powerful tool, you acknowledge and agree to the following comprehensive Terms of Use. We also encourage you to review the linked [disclaimer of warranty](https://github.com/AntonOsika/gpt-engineer/blob/main/DISCLAIMER.md) for additional information.
+Welcome to gpt-engineer! By utilizing this powerful tool, you acknowledge and agree to the following comprehensive Terms of Use. We also encourage you to review the linked [disclaimer of warranty](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/DISCLAIMER.md) for additional information.
 
 Both OpenAI, L.L.C. and the dedicated creators behind the remarkable gpt-engineer have implemented a data collection process focused on enhancing the product's capabilities. This endeavor is undertaken with utmost care and dedication to safeguarding user privacy. Rest assured that no information that could be directly attributed to any individual is stored.
 

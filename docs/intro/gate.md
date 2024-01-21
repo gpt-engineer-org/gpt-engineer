@@ -31,4 +31,4 @@ GPT-Engineer is an open-source project, and contributions from the community are
 
 ## References
 
-- [GPT-Engineer GitHub Repository](https://github.com/AntonOsika/gpt-engineer)
+- [GPT-Engineer GitHub Repository](https://github.com/gpt-engineer-org/gpt-engineer)

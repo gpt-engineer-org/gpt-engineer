@@ -5,8 +5,8 @@ description = "Specify what you want it to build, the AI asks for clarification,
 authors = ["Anton Osika <anton.osika@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/AntonOsika/gpt-engineer"
-repository = "https://github.com/AntonOsika/gpt-engineer"
+homepage = "https://github.com/gpt-engineer-org/gpt-engineer"
+repository = "https://github.com/gpt-engineer-org/gpt-engineer"
 documentation = "https://gpt-engineer.readthedocs.io/en/latest/"
 classifiers = [
   "Development Status :: 4 - Beta",
