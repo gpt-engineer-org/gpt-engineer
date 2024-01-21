@@ -19,7 +19,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12" # updated for llama-index dependency
-openai = "0.28"
+openai = ">=1.0.0"
 termcolor = "2.3.0"
 typer = ">=0.3.2"
 rudder-sdk-python = ">=2.0.2"
@@ -27,7 +27,8 @@ dataclasses-json = "0.5.7"
 tiktoken = ">=0.0.4"
 tabulate = "0.9.0"
 python-dotenv = ">=0.21.0"
-langchain = ">=0.0.335"
+langchain = ">=0.1.0"
+langchain_openai = ">=0.0.2"
 toml = ">=0.10.2"
 
 [tool.poetry.group.dev.dependencies]
