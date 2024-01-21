@@ -129,11 +129,27 @@ def parse_edits(chat: str):
     return edits
 
 
-def apply_edits(edits: List[Edit], files_dict: FilesDict):
-    # Helper function to compare strings ignoring spaces
-    def is_similar(str1, str2):
-        return sorted(str1.replace(" ", "")) == sorted(str2.replace(" ", ""))
+# Helper function to compare strings ignoring spaces
+def is_similar(str1, str2):
+    # Remove spaces and convert to lowercase for case-insensitive comparison
+    str1, str2 = str1.replace(" ", "").lower(), str2.replace(" ", "").lower()
 
+    # For single character strings, require exact match
+    if len(str1) == 1 or len(str2) == 1:
+        return str1 == str2
+
+    # Calculate intersection & Determine the longer string's length
+    from collections import Counter
+
+    counter1, counter2 = Counter(str1), Counter(str2)
+    intersection = sum((counter1 & counter2).values())
+    longer_length = max(len(str1), len(str2))
+
+    # Check if intersection is at least 90% of the longer string's length
+    return intersection >= 0.9 * longer_length
+
+
+def apply_edits(edits: List[Edit], files_dict: FilesDict):
     # Process each edit
     for edit in edits:
         filename = edit.filename

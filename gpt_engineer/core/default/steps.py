@@ -12,6 +12,7 @@ from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.core.chat_to_files import (
     chat_to_files_dict,
+    is_similar,
     overwrite_code_with_edits,
     parse_edits,
 )
@@ -138,13 +139,17 @@ def incorrect_edit(files_dict: FilesDict, chat: str) -> List[str,]:
         return problems
 
     for edit in edits:
-        # only trigger for existing files
         if edit.filename in files_dict:
-            if edit.content not in files_dict[edit.filename] and edit.is_before is True:
+            lines = files_dict[edit.filename].split("\n")
+            # make sure edit is in the file
+            if (
+                not any(is_similar(edit.content, line) for line in lines)
+                and edit.is_before is True
+            ):
                 problems.append(
-                    "This section, assigned to be exchanged for an edit block, does not have an exact match in the code: "
+                    "This section, assigned to be deleted for a *diff* change, does not have an exact match in the code: "
                     + edit.content
-                    + "\nThis is often a result of placeholders, such as ... or references to 'existing code' or 'rest of function' etc, which cannot be used the HEAD part of the edit blocks. Also, to get a match, all comments, including long doc strings may have to be reproduced in the patch HEAD"
+                    + "\n The content to be modified must be a reproduction of the submitted code, and the exact deletion statement must be submitted."
                 )
     return problems
 
