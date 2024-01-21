@@ -126,9 +126,7 @@ class AI:
 
         return messages
 
-    @backoff.on_exception(
-        backoff.expo, openai.RateLimitError, max_tries=7, max_time=45
-    )
+    @backoff.on_exception(backoff.expo, openai.RateLimitError, max_tries=7, max_time=45)
     def backoff_inference(self, messages):
         """
         Perform inference using the language model while implementing an exponential backoff strategy.
