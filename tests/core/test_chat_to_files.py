@@ -6,6 +6,7 @@ from gpt_engineer.core.chat_to_files import (
     Edit,
     apply_edits,
     chat_to_files_dict,
+    is_similar,
     logger as parse_logger,
     parse_edits,
 )
@@ -256,6 +257,26 @@ def test_apply_edit_no_match(log_capture):
     apply_edits(edits, code)
     assert code == {"file.py": "some content"}  # No change
     assert "not found" in log_capture.messages[0]
+
+
+def test_basic_similarity():
+    assert is_similar("abc", "cab")
+    assert not is_similar("abc", "def")
+
+
+def test_case_insensitivity_and_whitespace():
+    assert is_similar("A b C", "c a b")
+    assert not is_similar("Abc", "D e F")
+
+
+def test_length_and_character_frequency():
+    assert is_similar("aabbc", "bacba")
+    assert not is_similar("aabbcc", "abbcc")
+
+
+def test_edge_cases():
+    assert not is_similar("", "a")
+    assert is_similar("a", "a")
 
 
 if __name__ == "__main__":
