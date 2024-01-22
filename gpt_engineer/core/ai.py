@@ -11,7 +11,6 @@ import openai
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.chat_models.base import BaseChatModel
-from langchain_openai import ChatOpenAI
 from langchain.schema import (
     AIMessage,
     HumanMessage,
@@ -20,6 +19,7 @@ from langchain.schema import (
     messages_to_dict,
 )
 from langchain_community.chat_models import AzureChatOpenAI
+from langchain_openai import ChatOpenAI
 
 from gpt_engineer.core.token_usage import TokenUsageLog
 
