@@ -13,7 +13,7 @@ The `AI` class is the main interface to the LLM. It provides methods to start a 
 
 (agent_class)=
 ### 2. Agent Class (`gpt_engineer/applications/cli/cli_agent.py`)
-The `Agent` class is responsible for managing the lifecycle of code generation and improvement. Its main functions are: 
+The `Agent` class is responsible for managing the lifecycle of code generation and improvement. Its main functions are:
 
 - `init(self, prompt)`: Generates a new piece of code using the AI based on the provided prompt. It also generates a entrypoint file based on the generated code.
 
@@ -42,7 +42,7 @@ This module provides utilities to handle and process chat content, including par
 
 (steps)=
 ### 5. Steps (`gpt_engineer/core/default/steps.py`)
-This module defines a series of steps that can be run by the agent. 
+This module defines a series of steps that can be run by the agent.
 The main steps are:
 
 - `gen_code(ai, prompt, memory, preprompts_holder)`: Generate new code based on the specification.
@@ -51,7 +51,7 @@ The main steps are:
 
 - `execute_entrypoint(ai, execution_env, files_dict, preprompts_holder)`: Uses the entrypoint file to run the generated code inside the execution environment.
 
-- `improve(ai, prompt, files_dict, memory, preprompts_holder)`: Improves an existing codebase based on the provided specifications. 
+- `improve(ai, prompt, files_dict, memory, preprompts_holder)`: Improves an existing codebase based on the provided specifications.
 
 <br>
 
