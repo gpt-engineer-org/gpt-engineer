@@ -13,11 +13,6 @@ A basic Sphinx project lives in `docs/`, it was generated using Sphinx defaults.
 Read the Docs Build configuration is stored in `.readthedocs.yaml`.
 
 
-📍 [docs/requirements.txt](https://docs.readthedocs.io/en/stable/config-file/v2.html)<br>
-Python dependencies are [pinned](https://docs.readthedocs.io/en/latest/guides/reproducible-builds.html) (uses [pip-tools](https://pip-tools.readthedocs.io/en/latest/)) here. Make sure to add your Python dependencies to `requirements.txt` or if you choose [pip-tools](https://pip-tools.readthedocs.io/en/latest/), edit `docs/requirements.txt`.
-
-
-
 Example Project usage
 ---------------------
 
