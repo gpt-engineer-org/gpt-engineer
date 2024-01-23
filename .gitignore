@@ -71,6 +71,7 @@ docs/main
 docs/steps/
 docs/db
 docs/db/
+docs/core/
 
 # coding assistants
 .aider*
