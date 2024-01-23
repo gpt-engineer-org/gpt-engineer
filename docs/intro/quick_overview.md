@@ -12,13 +12,13 @@ The `AI` class is the main interface to the LLM. It provides methods to start a 
 ### 2. Agent Class (`gpt_engineer/applications/cli/cli_agent.py`)
 The `Agent` class is responsible for managing the lifecycle of code generation and improvement. Its main functions are: 
 
-`init(self, prompt)`: Generates a new piece of code using the AI based on the provided prompt. It also generates a entrypoint file based on the generated code.
+- `init(self, prompt)`: Generates a new piece of code using the AI based on the provided prompt. It also generates a entrypoint file based on the generated code.
 
-`improve(self, files_dict, prompt)`: Improves an existing piece of code using the AI class based on the provided prompt and files dictionary.
+- `improve(self, files_dict, prompt)`: Improves an existing piece of code using the AI class based on the provided prompt and files dictionary.
 
 <br>
 
-### 3. Files Dictionary (`gpt_engineer/core/files_dict.py`)
+### 3. Files Dictionary Class (`gpt_engineer/core/files_dict.py`)
 The `Files Dictionary` class extends the standard dictionary to enforce string keys and values, representing filenames and their corresponding code content. It provides a method to format its contents for chat-based interaction with the `AI` class.
 
 <br>
@@ -26,27 +26,27 @@ The `Files Dictionary` class extends the standard dictionary to enforce string k
 ### 4. Chat to Files (`gpt_engineer/core/chat_to_files.py`)
 This module provides utilities to handle and process chat content, including parsing chat messages to retrieve code blocks, storing these blocks in the `File Dictionary`, and overwriting the files based on new chat messages. The module contains four main functions:
 
-`chat_to_files_dict(chat)`: This function takes a chat conversation and extracts all the code blocks and preceding filenames. It returns an instance of `File Dictionary` representing filenames and their corresponding code content.
+- `chat_to_files_dict(chat)`: This function takes a chat conversation and extracts all the code blocks and preceding filenames. It returns an instance of `File Dictionary` representing filenames and their corresponding code content.
 
-`parse_edits(chat)`: This function parses edits from a chat and returns them as a list of `Edit` class objects.
+- `parse_edits(chat)`: This function parses edits from a chat and returns them as a list of `Edit` class objects.
 
-`apply_edits(edits, files_dict)`: This function takes a list of Edit objects and applies each edit to the code object. It handles the creation of new files and the modification of existing files when required.
+- `apply_edits(edits, files_dict)`: This function takes a list of Edit objects and applies each edit to the code object. It handles the creation of new files and the modification of existing files when required.
 
-`overwrite_code_with_edits(chat, files_dict)`: This function takes a chat string, and employs the `parse_edits` function to parse it for edits, before applying the edits to the relevant code object via the `apply_edits` function.
+- `overwrite_code_with_edits(chat, files_dict)`: This function takes a chat string, and employs the `parse_edits` function to parse it for edits, before applying the edits to the relevant code object via the `apply_edits` function.
 
 <br>
 
 ### 5. Steps (`gpt_engineer/core/default/steps.py`)
 This module defines a series of steps that can be run by the agent. 
-
-<br>
-
 The main steps are:
 
-`gen_code(ai, prompt, memory, preprompts_holder)`: Generate new code based on the specification. <br>
-`gen_entrypoint(ai, files_dict, memory, preprompts_holder)`: Generate an entrypoint file code based on the generated code. <br>
-`execute_entrypoint(ai, execution_env, files_dict, preprompts_holder)`: Uses the entrypoint file to run the generated code inside the execution environment. <br>
-`improve(ai, prompt, files_dict, memory, preprompts_holder)`: Improves an existing codebase based on the provided specifications. <br>
+- `gen_code(ai, prompt, memory, preprompts_holder)`: Generate new code based on the specification.
+
+- `gen_entrypoint(ai, files_dict, memory, preprompts_holder)`: Generate an entrypoint file code based on the generated code.
+
+- `execute_entrypoint(ai, execution_env, files_dict, preprompts_holder)`: Uses the entrypoint file to run the generated code inside the execution environment.
+
+- `improve(ai, prompt, files_dict, memory, preprompts_holder)`: Improves an existing codebase based on the provided specifications. 
 
 <br>
 
