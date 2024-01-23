@@ -126,7 +126,7 @@ def parse_edits(chat: str):
                 edits.append(Edit(filename, line_number, content, is_before))
 
     # Sort edits for sequential application
-    edits.sort(key=lambda edit: (edit.filename, edit.line_number, not edit.is_before))
+    edits.sort(key=lambda edit: (edit.filename, not edit.is_before, edit.line_number))
     return edits
 
 
@@ -187,6 +187,7 @@ def apply_edits(edits: List[Edit], files_dict: FilesDict):
             else:  # Addition
                 if (
                     lines[line_number] == "# Line deleted line by GPT"
+                    or lines[line_number] == ""
                     or len(files_dict[filename]) == 0
                 ):
                     lines[line_number] = edit.content
@@ -204,4 +205,10 @@ def apply_edits(edits: List[Edit], files_dict: FilesDict):
                     f"Added to {filename}, line {edit.line_number}: '{edit.content.strip()}'"
                 )
 
+        files_dict[filename] = "\n".join(lines)
+
+    # Remove deletion tag
+    for filename in files_dict.keys():
+        lines = files_dict[filename].split("\n")
+        lines = [line for line in lines if line.strip() != "# Line deleted line by GPT"]
         files_dict[filename] = "\n".join(lines)
