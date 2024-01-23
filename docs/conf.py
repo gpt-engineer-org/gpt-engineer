@@ -36,7 +36,7 @@ with open("../pyproject.toml") as f:
 master_doc = "index"
 
 # General information about the project.
-project = data["project"]["name"]
+project = data["tool"]["poetry"]["name"]
 copyright = "2023 Anton Osika"
 author = " Anton Osika & Contributors"
 
@@ -45,9 +45,9 @@ author = " Anton Osika & Contributors"
 # the built documents.
 #
 # The short X.Y version.
-version = data["project"]["version"]
+version = data["tool"]["poetry"]["version"]
 # The full version, including alpha/beta/rc tags.
-release = data["project"]["version"]
+release = data["tool"]["poetry"]["version"]
 
 
 # -- General configuration ---------------------------------------------
