@@ -38,30 +38,46 @@ class FilesDict(dict):
         super().__setitem__(key, value)
 
     def to_chat(self):
-        def format_file_to_diff(file_name: str, file_content: str) -> str:
-            """
-            Format a file string to use as input to the AI agent in diff format.
+        """
+        Formats the items of the object (assuming file name and content pairs)
+        into a string suitable for chat display.
 
-            Parameters
-            ----------
-            file_name : str
-                The name of the file.
-            file_content : str
-                The content of the file in diff format.
+        Returns
+        -------
+        str
+            A string representation of the files.
+        """
+        chat_str = ""
+        for file_name, file_content in self.items():
+            file_lines_dict = file_to_lines_dict(file_name, file_content)
+            for name, lines in file_lines_dict.items():
+                chat_str += f"File: {name}\n"
+                for line_number, line_content in lines.items():
+                    chat_str += f"{line_number} {line_content}\n"
+                chat_str += "\n"
 
-            Returns
-            -------
-            str
-                The formatted file string in diff format.
-            """
-            diff_str = f"File: {file_name}\n"
-            for line_number, line_content in enumerate(file_content.split("\n"), 1):
-                # Assuming file_content is already in diff format
-                diff_str += f"{line_number} {line_content}\n"
+        return f"```\n{chat_str}```"
 
-            return f"```\n{diff_str}```"
 
-        return "\n".join(
-            format_file_to_diff(file_name, file_content)
-            for file_name, file_content in self.items()
-        )
+def file_to_lines_dict(file_name: str, file_content: str) -> dict:
+    """
+    Converts file content into a dictionary where each line number is a key
+    and the corresponding line content is the value.
+
+    Parameters
+    ----------
+    file_name : str
+        The name of the file.
+    file_content : str
+        The content of the file.
+
+    Returns
+    -------
+    dict
+        A dictionary with file names as keys and dictionaries (line numbers as keys and line contents as values) as values.
+    """
+    lines_dict = {
+        line_number: line_content
+        for line_number, line_content in enumerate(file_content.split("\n"), 1)
+    }
+    return {file_name: lines_dict}
