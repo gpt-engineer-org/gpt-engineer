@@ -18,7 +18,7 @@ from langchain.schema import (
     messages_from_dict,
     messages_to_dict,
 )
-from langchain_community.chat_models import AzureChatOpenAI, ChatOpenAI
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
 
 from gpt_engineer.core.token_usage import TokenUsageLog
 
@@ -125,9 +125,7 @@ class AI:
 
         return messages
 
-    @backoff.on_exception(
-        backoff.expo, openai.error.RateLimitError, max_tries=7, max_time=45
-    )
+    @backoff.on_exception(backoff.expo, openai.RateLimitError, max_tries=7, max_time=45)
     def backoff_inference(self, messages):
         """
         Perform inference using the language model while implementing an exponential backoff strategy.
@@ -234,7 +232,6 @@ class AI:
             model=self.model_name,
             temperature=self.temperature,
             streaming=self.streaming,
-            client=openai.ChatCompletion,
             callbacks=[StreamingStdOutCallbackHandler()],
         )
 
