@@ -20,6 +20,8 @@ build:
       - poetry config virtualenvs.create false
     post_install:
       - poetry install
+    pre_build:
+      - python docs/api_reference/create_api_rst.py
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
