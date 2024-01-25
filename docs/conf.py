@@ -65,7 +65,6 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx_copybutton",
-    "sphinx_panels",
     "myst_parser",
     "IPython.sphinxext.ipython_console_highlighting",
 ]

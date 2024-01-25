@@ -49,7 +49,6 @@ sphinx-autobuild = ">=2021.3.14"
 sphinx_book_theme = ">=0.3.3"
 sphinx_rtd_theme = ">=1.0.0"
 sphinx-typlog-theme = ">=0.8.0"
-sphinx-panels = ">=0.6.0"
 toml = ">=0.10.2"
 myst-nb = ">=0.17.1"
 linkchecker = ">=10.2.1"
@@ -74,7 +73,7 @@ gpte_test_application = 'tests.caching_main:app'
 
 [tool.poetry.extras]
 test = ["pytest", "pytest-cov"]
-doc = ["autodoc_pydantic", "myst_parser", "nbsphinx", "sphinx", "sphinx-autobuild", "sphinx_book_theme", "sphinx_rtd_theme", "sphinx-typlog-theme", "sphinx-panels", "myst-nb", "linkchecker", "sphinx-copybutton", "markdown-include", "sphinx_copybutton"]
+doc = ["autodoc_pydantic", "myst_parser", "nbsphinx", "sphinx", "sphinx-autobuild", "sphinx_book_theme", "sphinx_rtd_theme", "sphinx-typlog-theme", "myst-nb", "linkchecker", "sphinx-copybutton", "markdown-include", "sphinx_copybutton"]
 experimental = ["llama-index", "rank-bm25", "tree_sitter_languages"]
 
 [tool.ruff]
