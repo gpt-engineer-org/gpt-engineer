@@ -57,10 +57,6 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
 By running gpt-engineer you agree to our [terms](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
-### Note
-
-- To run this tool, the new command `gpte` is recommended for better user experience. However, the earlier default commands `gpt-engineer` and `ge` are also supported.
-
 ## Relation to gptengineer.app
 [gptengineer.app](https://gptengineer.app/) is a commercial project for automatic generation of web-apps. It emerged from gpt-engineer and is committed to giving back to the open source community.  A portion of gptengineer.app’s revenue will fund a full-time role and infrastructure for maintaining open-source tools for code generation.
 
