@@ -23,13 +23,10 @@ Core Functions:
 - apply_edits: Applies edits to workspace files, maintaining their relevance.
 """
 
-
 import logging
 import re
 
 from collections import Counter
-from dataclasses import dataclass
-from typing import List
 
 from gpt_engineer.core.files_dict import FilesDict
 
@@ -84,52 +81,89 @@ def overwrite_code_with_edits(chat: str, files_dict: FilesDict):
     files_dict : FilesDict
         The FilesDict object to apply edits to.
     """
-    edits = parse_edits(chat)
-    apply_edits(edits, files_dict)
+    parse_edits(chat)
+    # apply_edits(files_dict, edits)
 
 
-@dataclass
-class Edit:
-    filename: str
-    line_number: int
-    content: str
-    is_before: bool
-
-
-def parse_edits(chat: str):
-    """
-    Parses edits from a chat string while preserving indentation, returning a list of Edit objects.
-
-    Parameters
-    ----------
-    chat : str
-        The chat string containing edits.
-
-    Returns
-    -------
-    List[Edit]
-        A list of Edit objects representing the parsed edits.
-    """
+def parse_edits(chat: str) -> list[dict]:
     edits = []
-    lines = chat.split("\n")
-    filename = ""
-    for line in lines:
-        if line.startswith("File:"):
-            filename = line.split(":")[1].strip()
-        else:
-            # Extract line number, edit type, and content with leading spaces
-            match = re.match(r"(\d+) ([-+])\s?(.*\S.*)", line)
-            if match:
-                line_number, symbol, content = match.groups()
-                line_number = int(line_number)
-                is_before = symbol == "-"
-                edits.append(Edit(filename, line_number, content, is_before))
+    diff_blocks = re.findall(r"```diff\n([\s\S]*?)\n```", chat)
+    for diff_block in diff_blocks:
+        lines = diff_block.split("\n")
+        file_name = lines[0][4:]  # Using the filename directly
+        start_line_num = int(lines[2][4:].split(",")[0])
+        current_line_num = start_line_num - 1
 
-    # Sort edits for sequential application
-    edits.sort(key=lambda edit: (edit.filename, not edit.is_before, edit.line_number))
+        edit = []
+        for line in lines[3:]:
+            current_line_num += 1  # Increment line number
+            if line.startswith("-"):
+                line_data = {
+                    "filename": file_name,
+                    "line_number": str(current_line_num),
+                    "change_type": "-",  # Denote removal
+                }
+                edit.append(line_data)
+
+            elif line.startswith("+"):
+                current_line_num -= 1  # follow last line
+                line_data = {
+                    "filename": file_name,
+                    "line_number": str(
+                        current_line_num
+                    ),  # Keep the current line number for '+' lines
+                    "change_type": "+",  # Denote addition
+                }
+                edit.append(line_data)
+                # Do not increment the line number here for '+' lines
+
+        edits.append(edit)
+    [print(f"\n{edit}") for edit in edits]
     return edits
 
 
+# @dataclass
+# class Edit:
+#     filename: str
+#     line_number: int
+#     content: str
+#     is_before: bool
+#
+#
+# def parse_edits(chat: str):
+#     """
+#     Parses edits from a chat string while preserving indentation, returning a list of Edit objects.
+#
+#     Parameters
+#     ----------
+#     chat : str
+#         The chat string containing edits.
+#
+#     Returns
+#     -------
+#     List[Edit]
+#         A list of Edit objects representing the parsed edits.
+#     """
+#     edits = []
+#     lines = chat.split("\n")
+#     filename = ""
+#     for line in lines:
+#         if line.startswith("File:"):
+#             filename = line.split(":")[1].strip()
+#         else:
+#             # Extract line number, edit type, and content with leading spaces
+#             match = re.match(r"(\d+) ([-+])\s?(.*\S.*)", line)
+#             if match:
+#                 line_number, symbol, content = match.groups()
+#                 line_number = int(line_number)
+#                 is_before = symbol == "-"
+#                 edits.append(Edit(filename, line_number, content, is_before))
+#
+#     # Sort edits for sequential application
+#     edits.sort(key=lambda edit: (edit.filename, not edit.is_before, edit.line_number))
+#     return edits
+#
+#
 def is_similar(str1, str2):
     """
     Compares two strings for similarity, ignoring spaces and case.
@@ -153,62 +187,64 @@ def is_similar(str1, str2):
     return intersection >= 0.9 * longer_length
 
 
-def apply_edits(edits: List[Edit], files_dict: FilesDict):
-    """
-    Applies a list of Edit objects to the provided FilesDict object.
-
-    Parameters
-    ----------
-    edits : List[Edit]
-        The list of edits to apply.
-    files_dict : FilesDict
-        The FilesDict object to be modified.
-    """
-    for edit in edits:
-        filename = edit.filename
-        if filename not in files_dict:
-            files_dict[filename] = ""
-            logger.warning(f"Created new file: {filename}")
-
-        lines = files_dict[filename].split("\n")
-        line_number = min(edit.line_number - 1, len(lines))
-
-        if line_number < len(lines):
-            if edit.is_before:  # Deletion
-                if is_similar(lines[line_number], edit.content):
-                    lines[line_number] = "# Line deleted line by GPT"
-                    logger.warning(
-                        f"Deleted from {filename}, line {edit.line_number}: '{edit.content}'"
-                    )
-                else:
-                    logger.warning(
-                        f"line {edit.line_number}: '{edit.content}' not found in {filename} where should be '{lines[line_number]}'"
-                    )
-            else:  # Addition
-                if (
-                    lines[line_number] == "# Line deleted line by GPT"
-                    or lines[line_number] == ""
-                    or len(files_dict[filename]) == 0
-                ):
-                    lines[line_number] = edit.content
-                    logger.warning(
-                        f"Added to {filename}, line {edit.line_number}: '{edit.content.strip()}'"
-                    )
-                else:
-                    logger.warning(
-                        f"The addition of {edit.content} is discarded for wrong line number"
-                    )
-        else:
-            if not edit.is_before:
-                lines.append(edit.content)
-                logger.warning(
-                    f"Added to {filename}, line {edit.line_number}: '{edit.content.strip()}'"
-                )
-
-        files_dict[filename] = "\n".join(lines)
-
-    # Remove deletion tag
-    for filename in files_dict.keys():
-        lines = files_dict[filename].split("\n")
-        lines = [line for line in lines if line.strip() != "# Line deleted line by GPT"]
-        files_dict[filename] = "\n".join(lines)
+#
+#
+# def apply_edits(edits: List[Edit], files_dict: FilesDict):
+#     """
+#     Applies a list of Edit objects to the provided FilesDict object.
+#
+#     Parameters
+#     ----------
+#     edits : List[Edit]
+#         The list of edits to apply.
+#     files_dict : FilesDict
+#         The FilesDict object to be modified.
+#     """
+#     for edit in edits:
+#         filename = edit.filename
+#         if filename not in files_dict:
+#             files_dict[filename] = ""
+#             logger.warning(f"Created new file: {filename}")
+#
+#         lines = files_dict[filename].split("\n")
+#         line_number = min(edit.line_number - 1, len(lines))
+#
+#         if line_number < len(lines):
+#             if edit.is_before:  # Deletion
+#                 if is_similar(lines[line_number], edit.content):
+#                     lines[line_number] = "# Line deleted line by GPT"
+#                     logger.warning(
+#                         f"Deleted from {filename}, line {edit.line_number}: '{edit.content}'"
+#                     )
+#                 else:
+#                     logger.warning(
+#                         f"line {edit.line_number}: '{edit.content}' not found in {filename} where should be '{lines[line_number]}'"
+#                     )
+#             else:  # Addition
+#                 if (
+#                     lines[line_number] == "# Line deleted line by GPT"
+#                     or lines[line_number] == ""
+#                     or len(files_dict[filename]) == 0
+#                 ):
+#                     lines[line_number] = edit.content
+#                     logger.warning(
+#                         f"Added to {filename}, line {edit.line_number}: '{edit.content.strip()}'"
+#                     )
+#                 else:
+#                     logger.warning(
+#                         f"The addition of {edit.content} is discarded for wrong line number"
+#                     )
+#         else:
+#             if not edit.is_before:
+#                 lines.append(edit.content)
+#                 logger.warning(
+#                     f"Added to {filename}, line {edit.line_number}: '{edit.content.strip()}'"
+#                 )
+#
+#         files_dict[filename] = "\n".join(lines)
+#
+#     # Remove deletion tag
+#     for filename in files_dict.keys():
+#         lines = files_dict[filename].split("\n")
+#         lines = [line for line in lines if line.strip() != "# Line deleted line by GPT"]
+#         files_dict[filename] = "\n".join(lines)
