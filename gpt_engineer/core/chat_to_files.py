@@ -25,10 +25,11 @@ Core Functions:
 
 import logging
 import re
-
+from typing import List
 from collections import Counter
 
-from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
+from gpt_engineer.core.diff import Diff, Hunk
 
 # Configure logging for the module
 logger = logging.getLogger(__name__)
@@ -85,85 +86,55 @@ def overwrite_code_with_edits(chat: str, files_dict: FilesDict):
     # apply_edits(files_dict, edits)
 
 
-def parse_edits(chat: str) -> list[dict]:
-    edits = []
-    diff_blocks = re.findall(r"```diff\n([\s\S]*?)\n```", chat)
-    for diff_block in diff_blocks:
-        lines = diff_block.split("\n")
-        file_name = lines[0][4:]  # Using the filename directly
-        start_line_num = int(lines[2][4:].split(",")[0])
-        current_line_num = start_line_num - 1
+def parse_diff(diff_string):
+    lines = diff_string.strip().split("\n")
+    diffs = {}
+    current_diff = None
+    hunk_lines = []
+    filename_pre = None
+    filename_post = None
 
-        edit = []
-        for line in lines[3:]:
-            current_line_num += 1  # Increment line number
-            if line.startswith("-"):
-                line_data = {
-                    "filename": file_name,
-                    "line_number": str(current_line_num),
-                    "change_type": "-",  # Denote removal
-                }
-                edit.append(line_data)
+    for line in lines:
+        if line.startswith("--- "):
+            filename_pre = line[4:]
+        elif line.startswith("+++ "):
+            if not filename_post is None:
+                current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
+                hunk_lines = []
+            filename_post = line[4:]
+            current_diff = Diff(filename_pre, filename_post)
+            diffs[filename_post] = current_diff
+        elif line.startswith("@@ "):
+            if hunk_lines:
+                current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
+                hunk_lines = []
+            hunk_header = parse_hunk_header(line)
+        elif line.startswith("+"):
+            hunk_lines.append(("add", line[1:]))
+        elif line.startswith("-"):
+            hunk_lines.append(("remove", line[1:]))
+        elif line.startswith(" "):
+            hunk_lines.append(("retain", line[1:]))
 
-            elif line.startswith("+"):
-                current_line_num -= 1  # follow last line
-                line_data = {
-                    "filename": file_name,
-                    "line_number": str(
-                        current_line_num
-                    ),  # Keep the current line number for '+' lines
-                    "change_type": "+",  # Denote addition
-                }
-                edit.append(line_data)
-                # Do not increment the line number here for '+' lines
+    current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
 
-        edits.append(edit)
-    [print(f"\n{edit}") for edit in edits]
-    return edits
+    return diffs
 
 
-# @dataclass
-# class Edit:
-#     filename: str
-#     line_number: int
-#     content: str
-#     is_before: bool
-#
-#
-# def parse_edits(chat: str):
-#     """
-#     Parses edits from a chat string while preserving indentation, returning a list of Edit objects.
-#
-#     Parameters
-#     ----------
-#     chat : str
-#         The chat string containing edits.
-#
-#     Returns
-#     -------
-#     List[Edit]
-#         A list of Edit objects representing the parsed edits.
-#     """
-#     edits = []
-#     lines = chat.split("\n")
-#     filename = ""
-#     for line in lines:
-#         if line.startswith("File:"):
-#             filename = line.split(":")[1].strip()
-#         else:
-#             # Extract line number, edit type, and content with leading spaces
-#             match = re.match(r"(\d+) ([-+])\s?(.*\S.*)", line)
-#             if match:
-#                 line_number, symbol, content = match.groups()
-#                 line_number = int(line_number)
-#                 is_before = symbol == "-"
-#                 edits.append(Edit(filename, line_number, content, is_before))
-#
-#     # Sort edits for sequential application
-#     edits.sort(key=lambda edit: (edit.filename, not edit.is_before, edit.line_number))
-#     return edits
-#
-#
+def parse_hunk_header(header_line):
+    # Parse the hunk header to extract the line numbers and lengths
+    # Example header: @@ -12,4 +12,5 @@
+    pre, post = header_line.split(" ")[1:3]
+    start_line_pre_edit, hunk_len_pre_edit = map(int, pre[1:].split(","))
+    start_line_post_edit, hunk_len_post_edit = map(int, post[1:].split(","))
+    return (
+        start_line_pre_edit,
+        hunk_len_pre_edit,
+        start_line_post_edit,
+        hunk_len_post_edit,
+    )
+
+
 def is_similar(str1, str2):
     """
     Compares two strings for similarity, ignoring spaces and case.

@@ -1,4 +1,65 @@
 import pytest
+from gpt_engineer.core.chat_to_files import parse_diff
+
+example_diff = """
+Irrelevant line to be ignored
+
+another irrelevant line to be ignored
+
+--- example.txt
++++ example.txt
+@@ -12,3 +12,4 @@
+     sample text 1
+     sample text 2
++    added extra line here
+-    original text A
++    updated original text A with changes
+@@ -35,4 +36,5 @@
+         checking status:
+-            perform operation X
++            perform operation X only if specific condition holds
++                new operation related to condition
+         evaluating next step:
+-            execute step Y
++            revised execution of step Y
+"""
+
+
+add_example = """
+Uninteresting stuff
+
+--- /dev/null
++++ new_file.txt
+@@ -0,0 +1,3 @@
++First example line
++
++Last example line
+"""
+
+
+def test_diff_changing_one_file():
+    diffs = parse_diff(example_diff)
+    for filename, diff in diffs.items():
+        string_diff = diff.diff_to_string()
+    correct_diff = "\n".join(example_diff.strip().split("\n")[4:])
+    assert string_diff == correct_diff
+
+
+def test_diff_adding_one_file():
+    add_diff = parse_diff(add_example)
+    for filename, diff in add_diff.items():
+        string_add_diff = diff.diff_to_string()
+    correct_add_diff = "\n".join(add_example.strip().split("\n")[2:])
+    assert string_add_diff == correct_add_diff
+
+
+def test_diff_changing_two_files():
+    merged_diff = parse_diff(example_diff + add_example)
+    correct_diff = "\n".join(example_diff.strip().split("\n")[4:])
+    correct_add_diff = "\n".join(add_example.strip().split("\n")[2:])
+    assert merged_diff["example.txt"].diff_to_string() == correct_diff
+    assert merged_diff["new_file.txt"].diff_to_string() == correct_add_diff
+
 
 # def test_standard_input():
 #     chat = """
@@ -116,6 +177,8 @@ import pytest
 #     """
 #     expected = {"[id].jsx": '1 + console.log("Hello, World!")'}
 #     assert chat_to_files_dict(chat) == expected
+
+
 #
 #
 # # Helper function to capture log messages
