@@ -49,17 +49,15 @@ class FilesDict(dict):
         """
         chat_str = ""
         for file_name, file_content in self.items():
-            file_lines_dict = file_to_lines_dict(file_name, file_content)
-            for name, lines in file_lines_dict.items():
-                chat_str += f"File: {name}\n"
-                for line_number, line_content in lines.items():
-                    chat_str += f"{line_number} {line_content}\n"
-                chat_str += "\n"
-
+            lines_dict = file_to_lines_dict(file_content)
+            chat_str += f"File: {file_name}\n"
+            for line_number, line_content in lines_dict.items():
+                chat_str += f"{line_number} {line_content}\n"
+            chat_str += "\n"
         return f"```\n{chat_str}```"
 
 
-def file_to_lines_dict(file_name: str, file_content: str) -> dict:
+def file_to_lines_dict(file_content: str) -> dict:
     """
     Converts file content into a dictionary where each line number is a key
     and the corresponding line content is the value.
@@ -80,4 +78,4 @@ def file_to_lines_dict(file_name: str, file_content: str) -> dict:
         line_number: line_content
         for line_number, line_content in enumerate(file_content.split("\n"), 1)
     }
-    return {file_name: lines_dict}
+    return lines_dict
