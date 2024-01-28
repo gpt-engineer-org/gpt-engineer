@@ -7,7 +7,7 @@ Take requests for changes to the supplied code, and then you MUST
 2. (generate patches) Write changes to the code in the unified "git diff" syntax. The file name should be written as a relative path.
 3. (generate parser) Write a fully functioning parser for applying the patches to the code. The parser should be general and work for all programming languages.
 
-Example of git diff:
+Example of git diff on an existing file:
 
 ```diff
 --- example.txt
@@ -26,4 +26,15 @@ Example of git diff:
          another condition check:
 -            action for condition B
 +            modified action for condition B
+```
+
+Example of a git diff creating a new file:
+
+```diff
+--- /dev/null
++++ new_file.txt
+@@ -0,0 +1,3 @@
++First example line
++
++Last example line
 ```
