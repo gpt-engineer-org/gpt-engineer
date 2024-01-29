@@ -1,25 +1,23 @@
 """
 Entrypoint for the CLI tool.
 
-Main Functionality:
----------------------
-- Load environment variables needed to work with OpenAI.
-- Allow users to specify parameters such as:
-  - Project path
-  - LLM
-  - Temperature
-  - Step configurations
-  - Code improvement mode
-  - Lite mode for lighter operations
-  - Azure endpoint for Azure OpenAI services
-  - Using project's preprompts or default ones
-  - Verbosity level for logging
-- Interact with AI, databases, and archive processes based on the user-defined parameters.
+This module serves as the entry point for a command-line interface (CLI) tool designed to interact with OpenAI's language models. It provides functionality to load necessary environment variables, configure various parameters for the AI interaction, and manage the generation or improvement of code projects.
 
-Notes:
-- Ensure the .env file has the `OPENAI_API_KEY` or provide it in the working directory.
-- The default project path is set to `projects/example`.
-- For azure_endpoint, provide the endpoint for Azure OpenAI service.
+Main Functionality
+------------------
+- Load environment variables required for OpenAI API interaction.
+- Parse user-specified parameters for project configuration and AI behavior.
+- Facilitate interaction with AI models, databases, and archival processes.
+
+Parameters
+----------
+None
+
+Notes
+-----
+- The `OPENAI_API_KEY` must be set in the environment or provided in a `.env` file within the working directory.
+- The default project path is `projects/example`.
+- When using the `azure_endpoint` parameter, provide the Azure OpenAI service endpoint URL.
 
 """
 
