@@ -49,6 +49,13 @@ app = typer.Typer()  # creates a CLI app
 
 
 def load_env_if_needed():
+    """
+    Load environment variables if the OPENAI_API_KEY is not already set.
+
+    This function checks if the OPENAI_API_KEY environment variable is set,
+    and if not, it attempts to load it from a .env file in the current working
+    directory. It then sets the openai.api_key for use in the application.
+    """
     if os.getenv("OPENAI_API_KEY") is None:
         load_dotenv()
     if os.getenv("OPENAI_API_KEY") is None:
@@ -58,6 +65,21 @@ def load_env_if_needed():
 
 
 def load_prompt(input_repo: DiskMemory, improve_mode):
+    """
+    Load or request a prompt from the user based on the mode.
+
+    Parameters
+    ----------
+    input_repo : DiskMemory
+        The disk memory object where prompts and other data are stored.
+    improve_mode : bool
+        Flag indicating whether the application is in improve mode.
+
+    Returns
+    -------
+    str
+        The loaded or inputted prompt.
+    """
     if input_repo.get("prompt"):
         return input_repo.get("prompt")
 
@@ -71,6 +93,21 @@ def load_prompt(input_repo: DiskMemory, improve_mode):
 
 
 def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
+    """
+    Get the path to the preprompts, using custom ones if specified.
+
+    Parameters
+    ----------
+    use_custom_preprompts : bool
+        Flag indicating whether to use custom preprompts.
+    input_path : Path
+        The path to the project directory.
+
+    Returns
+    -------
+    Path
+        The path to the directory containing the preprompts.
+    """
     original_preprompts_path = PREPROMPTS_PATH
     if not use_custom_preprompts:
         return original_preprompts_path
@@ -130,13 +167,41 @@ def main(
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     """
-    Generates a project from a prompt in PROJECT_PATH/prompt,
-    or improves an existing project (with -i) in PROJECT_PATH.
+    The main entry point for the CLI tool that generates or improves a project.
 
-    See README.md for more details.
+    This function sets up the CLI tool, loads environment variables, initializes
+    the AI, and processes the user's request to generate or improve a project
+    based on the provided arguments.
+
+    Parameters
+    ----------
+    project_path : str
+        The file path to the project directory.
+    model : str
+        The model ID string for the AI.
+    temperature : float
+        The temperature setting for the AI's responses.
+    improve_mode : bool
+        Flag indicating whether to improve an existing project.
+    lite_mode : bool
+        Flag indicating whether to run in lite mode.
+    clarify_mode : bool
+        Flag indicating whether to discuss specifications with AI before implementation.
+    self_heal_mode : bool
+        Flag indicating whether to enable self-healing mode.
+    azure_endpoint : str
+        The endpoint for Azure OpenAI services.
+    use_custom_preprompts : bool
+        Flag indicating whether to use custom preprompts.
+    verbose : bool
+        Flag indicating whether to enable verbose logging.
+
+    Returns
+    -------
+    None
     """
+
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
-    #
 
     if improve_mode:
         assert not (
