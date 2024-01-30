@@ -1,3 +1,16 @@
+"""
+Module for running benchmarks.
+
+This module defines functions to run benchmarks using a given agent and to print
+the results of the benchmark tasks.
+
+Functions:
+    run(agent: BaseAgent, benchmark: Benchmark, task_name: Optional[str], verbose: bool) -> List[TaskResult]:
+        Runs the benchmark tasks using the provided agent and returns a list of TaskResult objects.
+
+    print_results(results: List[TaskResult]) -> None:
+        Prints the results of the benchmark tasks to the console.
+"""
 import time
 
 from typing import List, Optional

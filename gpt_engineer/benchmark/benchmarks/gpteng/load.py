@@ -1,3 +1,21 @@
+"""
+Module for loading GPT-Eng evaluation tasks.
+
+This module provides functionality to load tasks for evaluating GPT-based models
+on engineering tasks. It converts predefined evaluation cases into Task objects
+that can be used to benchmark the performance of AI models.
+
+Functions:
+    expect_to_assertion(expected_result: dict) -> Callable[[Assertable], bool]:
+        Converts an expected result dictionary to an assertion function.
+
+    eval_to_task(case: dict) -> Task:
+        Converts an evaluation case dictionary to a Task object.
+
+    load_gpteng() -> Benchmark:
+        Loads the GPT-Eng benchmark, which consists of a series of tasks for evaluation.
+"""
+
 from pathlib import Path
 
 from gpt_engineer.benchmark.benchmarks.gpteng.eval_tools import (

@@ -1,12 +1,29 @@
 """
-This library is used for the evaluation of gpt-engineer's performance, on
-editing and creating code.  This is very low level in that it looks at the
-code written.  It is possible that the AI could solve the problem in ways
-that we cannot forsee, with this in mind higher level tests are always
-better than lower.
+Evaluation tools for assessing the performance of GPT-based models on code editing
+and creation tasks. These tools provide low-level checks on the written code and
+support higher-level tests for a comprehensive evaluation.
 
-The scope will bre relatively limited to a few languages but this could
-be expanded.
+Currently, the scope is limited to a few programming languages, with the potential
+for future expansion.
+
+Functions:
+    check_language(eval_d: dict) -> None:
+        Checks if the specified language in the evaluation dictionary is supported.
+
+    assert_exists_in_source_code(eval_d: dict, files_dict: FilesDict) -> bool:
+        Checks if a specified string exists in the source code within the provided files dictionary.
+
+    run_code_class_has_property(eval_d: dict, files_dict: FilesDict) -> bool:
+        Executes the code and checks if the specified class has the desired property.
+
+    run_code_class_has_property_w_value(eval_d: dict, files_dict: FilesDict) -> bool:
+        Executes the code and checks if the specified class has the desired property with the expected value.
+
+    run_code_eval_function(eval_d: dict, files_dict: FilesDict) -> bool:
+        Executes the code and evaluates a function call, checking if it returns the expected value.
+
+    check_evaluation_component(eval_d: dict, files_dict: FilesDict) -> bool:
+        Dispatches the evaluation component based on the type specified in the evaluation dictionary.
 """
 
 
