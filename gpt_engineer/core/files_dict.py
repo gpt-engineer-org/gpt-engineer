@@ -1,4 +1,5 @@
 from pathlib import Path
+from collections import OrderedDict
 
 
 # class Code(MutableMapping[str | Path, str]):
@@ -74,8 +75,10 @@ def file_to_lines_dict(file_content: str) -> dict:
     dict
         A dictionary with file names as keys and dictionaries (line numbers as keys and line contents as values) as values.
     """
-    lines_dict = {
-        line_number: line_content
-        for line_number, line_content in enumerate(file_content.split("\n"), 1)
-    }
+    lines_dict = OrderedDict(
+        {
+            line_number: line_content
+            for line_number, line_content in enumerate(file_content.split("\n"), 1)
+        }
+    )
     return lines_dict

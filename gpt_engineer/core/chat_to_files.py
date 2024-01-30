@@ -25,11 +25,9 @@ Core Functions:
 
 import logging
 import re
-from typing import List
-from collections import Counter
 
-from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
-from gpt_engineer.core.diff import Diff, Hunk
+from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.diff import Diff, Hunk, ADD, REMOVE, RETAIN
 
 # Configure logging for the module
 logger = logging.getLogger(__name__)
@@ -110,14 +108,17 @@ def parse_diff(diff_string):
                 hunk_lines = []
             hunk_header = parse_hunk_header(line)
         elif line.startswith("+"):
-            hunk_lines.append(("add", line[1:]))
+            hunk_lines.append((ADD, line[1:]))
         elif line.startswith("-"):
-            hunk_lines.append(("remove", line[1:]))
+            hunk_lines.append((REMOVE, line[1:]))
         elif line.startswith(" "):
-            hunk_lines.append(("retain", line[1:]))
+            hunk_lines.append((RETAIN, line[1:]))
 
     current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
-
+    if not diffs:
+        raise ValueError(
+            f"The diff {diff_string} is not a valid diff in the unified git diff format"
+        )
     return diffs
 
 
@@ -133,89 +134,3 @@ def parse_hunk_header(header_line):
         start_line_post_edit,
         hunk_len_post_edit,
     )
-
-
-def is_similar(str1, str2):
-    """
-    Compares two strings for similarity, ignoring spaces and case.
-
-    Parameters
-    ----------
-    str1, str2 : str
-        The strings to compare.
-
-    Returns
-    -------
-    bool
-        True if the strings are similar, False otherwise.
-    """
-    str1, str2 = str1.replace(" ", "").lower(), str2.replace(" ", "").lower()
-
-    counter1, counter2 = Counter(str1), Counter(str2)
-    intersection = sum((counter1 & counter2).values())
-    longer_length = max(len(str1), len(str2))
-
-    return intersection >= 0.9 * longer_length
-
-
-#
-#
-# def apply_edits(edits: List[Edit], files_dict: FilesDict):
-#     """
-#     Applies a list of Edit objects to the provided FilesDict object.
-#
-#     Parameters
-#     ----------
-#     edits : List[Edit]
-#         The list of edits to apply.
-#     files_dict : FilesDict
-#         The FilesDict object to be modified.
-#     """
-#     for edit in edits:
-#         filename = edit.filename
-#         if filename not in files_dict:
-#             files_dict[filename] = ""
-#             logger.warning(f"Created new file: {filename}")
-#
-#         lines = files_dict[filename].split("\n")
-#         line_number = min(edit.line_number - 1, len(lines))
-#
-#         if line_number < len(lines):
-#             if edit.is_before:  # Deletion
-#                 if is_similar(lines[line_number], edit.content):
-#                     lines[line_number] = "# Line deleted line by GPT"
-#                     logger.warning(
-#                         f"Deleted from {filename}, line {edit.line_number}: '{edit.content}'"
-#                     )
-#                 else:
-#                     logger.warning(
-#                         f"line {edit.line_number}: '{edit.content}' not found in {filename} where should be '{lines[line_number]}'"
-#                     )
-#             else:  # Addition
-#                 if (
-#                     lines[line_number] == "# Line deleted line by GPT"
-#                     or lines[line_number] == ""
-#                     or len(files_dict[filename]) == 0
-#                 ):
-#                     lines[line_number] = edit.content
-#                     logger.warning(
-#                         f"Added to {filename}, line {edit.line_number}: '{edit.content.strip()}'"
-#                     )
-#                 else:
-#                     logger.warning(
-#                         f"The addition of {edit.content} is discarded for wrong line number"
-#                     )
-#         else:
-#             if not edit.is_before:
-#                 lines.append(edit.content)
-#                 logger.warning(
-#                     f"Added to {filename}, line {edit.line_number}: '{edit.content.strip()}'"
-#                 )
-#
-#         files_dict[filename] = "\n".join(lines)
-#
-#     # Remove deletion tag
-#     for filename in files_dict.keys():
-#         lines = files_dict[filename].split("\n")
-#         lines = [line for line in lines if line.strip() != "# Line deleted line by GPT"]
-#         files_dict[filename] = "\n".join(lines)
