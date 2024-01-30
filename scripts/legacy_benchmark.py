@@ -1,3 +1,8 @@
+"""
+This module provides functionality to run benchmarks on different folders within
+the 'benchmark' directory, wait for their completion, and generate a report.
+"""
+
 # list all folders in benchmark folder
 # for each folder, run the benchmark
 import contextlib
@@ -17,6 +22,16 @@ from typer import run
 def main(
     n_benchmarks: Union[int, None] = None,
 ):
+    """
+    Main function that runs benchmarks on folders within the 'benchmark' directory.
+
+    Parameters
+    ----------
+    n_benchmarks : Union[int, None], optional
+        The number of benchmarks to run. If None, all benchmarks are run.
+
+    """
+
     path = Path("benchmark")
 
     folders: Iterable[Path] = path.iterdir()
@@ -80,6 +95,18 @@ def main(
 
 
 def generate_report(benchmarks, benchmark_path):
+    """
+    Generates a report of the benchmark results and optionally appends it to a markdown file.
+
+    Parameters
+    ----------
+    benchmarks : list
+        A list of benchmark folder paths that have been processed.
+    benchmark_path : Path
+        The path to the benchmark directory.
+
+    """
+
     headers = ["Benchmark", "Ran", "Works", "Perfect", "Notes"]
     rows = []
     for bench_folder in benchmarks:
@@ -107,10 +134,41 @@ def generate_report(benchmarks, benchmark_path):
 
 
 def to_emoji(value: bool) -> str:
+    """
+    Converts a boolean value to its corresponding emoji representation.
+
+    Parameters
+    ----------
+    value : bool
+        The boolean value to convert.
+
+    Returns
+    -------
+    str
+        An emoji string representing the boolean value.
+
+    """
+
     return "\U00002705" if value else "\U0000274C"
 
 
 def insert_markdown_section(file_path, section_title, section_text, level):
+    """
+    Inserts a new section into a markdown file at the specified level.
+
+    Parameters
+    ----------
+    file_path : Path
+        The path to the markdown file.
+    section_title : str
+        The title of the section to insert.
+    section_text : str
+        The text content of the section to insert.
+    level : int
+        The header level of the section.
+
+    """
+
     with open(file_path, "r") as file:
         lines = file.readlines()
 
@@ -139,6 +197,21 @@ def insert_markdown_section(file_path, section_title, section_text, level):
 
 
 def ask_yes_no(question: str) -> bool:
+    """
+    Asks a yes/no question and returns the response as a boolean value.
+
+    Parameters
+    ----------
+    question : str
+        The yes/no question to ask.
+
+    Returns
+    -------
+    bool
+        True if the answer is 'yes', False if 'no'.
+
+    """
+
     while True:
         response = input(question + " (y/n): ").lower().strip()
         if response == "y":
