@@ -1,3 +1,25 @@
+"""
+Module defining types used in benchmarking.
+
+This module contains dataclass definitions for various types used throughout the
+benchmarking process, such as Assertable, Task, Benchmark, and TaskResult.
+
+Classes:
+    Assertable:
+        Represents an object that can be asserted against in a benchmark task.
+
+    Assertion:
+        Type alias for a callable that takes an Assertable and returns a boolean.
+
+    Task:
+        Represents a single task within a benchmark, including its assertions.
+
+    Benchmark:
+        Represents a collection of tasks used to evaluate a model's performance.
+
+    TaskResult:
+        Represents the result of running a single task within a benchmark.
+"""
 from dataclasses import dataclass
 from subprocess import Popen
 from typing import Callable, Dict, Optional

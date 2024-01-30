@@ -1,3 +1,21 @@
+"""
+Main entry point for the benchmarking tool.
+
+This module provides a command-line interface for running benchmarks using Typer.
+It allows users to specify the path to an agent, the benchmark(s) to run, and other
+options such as verbosity.
+
+Functions:
+    get_agent(path: str) -> BaseAgent:
+        Dynamically imports and returns the default configuration agent from the given path.
+
+    main(path_to_agent: str, benchmarks: str, task_name: Optional[str], verbose: bool) -> None:
+        The main function that runs the specified benchmarks with the given agent.
+        Outputs the results to the console.
+
+    if __name__ == "__main__":
+        The standard boilerplate for invoking the main function when the script is executed.
+"""
 import importlib
 
 from typing import Annotated, Optional
