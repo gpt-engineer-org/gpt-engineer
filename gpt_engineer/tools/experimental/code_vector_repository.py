@@ -1,3 +1,10 @@
+"""
+This module provides a repository for managing and querying code vectors.
+
+Classes:
+    CodeVectorRepository: Manages a repository of code vectors for efficient querying.
+"""
+
 from typing import Dict, List
 
 from llama_index import Document, SimpleDirectoryReader, VectorStoreIndex
@@ -8,7 +15,22 @@ from gpt_engineer.tools.experimental.document_chunker import DocumentChunker
 
 
 class CodeVectorRepository:
+    """
+    Manages a repository of code vectors for efficient querying.
+
+    This class provides functionality to load documents from a directory, chunk them,
+    and create an index for querying using natural language questions.
+
+    Attributes:
+        _index (VectorStoreIndex): The index of code vectors.
+        _query_engine (QueryEngine): The engine used to query the index.
+        _retriever (Retriever): The retriever used for fetching relevant code chunks.
+    """
+
     def __init__(self):
+        """
+        Initializes a new instance of the CodeVectorRepository class.
+        """
         self._index = None
         self._query_engine = None
         self._retriever = None

@@ -1,3 +1,10 @@
+"""
+This module contains experimental steps for AI-based code improvement and manipulation.
+
+Functions:
+    improve_automatic_file_selection: Improves code based on a prompt by selecting relevant files automatically.
+"""
+
 import os
 import tempfile
 
@@ -21,6 +28,24 @@ def improve_automatic_file_selection(
     memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
 ):
+    """
+    Improves code based on a prompt by selecting relevant files automatically.
+
+    This function uses a code vector repository to identify relevant code chunks that
+    should be modified based on the given prompt. It then invokes the AI to generate
+    improvements for the selected code.
+
+    Parameters:
+        ai (AI): An instance of the AI model.
+        prompt (str): The prompt describing the improvement to be made.
+        code (FilesDict): The current state of the code.
+        memory (BaseMemory): The memory instance to log the AI's output.
+        preprompts_holder (PrepromptsHolder): Holder for pre-defined prompts.
+
+    Returns:
+        FilesDict: The improved code.
+    """
+
     code_vector_repository = CodeVectorRepository()
     # ToDo: Replace this hacky way to get the right langchain document format
     temp_dir = tempfile.mkdtemp()

@@ -1,3 +1,16 @@
+"""
+Provides tools for splitting documents into chunks based on programming language.
+
+Classes
+-------
+CodeSplitter
+    Splits code into chunks using an AST parser for a specified programming language.
+SortedDocuments
+    A named tuple to hold sorted documents by language and other types.
+DocumentChunker
+    Chunks documents based on their programming language and provides a list of chunked documents.
+"""
+
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, NamedTuple
@@ -11,7 +24,18 @@ from gpt_engineer.tools.experimental.supported_languages import SUPPORTED_LANGUA
 
 
 class CodeSplitter(TextSplitter):
-    """Split code using a AST parser."""
+    """
+    Splits code into chunks using an AST parser.
+
+    This class extends TextSplitter and provides functionality to split code into manageable
+    chunks using an AST parser for a specified programming language.
+
+    Attributes:
+        language (str): The programming language of the code.
+        chunk_lines (int): The number of lines per chunk.
+        chunk_lines_overlap (int): The number of overlapping lines between chunks.
+        max_chars (int): The maximum number of characters per chunk.
+    """
 
     def __init__(
         self,
@@ -21,6 +45,15 @@ class CodeSplitter(TextSplitter):
         max_chars: int = 1500,
         **kwargs,
     ):
+        """
+        Initializes a new instance of the CodeSplitter class.
+
+        Parameters:
+            language (str): The programming language of the code.
+            chunk_lines (int): The number of lines per chunk.
+            chunk_lines_overlap (int): The number of overlapping lines between chunks.
+            max_chars (int): The maximum number of characters per chunk.
+        """
         super().__init__(**kwargs)
 
         self.language = language
@@ -52,7 +85,24 @@ class CodeSplitter(TextSplitter):
         return new_chunks
 
     def split_text(self, text: str) -> List[str]:
-        """Split incoming code and return chunks using the AST."""
+        """
+        Split incoming code and return chunks using the AST.
+
+        Parameters
+        ----------
+        text : str
+            The code text to be split into chunks.
+
+        Returns
+        -------
+        List[str]
+            A list of code chunks split according to the AST of the language.
+
+        Raises
+        ------
+        ValueError
+            If the code cannot be parsed with the language's parser.
+        """
 
         try:
             parser = tree_sitter_languages.get_parser(self.language)
@@ -80,7 +130,31 @@ class SortedDocuments(NamedTuple):
 
 
 class DocumentChunker:
+    """
+    Chunks documents based on their programming language.
+
+    Methods
+    -------
+    chunk_documents(documents: List[Document]) -> List[Document]
+        Chunks the given documents based on their programming language and returns the chunked documents.
+    """
+
+    @staticmethod
     def chunk_documents(documents: List[Document]) -> List[Document]:
+        """
+        Chunks the given documents based on their programming language.
+
+        Parameters
+        ----------
+        documents : List[Document]
+            A list of Document objects to be chunked.
+
+        Returns
+        -------
+        List[Document]
+            A list of Document objects that have been chunked.
+        """
+
         chunked_documents = []
 
         sorted_documents = _sort_documents_by_programming_language_or_other(documents)
