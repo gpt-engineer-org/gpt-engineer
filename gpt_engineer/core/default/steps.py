@@ -1,3 +1,53 @@
+"""
+Module for defining the steps involved in generating and improving code using AI.
+
+This module provides functions that represent different steps in the process of generating
+and improving code using an AI model. These steps include generating code from a prompt,
+creating an entrypoint for the codebase, executing the entrypoint, and refining code edits.
+
+Functions
+---------
+curr_fn() -> str:
+    Returns the name of the current function.
+
+setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
+    Sets up the system prompt for generating code.
+
+gen_code(ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder) -> FilesDict:
+    Generates code from a prompt using AI and returns the generated files.
+
+gen_entrypoint(ai: AI, files_dict: FilesDict, memory: BaseMemory, preprompts_holder: PrepromptsHolder) -> FilesDict:
+    Generates an entrypoint for the codebase and returns the entrypoint files.
+
+execute_entrypoint(ai: AI, execution_env: BaseExecutionEnv, files_dict: FilesDict, preprompts_holder: PrepromptsHolder) -> FilesDict:
+    Executes the entrypoint of the codebase.
+
+setup_sys_prompt_existing_code(preprompts: MutableMapping[Union[str, Path], str]) -> str:
+    Sets up the system prompt for improving existing code.
+
+incorrect_edit(files_dict: FilesDict, chat: str) -> List[str]:
+    Identifies incorrect edits in the generated code.
+
+improve(ai: AI, prompt: str, files_dict: FilesDict, memory: BaseMemory, preprompts_holder: PrepromptsHolder) -> FilesDict:
+    Improves the code based on user input and returns the updated files.
+
+Imports
+-------
+- inspect: For getting the current function name.
+- re: For regular expression operations.
+- Path: For handling file system paths.
+- List, MutableMapping, Union: For type annotations.
+- HumanMessage, SystemMessage: For creating messages in the chat with AI.
+- colored: For coloring terminal text.
+- AI: For interacting with the AI model.
+- BaseExecutionEnv, BaseMemory: For defining the execution environment and memory interfaces.
+- chat_to_files_dict, overwrite_code_with_edits, parse_edits: For converting chat to files and applying edits.
+- MAX_EDIT_REFINEMENT_STEPS: For the maximum number of refinement steps.
+- CODE_GEN_LOG_FILE, ENTRYPOINT_FILE, ENTRYPOINT_LOG_FILE, IMPROVE_LOG_FILE: For file path constants.
+- FilesDict: For handling collections of files.
+- PrepromptsHolder: For managing preprompt messages.
+"""
+
 import inspect
 import re
 

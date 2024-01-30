@@ -83,8 +83,6 @@ class DiskMemory(BaseMemory):
     for this but it's essential to validate inputs from untrusted sources.
     """
 
-    """A simple key-value store, where keys are filenames and values are file contents."""
-
     def __init__(self, path: Union[str, Path]):
         """
         Initialize the DB class.

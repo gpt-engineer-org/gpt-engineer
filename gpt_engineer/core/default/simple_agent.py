@@ -1,3 +1,33 @@
+"""
+Module for defining a simple agent that uses AI to manage code generation and improvement.
+
+This module provides a class that represents an agent capable of initializing and improving
+a codebase using AI. It handles interactions with the AI model, memory, and execution
+environment to generate and refine code based on user prompts.
+
+Classes
+-------
+SimpleAgent
+    An agent that uses AI to generate and improve code based on a given prompt.
+
+Functions
+---------
+default_config_agent() -> SimpleAgent:
+    Creates an instance of SimpleAgent with default configuration.
+
+Imports
+-------
+- tempfile: For creating temporary directories.
+- Optional: For type annotations.
+- AI: For interacting with the AI model.
+- BaseAgent: For inheriting the base agent interface.
+- BaseExecutionEnv, BaseMemory: For defining the execution environment and memory interfaces.
+- DiskExecutionEnv, DiskMemory: For using disk-based execution environment and memory.
+- PREPROMPTS_PATH, memory_path: For locating preprompt files and memory path.
+- gen_code, gen_entrypoint, improve: For generating and improving code.
+- FilesDict: For handling collections of files.
+- PrepromptsHolder: For managing preprompt messages.
+"""
 import tempfile
 
 from typing import Optional
@@ -22,10 +52,33 @@ class SimpleAgent(BaseAgent):
     codebase based on user input. It uses an AI model to generate and refine code, and it
     interacts with a repository and an execution environment to manage and execute the code.
 
-    Attributes:
-        memory (BaseRepository): The repository where the code and related data are stored.
-        execution_env (BaseExecutionEnv): The environment in which the code is executed.
-        ai (AI): The AI model used for generating and improving code.
+    Attributes
+    ----------
+    memory : BaseMemory
+        The memory interface where the code and related data are stored.
+
+    execution_env : BaseExecutionEnv
+        The execution environment in which the code is executed.
+
+    ai : AI
+        The AI model used for generating and improving code.
+
+    preprompts_holder : PrepromptsHolder
+        The holder for preprompt messages that guide the AI model.
+
+    Methods
+    -------
+    __init__(memory: BaseMemory, execution_env: BaseExecutionEnv, ai: AI, preprompts_holder: PrepromptsHolder):
+        Initializes a new instance of SimpleAgent.
+
+    with_default_config(path: str, ai: AI, preprompts_holder: PrepromptsHolder) -> "SimpleAgent":
+        Creates a new instance of SimpleAgent with default configuration.
+
+    init(prompt: str) -> FilesDict:
+        Initializes a codebase from a prompt and returns the generated files.
+
+    improve(files_dict: FilesDict, prompt: str, execution_command: Optional[str]) -> FilesDict:
+        Improves an existing codebase based on a prompt and returns the updated files.
     """
 
     def __init__(
