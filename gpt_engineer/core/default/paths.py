@@ -1,3 +1,46 @@
+"""
+Module defining file system paths used by the application.
+
+This module contains definitions of file system paths that are used throughout the
+application to locate and manage various files and directories, such as logs, memory,
+and preprompts.
+
+Constants
+---------
+META_DATA_REL_PATH : str
+    The relative path to the directory where metadata is stored.
+
+MEMORY_REL_PATH : str
+    The relative path to the directory where memory-related files are stored.
+
+CODE_GEN_LOG_FILE : str
+    The filename for the log file that contains all output from code generation.
+
+IMPROVE_LOG_FILE : str
+    The filename for the log file that contains all output from code improvement.
+
+ENTRYPOINT_FILE : str
+    The filename for the entrypoint script that is executed to run the application.
+
+ENTRYPOINT_LOG_FILE : str
+    The filename for the log file that contains the chat related to entrypoint generation.
+
+PREPROMPTS_PATH : Path
+    The file system path to the directory containing preprompt files.
+
+Functions
+---------
+memory_path(path: str) -> str:
+    Constructs the full path to the memory directory based on a given base path.
+
+metadata_path(path: str) -> str:
+    Constructs the full path to the metadata directory based on a given base path.
+
+Imports
+-------
+- os: For operating system dependent functionality.
+- Path: For handling file system paths.
+"""
 import os
 
 from pathlib import Path

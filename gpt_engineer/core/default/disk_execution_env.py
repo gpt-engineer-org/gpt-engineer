@@ -1,3 +1,27 @@
+"""
+Module for managing the execution environment on the local disk.
+
+This module provides a class that handles the execution of code stored on the local
+file system. It includes methods for uploading files to the execution environment,
+running commands, and capturing the output.
+
+Classes
+-------
+DiskExecutionEnv
+    An execution environment that runs code on the local file system and captures
+    the output of the execution.
+
+Imports
+-------
+- subprocess: For running shell commands.
+- time: For timing the execution of commands.
+- Path: For handling file system paths.
+- Optional, Tuple, Union: For type annotations.
+- BaseExecutionEnv: For inheriting the base execution environment interface.
+- FileStore: For managing file storage.
+- FilesDict: For handling collections of files.
+"""
+
 import subprocess
 import time
 
@@ -11,14 +35,33 @@ from gpt_engineer.core.files_dict import FilesDict
 
 class DiskExecutionEnv(BaseExecutionEnv):
     """
-    An execution environment that runs code on the local file system.
+    An execution environment that runs code on the local file system and captures
+    the output of the execution.
 
     This class is responsible for executing code that is stored on disk. It ensures that
     the necessary entrypoint file exists and then runs the code using a subprocess. If the
     execution is interrupted by the user, it handles the interruption gracefully.
 
-    Attributes:
-        path (str): The file system path where the code is located and will be executed.
+    Attributes
+    ----------
+    store : FileStore
+        An instance of FileStore that manages the storage of files in the execution
+        environment.
+
+    Methods
+    -------
+    upload(files: FilesDict) -> "DiskExecutionEnv":
+        Uploads a collection of files to the execution environment.
+
+    download() -> FilesDict:
+        Downloads all files from the execution environment as a FilesDict.
+
+    popen(command: str) -> subprocess.Popen:
+        Starts a subprocess with the given command and returns the Popen object.
+
+    run(command: str, timeout: Optional[int] = None) -> Tuple[str, str, int]:
+        Executes the given command in the execution environment and returns the
+        standard output, standard error, and return code.
     """
 
     def __init__(self, path: Union[str, Path, None] = None):
