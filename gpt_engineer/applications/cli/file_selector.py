@@ -283,10 +283,6 @@ class FileSelector:
         Exception
             If no files are selected in the .toml file.
         """
-        """
-        Retrieves the list of files selected by the user from a .toml configuration file.
-        This function parses the .toml file and returns the list of selected files.
-        """
         selected_files = []
         edited_tree = toml.load(toml_file)  # Load the edited .toml file
 
@@ -337,9 +333,6 @@ class FileSelector:
         Dict[str, Any]
             The updated dictionary of files after merging.
         """
-        """
-        Merges the new files list with the existing one, preserving the selection status.
-        """
         # Update the existing files with any new files or changes
         for file, properties in new_files.items():
             if file not in existing_files:
@@ -361,10 +354,6 @@ class FileSelector:
         -------
         List[str]
             A list of strings representing the relative paths of all files in the project directory.
-        """
-        """
-        Generates a dictionary of all files in the project directory
-        with their selection status set to False by default.
         """
         all_files = []
         project_path = Path(
@@ -399,10 +388,6 @@ class FileSelector:
         bool
             True if the file should not be ignored, False otherwise.
         """
-        """
-        Check if a path is not hidden or in the '__pycache__' directory.
-        Helps in filtering out unnecessary files during file selection.
-        """
         is_hidden = not path.name.startswith(".")
         is_pycache = "__pycache__" not in path.name
         return is_hidden and is_pycache
@@ -427,11 +412,6 @@ class DisplayablePath(object):
         The prefix for the last parent item in the tree display.
     """
 
-    """
-    Represents a path in a file system and displays it in a tree-like structure.
-    Useful for displaying file and directory structures like in a file explorer.
-    """
-
     display_filename_prefix_middle = "├── "
     display_filename_prefix_last = "└── "
     display_parent_prefix_middle = "    "
@@ -451,9 +431,6 @@ class DisplayablePath(object):
             The parent path in the tree structure.
         is_last : bool
             Indicates whether this is the last sibling in the tree structure.
-        """
-        """
-        Initialize a DisplayablePath object.
         """
         self.depth = 0
         self.path = Path(str(path))
@@ -494,9 +471,6 @@ class DisplayablePath(object):
         DisplayablePath
             The next DisplayablePath object in the tree.
         """
-        """
-        Generate a tree of DisplayablePath objects, ensure it's only called on directories.
-        """
         root = Path(str(root))  # Ensure root is a Path object
         criteria = criteria or cls._default_criteria
         displayable_root = cls(root, parent, is_last)
@@ -530,9 +504,6 @@ class DisplayablePath(object):
         -------
         str
             The displayable string representation of the file or directory.
-        """
-        """
-        Get the displayable string representation of the file or directory.
         """
         if self.parent is None:
             return self.display_name
