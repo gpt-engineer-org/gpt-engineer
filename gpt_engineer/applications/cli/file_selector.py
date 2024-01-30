@@ -32,6 +32,28 @@ from gpt_engineer.core.files_dict import FilesDict
 
 
 class FileSelector:
+    """
+    Manages file selection and interaction within a project directory.
+
+    This class provides methods to interactively select files from the terminal,
+    save selections for later use, and integrate with system editors for direct
+    file modification.
+
+    Attributes
+    ----------
+    IGNORE_FOLDERS : set
+        A set of directory names to ignore during file selection.
+    FILE_LIST_NAME : str
+        The name of the file that stores the selected files list.
+    COMMENT : str
+        The comment string to be added to the top of the file selection list.
+
+    Parameters
+    ----------
+    project_path : Union[str, Path]
+        The path to the project directory where file selection is to be performed.
+    """
+
     IGNORE_FOLDERS = {"site-packages", "node_modules", "venv", "__pycache__"}
     FILE_LIST_NAME = "file_selection.toml"
     COMMENT = (
@@ -42,11 +64,30 @@ class FileSelector:
     )
 
     def __init__(self, project_path: Union[str, Path]):
+        """
+        Initializes the FileSelector with a given project path.
+
+        Parameters
+        ----------
+        project_path : Union[str, Path]
+            The path to the project directory where file selection is to be performed.
+        """
         self.project_path = project_path
         self.metadata_db = DiskMemory(metadata_path(self.project_path))
         self.toml_path = self.metadata_db.path / self.FILE_LIST_NAME
 
     def ask_for_files(self) -> FilesDict:
+        """
+        Prompts the user to select files for context improvement.
+
+        This method supports selection from the terminal or using a previously saved list.
+        In test mode, it retrieves files from a predefined TOML configuration.
+
+        Returns
+        -------
+        FilesDict
+            A dictionary with file paths as keys and file contents as values.
+        """
         """
         Asks the user to select files for the purpose of context improvement.
         It supports selection from the terminal or using a previously saved list.
@@ -77,8 +118,23 @@ class FileSelector:
         return FilesDict(content_dict)
 
     def editor_file_selector(
-        self, input_path: str | Path, init: bool = True
+        self, input_path: Union[str, Path], init: bool = True
     ) -> List[str]:
+        """
+        Provides an interactive file selection interface using a .toml file.
+
+        Parameters
+        ----------
+        input_path : Union[str, Path]
+            The path where file selection is to be performed.
+        init : bool, optional
+            Indicates whether to initialize the .toml file with the file tree.
+
+        Returns
+        -------
+        List[str]
+            A list of strings representing the paths of selected files.
+        """
         """
         Provides an interactive file selection interface by generating a tree representation in a .toml file.
         Allows users to select or deselect files for the context improvement process.
@@ -140,7 +196,15 @@ class FileSelector:
             input_path, toml_file
         )  # Return the list of selected files after user edits
 
-    def open_with_default_editor(self, file_path):
+    def open_with_default_editor(self, file_path: Union[str, Path]):
+        """
+        Opens a file with the system's default text editor.
+
+        Parameters
+        ----------
+        file_path : Union[str, Path]
+            The path to the file to be opened in the text editor.
+        """
         """
         Attempts to open the specified file using the system's default text editor or a common fallback editor.
         """
@@ -171,7 +235,20 @@ class FileSelector:
                 continue
         print("No suitable text editor found. Please edit the file manually.")
 
-    def is_utf8(self, file_path):
+    def is_utf8(self, file_path: Union[str, Path]) -> bool:
+        """
+        Checks if the file at the given path is UTF-8 encoded.
+
+        Parameters
+        ----------
+        file_path : Union[str, Path]
+            The path to the file to be checked.
+
+        Returns
+        -------
+        bool
+            True if the file is UTF-8 encoded, False otherwise.
+        """
         """
         Determines if the file is UTF-8 encoded by trying to read and decode it.
         Useful for ensuring that files are in a readable and compatible format.
@@ -183,7 +260,29 @@ class FileSelector:
         except UnicodeDecodeError:
             return False
 
-    def get_files_from_toml(self, input_path, toml_file):
+    def get_files_from_toml(
+        self, input_path: Union[str, Path], toml_file: Union[str, Path]
+    ) -> List[str]:
+        """
+        Retrieves a list of selected files from a .toml configuration file.
+
+        Parameters
+        ----------
+        input_path : Union[str, Path]
+            The path where file selection was performed.
+        toml_file : Union[str, Path]
+            The path to the .toml file containing the file selection.
+
+        Returns
+        -------
+        List[str]
+            A list of strings representing the paths of selected files.
+
+        Raises
+        ------
+        Exception
+            If no files are selected in the .toml file.
+        """
         """
         Retrieves the list of files selected by the user from a .toml configuration file.
         This function parses the .toml file and returns the list of selected files.
@@ -221,8 +320,23 @@ class FileSelector:
         return selected_files
 
     def merge_file_lists(
-        self, existing_files: list[str], new_files: list[str]
+        self, existing_files: Dict[str, Any], new_files: Dict[str, Any]
     ) -> Dict[str, Any]:
+        """
+        Merges two lists of files, preserving the selection status.
+
+        Parameters
+        ----------
+        existing_files : Dict[str, Any]
+            The dictionary of existing files with their properties.
+        new_files : Dict[str, Any]
+            The dictionary of new files with their properties.
+
+        Returns
+        -------
+        Dict[str, Any]
+            The updated dictionary of files after merging.
+        """
         """
         Merges the new files list with the existing one, preserving the selection status.
         """
@@ -234,7 +348,20 @@ class FileSelector:
 
         return existing_files
 
-    def get_current_files(self, project_path: Union[str, Path]) -> list[str]:
+    def get_current_files(self, project_path: Union[str, Path]) -> List[str]:
+        """
+        Generates a list of all files in the project directory.
+
+        Parameters
+        ----------
+        project_path : Union[str, Path]
+            The path to the project directory.
+
+        Returns
+        -------
+        List[str]
+            A list of strings representing the relative paths of all files in the project directory.
+        """
         """
         Generates a dictionary of all files in the project directory
         with their selection status set to False by default.
@@ -260,6 +387,19 @@ class FileSelector:
 
     def is_in_ignoring_extensions(self, path: Path) -> bool:
         """
+        Checks if a file path should be ignored based on predefined criteria.
+
+        Parameters
+        ----------
+        path : Path
+            The path to the file to be checked.
+
+        Returns
+        -------
+        bool
+            True if the file should not be ignored, False otherwise.
+        """
+        """
         Check if a path is not hidden or in the '__pycache__' directory.
         Helps in filtering out unnecessary files during file selection.
         """
@@ -269,6 +409,24 @@ class FileSelector:
 
 
 class DisplayablePath(object):
+    """
+    Represents and displays a file system path in a tree-like structure.
+
+    This class is used to visually represent the structure of directories and files
+    in a way that is similar to a file explorer's tree view.
+
+    Attributes
+    ----------
+    display_filename_prefix_middle : str
+        The prefix for non-last items in the tree display.
+    display_filename_prefix_last : str
+        The prefix for the last item in the tree display.
+    display_parent_prefix_middle : str
+        The prefix for non-last parent items in the tree display.
+    display_parent_prefix_last : str
+        The prefix for the last parent item in the tree display.
+    """
+
     """
     Represents a path in a file system and displays it in a tree-like structure.
     Useful for displaying file and directory structures like in a file explorer.
@@ -282,6 +440,18 @@ class DisplayablePath(object):
     def __init__(
         self, path: Union[str, Path], parent_path: "DisplayablePath", is_last: bool
     ):
+        """
+        Initializes a DisplayablePath object with a given path and parent.
+
+        Parameters
+        ----------
+        path : Union[str, Path]
+            The file system path to be displayed.
+        parent_path : DisplayablePath
+            The parent path in the tree structure.
+        is_last : bool
+            Indicates whether this is the last sibling in the tree structure.
+        """
         """
         Initialize a DisplayablePath object.
         """
@@ -305,6 +475,25 @@ class DisplayablePath(object):
     def make_tree(
         cls, root: Union[str, Path], parent=None, is_last=False, criteria=None
     ):
+        """
+        Creates a tree of DisplayablePath objects from a root directory.
+
+        Parameters
+        ----------
+        root : Union[str, Path]
+            The root directory from which to start creating the tree.
+        parent : DisplayablePath, optional
+            The parent path in the tree structure.
+        is_last : bool, optional
+            Indicates whether this is the last sibling in the tree structure.
+        criteria : callable, optional
+            A function to filter the paths included in the tree.
+
+        Yields
+        ------
+        DisplayablePath
+            The next DisplayablePath object in the tree.
+        """
         """
         Generate a tree of DisplayablePath objects, ensure it's only called on directories.
         """
@@ -334,6 +523,14 @@ class DisplayablePath(object):
         return True
 
     def displayable(self) -> str:
+        """
+        Returns a string representation of the path for display in a tree-like structure.
+
+        Returns
+        -------
+        str
+            The displayable string representation of the file or directory.
+        """
         """
         Get the displayable string representation of the file or directory.
         """
