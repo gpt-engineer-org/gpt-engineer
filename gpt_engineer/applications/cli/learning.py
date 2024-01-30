@@ -129,14 +129,6 @@ def human_review_input() -> Optional[Review]:
     Optional[Review]
         A Review object containing the user's feedback, or None if consent is not given.
     """
-    """
-    Ask the user to review the generated code and return their review.
-
-    Returns
-    -------
-    Review
-        The user's review of the generated code.
-    """
     print()
     if not check_collection_consent():
         return None
@@ -192,10 +184,6 @@ def check_collection_consent() -> bool:
     bool
         True if the user has given consent, False otherwise.
     """
-    """
-    Check if the user has given consent to store their data.
-    If not, ask for their consent.
-    """
     path = Path(".gpte_consent")
     if path.exists() and path.read_text() == "true":
         return True
@@ -213,9 +201,6 @@ def ask_collection_consent() -> bool:
     -------
     bool
         True if the user consents, False otherwise.
-    """
-    """
-    Ask the user for consent to store their data.
     """
     answer = input(
         "Is it ok if we store your prompts to help improve GPT Engineer? (y/n)"
