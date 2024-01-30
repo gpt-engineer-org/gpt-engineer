@@ -9,12 +9,17 @@ def post_data(url, extra_arguments):
     """
     Make an HTTP POST request with extra_arguments as data.
 
-    Args:
-    - url (str): The URL to which the POST request should be sent.
-    - extra_arguments (dict): A dictionary of data that needs to be sent in the POST request.
+    Parameters
+    ----------
+     url : str
+        The URL to which the POST request should be sent.
+    extra_arguments : dict
+        A dictionary of data that needs to be sent in the POST request.
 
-    Returns:
-    - response: The response from the server.
+    Returns
+    -------
+    response
+        The response from the server.
     """
 
     response = requests.post(url, json=extra_arguments)
