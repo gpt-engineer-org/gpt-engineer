@@ -1,4 +1,6 @@
 """
+Chat to Files Module
+
 This module provides utilities to handle and process chat content, especially for extracting code blocks
 and managing them within a specified GPT Engineer project ("workspace"). It offers functionalities like parsing chat messages to
 retrieve code blocks, storing these blocks into a workspace, and overwriting workspace content based on
@@ -17,13 +19,14 @@ Dependencies:
 - `gpt_engineer.cli.file_selector`: Constants related to file selection.
 
 Functions:
-- parse_chat: Extracts code blocks from chat messages.
-- to_files_and_memory: Saves chat content to memory and adds extracted files to a workspace.
-- to_files: Adds extracted files to a workspace.
-- get_code_strings: Retrieves file names and their content.
-- format_file_to_input: Formats file content for AI input.
-- overwrite_files_with_edits: Overwrites workspace files based on parsed edits from chat.
-- apply_edits: Applies file edits to a workspace.
+- chat_to_files_dict(chat: str) -> FilesDict
+    Extracts code blocks from a chat and returns them as a FilesDict object.
+- overwrite_code_with_edits(chat: str, files_dict: FilesDict)
+    Overwrites code with edits extracted from chat.
+- parse_edits(chat: str) -> List[Edit]
+    Parses edits from a chat string and returns them as a list of Edit objects.
+- apply_edits(edits: List[Edit], files_dict: FilesDict)
+    Applies a list of edits to the given code object.
 """
 
 import logging
@@ -37,20 +40,22 @@ from gpt_engineer.core.files_dict import FilesDict
 logger = logging.getLogger(__name__)
 
 
-def chat_to_files_dict(chat) -> FilesDict:
+def chat_to_files_dict(chat: str) -> FilesDict:
     """
-    Extracts all code blocks from a chat and returns them
-    as a list of (filename, codeblock) tuples.
+    Extracts all code blocks from a chat and returns them as a FilesDict object.
+
+    Parses the chat string to identify and extract code blocks, which are then stored in a FilesDict
+    object with filenames as keys and code content as values.
 
     Parameters
     ----------
     chat : str
-        The chat to extract code blocks from.
+        The chat string to extract code blocks from.
 
     Returns
     -------
-    List[Tuple[str, str]]
-        A list of tuples, where each tuple contains a filename and a code block.
+    FilesDict
+        A FilesDict object containing the extracted code blocks, with filenames as keys.
     """
     # Get all ``` blocks and preceding filenames
     regex = r"(\S+)\n\s*```[^\n]*\n(.+?)```"
@@ -83,15 +88,15 @@ def overwrite_code_with_edits(chat: str, files_dict: FilesDict):
     """
     Overwrite code with edits extracted from chat.
 
-    This function takes a chat string, parses it for edits, and applies those edits
-    to the provided code object.
+    Takes a chat string, parses it for edits using the `parse_edits` function, and applies those edits
+    to the provided FilesDict object using the `apply_edits` function.
 
     Parameters
     ----------
     chat : str
         The chat content containing code edits.
     files_dict : FilesDict
-        The code object to apply edits to.
+        The FilesDict object to apply edits to.
     """
     edits = parse_edits(chat)
     apply_edits(edits, files_dict)
@@ -104,12 +109,12 @@ class Edit:
     after: str
 
 
-def parse_edits(chat: str):
+def parse_edits(chat: str) -> List[Edit]:
     """
     Parse edits from a chat string.
 
-    This function extracts code edits from a chat string and returns them as a list
-    of Edit objects.
+    Extracts code edits from a chat string and returns them as a list of Edit objects. Each Edit object
+    contains the filename, the original code block, and the updated code block.
 
     Parameters
     ----------
@@ -120,6 +125,11 @@ def parse_edits(chat: str):
     -------
     List[Edit]
         A list of Edit objects representing the parsed code edits.
+
+    Raises
+    ------
+    ValueError
+        If the text cannot be parsed as a code edit.
     """
 
     def parse_one_edit(lines):
@@ -161,17 +171,17 @@ def parse_edits(chat: str):
 
 def apply_edits(edits: List[Edit], files_dict: FilesDict):
     """
-    Apply a list of edits to the given code.
+    Apply a list of edits to the given FilesDict object.
 
-    This function takes a list of Edit objects and applies each edit to the code object.
-    It handles the creation of new files and the modification of existing files based on the edits.
+    Takes a list of Edit objects and applies each edit to the FilesDict object. It handles the creation
+    of new files and the modification of existing files based on the edits.
 
     Parameters
     ----------
     edits : List[Edit]
         A list of Edit objects representing the code edits to apply.
     files_dict : FilesDict
-        The code object to apply edits to.
+        The FilesDict object to apply edits to.
     """
     for edit in edits:
         filename = edit.filename

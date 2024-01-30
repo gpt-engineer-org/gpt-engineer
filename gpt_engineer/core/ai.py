@@ -1,3 +1,17 @@
+"""
+AI Module
+
+This module provides an AI class that interfaces with language models to perform various tasks such as
+starting a conversation, advancing the conversation, and handling message serialization. It also includes
+backoff strategies for handling rate limit errors from the OpenAI API.
+
+Classes:
+    AI: A class that interfaces with language models for conversation management and message serialization.
+
+Functions:
+    serialize_messages(messages: List[Message]) -> str
+        Serialize a list of messages to a JSON string.
+"""
 from __future__ import annotations
 
 import json
@@ -30,6 +44,43 @@ logger = logging.getLogger(__name__)
 
 
 class AI:
+    """
+    A class that interfaces with language models for conversation management and message serialization.
+
+    This class provides methods to start and advance conversations, handle message serialization,
+    and implement backoff strategies for rate limit errors when interacting with the OpenAI API.
+
+    Attributes
+    ----------
+    temperature : float
+        The temperature setting for the language model.
+    azure_endpoint : str
+        The endpoint URL for the Azure-hosted language model.
+    model_name : str
+        The name of the language model to use.
+    streaming : bool
+        A flag indicating whether to use streaming for the language model.
+    llm : BaseChatModel
+        The language model instance for conversation management.
+    token_usage_log : TokenUsageLog
+        A log for tracking token usage during conversations.
+
+    Methods
+    -------
+    start(system: str, user: str, step_name: str) -> List[Message]
+        Start the conversation with a system message and a user message.
+    next(messages: List[Message], prompt: Optional[str], step_name: str) -> List[Message]
+        Advances the conversation by sending message history to LLM and updating with the response.
+    backoff_inference(messages: List[Message]) -> Any
+        Perform inference using the language model with an exponential backoff strategy.
+    serialize_messages(messages: List[Message]) -> str
+        Serialize a list of messages to a JSON string.
+    deserialize_messages(jsondictstr: str) -> List[Message]
+        Deserialize a JSON string to a list of messages.
+    _create_chat_model() -> BaseChatModel
+        Create a chat model with the specified model name and temperature.
+    """
+
     def __init__(
         self,
         model_name="gpt-4-1106-preview",
