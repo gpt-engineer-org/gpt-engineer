@@ -35,6 +35,9 @@ python create_api_rst.py
 
 # Build the docs
 make html
+
+## Alternatively, to rebuild the docs on changes with live-reload in the browser
+sphinx-autobuild docs _build/html
 ```
 
 Project Docs Structure
