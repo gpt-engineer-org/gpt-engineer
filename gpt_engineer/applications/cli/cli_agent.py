@@ -2,7 +2,6 @@
 This module provides the CliAgent class which manages the lifecycle of code generation and improvement
 using an AI model. It includes functionalities to initialize code generation, improve existing code,
 and process the code through various steps defined in the step bundle.
-
 """
 
 from typing import Callable, Optional, TypeVar

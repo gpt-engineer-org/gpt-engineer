@@ -8,6 +8,7 @@ to their corresponding code content (as strings).
 Type Aliases:
     BaseMemory: A mutable mapping from file names to code content.
 """
+
 from pathlib import Path
 from typing import MutableMapping, Union
 
