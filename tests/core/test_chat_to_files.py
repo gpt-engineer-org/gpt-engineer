@@ -1,6 +1,7 @@
 import pytest
-from gpt_engineer.core.chat_to_files import parse_diff
+from gpt_engineer.core.chat_to_files import parse_diff, chat_to_files_dict
 from gpt_engineer.core.files_dict import file_to_lines_dict
+from gpt_engineer.core.diff import is_similar
 
 example_diff = """
 Irrelevant line to be ignored
@@ -189,122 +190,122 @@ def test_correct_skipped_lines_and_number_correction():
     assert diffs["example.txt"].diff_to_string() == corrected_diff_from_missing_lines
 
 
-# def test_standard_input():
-#     chat = """
-#     Some text describing the code
-# file1.py
-# ```python
-# 1 + print("Hello, World!")
-# ```
-#
-# file2.py
-# ```python
-# 1 + def add(a, b):
-# 2 +    return a + b
-# ```
-#     """
-#     expected = {
-#         "file1.py": '1 + print("Hello, World!")',
-#         "file2.py": "1 + def add(a, b):\n2 +    return a + b",
-#     }
-#     assert chat_to_files_dict(chat) == expected
-#
-#
-# def test_no_code_blocks():
-#     chat = "Just some regular chat without code."
-#     expected = {}
-#     assert chat_to_files_dict(chat) == expected
-#
-#
-# def test_special_characters_in_filename():
-#     chat = """
-#     file[1].py
-#     ```python
-#     1 + print("File 1")
-#     ```
-#
-#     file`2`.py
-#     ```python
-#     1 + print("File 2")
-#     ```
-#     """
-#     expected = {
-#         "file[1].py": '1 + print("File 1")',
-#         "file`2`.py": '1 + print("File 2")',
-#     }
-#     parsed = chat_to_files_dict(chat)
-#     assert parsed == expected
-#
-#
-# def test_empty_code_blocks():
-#     chat = """
-#     empty.py
-#     ```
-#     ```
-#     """
-#     expected = {"empty.py": ""}
-#     assert chat_to_files_dict(chat) == expected
-#
-#
-# def test_mixed_content():
-#     chat = """
-#     script.sh
-#     ```bash
-#     1 + echo "Hello"
-#     ```
-#
-#     script.py
-#     ```python
-#     1 + print("World")
-#     ```
-#     """
-#     expected = {"script.sh": '1 + echo "Hello"', "script.py": '1 + print("World")'}
-#     assert chat_to_files_dict(chat) == expected
-#
-#
-# def test_filename_line_break():
-#     chat = """
-#     file1.py
-#
-#     ```python
-#     1 + print("Hello, World!")
-#     ```
-#     """
-#     expected = {"file1.py": '1 + print("Hello, World!")'}
-#     assert chat_to_files_dict(chat) == expected
-#
-#
-# def test_filename_in_backticks():
-#     chat = """
-#     `file1.py`
-#     ```python
-#     1 + print("Hello, World!")
-#     ```
-#     """
-#     expected = {"file1.py": '1 + print("Hello, World!")'}
-#     assert chat_to_files_dict(chat) == expected
-#
-#
-# def test_filename_with_file_tag():
-#     chat = """
-#     [FILE: file1.py]
-#     ```python
-#     1 + print("Hello, World!")
-#     ```
-#     """
-#     expected = {"file1.py": '1 + print("Hello, World!")'}
-#     assert chat_to_files_dict(chat) == expected
-#
-#
-# def test_filename_with_different_extension():
-#     chat = """
-#     [id].jsx
-#     ```javascript
-#     1 + console.log("Hello, World!")
-#     ```
-#     """
-#     expected = {"[id].jsx": '1 + console.log("Hello, World!")'}
-#     assert chat_to_files_dict(chat) == expected
+def test_standard_input():
+    chat = """
+    Some text describing the code
+file1.py
+```python
+1 + print("Hello, World!")
+```
+
+file2.py
+```python
+1 + def add(a, b):
+2 +    return a + b
+```
+    """
+    expected = {
+        "file1.py": '1 + print("Hello, World!")',
+        "file2.py": "1 + def add(a, b):\n2 +    return a + b",
+    }
+    assert chat_to_files_dict(chat) == expected
+
+
+def test_no_code_blocks():
+    chat = "Just some regular chat without code."
+    expected = {}
+    assert chat_to_files_dict(chat) == expected
+
+
+def test_special_characters_in_filename():
+    chat = """
+    file[1].py
+    ```python
+    1 + print("File 1")
+    ```
+
+    file`2`.py
+    ```python
+    1 + print("File 2")
+    ```
+    """
+    expected = {
+        "file[1].py": '1 + print("File 1")',
+        "file`2`.py": '1 + print("File 2")',
+    }
+    parsed = chat_to_files_dict(chat)
+    assert parsed == expected
+
+
+def test_empty_code_blocks():
+    chat = """
+    empty.py
+    ```
+    ```
+    """
+    expected = {"empty.py": ""}
+    assert chat_to_files_dict(chat) == expected
+
+
+def test_mixed_content():
+    chat = """
+    script.sh
+    ```bash
+    1 + echo "Hello"
+    ```
+
+    script.py
+    ```python
+    1 + print("World")
+    ```
+    """
+    expected = {"script.sh": '1 + echo "Hello"', "script.py": '1 + print("World")'}
+    assert chat_to_files_dict(chat) == expected
+
+
+def test_filename_line_break():
+    chat = """
+    file1.py
+
+    ```python
+    1 + print("Hello, World!")
+    ```
+    """
+    expected = {"file1.py": '1 + print("Hello, World!")'}
+    assert chat_to_files_dict(chat) == expected
+
+
+def test_filename_in_backticks():
+    chat = """
+    `file1.py`
+    ```python
+    1 + print("Hello, World!")
+    ```
+    """
+    expected = {"file1.py": '1 + print("Hello, World!")'}
+    assert chat_to_files_dict(chat) == expected
+
+
+def test_filename_with_file_tag():
+    chat = """
+    [FILE: file1.py]
+    ```python
+    1 + print("Hello, World!")
+    ```
+    """
+    expected = {"file1.py": '1 + print("Hello, World!")'}
+    assert chat_to_files_dict(chat) == expected
+
+
+def test_filename_with_different_extension():
+    chat = """
+    [id].jsx
+    ```javascript
+    1 + console.log("Hello, World!")
+    ```
+    """
+    expected = {"[id].jsx": '1 + console.log("Hello, World!")'}
+    assert chat_to_files_dict(chat) == expected
 
 
 #
@@ -438,24 +439,24 @@ def test_correct_skipped_lines_and_number_correction():
 #     assert "not found" in log_capture.messages[0]
 #
 #
-# def test_basic_similarity():
-#     assert is_similar("abc", "cab")
-#     assert not is_similar("abc", "def")
-#
-#
-# def test_case_insensitivity_and_whitespace():
-#     assert is_similar("A b C", "c a b")
-#     assert not is_similar("Abc", "D e F")
-#
-#
-# def test_length_and_character_frequency():
-#     assert is_similar("aabbc", "bacba")
-#     assert not is_similar("aabbcc", "abbcc")
-#
-#
-# def test_edge_cases():
-#     assert not is_similar("", "a")
-#     assert is_similar("a", "a")
+def test_basic_similarity():
+    assert is_similar("abc", "cab")
+    assert not is_similar("abc", "def")
+
+
+def test_case_insensitivity_and_whitespace():
+    assert is_similar("A b C", "c a b")
+    assert not is_similar("Abc", "D e F")
+
+
+def test_length_and_character_frequency():
+    assert is_similar("aabbc", "bacba")
+    assert not is_similar("aabbcc", "abbcc")
+
+
+def test_edge_cases():
+    assert not is_similar("", "a")
+    assert is_similar("a", "a")
 
 
 if __name__ == "__main__":
