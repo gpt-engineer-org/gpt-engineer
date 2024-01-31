@@ -130,6 +130,9 @@ class Diff:
         self.filename_post = filename_post
         self.hunks = []
 
+    def is_new_file(self):
+        return any([hunk.is_new_file for hunk in self.hunks])
+
     def diff_to_string(self):
         string = f"--- {self.filename_pre}\n"
         string += f"+++ {self.filename_post}\n"

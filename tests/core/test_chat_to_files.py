@@ -1,5 +1,5 @@
 import pytest
-from gpt_engineer.core.chat_to_files import parse_diff, chat_to_files_dict
+from gpt_engineer.core.chat_to_files import parse_diffs, chat_to_files_dict
 from gpt_engineer.core.files_dict import file_to_lines_dict
 from gpt_engineer.core.diff import is_similar
 
@@ -133,7 +133,7 @@ def insert_string_in_lined_string(string, to_insert, line_number):
 
 
 def test_diff_changing_one_file():
-    diffs = parse_diff(example_diff)
+    diffs = parse_diffs(example_diff)
     for filename, diff in diffs.items():
         string_diff = diff.diff_to_string()
     correct_diff = "\n".join(example_diff.strip().split("\n")[4:])
@@ -141,7 +141,7 @@ def test_diff_changing_one_file():
 
 
 def test_diff_adding_one_file():
-    add_diff = parse_diff(add_example)
+    add_diff = parse_diffs(add_example)
     for filename, diff in add_diff.items():
         string_add_diff = diff.diff_to_string()
     correct_add_diff = "\n".join(add_example.strip().split("\n")[2:])
@@ -149,7 +149,7 @@ def test_diff_adding_one_file():
 
 
 def test_diff_changing_two_files():
-    merged_diff = parse_diff(example_diff + add_example)
+    merged_diff = parse_diffs(example_diff + add_example)
     correct_diff = "\n".join(example_diff.strip().split("\n")[4:])
     correct_add_diff = "\n".join(add_example.strip().split("\n")[2:])
     assert merged_diff["example.txt"].diff_to_string() == correct_diff
@@ -158,14 +158,14 @@ def test_diff_changing_two_files():
 
 def test_validate_diff_correct():
     lines_dict = file_to_lines_dict(file_example)
-    diffs = parse_diff(example_diff)
+    diffs = parse_diffs(example_diff)
     # This is a test in its own right since it full of exceptions, would something go wrong
     list(diffs.values())[0].validate_and_correct(lines_dict)
 
 
 def test_correct_distorted_numbers():
     lines_dict = file_to_lines_dict(file_example)
-    diffs = parse_diff(example_line_dist_diff)
+    diffs = parse_diffs(example_line_dist_diff)
     # This is a test in its own right since it full of exceptions, would something go wrong
     list(diffs.values())[0].validate_and_correct(lines_dict)
     correct_diff = "\n".join(example_diff.strip().split("\n")[4:])
@@ -176,7 +176,7 @@ def test_correct_skipped_lines():
     distorted_example = insert_string_in_lined_string(
         file_example, "\n#comment\n\n", 14
     )
-    diffs = parse_diff(example_diff)
+    diffs = parse_diffs(example_diff)
     list(diffs.values())[0].validate_and_correct(file_to_lines_dict(distorted_example))
     assert diffs["example.txt"].diff_to_string() == corrected_diff_from_missing_lines
 
@@ -185,7 +185,7 @@ def test_correct_skipped_lines_and_number_correction():
     distorted_example = insert_string_in_lined_string(
         file_example, "\n#comment\n\n", 14
     )
-    diffs = parse_diff(example_line_dist_diff)
+    diffs = parse_diffs(example_line_dist_diff)
     list(diffs.values())[0].validate_and_correct(file_to_lines_dict(distorted_example))
     assert diffs["example.txt"].diff_to_string() == corrected_diff_from_missing_lines
 

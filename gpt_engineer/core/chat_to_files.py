@@ -25,7 +25,7 @@ Core Functions:
 
 import logging
 import re
-
+from typing import Dict
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.diff import Diff, Hunk, ADD, REMOVE, RETAIN
 
@@ -69,22 +69,11 @@ def chat_to_files_dict(chat) -> FilesDict:
     return files_dict
 
 
-def overwrite_code_with_edits(chat: str, files_dict: FilesDict):
-    """
-    Parses edits from a chat and applies them to the provided FilesDict object.
-
-    Parameters
-    ----------
-    chat : str
-        The chat content containing code edits.
-    files_dict : FilesDict
-        The FilesDict object to apply edits to.
-    """
-    parse_edits(chat)
-    # apply_edits(files_dict, edits)
+def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
+    raise NotImplemented
 
 
-def parse_diff(diff_string):
+def parse_diffs(diff_string: str) -> Dict[str, Diff]:
     lines = diff_string.strip().split("\n")
     diffs = {}
     current_diff = None

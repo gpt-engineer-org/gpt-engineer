@@ -12,10 +12,10 @@ from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.core.chat_to_files import (
     chat_to_files_dict,
-    is_similar,
-    overwrite_code_with_edits,
-    parse_edits,
+    parse_diffs,
+    apply_diffs,
 )
+from gpt_engineer.core.diff import is_similar
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
@@ -23,7 +23,7 @@ from gpt_engineer.core.default.paths import (
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE,
 )
-from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
 
@@ -129,31 +129,6 @@ def setup_sys_prompt_existing_code(
     )
 
 
-def incorrect_edit(files_dict: FilesDict, chat: str) -> List[str,]:
-    problems = []
-    try:
-        edits = parse_edits(chat)
-    except ValueError as problem:
-        print("Not possible to parse chat to edits")
-        problems.append(str(problem))
-        return problems
-
-    for edit in edits:
-        if edit.filename in files_dict:
-            lines = files_dict[edit.filename].split("\n")
-            # make sure edit is in the file
-            if (
-                not any(is_similar(edit.content, line) for line in lines)
-                and edit.is_before is True
-            ):
-                problems.append(
-                    "This section, assigned to be deleted for a *diff* change, does not have an exact match in the code: "
-                    + edit.content
-                    + "\n The content to be modified must be a reproduction of the submitted code, and the exact deletion statement must be submitted."
-                )
-    return problems
-
-
 def improve(
     ai: AI,
     prompt: str,
@@ -176,16 +151,31 @@ def improve(
     while len(problems) > 0 and edit_refinements <= MAX_EDIT_REFINEMENT_STEPS:
         messages = ai.next(messages, step_name=curr_fn())
         chat = messages[-1].content.strip()
-        problems = incorrect_edit(files_dict, chat)
-        if len(problems) > 0:
-            messages.append(
-                HumanMessage(
-                    content="Some previously produced edits were not on the requested format, or the HEAD part was not found in the code. Details: "
-                    + "\n".join(problems)
-                    + "\n Please provide ALL the edits again, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
+        try:
+            diffs = parse_diffs(chat)
+            for file_name, diff in diffs.items():
+                # if diff is a new file, validation and correction is unnecessary
+                # ToDo: ALSO correct diff numbers for new files
+                if not diff.is_new_file():
+                    diff.validate_and_correct(
+                        file_to_lines_dict(files_dict[diff.filename_pre])
+                    )
+            files_dict = apply_diffs(diffs, files_dict)
+            memory[IMPROVE_LOG_FILE] = chat
+            return files_dict
+        except ValueError as error:
+            # here we pray that we have given sufficient information in the exception.
+            problems.append(str(error))
+            if len(problems) > 0:
+                messages.append(
+                    HumanMessage(
+                        content="Some previously produced edits were not on the requested format, or the HEAD part was not found in the code. Details: "
+                        + "\n".join(problems)
+                        + "\n Please provide ALL the edits again, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
+                    )
                 )
-            )
-        edit_refinements += 1
-    overwrite_code_with_edits(chat, files_dict)
+            edit_refinements += 1
+
     memory[IMPROVE_LOG_FILE] = chat
+    print("WARNING: Failed to parse and apply the edits")
     return files_dict
