@@ -30,16 +30,11 @@ PREPROMPTS_PATH : Path
 
 Functions
 ---------
-memory_path(path: str) -> str:
+memory_path : function
     Constructs the full path to the memory directory based on a given base path.
 
-metadata_path(path: str) -> str:
+metadata_path : function
     Constructs the full path to the metadata directory based on a given base path.
-
-Imports
--------
-- os: For operating system dependent functionality.
-- Path: For handling file system paths.
 """
 import os
 
@@ -55,8 +50,34 @@ PREPROMPTS_PATH = Path(__file__).parent.parent.parent / "preprompts"
 
 
 def memory_path(path):
+    """
+    Constructs the full path to the memory directory based on a given base path.
+
+    Parameters
+    ----------
+    path : str
+        The base path to append the memory directory to.
+
+    Returns
+    -------
+    str
+        The full path to the memory directory.
+    """
     return os.path.join(path, MEMORY_REL_PATH)
 
 
 def metadata_path(path):
+    """
+    Constructs the full path to the metadata directory based on a given base path.
+
+    Parameters
+    ----------
+    path : str
+        The base path to append the metadata directory to.
+
+    Returns
+    -------
+    str
+        The full path to the metadata directory.
+    """
     return os.path.join(path, META_DATA_REL_PATH)

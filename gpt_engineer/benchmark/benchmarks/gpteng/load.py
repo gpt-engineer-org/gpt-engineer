@@ -5,15 +5,16 @@ This module provides functionality to load tasks for evaluating GPT-based models
 on engineering tasks. It converts predefined evaluation cases into Task objects
 that can be used to benchmark the performance of AI models.
 
-Functions:
-    expect_to_assertion(expected_result: dict) -> Callable[[Assertable], bool]:
-        Converts an expected result dictionary to an assertion function.
+Functions
+---------
+expect_to_assertion : function
+    Converts an expected result dictionary to an assertion function.
 
-    eval_to_task(case: dict) -> Task:
-        Converts an evaluation case dictionary to a Task object.
+eval_to_task : function
+    Converts an evaluation case dictionary to a Task object.
 
-    load_gpteng() -> Benchmark:
-        Loads the GPT-Eng benchmark, which consists of a series of tasks for evaluation.
+load_gpteng : function
+    Loads the GPT-Eng benchmark, which consists of a series of tasks for evaluation.
 """
 
 from pathlib import Path
@@ -149,6 +150,20 @@ evaluations = [
 
 
 def expect_to_assertion(expected_result):
+    """
+    Converts an expected result dictionary to an assertion function.
+
+    Parameters
+    ----------
+    expected_result : dict
+        The dictionary containing the expected result configuration.
+
+    Returns
+    -------
+    function
+        An assertion function that takes an Assertable object and returns a boolean.
+    """
+
     def assertion(assertable: Assertable):
         return check_evaluation_component(expected_result, assertable.files)
 
@@ -156,6 +171,19 @@ def expect_to_assertion(expected_result):
 
 
 def eval_to_task(case):
+    """
+    Converts an evaluation case dictionary to a Task object.
+
+    Parameters
+    ----------
+    case : dict
+        The dictionary containing the evaluation case configuration.
+
+    Returns
+    -------
+    Task
+        A Task object constructed from the evaluation case dictionary.
+    """
     if "improve_code_prompt" in case:
         prompt = case["improve_code_prompt"]
     else:
@@ -174,6 +202,14 @@ def eval_to_task(case):
 
 
 def load_gpteng():
+    """
+    Loads the GPT-Eng benchmark, which consists of a series of tasks for evaluation.
+
+    Returns
+    -------
+    Benchmark
+        A Benchmark object containing a list of Task objects for the GPT-Eng evaluation.
+    """
     return Benchmark(
         name="gpte_eval", tasks=[eval_to_task(case) for case in evaluations]
     )
