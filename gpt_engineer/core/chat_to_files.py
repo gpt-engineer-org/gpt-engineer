@@ -80,28 +80,32 @@ def parse_diffs(diff_string: str) -> Dict[str, Diff]:
     hunk_lines = []
     filename_pre = None
     filename_post = None
-
+    fence_count = 0
     for line in lines:
-        if line.startswith("--- "):
-            filename_pre = line[4:]
-        elif line.startswith("+++ "):
-            if not filename_post is None:
-                current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
-                hunk_lines = []
-            filename_post = line[4:]
-            current_diff = Diff(filename_pre, filename_post)
-            diffs[filename_post] = current_diff
-        elif line.startswith("@@ "):
-            if hunk_lines:
-                current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
-                hunk_lines = []
-            hunk_header = parse_hunk_header(line)
-        elif line.startswith("+"):
-            hunk_lines.append((ADD, line[1:]))
-        elif line.startswith("-"):
-            hunk_lines.append((REMOVE, line[1:]))
-        elif line.startswith(" "):
-            hunk_lines.append((RETAIN, line[1:]))
+        if line.startswith("```"):
+            fence_count += 1
+            continue
+        if fence_count % 2 == 1:
+            if line.startswith("--- "):
+                filename_pre = line[4:]
+            elif line.startswith("+++ "):
+                if not filename_post is None:
+                    current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
+                    hunk_lines = []
+                filename_post = line[4:]
+                current_diff = Diff(filename_pre, filename_post)
+                diffs[filename_post] = current_diff
+            elif line.startswith("@@ "):
+                if hunk_lines:
+                    current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
+                    hunk_lines = []
+                hunk_header = parse_hunk_header(line)
+            elif line.startswith("+"):
+                hunk_lines.append((ADD, line[1:]))
+            elif line.startswith("-"):
+                hunk_lines.append((REMOVE, line[1:]))
+            elif line.startswith(""):
+                hunk_lines.append((RETAIN, line[1:]))
 
     current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
     if not diffs:

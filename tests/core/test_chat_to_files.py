@@ -7,7 +7,7 @@ example_diff = """
 Irrelevant line to be ignored
 
 another irrelevant line to be ignored
-
+```diff
 --- example.txt
 +++ example.txt
 @@ -12,3 +12,4 @@
@@ -24,13 +24,14 @@ another irrelevant line to be ignored
          evaluating next step:
 -            execute step Y
 +            revised execution of step Y
+```
 """
 
 example_line_dist_diff = """
 Irrelevant line to be ignored
 
 another irrelevant line to be ignored
-
+```diff
 --- example.txt
 +++ example.txt
 @@ -10,4 +13,5 @@
@@ -47,18 +48,20 @@ another irrelevant line to be ignored
          evaluating next step:
 -            execute step Y
 +            revised execution of step Y
+```
 """
 
 
 add_example = """
 Uninteresting stuff
-
+```diff
 --- /dev/null
 +++ new_file.txt
 @@ -0,0 +1,3 @@
 +First example line
 +
 +Last example line
+```
 """
 
 file_example = """# Introduction
@@ -136,7 +139,7 @@ def test_diff_changing_one_file():
     diffs = parse_diffs(example_diff)
     for filename, diff in diffs.items():
         string_diff = diff.diff_to_string()
-    correct_diff = "\n".join(example_diff.strip().split("\n")[4:])
+    correct_diff = "\n".join(example_diff.strip().split("\n")[4:-1])
     assert string_diff == correct_diff
 
 
@@ -144,14 +147,14 @@ def test_diff_adding_one_file():
     add_diff = parse_diffs(add_example)
     for filename, diff in add_diff.items():
         string_add_diff = diff.diff_to_string()
-    correct_add_diff = "\n".join(add_example.strip().split("\n")[2:])
+    correct_add_diff = "\n".join(add_example.strip().split("\n")[2:-1])
     assert string_add_diff == correct_add_diff
 
 
 def test_diff_changing_two_files():
     merged_diff = parse_diffs(example_diff + add_example)
-    correct_diff = "\n".join(example_diff.strip().split("\n")[4:])
-    correct_add_diff = "\n".join(add_example.strip().split("\n")[2:])
+    correct_diff = "\n".join(example_diff.strip().split("\n")[4:-1])
+    correct_add_diff = "\n".join(add_example.strip().split("\n")[2:-1])
     assert merged_diff["example.txt"].diff_to_string() == correct_diff
     assert merged_diff["new_file.txt"].diff_to_string() == correct_add_diff
 
@@ -168,7 +171,7 @@ def test_correct_distorted_numbers():
     diffs = parse_diffs(example_line_dist_diff)
     # This is a test in its own right since it full of exceptions, would something go wrong
     list(diffs.values())[0].validate_and_correct(lines_dict)
-    correct_diff = "\n".join(example_diff.strip().split("\n")[4:])
+    correct_diff = "\n".join(example_diff.strip().split("\n")[4:-1])
     assert diffs["example.txt"].diff_to_string() == correct_diff
 
 
