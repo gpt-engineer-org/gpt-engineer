@@ -103,10 +103,31 @@ End.
 Conclusion: ***
 """
 
+corrected_diff_from_missing_lines = """--- example.txt
++++ example.txt
+@@ -12,7 +12,8 @@
+     sample text 1
+     sample text 2
++    added extra line here
+ 
+ #comment
+ 
+ 
+-    original text A
++    updated original text A with changes
+@@ -39,4 +40,5 @@
+         checking status:
+-            perform operation X
++            perform operation X only if specific condition holds
++                new operation related to condition
+         evaluating next step:
+-            execute step Y
++            revised execution of step Y"""
+
 
 def insert_string_in_lined_string(string, to_insert, line_number):
     split_string = string.split("\n")
-    split_string.insert(line_number, to_insert)
+    split_string.insert(line_number - 1, to_insert)
     return "\n".join(split_string)
 
 
@@ -146,7 +167,26 @@ def test_correct_distorted_numbers():
     diffs = parse_diff(example_line_dist_diff)
     # This is a test in its own right since it full of exceptions, would something go wrong
     list(diffs.values())[0].validate_and_correct(lines_dict)
-    assert diffs["new_file.txt"].diff_to_string() == example_diff
+    correct_diff = "\n".join(example_diff.strip().split("\n")[4:])
+    assert diffs["example.txt"].diff_to_string() == correct_diff
+
+
+def test_correct_skipped_lines():
+    distorted_example = insert_string_in_lined_string(
+        file_example, "\n#comment\n\n", 14
+    )
+    diffs = parse_diff(example_diff)
+    list(diffs.values())[0].validate_and_correct(file_to_lines_dict(distorted_example))
+    assert diffs["example.txt"].diff_to_string() == corrected_diff_from_missing_lines
+
+
+def test_correct_skipped_lines_and_number_correction():
+    distorted_example = insert_string_in_lined_string(
+        file_example, "\n#comment\n\n", 14
+    )
+    diffs = parse_diff(example_line_dist_diff)
+    list(diffs.values())[0].validate_and_correct(file_to_lines_dict(distorted_example))
+    assert diffs["example.txt"].diff_to_string() == corrected_diff_from_missing_lines
 
 
 # def test_standard_input():

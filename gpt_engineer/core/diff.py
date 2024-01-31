@@ -30,7 +30,7 @@ class Hunk:
             self.is_new_file = False
 
     def add_retained_line(self, line, index):
-        self.lines.insert(line, index)
+        self.lines.insert(index, (RETAIN, line))
         self.category_counts[RETAIN] += 1
 
     def add_lines(self, new_lines):
@@ -63,25 +63,29 @@ class Hunk:
             # now find the true starting line compare to all lines and see how many matches we get
             # ToDo handle the case where the start line is 0 or 1 characters separately
             # ToDo handle the case where the start line is an add (and shouldn't exist in the orig file)
-            pot_start_lines = [
-                is_similar(self.lines[0], line)
-                for line in lines_dict[self.start_line_pre_edit].values()
-            ]
-            sum_of_matches = sum(pot_start_lines)
+            pot_start_lines = {
+                key: is_similar(self.lines[0][1], line)
+                for key, line in lines_dict.items()
+            }
+            sum_of_matches = sum(pot_start_lines.values())
             if sum_of_matches == 0:
                 # ToDo handle this case constructively
                 raise ValueError(
                     f"The starting line of the diff {self.hunk_to_string()} does not exist in the code"
                 )
             elif sum_of_matches == 1:
-                start_ind = pot_start_lines.index(True)
+                start_ind = list(pot_start_lines.keys())[
+                    list(pot_start_lines.values()).index(True)
+                ]  # lines are one indexed
             else:
                 logging.warning("multiple candidates for starting index")
                 # ToDo handle all the cases better again here. Smartest choice is that, for each candidate check match to the next line etc (recursively)
-                start_ind = pot_start_lines.index(True)
+                start_ind = list(pot_start_lines.keys())[
+                    list(pot_start_lines.values()).index(True)
+                ]
             self.start_line_pre_edit = start_ind
             # This should now be fulfilled by default
-            assert is_similar(self.lines[0], lines_dict[self.start_line_pre_edit])
+            assert is_similar(self.lines[0][1], lines_dict[self.start_line_pre_edit])
 
         # Now we should be able to validate the hunk line by line and add missing line
         hunk_ind = 0
@@ -99,7 +103,10 @@ class Hunk:
                     {key: val for key, val in lines_dict.items() if key > file_ind},
                 ):
                     # now we assume that some lines were simply skipped and we should add them to the diff
-                    self.add_retained_line(self.lines[hunk_ind][1], hunk_ind)
+                    # NOTE A SMALL THING HERE, IF THE LLM SKIPS SOME LINES AND HAS ADDs ADJACENT TO THE SKIPPED BLOCK
+                    # WE CANNOT KNOW WHETHER THE ADDs SHOULD BE BEFORE OR AFTER THE BLOCK. WE OPT FOR PUTTING IT BEFORE.
+                    # IF IT MATTERED, WE ASSUME THE LLM WOULD NOT SKIP THE BLOCK
+                    self.add_retained_line(lines_dict[file_ind], hunk_ind)
                     hunk_ind += 1
                     file_ind += 1
                 # if we don't, we have a problem
@@ -134,7 +141,6 @@ class Diff:
         past_hunk = None
         cut_lines_dict = lines_dict.copy()
         for hunk in self.hunks:
-            hunk.validate_and_correct(cut_lines_dict)
             if past_hunk is not None:
                 cut_lines_dict = {
                     key: val
@@ -142,6 +148,24 @@ class Diff:
                     if key
                     >= (past_hunk.start_line_pre_edit + past_hunk.hunk_len_pre_edit)
                 }
+            hunk.validate_and_correct(cut_lines_dict)
+            # now correct the numbers, assuming the start line pre-edit has been fixed
+            hunk.hunk_len_pre_edit = (
+                hunk.category_counts[RETAIN] + hunk.category_counts[REMOVE]
+            )
+            hunk.hunk_len_post_edit = (
+                hunk.category_counts[RETAIN] + hunk.category_counts[ADD]
+            )
+            if past_hunk is not None:
+                hunk.start_line_post_edit = (
+                    hunk.start_line_pre_edit
+                    + past_hunk.hunk_len_post_edit
+                    - past_hunk.hunk_len_pre_edit
+                    + past_hunk.start_line_post_edit
+                    - past_hunk.start_line_pre_edit
+                )
+            else:
+                hunk.start_line_post_edit = hunk.start_line_pre_edit
             past_hunk = hunk
 
 
