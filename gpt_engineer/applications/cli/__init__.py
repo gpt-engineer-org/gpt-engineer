@@ -14,6 +14,8 @@ file_selector : module
     Module for selecting files using GUI and terminal-based file explorer.
 learning : module
     Module providing tools and data structures for data collection.
+agent : module
+    Module mnagaing the lifecycle of code generation and improvement using an AI model.
 
 Each module is documented with its specific functionalities, usage, and examples where applicable.
 """
