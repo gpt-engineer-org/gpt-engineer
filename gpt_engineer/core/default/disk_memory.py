@@ -1,30 +1,23 @@
 """
-Module for simple file-based key-value database management.
+Disk Memory Module
+==================
 
 This module provides a simple file-based key-value database system, where keys are
-represented as filenames and values are the contents of these files. The primary class,
-DB, is responsible for the CRUD operations on the database. Additionally, the module
-provides a dataclass `DBs` that encapsulates multiple `DB` instances to represent different
-databases like memory, logs, preprompts, etc.
+represented as filenames and values are the contents of these files. The `DiskMemory` class
+is responsible for the CRUD operations on the database.
 
-Functions:
-    archive(dbs: DBs) -> None:
-        Archives the memory and workspace databases, moving their contents to
-        the archive database with a timestamp.
+Attributes
+----------
+None
 
-Classes:
-    DB:
-        A simple key-value store implemented as a file-based system.
+Functions
+---------
+None
 
-    DBs:
-        A dataclass containing multiple DB instances representing different databases.
-
-Imports:
-    - datetime: For timestamp generation when archiving.
-    - shutil: For moving directories during archiving.
-    - dataclasses: For the DBs dataclass definition.
-    - pathlib: For path manipulations.
-    - typing: For type annotations.
+Classes
+-------
+DiskMemory
+    A file-based key-value store where keys correspond to filenames and values to file contents.
 """
 
 import json
@@ -39,17 +32,6 @@ from gpt_engineer.tools.supported_languages import SUPPORTED_LANGUAGES
 
 # This class represents a simple database that stores its tools as files in a directory.
 class DiskMemory(BaseMemory):
-    """
-    A file-based key-value store where keys correspond to filenames and values to file contents.
-
-    This class provides an interface to a file-based database, leveraging file operations to
-    facilitate CRUD-like interactions. It allows for quick checks on the existence of keys,
-    retrieval of values based on keys, and setting new key-value pairs.
-
-    Attributes:
-        path (Path): The directory path where the database files are stored.
-    """
-
     """
     A file-based key-value store where keys correspond to filenames and values to file contents.
 
@@ -75,22 +57,17 @@ class DiskMemory(BaseMemory):
 
     __setitem__(key: Union[str, Path], val: str):
         Set or update the content of a file in the database.
-
-    Note:
-    -----
-    Care should be taken when choosing keys (filenames) to avoid potential
-    security issues, such as directory traversal. The class implements some checks
-    for this but it's essential to validate inputs from untrusted sources.
     """
 
     def __init__(self, path: Union[str, Path]):
         """
-        Initialize the DB class.
+        Initialize the DiskMemory class with a specified path.
 
         Parameters
         ----------
-        path : Union[str, Path]
-            The path to the directory where the database files are stored.
+        path : str or Path
+            The path to the directory where the database files will be stored.
+
         """
         self.path: Path = Path(path).absolute()
 
@@ -98,38 +75,40 @@ class DiskMemory(BaseMemory):
 
     def __contains__(self, key: str) -> bool:
         """
-        Check if a file with the specified name exists in the database.
+        Determine whether the database contains a file with the specified key.
 
         Parameters
         ----------
         key : str
-            The name of the file to check.
+            The key (filename) to check for existence in the database.
 
         Returns
         -------
         bool
-            True if the file exists, False otherwise.
+            Returns True if the file exists, False otherwise.
+
         """
         return (self.path / key).is_file()
 
     def __getitem__(self, key: str) -> str:
         """
-        Get the content of a file in the database.
+        Retrieve the content of a file in the database corresponding to the given key.
 
         Parameters
         ----------
         key : str
-            The name of the file to get the content of.
+            The key (filename) whose content is to be retrieved.
 
         Returns
         -------
         str
-            The content of the file.
+            The content of the file associated with the key.
 
         Raises
         ------
         KeyError
-            If the file does not exist in the database.
+            If the file corresponding to the key does not exist in the database.
+
         """
         full_path = self.path / key
 
@@ -140,19 +119,20 @@ class DiskMemory(BaseMemory):
 
     def get(self, key: str, default: Optional[Any] = None) -> Any:
         """
-        Get the content of a file in the database, or a default value if the file does not exist.
+        Retrieve the content of a file in the database, or return a default value if not found.
 
         Parameters
         ----------
         key : str
-            The name of the file to get the content of.
-        default : any, optional
-            The default value to return if the file does not exist, by default None.
+            The key (filename) whose content is to be retrieved.
+        default : Any, optional
+            The default value to return if the file does not exist. Default is None.
 
         Returns
         -------
-        any
-            The content of the file, or the default value if the file does not exist.
+        Any
+            The content of the file if it exists, otherwise the default value.
+
         """
         try:
             return self[key]
@@ -161,19 +141,22 @@ class DiskMemory(BaseMemory):
 
     def __setitem__(self, key: Union[str, Path], val: str) -> None:
         """
-        Set the content of a file in the database.
+        Set or update the content of a file in the database corresponding to the given key.
 
         Parameters
         ----------
-        key : Union[str, Path]
-            The name of the file to set the content of.
+        key : str or Path
+            The key (filename) where the content is to be set.
         val : str
-            The content to set.
+            The content to be written to the file.
 
         Raises
         ------
+        ValueError
+            If the key attempts to access a parent path.
         TypeError
-            If val is not string.
+            If the value is not a string.
+
         """
         if str(key).startswith("../"):
             raise ValueError(f"File name {key} attempted to access parent path.")
@@ -188,17 +171,18 @@ class DiskMemory(BaseMemory):
 
     def __delitem__(self, key: Union[str, Path]) -> None:
         """
-        Delete a file or directory in the database.
+        Delete a file or directory from the database corresponding to the given key.
 
         Parameters
         ----------
-        key : Union[str, Path]
-            The name of the file or directory to delete.
+        key : str or Path
+            The key (filename or directory name) to be deleted.
 
         Raises
         ------
         KeyError
-            If the file or directory does not exist in the database.
+            If the file or directory corresponding to the key does not exist in the database.
+
         """
         item_path = self.path / key
         if not item_path.exists():
@@ -210,6 +194,15 @@ class DiskMemory(BaseMemory):
             shutil.rmtree(item_path)
 
     def __iter__(self) -> Iterator[str]:
+        """
+        Iterate over the keys (filenames) in the database.
+
+        Yields
+        ------
+        Iterator[str]
+            An iterator over the sorted list of keys (filenames) in the database.
+
+        """
         return iter(
             sorted(
                 str(item.relative_to(self.path))
@@ -218,7 +211,16 @@ class DiskMemory(BaseMemory):
             )
         )
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Get the number of files in the database.
+
+        Returns
+        -------
+        int
+            The number of files in the database.
+
+        """
         return len(list(self.__iter__()))
 
     def _supported_files(self) -> str:
@@ -238,7 +240,19 @@ class DiskMemory(BaseMemory):
 
     def to_path_list_string(self, supported_code_files_only: bool = False) -> str:
         """
-        Returns directory as a list of file paths. Useful for passing to the LLM where it needs to understand the wider context of files available for reference.
+        Generate a string representation of the file paths in the database.
+
+        Parameters
+        ----------
+        supported_code_files_only : bool, optional
+            If True, filter the list to include only supported code file extensions.
+            Default is False.
+
+        Returns
+        -------
+        str
+            A newline-separated string of file paths.
+
         """
         if supported_code_files_only:
             return self._supported_files()
@@ -246,7 +260,25 @@ class DiskMemory(BaseMemory):
             return self._all_files()
 
     def to_dict(self) -> Dict[Union[str, Path], str]:
+        """
+        Convert the database contents to a dictionary.
+
+        Returns
+        -------
+        Dict[Union[str, Path], str]
+            A dictionary with keys as filenames and values as file contents.
+
+        """
         return {file_path: self[file_path] for file_path in self}
 
     def to_json(self) -> str:
+        """
+        Serialize the database contents to a JSON string.
+
+        Returns
+        -------
+        str
+            A JSON string representation of the database contents.
+
+        """
         return json.dumps(self.to_dict())
