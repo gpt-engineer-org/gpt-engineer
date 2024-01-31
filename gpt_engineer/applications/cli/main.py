@@ -18,7 +18,6 @@ Notes
 - The `OPENAI_API_KEY` must be set in the environment or provided in a `.env` file within the working directory.
 - The default project path is `projects/example`.
 - When using the `azure_endpoint` parameter, provide the Azure OpenAI service endpoint URL.
-
 """
 
 import logging
