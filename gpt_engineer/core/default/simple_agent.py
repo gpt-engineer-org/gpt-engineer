@@ -7,27 +7,15 @@ environment to generate and refine code based on user prompts.
 
 Classes
 -------
-SimpleAgent
+SimpleAgent : class
     An agent that uses AI to generate and improve code based on a given prompt.
 
 Functions
 ---------
-default_config_agent() -> SimpleAgent:
+default_config_agent : function
     Creates an instance of SimpleAgent with default configuration.
-
-Imports
--------
-- tempfile: For creating temporary directories.
-- Optional: For type annotations.
-- AI: For interacting with the AI model.
-- BaseAgent: For inheriting the base agent interface.
-- BaseExecutionEnv, BaseMemory: For defining the execution environment and memory interfaces.
-- DiskExecutionEnv, DiskMemory: For using disk-based execution environment and memory.
-- PREPROMPTS_PATH, memory_path: For locating preprompt files and memory path.
-- gen_code, gen_entrypoint, improve: For generating and improving code.
-- FilesDict: For handling collections of files.
-- PrepromptsHolder: For managing preprompt messages.
 """
+
 import tempfile
 
 from typing import Optional
@@ -56,28 +44,22 @@ class SimpleAgent(BaseAgent):
     ----------
     memory : BaseMemory
         The memory interface where the code and related data are stored.
-
     execution_env : BaseExecutionEnv
         The execution environment in which the code is executed.
-
     ai : AI
         The AI model used for generating and improving code.
-
     preprompts_holder : PrepromptsHolder
         The holder for preprompt messages that guide the AI model.
 
     Methods
     -------
-    __init__(memory: BaseMemory, execution_env: BaseExecutionEnv, ai: AI, preprompts_holder: PrepromptsHolder):
+    __init__(self, memory: BaseMemory, execution_env: BaseExecutionEnv, ai: AI, preprompts_holder: PrepromptsHolder):
         Initializes a new instance of SimpleAgent.
-
-    with_default_config(path: str, ai: AI, preprompts_holder: PrepromptsHolder) -> "SimpleAgent":
+    with_default_config(cls, path: str, ai: AI, preprompts_holder: PrepromptsHolder) -> "SimpleAgent":
         Creates a new instance of SimpleAgent with default configuration.
-
-    init(prompt: str) -> FilesDict:
+    init(self, prompt: str) -> FilesDict:
         Initializes a codebase from a prompt and returns the generated files.
-
-    improve(files_dict: FilesDict, prompt: str, execution_command: Optional[str]) -> FilesDict:
+    improve(self, files_dict: FilesDict, prompt: str, execution_command: Optional[str]) -> FilesDict:
         Improves an existing codebase based on a prompt and returns the updated files.
     """
 
@@ -126,4 +108,12 @@ class SimpleAgent(BaseAgent):
 
 
 def default_config_agent():
+    """
+    Creates an instance of SimpleAgent with default configuration.
+
+    Returns
+    -------
+    SimpleAgent
+        An instance of SimpleAgent with a temporary directory as its base path.
+    """
     return SimpleAgent.with_default_config(tempfile.mkdtemp())
