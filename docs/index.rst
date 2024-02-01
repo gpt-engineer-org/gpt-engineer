@@ -22,7 +22,7 @@ Welcome to GPT-ENGINEER's Documentation
    :caption: CONTRIBUTE:
 
    contributing_link
-   DOCS_BUILDING.md
+   docs_building.md
    roadmap_link
    code_conduct_link
    disclaimer_link
