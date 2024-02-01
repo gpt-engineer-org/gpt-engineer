@@ -14,7 +14,6 @@ Welcome to GPT-ENGINEER's Documentation
    :caption: USER GUIDES:
 
    custom_steps.md
-   readme_link
    windows_readme_link
    open_models.md
    tracing_debugging.md
