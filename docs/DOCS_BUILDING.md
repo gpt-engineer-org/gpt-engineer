@@ -30,6 +30,7 @@ Update `repository_stats.md` file under `docs/intro`
 # Install required Python dependencies (MkDocs etc.)
 poetry install
 cd docs/
+
 # Create the `api_reference.rst`
 python create_api_rst.py
 
@@ -37,7 +38,7 @@ python create_api_rst.py
 make html
 
 ## Alternatively, to rebuild the docs on changes with live-reload in the browser
-sphinx-autobuild docs _build/html
+sphinx-autobuild . _build/html
 ```
 
 Project Docs Structure
