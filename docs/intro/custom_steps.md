@@ -1,23 +1,3 @@
-# Harmony of AI, DB, and Steps
-GPT-Engineer is a powerful tool that uses AI to automate software engineering tasks. It is designed with a modular architecture that makes it easy to extend and customize. The core components of GPT-Engineer are the AI class, the DB class, and the steps module. These components work together in harmony to provide a flexible and powerful system for automating software engineering tasks.
-
-<br>
-
-## AI Class
-The AI class is the main interface to the GPT-3 model. It provides methods to start a conversation with the model, continue an existing conversation, and format system and user messages. The AI class is responsible for interacting with the GPT-3 model and generating the AI's responses.
-
-<br>
-
-## DB Class
-The DB class represents a simple database that stores its data as files in a directory. It is a key-value store, where keys are filenames and values are file contents. The DB class is responsible for managing the data used by the GPT-Engineer system.
-
-<br>
-
-## Steps Module
-The steps module defines a series of steps that the AI can perform to generate code, clarify instructions, generate specifications, and more. Each step is a function that takes an AI and a set of databases as arguments and returns a list of messages. The steps module is responsible for controlling the flow of the GPT-Engineer system.
-
-<br>
-
 ### How Each Step is Made
 Each step in the steps module is a function that takes an AI and a set of databases as arguments. The function performs a specific task, such as generating code or clarifying instructions, and returns a list of messages. The messages are then saved to the databases and used in subsequent steps.
 

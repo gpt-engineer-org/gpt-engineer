@@ -5,8 +5,9 @@ Welcome to GPT-ENGINEER's Documentation
    :maxdepth: 2
    :caption: GET STARTED:
 
-   intro/quick_overview.md
-   intro/repository_stats.md
+   intro/introduction.md
+   intro/installation.md
+   intro/quickstart.md
 
 .. toctree::
    :maxdepth: 2
@@ -21,19 +22,13 @@ Welcome to GPT-ENGINEER's Documentation
 
 .. toctree::
    :maxdepth: 2
-   :caption: HARMONY OF AI, DB, & STEPS:
+   :caption: CUSTOM STEPS:
 
-   intro/harmony_db_ai_steps.md
-
-.. toctree::
-   :maxdepth: 2
-   :caption: CHAT PARSING & SELF EXECUTION:
-
-   intro/chat_parsing.md
+   intro/custom_steps.md
 
 .. toctree::
    :maxdepth: 2
-   :caption: CONTRIBUTING GUIDES:
+   :caption: CONTRIBUTE:
 
    contributing_link
    DOCS_BUILDING.md
