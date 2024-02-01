@@ -3,11 +3,10 @@ Welcome to GPT-ENGINEER's Documentation
 
 .. toctree::
    :maxdepth: 2
-   :caption: INTRODUCTION:
+   :caption: Get started:
 
    intro/quick_overview.md
    intro/repository_stats.md
-   results_link
    intro/main_script.md
    intro/scripts.md
    intro/preprompts.md
