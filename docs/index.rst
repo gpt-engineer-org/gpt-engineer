@@ -3,13 +3,10 @@ Welcome to GPT-ENGINEER's Documentation
 
 .. toctree::
    :maxdepth: 2
-   :caption: Get started:
+   :caption: GET STARTED:
 
    intro/quick_overview.md
    intro/repository_stats.md
-   intro/main_script.md
-   intro/scripts.md
-   intro/preprompts.md
 
 .. toctree::
    :maxdepth: 2
@@ -21,17 +18,6 @@ Welcome to GPT-ENGINEER's Documentation
    windows_readme_link
    open_models.md
    tracing_debugging.md
-
-
-.. toctree::
-   :maxdepth: 2
-   :caption: CORE COMPONENTS:
-
-   intro/gate.md
-   intro/ai_class.md
-   intro/db_class.md
-   intro/steps_module.md
-
 
 .. toctree::
    :maxdepth: 2
