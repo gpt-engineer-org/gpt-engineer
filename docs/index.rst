@@ -5,26 +5,19 @@ Welcome to GPT-ENGINEER's Documentation
    :maxdepth: 2
    :caption: GET STARTED:
 
-   intro/introduction.md
-   intro/installation.md
-   intro/quickstart.md
+   introduction.md
+   installation
+   usage
 
 .. toctree::
    :maxdepth: 2
    :caption: USER GUIDES:
 
-   installation
-   usage
+   custom_steps.md
    readme_link
    windows_readme_link
    open_models.md
    tracing_debugging.md
-
-.. toctree::
-   :maxdepth: 2
-   :caption: CUSTOM STEPS:
-
-   intro/custom_steps.md
 
 .. toctree::
    :maxdepth: 2
