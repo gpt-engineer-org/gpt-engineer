@@ -1,4 +1,3 @@
-============================
 Using with open/local models
 ============================
 
@@ -21,7 +20,7 @@ Then, you can use the port and host to run the following example using WizardCod
 ```
 
 Using Azure models
-==================
+------------------
 
 You set your Azure OpenAI key:
 - `export OPENAI_API_KEY=[your api key]`

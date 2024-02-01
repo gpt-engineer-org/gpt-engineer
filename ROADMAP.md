@@ -45,7 +45,7 @@ By improving the codebase and developer ergonomics, we accelerate progress. Some
 - [ ] Set up automatic PR review for all PRs with e.g. Codium pr-agent
 - [ ] LLM tests in CI: Run super small tests with GPT3.5 in CI, that check that simple code generation still works
 
-# How you can help out
+## How you can help out
 
 You can:
 
