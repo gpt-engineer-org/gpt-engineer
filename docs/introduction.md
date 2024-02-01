@@ -1,6 +1,8 @@
 # Introduction
 GPT-Engineer is a project that uses LLMs (such as GPT-4) to automate the process of software engineering. It includes several Python scripts that interact with the LLM to generate code, clarify requirements, generate specifications, and more.
 
+The repository is written in Python and is publicly available on GitHub.
+
 <br>
 
 ## Core Components
@@ -58,11 +60,6 @@ The main steps are:
 ### 6. Main Script (`gpt_engineer/applications/cli/main.py`)
 The main script is the is the entry point of the application and uses the `Typer` library to create a command-line interface. It sets up instances of an [`AI`](ai_class), a [`Files Dictionary`](files_dictionary_class), a `BaseMemory`, a `BaseExecutionEnv` and an [`Agent`](agent_class) that runs a series of [steps](steps) based on the provided configuration.
 
-## Repository Overview
-
-The GPT-Engineer repository is a project developed by Anton Osika, which uses GPT-4 to automate the process of software engineering. The repository is written in Python and is publicly available on GitHub.
-
-<br>
 
 ## Example
 You can find an example of the project in action [here](https://github.com/gpt-engineer-org/gpt-engineer/assets/4467025/6e362e45-4a94-4b0d-973d-393a31d92d9b).
