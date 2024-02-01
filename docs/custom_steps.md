@@ -1,3 +1,5 @@
+# Customizing steps
+
 ### How Each Step is Made
 Each step in the steps module is a function that takes an AI and a set of databases as arguments. The function performs a specific task, such as generating code or clarifying instructions, and returns a list of messages. The messages are then saved to the databases and used in subsequent steps.
 
