@@ -25,9 +25,11 @@ Core Functions:
 
 import logging
 import re
+
 from typing import Dict
-from gpt_engineer.core.files_dict import FilesDict
-from gpt_engineer.core.diff import Diff, Hunk, ADD, REMOVE, RETAIN
+
+from gpt_engineer.core.diff import ADD, REMOVE, RETAIN, Diff, Hunk
+from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 
 # Configure logging for the module
 logger = logging.getLogger(__name__)
@@ -70,7 +72,54 @@ def chat_to_files_dict(chat) -> FilesDict:
 
 
 def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
-    raise NotImplemented
+    """
+    Applies a set of diffs to a FilesDict object and returns the modified FilesDict.
+
+    Parameters
+    ----------
+    diffs : Dict[str, Diff]
+        A dictionary of file paths and their respective diffs to apply.
+    files : FilesDict
+        The FilesDict object to apply the diffs to.
+
+    Returns
+    -------
+    FilesDict
+        A FilesDict object with the diffs applied to the original files.
+    """
+    for diff in diffs.values():
+        if diff.is_new_file():
+            files[diff.filename_post] = "\n".join(
+                line[1] for hunk in diff.hunks for line in hunk.lines
+            )
+        else:
+            for hunk in diff.hunks:
+                line_dict = file_to_lines_dict(files[diff.filename_pre])
+                current_line = hunk.start_line_pre_edit
+                for line in hunk.lines:
+                    if line[0] == RETAIN:
+                        current_line += 1
+                    elif line[0] == ADD:
+                        # append to the last line end
+                        current_line -= 1
+                        # Append a new line and the content if the line exists, else just add the content
+                        if current_line in line_dict.keys():
+                            line_dict[current_line] += "\n" + line[1]
+                        else:
+                            line_dict[current_line] = line[1]
+                        logger.warning(
+                            f"Added line {line[1]} to {diff.filename_post} at line {current_line} end"
+                        )
+                        current_line += 1
+                    elif line[0] == REMOVE:
+                        # Make the line content empty
+                        line_dict[current_line] = ""
+                        logger.warning(
+                            f"Removed line {line[1]} from {diff.filename_post} at line {current_line}"
+                        )
+                        current_line += 1
+                files[diff.filename_pre] = "\n".join(line_dict.values())
+        return files
 
 
 def parse_diffs(diff_string: str) -> Dict[str, Diff]:
@@ -81,6 +130,7 @@ def parse_diffs(diff_string: str) -> Dict[str, Diff]:
     filename_pre = None
     filename_post = None
     fence_count = 0
+    hunk_header = None
     for line in lines:
         if line.startswith("```"):
             fence_count += 1
@@ -89,14 +139,18 @@ def parse_diffs(diff_string: str) -> Dict[str, Diff]:
             if line.startswith("--- "):
                 filename_pre = line[4:]
             elif line.startswith("+++ "):
-                if not filename_post is None:
+                if (
+                    filename_post is not None
+                    and current_diff is not None
+                    and hunk_header is not None
+                ):
                     current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
                     hunk_lines = []
                 filename_post = line[4:]
                 current_diff = Diff(filename_pre, filename_post)
                 diffs[filename_post] = current_diff
             elif line.startswith("@@ "):
-                if hunk_lines:
+                if hunk_lines and current_diff is not None and hunk_header is not None:
                     current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
                     hunk_lines = []
                 hunk_header = parse_hunk_header(line)
@@ -106,8 +160,10 @@ def parse_diffs(diff_string: str) -> Dict[str, Diff]:
                 hunk_lines.append((REMOVE, line[1:]))
             elif line.startswith(""):
                 hunk_lines.append((RETAIN, line[1:]))
+    # Check current_diff is not None before appending last hunk
+    if current_diff is not None and hunk_lines and hunk_header is not None:
+        current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
 
-    current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
     if not diffs:
         raise ValueError(
             f"The diff {diff_string} is not a valid diff in the unified git diff format"
