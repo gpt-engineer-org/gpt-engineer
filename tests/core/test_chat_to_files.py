@@ -197,6 +197,8 @@ def test_correct_skipped_lines_and_number_correction():
 
 
 def test_controller_diff():
+    controller_diff = None
+    controller_code = None
     with open(
         os.path.join(THIS_FILE_DIR, "chat_to_files_test_cases", "diff_controller"), "r"
     ) as f:

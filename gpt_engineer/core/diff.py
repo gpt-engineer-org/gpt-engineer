@@ -1,5 +1,5 @@
 import logging
-
+from typing import List
 from collections import Counter
 
 RETAIN = "retain"
@@ -33,6 +33,11 @@ class Hunk:
         self.lines.insert(index, (RETAIN, line))
         self.category_counts[RETAIN] += 1
 
+    def pop_line(self, line, index):
+        self.lines.pop(index)
+        assert self.category_counts[line[0]] > 0
+        self.category_counts[line[0]] -= 1
+
     def add_lines(self, new_lines):
         for line in new_lines:
             self.lines.append(line)
@@ -47,11 +52,20 @@ class Hunk:
             string += f"{line_prefix}{line_content}\n"
         return string
 
-    @staticmethod
-    def future_line_match(line, lines_dict):
-        return any([is_similar(line, file_line) for file_line in lines_dict.values()])
+    # @staticmethod
+    # def future_line_match(line, lines_dict):
+    #     return any([is_similar(line, file_line) for file_line in lines_dict.values()])
 
-    def validate_and_correct(self, lines_dict: dict) -> bool:
+    def make_forward_block(self, hunk_ind: int, forward_block_len) -> str:
+        forward_lines = [
+            line[1] for line in self.lines[hunk_ind:] if not line[0] == ADD
+        ]
+        forward_block = "\n".join(forward_lines[0:forward_block_len])
+        return forward_block
+
+    def validate_and_correct(
+        self, lines_dict: dict, forward_block_len: int = 10
+    ) -> bool:
         # rule out the case that its a new file
         if self.is_new_file:
             # this hunk cannot be falsified and is by definition true
@@ -98,26 +112,70 @@ class Hunk:
                 hunk_ind += 1
             elif not is_similar(self.lines[hunk_ind][1], lines_dict[file_ind]):
                 # check if we get a match further down the road
-                if self.future_line_match(
-                    self.lines[hunk_ind][1],
-                    {key: val for key, val in lines_dict.items() if key > file_ind},
+                # if self.future_line_match(
+                #     self.lines[hunk_ind][1],
+                #     {key: val for key, val in lines_dict.items() if key > file_ind},
+                # ):
+                # make a forward block from the code for comparisons
+                forward_code = "\n".join(
+                    [
+                        lines_dict[ind]
+                        for ind in range(
+                            file_ind,
+                            min(file_ind + forward_block_len, max(lines_dict.keys())),
+                        )
+                    ]
+                )
+                # make the original forward block for quantitative comparison
+                forward_block = self.make_forward_block(hunk_ind, forward_block_len)
+                orig_count_ratio = count_ratio(forward_block, forward_code)
+                # Here we have 2 cases
+                # 1) some lines were simply skipped in the diff and we should add them to the diff
+                # If this is the case, adding the line to the diff, should give an improved forward diff
+                forward_block_missing_line = self.make_forward_block(
+                    hunk_ind, forward_block_len - 1
+                )
+                # insert the missing line in front of the block
+                forward_block_missing_line = "\n".join(
+                    [lines_dict[file_ind], forward_block_missing_line]
+                )
+                missing_line_count_ratio = count_ratio(
+                    forward_block_missing_line, forward_code
+                )
+                # 2) Additional lines, not belonging to the code were added to the diff
+                forward_block_false_line = self.make_forward_block(
+                    hunk_ind + 1, forward_block_len
+                )
+                false_line_count_ratio = count_ratio(
+                    forward_block_false_line, forward_code
+                )
+                if (
+                    orig_count_ratio >= missing_line_count_ratio
+                    and orig_count_ratio >= false_line_count_ratio
                 ):
-                    # now we assume that some lines were simply skipped and we should add them to the diff
-                    # NOTE A SMALL THING HERE, IF THE LLM SKIPS SOME LINES AND HAS ADDs ADJACENT TO THE SKIPPED BLOCK
-                    # WE CANNOT KNOW WHETHER THE ADDs SHOULD BE BEFORE OR AFTER THE BLOCK. WE OPT FOR PUTTING IT BEFORE.
-                    # IF IT MATTERED, WE ASSUME THE LLM WOULD NOT SKIP THE BLOCK
+                    # This means that accounting for neither  scenario 1 nor 2 improved the situation
+                    raise ValueError(
+                        f"The trail of the diff, {forward_block}, does not match the code {forward_code}."
+                    )
+                elif missing_line_count_ratio > false_line_count_ratio:
                     self.add_retained_line(lines_dict[file_ind], hunk_ind)
                     hunk_ind += 1
                     file_ind += 1
-                # if we don't, we have a problem
+                    # NOTE: IF THE LLM SKIPS SOME LINES AND HAS ADDs ADJACENT TO THE SKIPPED BLOCK,
+                    # WE CANNOT KNOW WHETHER THE ADDs SHOULD BE BEFORE OR AFTER THE BLOCK. WE OPT FOR PUTTING IT BEFORE.
+                    # IF IT MATTERED, WE ASSUME THE LLM WOULD NOT SKIP THE BLOCK
                 else:
-                    raise ValueError(
-                        f"The line {self.lines[hunk_ind][1]} in the diff cannot be found in the code"
-                    )
+                    self.pop_line(self.lines[hunk_ind], hunk_ind)
+
+                # if we don't, we have a problem
+                # else:
+                #     raise ValueError(
+                #         f"The line {self.lines[hunk_ind][1]} in the diff cannot be found in the code"
+                #     )
             else:
                 hunk_ind += 1
                 file_ind += 1
-        if file_ind < len(self.lines) - 1:
+        if hunk_ind < len(self.lines) - 1:
             remaining_lines = "\n".join(
                 f"{line_type}: {line_content}"
                 for line_type, line_content in self.lines[file_ind + 1 :]
@@ -175,7 +233,7 @@ class Diff:
             past_hunk = hunk
 
 
-def is_similar(str1, str2):
+def is_similar(str1, str2, similarity_threshold=0.9):
     """
     Compares two strings for similarity, ignoring spaces and case.
 
@@ -183,16 +241,25 @@ def is_similar(str1, str2):
     ----------
     str1, str2 : str
         The strings to compare.
+    similarity_threshold: float
+        How similar must the strings be
 
     Returns
     -------
     bool
         True if the strings are similar, False otherwise.
     """
+
+    return count_ratio(str1, str2) >= similarity_threshold
+
+
+def count_ratio(str1, str2):
     str1, str2 = str1.replace(" ", "").lower(), str2.replace(" ", "").lower()
 
     counter1, counter2 = Counter(str1), Counter(str2)
     intersection = sum((counter1 & counter2).values())
     longer_length = max(len(str1), len(str2))
-
-    return intersection >= 0.9 * longer_length
+    if longer_length == 0:
+        return 1
+    else:
+        return intersection / longer_length
