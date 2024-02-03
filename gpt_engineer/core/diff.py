@@ -1,6 +1,6 @@
 import logging
+
 from collections import Counter
-from copy import deepcopy
 
 RETAIN = "retain"
 ADD = "add"
@@ -118,7 +118,10 @@ class Hunk:
                 hunk_ind += 1
                 file_ind += 1
         if file_ind < len(self.lines) - 1:
-            remaining_lines = "\n".join(self.lines[file_ind + 1 :])
+            remaining_lines = "\n".join(
+                f"{line_type}: {line_content}"
+                for line_type, line_content in self.lines[file_ind + 1 :]
+            )
             raise ValueError(
                 f"Hunk validation stopped before the lines {remaining_lines} were validated. The diff is incorrect"
             )
