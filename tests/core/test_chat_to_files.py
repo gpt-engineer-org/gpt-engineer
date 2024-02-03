@@ -2,6 +2,9 @@ import pytest
 from gpt_engineer.core.chat_to_files import parse_diffs, chat_to_files_dict
 from gpt_engineer.core.files_dict import file_to_lines_dict
 from gpt_engineer.core.diff import is_similar
+import os
+
+THIS_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 example_diff = """
 Irrelevant line to be ignored
@@ -191,6 +194,19 @@ def test_correct_skipped_lines_and_number_correction():
     diffs = parse_diffs(example_line_dist_diff)
     list(diffs.values())[0].validate_and_correct(file_to_lines_dict(distorted_example))
     assert diffs["example.txt"].diff_to_string() == corrected_diff_from_missing_lines
+
+
+def test_controller_diff():
+    with open(
+        os.path.join(THIS_FILE_DIR, "chat_to_files_test_cases", "diff_controller"), "r"
+    ) as f:
+        controller_diff = f.read()
+    with open(
+        os.path.join(THIS_FILE_DIR, "chat_to_files_test_cases", "controller_code"), "r"
+    ) as f:
+        controller_code = f.read()
+    diffs = parse_diffs(controller_diff)
+    list(diffs.values())[0].validate_and_correct(file_to_lines_dict(controller_code))
 
 
 def test_standard_input():
