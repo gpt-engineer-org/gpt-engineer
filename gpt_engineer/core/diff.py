@@ -206,11 +206,13 @@ class Diff:
         cut_lines_dict = lines_dict.copy()
         for hunk in self.hunks:
             if past_hunk is not None:
+                # make sure to not cut so much that the start_line gets out of range
+                cut_ind = min(
+                    past_hunk.start_line_pre_edit + past_hunk.hunk_len_pre_edit,
+                    hunk.start_line_pre_edit,
+                )
                 cut_lines_dict = {
-                    key: val
-                    for key, val in cut_lines_dict.items()
-                    if key
-                    >= (past_hunk.start_line_pre_edit + past_hunk.hunk_len_pre_edit)
+                    key: val for key, val in cut_lines_dict.items() if key >= (cut_ind)
                 }
             hunk.validate_and_correct(cut_lines_dict)
             # now correct the numbers, assuming the start line pre-edit has been fixed
