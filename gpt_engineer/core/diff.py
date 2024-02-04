@@ -1,5 +1,5 @@
 import logging
-from typing import List
+
 from collections import Counter
 
 RETAIN = "retain"
@@ -175,7 +175,12 @@ class Hunk:
             else:
                 hunk_ind += 1
                 file_ind += 1
-        if hunk_ind < len(self.lines) - 1:
+        # if we have not validated all lines, we have a problem
+        non_added_lines = 0
+        for line_type, line_content in self.lines:
+            if line_type != ADD:
+                non_added_lines += 1
+        if hunk_ind < non_added_lines - 1:
             remaining_lines = "\n".join(
                 f"{line_type}: {line_content}"
                 for line_type, line_content in self.lines[file_ind + 1 :]
@@ -210,7 +215,8 @@ class Diff:
                     key: val
                     for key, val in cut_lines_dict.items()
                     if key
-                    >= (past_hunk.start_line_pre_edit + past_hunk.hunk_len_pre_edit)
+                    # provides a wider range of protection against key errors
+                    >= (past_hunk.start_line_pre_edit)
                 }
             hunk.validate_and_correct(cut_lines_dict)
             # now correct the numbers, assuming the start line pre-edit has been fixed
