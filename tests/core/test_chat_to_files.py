@@ -1,8 +1,10 @@
-import pytest
-from gpt_engineer.core.chat_to_files import parse_diffs, chat_to_files_dict
-from gpt_engineer.core.files_dict import file_to_lines_dict
-from gpt_engineer.core.diff import is_similar
 import os
+
+import pytest
+
+from gpt_engineer.core.chat_to_files import chat_to_files_dict, parse_diffs
+from gpt_engineer.core.diff import is_similar
+from gpt_engineer.core.files_dict import file_to_lines_dict
 
 THIS_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -116,10 +118,10 @@ corrected_diff_from_missing_lines = """--- example.txt
      sample text 1
      sample text 2
 +    added extra line here
- 
+
  #comment
- 
- 
+
+
 -    original text A
 +    updated original text A with changes
 @@ -39,4 +40,5 @@
@@ -209,6 +211,52 @@ def test_controller_diff():
         controller_code = f.read()
     diffs = parse_diffs(controller_diff)
     list(diffs.values())[0].validate_and_correct(file_to_lines_dict(controller_code))
+
+
+def test_simple_calculator_diff():
+    simple_calculator_diff = None
+    simple_calculator_code = None
+    with open(
+        os.path.join(
+            THIS_FILE_DIR, "chat_to_files_test_cases", "diff_simple_calculator"
+        ),
+        "r",
+    ) as f:
+        simple_calculator_diff = f.read()
+    with open(
+        os.path.join(
+            THIS_FILE_DIR, "chat_to_files_test_cases", "simple_calculator_code"
+        ),
+        "r",
+    ) as f:
+        simple_calculator_code = f.read()
+    diffs = parse_diffs(simple_calculator_diff)
+    list(diffs.values())[0].validate_and_correct(
+        file_to_lines_dict(simple_calculator_code)
+    )
+
+
+def test_complex_temperature_converter_diff():
+    temperature_converter_diff = None
+    temperature_converter_code = None
+    with open(
+        os.path.join(
+            THIS_FILE_DIR, "chat_to_files_test_cases", "diff_temperature_converter"
+        ),
+        "r",
+    ) as f:
+        temperature_converter_diff = f.read()
+    with open(
+        os.path.join(
+            THIS_FILE_DIR, "chat_to_files_test_cases", "temperature_converter_code"
+        ),
+        "r",
+    ) as f:
+        temperature_converter_code = f.read()
+    diffs = parse_diffs(temperature_converter_diff)
+    list(diffs.values())[0].validate_and_correct(
+        file_to_lines_dict(temperature_converter_code)
+    )
 
 
 def test_standard_input():

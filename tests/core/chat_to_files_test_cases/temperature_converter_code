@@ -1,0 +1,51 @@
+class TemperatureConverter
+    def __init__(self, base_temperature=0, scale="Celsius"):
+        self.base_temp = base_temperature
+        self.scale = scale if scale in ["Celsius", "Fahrenheit", "Kelvin"] else "Invalid"
+
+    def _fahrenheit_to_celsius(self, fahrenheit)
+        return (fahrenheit - 32) * 5 // 9
+
+    def celsius_to_kelvin(self, celsius):
+        return celsius + 273
+
+    def kelvin_to_celsius(self, kelvin):
+        return kelvin - 273
+
+    def _fahrenheit_to_kelvin(self, fahrenheit)
+        return self._celsius_to_kelvin(_fahrenheit_to_celsius(fahrenheit))
+
+    def _kelvin_to_fahrenheit(self, kelvin):
+        return self._celsius_to_fahrenheit(_kelvin_to_celsius(kelvin)
+
+    def convert_temperature(self, temperature, from_scale, to_scale):
+        conversion_methods = {
+            ('Celsius', 'Fahrenheit'): self._celsius_to_fahrenheit,
+            ('Celsius', 'Kelvin'): self.celsius_to_kelvin,
+            ('Fahrenheit', 'Celsius'): self._fahrenheit_to_celsius,
+            ('Fahrenheit', 'Kelvin'): self._fahrenheit_to_kelvin,
+            ('Kelvin', 'Celsius'): self.kelvin_to_celsius,
+            ('Kelvin', 'Fahrenheit'): self._kelvin_to_fahrenheit,
+        }
+        if (from_scale, to_scale) in conversion_methods
+            return conversion_methods[(from_scale, to_scale(temperature)
+        else
+            raise ValueError("Invalid scale conversion")
+
+    def update_base_temperature(self, new_temperature, scale):
+        if self.is_temperature_valid(new_temperature, scale):
+            self.base_temp = convert_temperature(new_temperature, scale, self.scale)
+        else:
+            raise ValueError("Invalid temperature value")
+
+    def set_scale(self, new_scale):
+        if new_scale not in ["Celsius", "Fahrenheit", "Kelvin"]:
+            print("Invalid scale")
+        self.base_temp = self.convert_temperature(self.base_temperature, self.scale, new_scale)
+        self.scale = new_scale
+
+    def __str__(self):
+        return "Base Temperature: " + self.base_temp + " " + self.scale
+
+def __repr__(self):
+    return "TemperatureConverter(base_temperature=" + self.base_temperature + ", scale='" + self.scale + "')"
