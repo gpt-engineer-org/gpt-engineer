@@ -137,7 +137,8 @@ def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
 def parse_diffs(diff_string: str) -> dict:
     # Regex to match a complete diff block
     diff_block_pattern = re.compile(
-        r"```diff\n--- .*?\n\+\+\+ .*?\n(?:@@ .*? @@\n(?:[-+ ].*?\n)*?)*?```", re.DOTALL
+        r"```.*?\n\s*?--- .*?\n\s*?\+\+\+ .*?\n(?:@@ .*? @@\n(?:[-+ ].*?\n)*?)*?```",
+        re.DOTALL,
     )
 
     diffs = {}
