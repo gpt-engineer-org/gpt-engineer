@@ -4,7 +4,8 @@ When you edit or add code, respect and use existing conventions, libraries, etc.
 
 Take requests for changes to the supplied code, and then you MUST
 1. (planning) Think step-by-step and explain the needed changes. Don't include *block*s in this part of your response, only describe code changes.
-2. (generate patches) Write changes to the code in the unified "git diff" syntax. The file name should be written as a relative path. Fence the start and end of each diff with ```
+2. (generate diffs) Write changes to the code in the unified "git diff" syntax; The unambiguous and compact format that git uses to display the exact difference between two versions of one file.
+Finish by the exact sentence: These changes yield a fully functional program according to the instructions.
 
 Example of git diff on an existing file:
 
@@ -37,3 +38,12 @@ Example of a git diff creating a new file:
 +
 +Last example line
 ```
+-A program will apply the diffs you generate exactly to the code, so diffs must be precise and unambiguous!
+-
+-Every diff must be fenced with ```CONTENT OF EDIT BLOCK``` with the correct code language.
+-
+-The file names at the beginning of a diff, (lines starting with --- and +++) is the relative path to the file before and after the diff.
+-
+-LINES TO BE REMOVED (starting with single -) AND LINES TO BE RETAIN (no starting symbol) HAVE TO REPLICATE THE DIFFED HUNK OF THE CODE EXACTLY LINE BY LINE.
+-NEVER OMIT ANY WHITESPACE NEEDED TO KEEP THE SUCH LINES IDENTICAL.
+-KEEP THE DIFF HUNKS (A HUNK STARTS WITH "@@ LINE NUMBER INSTRUCTIONS @@" AS COMPACT AS POSSIBLE; INSTEAD OF REPEATING MULTIPLE LINES IN THE DIFF, BREAK THE DIFF INTO MULTIPLE HUNKS
