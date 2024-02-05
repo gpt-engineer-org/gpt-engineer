@@ -112,27 +112,6 @@ End.
 Conclusion: ***
 """
 
-corrected_diff_from_missing_lines = """--- example.txt
-+++ example.txt
-@@ -12,7 +12,8 @@
-     sample text 1
-     sample text 2
-+    added extra line here
-
- #comment
-
-
--    original text A
-+    updated original text A with changes
-@@ -39,4 +40,5 @@
-         checking status:
--            perform operation X
-+            perform operation X only if specific condition holds
-+                new operation related to condition
-         evaluating next step:
--            execute step Y
-+            revised execution of step Y"""
-
 
 def insert_string_in_lined_string(string, to_insert, line_number):
     split_string = string.split("\n")
@@ -186,6 +165,15 @@ def test_correct_skipped_lines():
     )
     diffs = parse_diffs(example_diff)
     list(diffs.values())[0].validate_and_correct(file_to_lines_dict(distorted_example))
+    with open(
+        os.path.join(
+            THIS_FILE_DIR,
+            "chat_to_files_test_cases",
+            "corrected_diff_from_missing_lines",
+        ),
+        "r",
+    ) as f:
+        corrected_diff_from_missing_lines = f.read()
     assert diffs["example.txt"].diff_to_string() == corrected_diff_from_missing_lines
 
 
@@ -195,12 +183,19 @@ def test_correct_skipped_lines_and_number_correction():
     )
     diffs = parse_diffs(example_line_dist_diff)
     list(diffs.values())[0].validate_and_correct(file_to_lines_dict(distorted_example))
+    with open(
+        os.path.join(
+            THIS_FILE_DIR,
+            "chat_to_files_test_cases",
+            "corrected_diff_from_missing_lines",
+        ),
+        "r",
+    ) as f:
+        corrected_diff_from_missing_lines = f.read()
     assert diffs["example.txt"].diff_to_string() == corrected_diff_from_missing_lines
 
 
 def test_controller_diff():
-    controller_diff = None
-    controller_code = None
     with open(
         os.path.join(THIS_FILE_DIR, "chat_to_files_test_cases", "diff_controller"), "r"
     ) as f:
