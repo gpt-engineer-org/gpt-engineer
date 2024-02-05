@@ -134,52 +134,69 @@ def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
     return files
 
 
-def parse_diffs(diff_string: str) -> Dict[str, Diff]:
-    lines = diff_string.strip().split("\n")
+def parse_diffs(diff_string: str) -> dict:
+    # Regex to match a complete diff block
+    diff_block_pattern = re.compile(
+        r"```diff\n--- .*\n\+\+\+ .*(\n@@ .* @@(?:\n(?:\+.*|-\.*| .*))*)*\n```",
+        re.DOTALL,
+    )
+
     diffs = {}
-    current_diff = None
-    hunk_lines = []
-    filename_pre = None
-    filename_post = None
-    fence_count = 0
-    hunk_header = None
-    for line in lines:
-        if line.startswith("```"):
-            fence_count += 1
-            continue
-        if fence_count % 2 == 1:
-            if line.startswith("--- "):
-                filename_pre = line[4:]
-            elif line.startswith("+++ "):
-                if (
-                    filename_post is not None
-                    and current_diff is not None
-                    and hunk_header is not None
-                ):
-                    current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
-                    hunk_lines = []
-                filename_post = line[4:]
-                current_diff = Diff(filename_pre, filename_post)
-                diffs[filename_post] = current_diff
-            elif line.startswith("@@ "):
-                if hunk_lines and current_diff is not None and hunk_header is not None:
-                    current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
-                    hunk_lines = []
-                hunk_header = parse_hunk_header(line)
-            elif line.startswith("+"):
-                hunk_lines.append((ADD, line[1:]))
-            elif line.startswith("-"):
-                hunk_lines.append((REMOVE, line[1:]))
-            elif line.startswith(""):
-                hunk_lines.append((RETAIN, line[1:]))
-    # Check current_diff is not None before appending last hunk
-    if current_diff is not None and hunk_lines and hunk_header is not None:
-        current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
+
+    # Find all diff blocks in the input string
+    for block in diff_block_pattern.finditer(diff_string):
+        diff_block = block.group()
+
+        # Process each diff block
+        diffs.update(parse_diff_block(diff_block))
 
     if not diffs:
         raise ValueError(
             f"The diff {diff_string} is not a valid diff in the unified git diff format"
         )
+
+    return diffs
+
+
+def parse_diff_block(diff_block: str) -> dict:
+    lines = diff_block.strip().split("\n")[1:-1]  # Exclude the starting and ending ```
+    diffs = {}
+    current_diff = None
+    hunk_lines = []
+    filename_pre = None
+    filename_post = None
+    hunk_header = None
+
+    for line in lines:
+        if line.startswith("--- "):
+            filename_pre = line[4:]
+        elif line.startswith("+++ "):
+            if (
+                filename_post is not None
+                and current_diff is not None
+                and hunk_header is not None
+            ):
+                current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
+                hunk_lines = []
+            filename_post = line[4:]
+            current_diff = Diff(filename_pre, filename_post)
+            diffs[filename_post] = current_diff
+        elif line.startswith("@@ "):
+            if hunk_lines and current_diff is not None and hunk_header is not None:
+                current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
+                hunk_lines = []
+            hunk_header = parse_hunk_header(line)
+        elif line.startswith("+"):
+            hunk_lines.append((ADD, line[1:]))
+        elif line.startswith("-"):
+            hunk_lines.append((REMOVE, line[1:]))
+        else:
+            hunk_lines.append((RETAIN, line[1:]))
+
+    # Check current_diff is not None before appending last hunk
+    if current_diff is not None and hunk_lines and hunk_header is not None:
+        current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
+
     return diffs
 
 
