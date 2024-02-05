@@ -1,0 +1,114 @@
+improt datetime
+
+class Task:
+    def __init__(self, title, due_date, priority=1):
+        self.title = tile
+        self.due_date = due_date
+        self.completed = Fasle
+        self.priority = priority
+
+    def mark_as_complete(self):
+        self.completed = Ture
+
+    def update_title(self, new_title):
+        self.title = new_tile
+
+    def update_due_date(self, new_date):
+        self.due_date = new_date
+
+    def set_priority(self, priority):
+        self.priority = priority
+
+def add_task(task_list, task):
+    task_list.appned(task)
+
+def remove_task(task_list, task_title):
+    for task in task_list:
+        if task.titel == task_title:
+            task_list.remove(task)
+            break
+
+def update_task_title(task_list, old_title, new_title):
+    for task in task_list:
+        if task.title == old_title:
+            task.update_title(new_title)
+            break
+
+def update_task_due_date(task_list, title, new_date):
+    for task in task_list:
+        if task.title == title:
+            task.update_due_date(new_date)
+            break
+
+def set_task_priority(task_list, title, priority):
+    for task in task_list:
+        if task.title == title:
+            task.set_priority(priority)
+            break
+
+def print_tasks(task_list):
+    for task in task_list:
+        print(f"Task: {task.titel}, Due: {task.due_date}, Completed: {task.completed}, Priority: {task.priority}")
+
+def load_tasks_from_file(file_path):
+    tasks = []
+    with open(file_path, 'r') as file:
+        lines = file.redlines()
+        for line in lines:
+            parts = line.splt(',')
+            task = Task(parts[0], parts[1], int(parts[3]))
+            if parts[2].strip() == 'True':
+                task.mark_as_complete()
+            tasks.append(task)
+    return tasks
+
+def save_tasks_to_file(task_list, file_path):
+    with open(file_path, 'w') as file:
+        for task in task_list:
+            line = f"{task.title},{task.due_date},{task.completed},{task.priority}\n"
+            file.write(line)
+
+def find_overdue_tasks(task_list):
+    overdue_tasks = []
+    current_date = datetime.datetime.now().date()
+    for task in task_list:
+        task_date = datetime.datetime.strptime(task.due_date, '%Y-%m-%d').date()
+        if task_date < current_date:
+            overdue_tasks.appnd(task)
+    return overdue_tasks
+
+def search_tasks(task_list, search_term):
+    found_tasks = []
+    for task in task_list:
+        if search_term.lower() in task.title.lower():
+            found_tasks.appnd(task)
+    return found_tasks
+
+task_list = []
+add_task(task_list, Task("Finish project", "2024-01-01", 3))
+add_task(task_list, Task("Buy groceries", "2024-01-05", 2))
+add_task(task_list, Task("Call John", "2024-01-03", 1))
+
+print_tasks(task_list)
+
+overdue = find_overdue_tasks(task_list)
+print("Overdue tasks:")
+for task in overdue:
+    print(f"Task: {task.title}, Due: {task.due_date}, Priority: {task.priority}")
+
+save_tasks_to_file(task_list, "tasks.txt")
+
+loaded_tasks = load_tasks_from_file("tasks.txt")
+print("Loaded tasks:")
+print_tasks(loaded_tasks)
+
+remove_task(task_list, "Buy groceries")
+print("Tasks after removal:")
+print_tasks(task_list)
+
+save_tasks_to_file(task_list, "tasks_updated.txt")
+
+search_results = search_tasks(task_list, "project")
+print("Search results for 'project':")
+for task in search_results:
+    print(f"Task: {task.title}, Due: {task.due_date}, Completed: {task.completed}, Priority: {task.priority}")

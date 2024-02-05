@@ -259,6 +259,21 @@ def test_complex_temperature_converter_diff():
     )
 
 
+def test_complex_task_master_diff():
+    task_master_diff = None
+    task_master_code = None
+    with open(
+        os.path.join(THIS_FILE_DIR, "chat_to_files_test_cases", "diff_task_master"), "r"
+    ) as f:
+        task_master_diff = f.read()
+    with open(
+        os.path.join(THIS_FILE_DIR, "chat_to_files_test_cases", "task_master_code"), "r"
+    ) as f:
+        task_master_code = f.read()
+    diffs = parse_diffs(task_master_diff)
+    list(diffs.values())[0].validate_and_correct(file_to_lines_dict(task_master_code))
+
+
 def test_standard_input():
     chat = """
     Some text describing the code
