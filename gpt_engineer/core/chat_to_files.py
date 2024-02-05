@@ -137,12 +137,13 @@ def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
 def parse_diffs(diff_string: str) -> dict:
     # Regex to match a complete diff block
     diff_block_pattern = re.compile(
-        r"```diff\n--- .*\n\+\+\+ .*(\n@@ .* @@(?:\n(?:\+.*|-\.*| .*))*)*\n```",
-        re.DOTALL,
+        r"```diff\n--- .*?\n\+\+\+ .*?\n(?:@@ .*? @@\n(?:[-+ ].*?\n)*?)*?```", re.DOTALL
     )
 
     diffs = {}
-
+    matches1 = diff_block_pattern.findall(diff_string)
+    # Check if two separate diffs are matched
+    print("Number of matches in test string 1:", len(matches1))
     # Find all diff blocks in the input string
     for block in diff_block_pattern.finditer(diff_string):
         diff_block = block.group()
@@ -190,7 +191,7 @@ def parse_diff_block(diff_block: str) -> dict:
             hunk_lines.append((ADD, line[1:]))
         elif line.startswith("-"):
             hunk_lines.append((REMOVE, line[1:]))
-        else:
+        elif line.startswith(""):
             hunk_lines.append((RETAIN, line[1:]))
 
     # Check current_diff is not None before appending last hunk
