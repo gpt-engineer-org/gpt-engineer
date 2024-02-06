@@ -84,6 +84,11 @@ class Hunk:
             sum_of_matches = sum(pot_start_lines.values())
             if sum_of_matches == 0:
                 # ToDo handle this case constructively
+                # before we go any further, we should remove the comment from LLM
+                if self.lines[0][1].count("#") > 0:
+                    self.pop_line(self.lines[0], 0)
+                    return self.validate_and_correct(lines_dict, forward_block_len)
+
                 raise ValueError(
                     f"The starting line of the diff {self.hunk_to_string()} does not exist in the code"
                 )
@@ -116,6 +121,11 @@ class Hunk:
                 #     self.lines[hunk_ind][1],
                 #     {key: val for key, val in lines_dict.items() if key > file_ind},
                 # ):
+                # before we go any further, we should remove the comment from LLM
+                if self.lines[hunk_ind][1].count("#") > 0:
+                    self.pop_line(self.lines[hunk_ind], hunk_ind)
+                    continue
+
                 # make a forward block from the code for comparisons
                 forward_code = "\n".join(
                     [
