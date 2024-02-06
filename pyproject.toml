@@ -56,14 +56,6 @@ sphinx-copybutton = ">=0.5.1"
 markdown-include = ">=0.6.0"
 sphinx_copybutton = ">=0.5.2"
 
-[tool.poetry.group.experimental]
-optional = true
-
-[tool.poetry.group.experimental.dependencies]
-llama-index = ">=0.8"
-rank-bm25 = ">=0.2.2"
-tree_sitter_languages = ">=1.8.0"
-
 [tool.poetry.scripts]
 gpt-engineer = 'gpt_engineer.applications.cli.main:app'
 ge = 'gpt_engineer.applications.cli.main:app'
@@ -74,7 +66,6 @@ gpte_test_application = 'tests.caching_main:app'
 [tool.poetry.extras]
 test = ["pytest", "pytest-cov"]
 doc = ["autodoc_pydantic", "myst_parser", "nbsphinx", "sphinx", "sphinx-autobuild", "sphinx_book_theme", "sphinx_rtd_theme", "sphinx-typlog-theme", "myst-nb", "linkchecker", "sphinx-copybutton", "markdown-include", "sphinx_copybutton"]
-experimental = ["llama-index", "rank-bm25", "tree_sitter_languages"]
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
