@@ -85,7 +85,7 @@ autodoc_pydantic_field_signature_prefix = "param"
 autodoc_member_order = "groupwise"
 autoclass_content = "both"
 autodoc_typehints_format = "short"
-autodoc_mock_imports = ["tree_sitter_languages", "llama-index"]
+autodoc_mock_imports = ["tree_sitter_languages", "llama_index"]
 
 autodoc_default_options = {
     "members": True,
