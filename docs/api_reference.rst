@@ -126,17 +126,6 @@ Functions
     :no-members:
     :no-inherited-members:
 
-Classes
---------------
-.. currentmodule:: gpt_engineer
-
-.. autosummary::
-    :toctree: tools
-    :template: class.rst
-
-    tools.experimental.document_chunker.CodeSplitter
-    tools.experimental.document_chunker.SortedDocuments
-
 Functions
 --------------
 .. currentmodule:: gpt_engineer
@@ -148,4 +137,3 @@ Functions
     tools.custom_steps.get_platform_info
     tools.custom_steps.lite_gen
     tools.custom_steps.self_heal
-    tools.experimental.experimental_steps.improve_automatic_file_selection
