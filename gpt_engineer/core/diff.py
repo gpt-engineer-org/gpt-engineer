@@ -82,7 +82,6 @@ class Hunk:
         if not start_true:
             # now find the true starting line compare to all lines and see how many matches we get
             # ToDo handle the case where the start line is 0 or 1 characters separately
-            # ToDo handle the case where the start line is an add (and shouldn't exist in the orig file)
             # handle the case where the start line is an add
             if self.lines[0][0] == ADD:
                 start_line = None
@@ -110,7 +109,6 @@ class Hunk:
             }
             sum_of_matches = sum(pot_start_lines.values())
             if sum_of_matches == 0:
-                # ToDo handle this case constructively
                 # before we go any further, we should check if it's a comment from LLM
                 if self.lines[0][1].count("#") > 0:
                     # if it is, we can mark it as a ADD lines
