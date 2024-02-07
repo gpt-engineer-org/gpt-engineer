@@ -33,6 +33,12 @@ class Hunk:
         self.lines.insert(index, (RETAIN, line))
         self.category_counts[RETAIN] += 1
 
+    def relabel_line(self, index, new_label):
+        old_label = self.lines[index][0]
+        self.lines[index] = (new_label, self.lines[index][1])
+        self.category_counts[old_label] -= 1
+        self.category_counts[new_label] += 1
+
     def pop_line(self, line, index):
         self.lines.pop(index)
         assert self.category_counts[line[0]] > 0
@@ -77,6 +83,27 @@ class Hunk:
             # now find the true starting line compare to all lines and see how many matches we get
             # ToDo handle the case where the start line is 0 or 1 characters separately
             # ToDo handle the case where the start line is an add (and shouldn't exist in the orig file)
+            # handle the case where the start line is an add
+            if self.lines[0][0] == ADD:
+                start_line = None
+                # find the first line that is not an add
+                for index, line in enumerate(self.lines):
+                    if line[0] != ADD:
+                        for line_number, line_content in lines_dict.items():
+                            if is_similar(line[1], line_content) and line[1] != "":
+                                start_line = line_number - 1
+                                break
+                        # if the start line is not found, this should be a comment from LLM
+                        if start_line is None:
+                            self.relabel_line(index, ADD)
+                            continue
+                        else:
+                            self.start_line_pre_edit = start_line
+                            self.add_retained_line(lines_dict[start_line], 0)
+                            return self.validate_and_correct(
+                                lines_dict, forward_block_len
+                            )
+
             pot_start_lines = {
                 key: is_similar(self.lines[0][1], line)
                 for key, line in lines_dict.items()
@@ -84,9 +111,11 @@ class Hunk:
             sum_of_matches = sum(pot_start_lines.values())
             if sum_of_matches == 0:
                 # ToDo handle this case constructively
-                # before we go any further, we should remove the comment from LLM
+                # before we go any further, we should check if it's a comment from LLM
                 if self.lines[0][1].count("#") > 0:
-                    self.pop_line(self.lines[0], 0)
+                    # if it is, we can mark it as a ADD lines
+                    self.relabel_line(0, ADD)
+                    # and restart the validation at the next line
                     return self.validate_and_correct(lines_dict, forward_block_len)
 
                 raise ValueError(
@@ -121,9 +150,9 @@ class Hunk:
                 #     self.lines[hunk_ind][1],
                 #     {key: val for key, val in lines_dict.items() if key > file_ind},
                 # ):
-                # before we go any further, we should remove the comment from LLM
+                # before we go any further, we should relabel the comment from LLM
                 if self.lines[hunk_ind][1].count("#") > 0:
-                    self.pop_line(self.lines[hunk_ind], hunk_ind)
+                    self.relabel_line(hunk_ind, ADD)
                     continue
 
                 # make a forward block from the code for comparisons
