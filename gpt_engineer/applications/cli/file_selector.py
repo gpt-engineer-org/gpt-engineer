@@ -18,9 +18,9 @@ file handling and persistence.
 
 """
 
+import fnmatch
 import os
 import subprocess
-import fnmatch
 
 from pathlib import Path
 from typing import Any, Dict, List, Union

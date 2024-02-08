@@ -42,14 +42,14 @@ from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.core.default.steps import execute_entrypoint, gen_code, improve
-from gpt_engineer.core.preprompts_holder import PrepromptsHolder
-from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
 from gpt_engineer.core.git import (
+    has_uncommitted_changes,
+    init_git_repo,
     is_git_installed,
     is_git_repo,
-    init_git_repo,
-    has_uncommitted_changes,
 )
+from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
 
 app = typer.Typer()  # creates a CLI app
 
