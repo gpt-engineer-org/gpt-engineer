@@ -20,6 +20,7 @@ file handling and persistence.
 
 import os
 import subprocess
+import fnmatch
 
 from pathlib import Path
 from typing import Any, Dict, List, Union
@@ -29,6 +30,7 @@ import toml
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import metadata_path
 from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.git import get_gitignore_rules
 
 
 class FileSelector:
@@ -234,23 +236,38 @@ class FileSelector:
 
         return existing_files
 
+    def should_filter_file(self, file_path: Path, filters: List[str]) -> bool:
+        """
+        Determines if a file should be ignored based on .gitignore rules.
+        """
+        for f in filters:
+            if fnmatch.fnmatchcase(str(file_path), f):
+                return True
+        return False
+
     def get_current_files(self, project_path: Union[str, Path]) -> list[str]:
         """
-        Generates a dictionary of all files in the project directory
-        with their selection status set to False by default.
+        Generates a dictionary of all files in the project directory with their
+        selection status set to False by default. Hides files based on
+        .gitignore rules.
         """
         all_files = []
         project_path = Path(
             project_path
         ).resolve()  # Ensure path is absolute and resolved
 
-        for path in project_path.glob("**/*"):  # Recursively list all files
+        file_list = project_path.glob("**/*")
+        gitignore_rules = get_gitignore_rules(project_path)
+
+        for path in file_list:  # Recursively list all files
             if path.is_file():
                 relpath = path.relative_to(project_path)
+                if self.should_filter_file(relpath, gitignore_rules):
+                    continue
 
                 parts = relpath.parts
                 if any(part.startswith(".") for part in parts):
-                    continue  # Skip hidden fileso
+                    continue  # Skip hidden files
                 if any(part in self.IGNORE_FOLDERS for part in parts):
                     continue
 
