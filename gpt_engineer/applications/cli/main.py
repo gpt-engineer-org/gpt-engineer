@@ -44,7 +44,12 @@ from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.core.default.steps import execute_entrypoint, gen_code, improve
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
-from gpt_engineer.core.git import is_git_installed, is_git_repo, init_git_repo, has_uncommitted_changes
+from gpt_engineer.core.git import (
+    is_git_installed,
+    is_git_repo,
+    init_git_repo,
+    has_uncommitted_changes,
+)
 
 app = typer.Typer()  # creates a CLI app
 
@@ -158,15 +163,21 @@ def main(
     # Check if there's a git repo and verify that there aren't any uncommitted changes
     if is_git_installed():
         if not is_git_repo(path) and not improve_mode:
-            repo_created = input(
-                "The path does not contain a git repository. Do you want to initialize one? (y/N) "
-            ).lower() == "y"
+            repo_created = (
+                input(
+                    "The path does not contain a git repository. Do you want to initialize one? (y/N) "
+                ).lower()
+                == "y"
+            )
             if repo_created:
                 init_git_repo(path)
         if is_git_repo(path) and has_uncommitted_changes(path):
-            continue_despite_uncommitted_changes = input(
-                "Your project has uncommitted changes. Are you sure you want to continue? (y/N) "
-            ).lower() == "y"
+            continue_despite_uncommitted_changes = (
+                input(
+                    "Your project has uncommitted changes. Are you sure you want to continue? (y/N) "
+                ).lower()
+                == "y"
+            )
             if not continue_despite_uncommitted_changes:
                 return
 
