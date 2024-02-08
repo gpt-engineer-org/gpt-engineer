@@ -1,0 +1,640 @@
+﻿using namespace System.Collections.Generic
+
+
+param(
+    [string]$CsvPath = "C:\Powershell\Files\tests2.csv",
+    [switch]$VerboseMode
+)
+# Start the stopwatch to measure the duration of the script execution
+
+$stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+
+
+#----------------------------------------------------------------[DCs]---------------------------------------------------------------
+$myList = [List[string]]@('lsdc3.contoso.com','rrdc3.contoso.com','contdc1.contoso.com','osodc1.contoso.com','updc1.contoso.com')
+#-----------------------------------------------------------[Declarations]-----------------------------------------------------------
+
+<#
+
+.DESCRIPTION
+The script reads a CSV file containing VM specifications, sorts the entries by car, and then clones VMs based on the provided templates. It handles different accounts and domains, sets up credentials, and configures network settings for each VM.
+
+.PARAMETER CsvPath
+The path to the CSV file containing the VM specifications.
+
+.EXAMPLE
+PS> .\New-VMClone2.ps1 -CsvPath "C:\Powershell\Files\server_creation_rev5.csv"
+
+.NOTES
+Author: mike wheat
+Date: 01/23/2024
+#>
+
+# Import VM List from the specified CSV file
+try {
+    $vmList = Import-Csv -Path $CsvPath -ErrorAction Stop
+    Write-Verbose "CSV file imported successfully." -Verbose:$VerboseMode
+} catch {
+    Write-Host "Error importing CSV: $($_.Exception.Message)" -ForegroundColor Red
+    exit
+}
+
+$sort_list = $vmList | Sort-Object -Property Railroad
+
+# Initialize server lists for different cars as ArrayLists and ensure they are not null before use
+$lsServers = New-Object System.Collections.ArrayList
+$nsServers = New-Object System.Collections.ArrayList
+$contServers = New-Object System.Collections.ArrayList
+$osoServers = New-Object System.Collections.ArrayList
+$cnServers = New-Object System.Collections.ArrayList
+$uptestServers = New-Object System.Collections.ArrayList
+$upprodServers = New-Object System.Collections.ArrayList
+$server_lists = New-Object System.Collections.ArrayList
+
+# Function to safely add servers to the server lists
+function Safe-AddToList($list, $item) {
+    if ($null -ne $list -and $null -ne $item) {
+        $list.Add($item) | Out-Null
+    }
+}
+
+#Write-Host $server_lists.Add($sort_list)
+#Write-Host $server_lists
+
+
+# $server_list.Add(1)
+
+$prefix = "T-"
+
+#Ubuntu Template Variables
+$template_name = "x.Ubuntu22Template_replica"
+$template_name_ls = "x.Ubuntu22Template"
+$template_ip = "10.2.82.254"
+$template_vlan = "VM Network 82"
+
+#-----------------------------------------------------------[Functions]------------------------------------------------------------
+function Make-VCCreds([string]$domain)
+{
+    #Creates a vCenter credential variable based on the domain
+    if ($domain -like "CTN")
+    {
+        $User = "contoso\VMPowerUser" #VMPowerUser //CTNPowershell
+    }
+    elseif ($domain -like "NS" -or $domain -like "RR")
+    {
+        $User = "contoso\VMPowerUser" #VMPowerUser //CTNPowershell
+    }
+    elseif ($domain -like "CTNBNF")
+    {
+        $User = "contoso\VMPowerUser" #VMPowerUser //CTNPowershell
+    }
+    elseif ($domain -like "CTNCX")
+    {
+        $User = "contoso\VMPowerUser" #VMPowerUser //CTNPowershell
+    }
+    elseif ($domain -like "CTNUP")
+    {
+        $User = "contoso\VMPowerUser" #VMPowerUser //CTNPowershell
+    }
+    elseif ($domain -like "CTNC")
+    {
+        $User = "LSTPU\VMPowerUser" #VMPowerUser //CTNPowershell
+    }
+    else
+    {
+        $User = "contoso\VMPowerUser" #VMPowerUser /$domain/CTNPowershell
+    }
+
+    $password = get-content C:\Powershell\Key23\cred_Administrator.txt | ConvertTo-SecureString
+    $vc_creds = New-Object System.Management.Automation.PSCredential ($User, $Password)
+
+    #$CredentialCTN = New-Object System.Management.Automation.PSCredential ($User, $Password)
+    #$vc_creds = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $User, (Get-Content $Password | ConvertTo-SecureString -Key $key)
+    #Write-Host $vc_creds
+    return $vc_creds
+
+}
+
+function Make-SSHCreds()
+{
+    #Creates SSH credential for the linuxsupport account
+    $User = "linuxsupport"
+    $PasswordFile = "C:\Pow\Credentials\support.txt"
+    $KeyFile = "C:\Pow\Credentials\support.key"
+    $key = Get-Content $KeyFile
+    $ssh_creds = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $User, (Get-Content $PasswordFile | ConvertTo-SecureString -Key $key)
+    return $ssh_creds
+}
+
+#-----------------------------------------------------------[Execution]------------------------------------------------------------
+
+#Make Creds to be used to SSH into created servers
+$ssh_creds = Make-SSHCreds
+
+# Initialize the server lists before the foreach loop
+# Initialize the server lists as generic lists before the foreach loop
+$ls_servers = New-Object System.Collections.Generic.List[object]
+$ns_servers = New-Object System.Collections.Generic.List[object]
+$cont_servers = New-Object System.Collections.Generic.List[object]
+$oso_servers = New-Object System.Collections.Generic.List[object]
+$cn_servers = New-Object System.Collections.Generic.List[object]
+$upprod_servers = New-Object System.Collections.Generic.List[object]
+$uptest_servers = New-Object System.Collections.Generic.List[object]
+
+foreach ($row in $sort_list) {
+    if ($row.Railroad.ToLower() -eq "ls") {
+        $ls_servers.Add($row)
+    }
+    if ($row.Railroad.ToLower() -eq "ns" -or $row.Railroad.ToLower() -eq "rr") {
+        $ns_servers.Add($row)
+    }
+    if ($row.Railroad.ToLower() -eq "cont") {
+        $cont_servers.Add($row)
+    }
+    if ($row.Railroad.ToLower() -eq "oso") {
+        $oso_servers.Add($row)
+    }
+    if ($row.Railroad.ToLower() -eq "cn") {
+        $cn_servers.Add($row)
+    }
+    if ($row.Railroad.ToLower() -eq "up") {
+        if ($row.Name -like "up*p*") {
+            $upprod_servers.Add($row)
+        }
+        if ($row.Name -like "up*Test*") {
+            $uptest_servers.Add($row)
+        }
+    }
+}
+
+
+if ($ls_servers -and $ls_servers.Count -gt 0)
+{
+    $server_lists.Add($ls_servers)
+    Write-Verbose "Added CTN servers to server list." -Verbose:$VerboseMode
+}
+# Replace direct indexing checks with null and count checks
+if ($null -ne $ns_servers -and $ns_servers.Count -gt 0)
+{
+    $server_lists.Add($ns_servers)
+}
+if ($null -ne $cont_servers -and $cont_servers.Count -gt 0)
+{
+    $server_lists.Add($cont_servers)
+}
+if ($null -ne $oso_servers -and $oso_servers.Count -gt 0)
+{
+    $server_lists.Add($oso_servers)
+}
+if ($null -ne $cn_servers -and $cn_servers.Count -gt 0)
+{
+    $server_lists.Add($cn_servers)
+}
+if ($null -ne $upprod_servers -and $upprod_servers.Count -gt 0)
+{
+    $server_lists.Add($upprod_servers)
+}
+if ($null -ne $uptest_servers -and $uptest_servers.Count -gt 0)
+{
+    $server_lists.Add($uptest_servers)
+}
+# Ensure that the server_lists array is not null or empty before iterating
+if ($server_lists -and $server_lists.Count -gt 0) {
+    # ... (rest of the code inside the if block)
+    # The closing brace for the if block was missing. It has been added below.
+}
+    foreach ($server_list in $server_lists)
+{
+
+    #Clear out variables each loop
+    $servers = $null
+    $car = $null
+    $cred_domain = $null
+    $vcenter = $null
+
+    #Check to make sure the lists have servers in it and only run logic if there are servers to be created
+    ### CTN ###
+    if ((Compare-Object -ReferenceObject $server_list -DifferenceObject $ls_servers -Property Name) -eq $null)
+    {
+        $servers = $ls_servers
+        $car = "ls"
+        $cred_domain = "ls"
+        $vcenter = "ls-vcenter.contoso.com"
+    }
+    ### NS ###
+    if ((Compare-Object -ReferenceObject $server_list -DifferenceObject $ns_servers -Property Name) -eq $null)
+    {
+        $servers = $ns_servers
+        $car = "rr"
+        $cred_domain = "NS"
+        $vcenter = "nso-vcenter.contoso.com"
+    }
+    ### BN ###
+    if ((Compare-Object -ReferenceObject $server_list -DifferenceObject $cont_servers -Property Name) -eq $null)
+    {
+        $servers = $cont_servers
+        $car = "BN"
+        $cred_domain = "CTNBN"
+        $vcenter = "cont-vcenter.contoso.com"
+    }
+    ### CSX ###
+    if ((Compare-Object -ReferenceObject $server_list -DifferenceObject $oso_servers -Property Name) -eq $null)
+    {
+        $servers = $oso_servers
+        $car = "CS"
+        $cred_domain = "CTNCS"
+        $vcenter = "oso-vcenter.contoso.com"
+    }
+    ### CN ###
+    if ((Compare-Object -ReferenceObject $server_list -DifferenceObject $cn_servers -Property Name) -eq $null)
+    {
+        # The CN car section is commented out
+        # $servers = $cn_servers
+        # $car = "CN"
+        # $cred_domain = "CTNCN"
+        # $vcenter = "cn-vcenter.lscn.com"
+        #below is the test vcenter for now.
+	# $vcenter = "vcenter1test.contoso.com"
+    }
+    ### UP PROD ###
+    if ((Compare-Object -ReferenceObject $server_list -DifferenceObject $upprod_servers -Property Name) -eq $null)
+    {
+        $servers = $upprod_servers
+        $car = "up"
+        $cred_domain = "CTNUP"
+        $vcenter = "up-vcenter.contoso.com"
+    }
+    ### UP TEST ###
+    if ((Compare-Object -ReferenceObject $server_list -DifferenceObject $uptest_servers -Property Name) -eq $null)
+    {
+        $servers = $uptest_servers
+        $car = "UP"
+        $cred_domain = "CTNUP"
+        $vcenter = "up-vcenter.contoso.com"
+        # $vcenter = "up-vcenter1test.contoso.com"
+    }
+    #Use the Above function to create creds for the domain Powershell account
+    # Use the Make-VCCreds function to create credentials and handle potential errors
+try {
+    $vc_creds = Make-VCCreds -domain $cred_domain
+} catch {
+    Write-Host "Failed to create vCenter credentials for domain $cred_domain. Error: $($_.Exception.Message)" -ForegroundColor Red
+    continue
+}
+
+   if ($null -ne $vcenter) {
+    # Ensure Session Is Clear
+    Write-Verbose "Disconnecting from vCenter: $vcenter" -Verbose:$VerboseMode
+    write-host "There is an error coming, don't worry it's a normal error. Just clearing the session"
+
+    try {
+        Disconnect-VIServer $vcenter -Confirm:$false -ErrorAction Stop
+    } catch {
+        # Handle the error here, if needed
+        Write-Verbose "Error disconnecting from vCenter: $_" -Verbose:$VerboseMode
+    }
+
+    # Connect New Session
+    Write-Host 'Attempting to connect to ' $vcenter
+    try {
+        Write-Verbose "Attempting to connect to vCenter: $vcenter" -Verbose:$VerboseMode
+        Connect-VIServer $vcenter -Credential $vc_creds -ErrorAction Stop -Verbose
+    } catch {
+        Write-Host "`nFailed to connect to" $vcenter ". Please re-attempt."
+        break
+    }
+}
+
+    #Uses the server lists to pull all the VMs to be created
+    foreach ($server in $servers)
+    {
+
+        $vm_name = $server.name
+        # Updated VM renaming logic to apply prefixes correctly based on environment and client
+        if ($server.Railroad -eq "ls" -and $server.Name -notlike "*Test*" -and $server.Name -notlike "*T") {
+            $vm_name = "P-" + $server.Name
+        } elseif ($server.Name -like "*Test*" -or $server.Name -like "*T") {
+            $vm_name = "T-" + $server.Name
+        } else {
+            $vm_name = $server.Name
+        }
+
+        $server_name = $server.name
+        $server_ip = $server.ip
+        $server_car = $server.car
+        $server_domain = $server.domain
+        $server_name_lower = $server_name.ToLower() #To Lower Case: https://devblogs.microsoft.com/scripting/powertip-convert-all-uppercase-string-to-lowercase/
+
+        #This verifies no VM with the same name exists
+        $duplicate = Get-VM -Name $vm_name -ErrorAction Ignore
+        # Corrected indentation and removed unnecessary comments
+        if ($duplicate) {
+            Write-Host "VM with name $vm_name already exists."
+            continue
+        }
+
+        #Gather Required Data to create the VM and distribute it to appropriate resources
+        $vmhosts = Get-VMHost
+        #Write-Host $vmhosts
+        $vmhost = $vmhosts | Get-Random
+        #$vmhost = Get-VMHost -Name "DOMAINvm1p"
+        $stringBufferDSProd="-Datastore"
+
+        #Verifies that the naming convention is correct and chooses proper datastores
+        if ($vm_name -like "T-*" -or $vm_name -like "*-Test") {
+    $datastores = Get-Datastore | Where-Object {
+        ($_.name -like "*DatastoreTest0*") -and ($_.name -notlike "*DB*")
+    }
+}
+	elseif ($vm_name -like "P-*" -and $vm_name -notlike "*DB*" -and $vm_name -notlike "*db*")
+        {
+            $datastores = Get-Datastore | Where-Object {($_.name.ToLower() -like ("$car$stringBufferDSProd*").ToLower()) -and ($_.name -notlike "*Test*") -and ($_.name -notlike "*DB*") -and ($_.name -notlike "*vLabDatastore*")}
+        }
+        elseif ($vm_name -like "*db*" -or $vm_name -like "*DB*") {
+		$datastores = Get-Datastore | Where-Object { $_.name.ToLower() -like "*db*" }
+          }
+	 else
+        {
+           Write-Host "Incorrect VM Naming Convention. VM Name should be similar to the form: T-BNApps103Test or BNApps103P"
+           $datastores = Get-Datastore | Get-Random
+           }
+        $datastoreSorted = $datastores | Sort-Object -Property FreeSpaceGB -Descending
+        # Assuming $datastores contains the list of datastore objects sorted by available space
+        # $vm_name contains the name of the VM to be created
+
+
+foreach ($ds in $datastoreSorted) {
+    # Determine the type of server (Test or Production)
+    $isTestServer = $vm_name -like "*Test"
+    $isProdServer = $vm_name -like "P-*" -or $vm_name -like "*-P"
+
+    # Extract the base name for comparison (excluding the ending pattern)
+    $baseName = if ($isTestServer) { $vm_name -replace "-Test$" }
+                elseif ($isProdServer) { $vm_name -replace "^(P-)|(-P)$"}
+
+    # Check for existing VMs with a similar base name on the current datastore
+    $existingVMs = Get-VM | Where-Object {
+        $_.Datastore -eq $ds.Name -and
+        $_.Name -like "$baseName*" -and
+        ($isTestServer -or $_.Name -notlike "*Test")
+    }
+
+    # If there are no existing VMs with the similar base name, select this datastore
+    if ($existingVMs.Count -eq 0) {
+        $datastore = $ds
+        Write-Host "Selected datastore: $($datastore.Name) with available space: $($datastore.FreeSpaceGB) GB"
+        break
+    }
+}
+
+# Output the selected datastore
+if ($datastore) {
+    Write-Host "Using datastore: $($datastore.Name)"
+} else {
+    Write-Host "No suitable datastore found."
+}
+
+
+	#Choose the proper VM to clone
+        if($car -like "ls")
+        {
+            $template = Get-VM -Name "$template_name_ls"
+        }
+        else
+        {
+        $template = Get-VM -Name "$template_name"
+        }
+
+        $diskformat = "Thin"
+        Sleep 10
+        #Create a clone of the Ubuntu20 Template machine, with thin provisioned storage
+        Write-Host "VCenter: "$vcenter "VMName: "$vm_name "Template: "$template "VMHosts: "$vmhosts "VMHost: "$vmhost "Datastore: "$datastore "Datastores: "$datastores $diskformat
+        Write-Verbose "Creating new VM: $vm_name on host: $vmhost" -Verbose:$VerboseMode
+        New-VM -Name $vm_name -VM $template -VMHost $vmhost -Datastore $datastore -DiskStorageFormat $diskformat -Confirm:$False -verbose
+        SLeep 10
+        #Wait 10 seconds and then attach the network and power on the VM
+        Sleep 10
+        $vm = Get-VM $vm_name
+        #Write-Host $vm
+        if($vm)
+        {
+            #Grab the second the third octet and check the hosts for a VLAN with that ID
+            $vlan_id = $server_ip.Split('.')[-2]
+            $server_vlan = Get-VDPortGroup | Where {$_.Name -contains "*$vlan_id"} -ErrorAction Continue
+            # Corrected the logic for VLAN assignment and improved readability
+            if ($server_vlan) {
+                # Connect the NIC to the VM with the correct VLAN
+                $vm | Get-NetworkAdapter | Set-NetworkAdapter -PortGroup $server_vlan -Confirm:$false -Verbose
+                $vm | Get-NetworkAdapter | Set-NetworkAdapter -Type Vmxnet3 -StartConnected $true -Confirm:$false -Verbose
+            } elseif (($server_vlan -eq $null) -and ($server.car -like $server.domain)) {
+                $server_vlan = Get-VirtualNetwork | Where-Object { $_.Name -like "*$vlan_id" }
+                $vm | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $server_vlan -Type Vmxnet3 -StartConnected $true -Confirm:$false -Verbose
+            } else {
+                Write-Host "This network $vlan_id does not exist on this vCenter $vcenter"
+                break
+            }
+
+            #Turn on VM and wait for VMTools to respond
+            Start-VM -VM $vm
+
+            # Minimum
+            # Sleep 150 -- optional: true was added to /etc/netplan/00-* to resolve this
+            sleep 150
+
+            #Script to run locally against VM
+            $provision_script = "sudo ls-provision-auto $server_name_lower $server_ip $server_car"
+            $provision_script_sssd = "sudo ls-sssd $server_name_lower $server_ip $server_car"
+            Invoke-VMScript -VM $vm -GuestCredential $ssh_creds -ScriptType bash -ScriptText $provision_script -Confirm:$False -Verbose
+
+            # Adjust Per VM Template (Don't Go Below 30)
+            sleep 120
+
+            #Restart VM after script runs
+            Restart-VM $vm -Confirm:$False
+
+            ###IF DC's Change - You Will Need To WinRM Accept Them###
+            if($server_domain -like "ls")
+            {
+                $Zone = "contoso.com"
+            }
+            elseif($server_domain -like "rr")
+            {
+                $Zone = "contoso.com"
+            }
+            elseif($server_domain -like "oso")
+            {
+                $Zone = "contoso.com"
+            }
+            elseif($server_domain -like "cont")
+            {
+                $Zone = "contoso.com"
+            }
+            elseif($server_domain -like "up")
+            {
+                $Zone = "contoso.com"
+            }
+            else
+            {
+                $Zone = "$server_domain.com"
+            }
+
+            $firstoctet = $server_ip.Split(".")[2]
+            $secondoctet = $server_ip.Split(".")[1]
+            $thirdoctet = $server_ip.Split(".")[0]
+
+            $serverIpReverse = $firstoctet + '.' + $secondoctet + '.' + $thirdoctet + '.' + "in-addr.arpa"
+
+
+            Write-Host $serverIpReverse
+            Write-Host $server_name_lower'.'$server_domain
+
+            $sb = {
+                param($Zone,$server_name_lower,$server_ip,$serverIpReverse,$server_domain)
+
+                $test = Get-DNSServerResourceRecord -RRType A -ZoneName $Zone -Name $server_name_lower
+                if($test -ne $null)
+                {
+                    Return "Found DNS Record for $server_name_lower"
+                }
+                elseif($null -eq $test)
+                {
+                    Add-DnsServerResourceRecordA -name $server_name_lower -ZoneName $Zone -AllowUpdateAny -IPv4Address $server_ip -TimeToLive 01:00:00
+                    #Add-DnsServerResourceRecordPtr -Name $server_ip -ZoneName $serverIpReverse -AllowUpdateAny -TimeToLive 01:00:00 -AgeRecord -PtrDomainName $server_name_lower'.'$Zone
+                    Return "Created DNS Record for $server_name_lower"
+                    #Return "Created R-DNS Record for $server_name_lower"
+                }
+                else
+                {
+                    Return "An error occurred when creating the DNS entry."
+                }
+            }
+
+            # Improved the selection of the domain controller and removed unnecessary comments
+            # Modify for all DCs
+            $domainController = $myList | Where-Object { $_ -match $car }
+            $forwardZoneName = $Zone
+            # Corrected the script block for reverse DNS record creation and improved readability
+            $rSb = {
+                param($domainController, $forwardZoneName, $server_name_lower)
+
+                $records = Get-DnsServerResourceRecord -ZoneName $forwardZoneName -RRType A -Name $server_name_lower
+                foreach ($record in $records) {
+                    # The reverse lookup domain name. This is the PTR Response.
+                    $ptrDomain = $record.HostName + '.' + $forwardZoneName
+
+                    # Grab the last octet of the IP address for the record being processed.
+                    $name = ($record.RecordData.IPv4Address.ToString() -replace '^(\d+)\.(\d+)\.(\d+).(\d+)$', '$4')
+
+                    # Reverse the IP Address for the Zone Name. Leave off the last octet to place in proper /24 subnet.
+                    $rzname = ($record.RecordData.IPv4Address.ToString() -replace '^(\d+)\.(\d+)\.(\d+).(\d+)$', '$3.$2.$1') + '.in-addr.arpa'
+                    Write-Host $ptrDomain $name $rzname
+                    # Add the new PTR record.
+                    Add-DnsServerResourceRecordPtr -Name $name -ZoneName $rzname -ComputerName $domainController -PtrDomainName $ptrDomain
+                }
+            }
+
+            if (($server_domain -like "CTN" -or $server_domain -like "contoso"))
+            {
+                $session = New-PSSession -ComputerName "CTNDC3.contoso.com" -Credential $vc_creds
+                Write-Verbose "Creating DNS A record for: $server_name_lower" -Verbose:$VerboseMode
+                Invoke-Command -Session $session -ScriptBlock $sb -ArgumentList $Zone,$server_name_lower,$server_ip,$serverIpReverse,$server_domain
+                Write-Verbose "DNS A record created successfully." -Verbose:$VerboseMode
+                Sleep 45
+                Write-Verbose "Creating DNS PTR record for: $server_name_lower" -Verbose:$VerboseMode
+                Invoke-Command -Session $session -ScriptBlock $rSb -ArgumentList $domainController,$forwardZoneName,$server_name_lower
+                Write-Verbose "DNS PTR record created successfully." -Verbose:$VerboseMode
+                Remove-PSSession $session
+            }
+            elseif($server_domain -like "RR" -or $server_domain -like "railrug")
+            {
+                $session = New-PSSession -ComputerName "RRDC3.contoso.com" -Credential $vc_creds
+                Write-Verbose "Creating DNS A record for: $server_name_lower" -Verbose:$VerboseMode
+                Invoke-Command -Session $session -ScriptBlock $sb -ArgumentList $Zone,$server_name_lower,$server_ip,$serverIpReverse,$server_domain
+                Write-Verbose "DNS A record created successfully." -Verbose:$VerboseMode
+                Sleep 45
+                Write-Verbose "Creating DNS PTR record for: $server_name_lower" -Verbose:$VerboseMode
+                Invoke-Command -Session $session -ScriptBlock $rSb -ArgumentList $domainController,$forwardZoneName,$server_name_lower
+                Write-Verbose "DNS PTR record created successfully." -Verbose:$VerboseMode
+                Remove-PSSession $session
+            }
+            elseif($server_domain -like "DMZ" -or $server_domain -like "lsdmz")
+            {
+                $session = New-PSSession -ComputerName "CTNDMZDC3.lsdmz.com" -Credential $vc_creds
+                Write-Verbose "Creating DNS A record for: $server_name_lower" -Verbose:$VerboseMode
+                Invoke-Command -Session $session -ScriptBlock $sb -ArgumentList $Zone,$server_name_lower,$server_ip,$serverIpReverse,$server_domain
+                Write-Verbose "DNS A record created successfully." -Verbose:$VerboseMode
+                Sleep 45
+                Write-Verbose "Creating DNS PTR record for: $server_name_lower" -Verbose:$VerboseMode
+                Invoke-Command -Session $session -ScriptBlock $rSb -ArgumentList $domainController,$forwardZoneName,$server_name_lower
+                Write-Verbose "DNS PTR record created successfully." -Verbose:$VerboseMode
+                Remove-PSSession $session
+            }
+            elseif ($server_domain -like "BN" -or $server_domain -like "contoso")
+            {
+                $session = New-PSSession -ComputerName "BNDC1.contoso.com" -Credential $vc_creds
+                Write-Verbose "Creating DNS A record for: $server_name_lower" -Verbose:$VerboseMode
+                Invoke-Command -Session $session -ScriptBlock $sb -ArgumentList $Zone,$server_name_lower,$server_ip,$serverIpReverse,$server_domain
+                Write-Verbose "DNS A record created successfully." -Verbose:$VerboseMode
+                Sleep 45
+                Write-Verbose "Creating DNS PTR record for: $server_name_lower" -Verbose:$VerboseMode
+                Invoke-Command -Session $session -ScriptBlock $rSb -ArgumentList $domainController,$forwardZoneName,$server_name_lower
+                Write-Verbose "DNS PTR record created successfully." -Verbose:$VerboseMode
+                Remove-PSSession $session
+            }
+            elseif ($server_domain -like "CSX" -or $server_domain -like "contoso")
+            {
+                $session = New-PSSession -ComputerName "CSXDC1.contoso.com" -Credential $vc_creds
+                Write-Verbose "Creating DNS A record for: $server_name_lower" -Verbose:$VerboseMode
+                Invoke-Command -Session $session -ScriptBlock $sb -ArgumentList $Zone,$server_name_lower,$server_ip,$serverIpReverse,$server_domain
+                Write-Verbose "DNS A record created successfully." -Verbose:$VerboseMode
+                Sleep 45
+                Write-Verbose "Creating DNS PTR record for: $server_name_lower" -Verbose:$VerboseMode
+                Invoke-Command -Session $session -ScriptBlock $rSb -ArgumentList $domainController,$forwardZoneName,$server_name_lower
+                Write-Verbose "DNS PTR record created successfully." -Verbose:$VerboseMode
+                Remove-PSSession $session
+            }
+            elseif ($server_domain -like "UP" -or $server_domain -like "lsup")
+            {
+                $session = New-PSSession -ComputerName "10.2.82.10" -Credential $vc_creds
+                Write-Verbose "Creating DNS A record for: $server_name_lower" -Verbose:$VerboseMode
+                Invoke-Command -Session $session -ScriptBlock $sb -ArgumentList $Zone,$server_name_lower,$server_ip,$serverIpReverse,$server_domain
+                Write-Verbose "DNS A record created successfully." -Verbose:$VerboseMode
+                Sleep 45
+                Write-Verbose "Creating DNS PTR record for: $server_name_lower" -Verbose:$VerboseMode
+                Invoke-Command -Session $session -ScriptBlock $rSb -ArgumentList $domainController,$forwardZoneName,$server_name_lower
+                Write-Verbose "DNS PTR record created successfully." -Verbose:$VerboseMode
+                Remove-PSSession $session
+            }
+            else
+            {
+                Write-Host "No DNS entry was created for " $server_name_lower -BackgroundColor Red
+            }
+
+            ###END CHANGES###
+        }
+        Write-Host "Created $vm_name with $server_ip for $server_car"
+    }
+
+    # Disconnect from vCenter only if there is an active session
+    $currentSession = Get-PSSession -Name $vcenter -ErrorAction SilentlyContinue
+    if ($currentSession -and $currentSession.State -eq 'Opened') {
+        Write-Verbose "Disconnecting from vCenter: $vcenter" -Verbose:$VerboseMode
+        Disconnect-VIServer $vcenter -Confirm:$false
+    } else {
+        Write-Verbose "No active vCenter session to disconnect from: $vcenter" -Verbose:$VerboseMode
+    }
+}
+
+#-----------------------------------------------------------[Finish]------------------------------------------------------------
+
+# Improved cleanup of variables with better error handling and corrected indentation
+# Correct the final cleanup section
+try {
+    Get-Variable -Exclude "PWD", "*Preference", "server_lists" | Remove-Variable -ErrorAction SilentlyContinue
+} catch {
+    Write-Host "Error clearing variables: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+# Stop the stopwatch and write the elapsed time to the console
+$stopwatch.Stop()
+Write-Host "Total execution time: $($stopwatch.Elapsed.ToString())"
