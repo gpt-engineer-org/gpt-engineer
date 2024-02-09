@@ -276,6 +276,10 @@ def test_complex_task_master_diff():
     load_and_test_diff("diff_task_master", "task_master_code")
 
 
+def test_complex_task_master_diff():
+    load_and_test_diff("wheaties_example_code", "wheaties_example_diff")
+
+
 def load_and_test_diff(
     diff_file_name: str, code_file_name: str
 ) -> Tuple[str, str, Dict]:
