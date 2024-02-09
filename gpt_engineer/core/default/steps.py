@@ -2,7 +2,7 @@ import inspect
 import re
 
 from pathlib import Path
-from typing import List, MutableMapping, Union
+from typing import MutableMapping, Union
 
 from langchain.schema import HumanMessage, SystemMessage
 from termcolor import colored
@@ -10,12 +10,7 @@ from termcolor import colored
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.base_memory import BaseMemory
-from gpt_engineer.core.chat_to_files import (
-    chat_to_files_dict,
-    parse_diffs,
-    apply_diffs,
-)
-from gpt_engineer.core.diff import is_similar
+from gpt_engineer.core.chat_to_files import apply_diffs, chat_to_files_dict, parse_diffs
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
@@ -151,31 +146,37 @@ def improve(
     while len(problems) > 0 and edit_refinements <= MAX_EDIT_REFINEMENT_STEPS:
         messages = ai.next(messages, step_name=curr_fn())
         chat = messages[-1].content.strip()
-        try:
-            diffs = parse_diffs(chat)
-            for file_name, diff in diffs.items():
-                # if diff is a new file, validation and correction is unnecessary
-                # ToDo: ALSO correct diff numbers for new files
-                if not diff.is_new_file():
-                    diff.validate_and_correct(
-                        file_to_lines_dict(files_dict[diff.filename_pre])
-                    )
-            files_dict = apply_diffs(diffs, files_dict)
-            memory[IMPROVE_LOG_FILE] = chat
-            return files_dict
-        except ValueError as error:
-            # here we pray that we have given sufficient information in the exception.
-            problems.append(str(error))
-            if len(problems) > 0:
-                messages.append(
-                    HumanMessage(
-                        content="Some previously produced edits were not on the requested format, or the HEAD part was not found in the code. Details: "
-                        + "\n".join(problems)
-                        + "\n Please provide ALL the edits again, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
-                    )
-                )
-            edit_refinements += 1
 
-    memory[IMPROVE_LOG_FILE] = chat
-    print("WARNING: Failed to parse and apply the edits")
-    return files_dict
+        diffs = parse_diffs(chat)
+
+        # validate and correct diffs
+        problems = []
+        for file_name, diff in diffs.items():
+            # if diff is a new file, validation and correction is unnecessary
+            if diff.is_new_file():
+                files_dict = apply_diffs(diffs, files_dict)
+                return files_dict
+
+            else:
+                is_valid, error_message = diff.validate_and_correct(
+                    file_to_lines_dict(files_dict[diff.filename_pre])
+                )
+                # apply diff if valid
+                if is_valid:
+                    files_dict = apply_diffs(diffs, files_dict)
+                    memory[IMPROVE_LOG_FILE] = chat
+                    return files_dict
+                else:
+                    # collect problems and ask for new diffs
+                    problems.append(error_message)
+
+        if len(problems) > 0:
+            messages.append(
+                HumanMessage(
+                    content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details: "
+                    + "\n".join(problems)
+                    + "\n Please ONLY provide the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
+                )
+            )
+        edit_refinements += 1
+        # Todo: parse corrected diffs and apply them, discard invalid ones

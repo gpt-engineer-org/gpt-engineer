@@ -1,6 +1,7 @@
 import logging
 
 from collections import Counter
+from typing import Optional, Tuple
 
 RETAIN = "retain"
 ADD = "add"
@@ -71,11 +72,13 @@ class Hunk:
 
     def validate_and_correct(
         self, lines_dict: dict, forward_block_len: int = 10
-    ) -> bool:
+    ) -> Tuple[bool, Optional[str]]:
+        # salvaging correct hunks
+        error_message: Optional[str] = None
         # rule out the case that its a new file
         if self.is_new_file:
             # this hunk cannot be falsified and is by definition true
-            return True
+            return True, error_message
         # check the location of the actual starting line:
         start_true = is_similar(self.lines[0][1], lines_dict[self.start_line_pre_edit])
 
@@ -89,6 +92,7 @@ class Hunk:
                 for index, line in enumerate(self.lines):
                     if line[0] != ADD:
                         for line_number, line_content in lines_dict.items():
+                            # if the line is similar to a non-blank line in line_dict, we can pick the line prior to it
                             if is_similar(line[1], line_content) and line[1] != "":
                                 start_line = line_number - 1
                                 break
@@ -97,6 +101,7 @@ class Hunk:
                             self.relabel_line(index, ADD)
                             continue
                         else:
+                            # the line prior to the start line is found now we insert it to the first place as the start line
                             self.start_line_pre_edit = start_line
                             self.add_retained_line(lines_dict[start_line], 0)
                             return self.validate_and_correct(
@@ -111,14 +116,16 @@ class Hunk:
             if sum_of_matches == 0:
                 # before we go any further, we should check if it's a comment from LLM
                 if self.lines[0][1].count("#") > 0:
-                    # if it is, we can mark it as a ADD lines
+                    # if it is, we can mark it as an ADD lines
                     self.relabel_line(0, ADD)
                     # and restart the validation at the next line
                     return self.validate_and_correct(lines_dict, forward_block_len)
 
-                raise ValueError(
-                    f"The starting line of the diff {self.hunk_to_string()} does not exist in the code"
-                )
+                else:
+                    return (
+                        False,
+                        f"In {self.hunk_to_string()}:The starting line of the diff {self.hunk_to_string()} does not exist in the code",
+                    )
             elif sum_of_matches == 1:
                 start_ind = list(pot_start_lines.keys())[
                     list(pot_start_lines.values()).index(True)
@@ -143,11 +150,6 @@ class Hunk:
                 # this cannot be validated, jump one index
                 hunk_ind += 1
             elif not is_similar(self.lines[hunk_ind][1], lines_dict[file_ind]):
-                # check if we get a match further down the road
-                # if self.future_line_match(
-                #     self.lines[hunk_ind][1],
-                #     {key: val for key, val in lines_dict.items() if key > file_ind},
-                # ):
                 # before we go any further, we should relabel the comment from LLM
                 if self.lines[hunk_ind][1].count("#") > 0:
                     self.relabel_line(hunk_ind, ADD)
@@ -190,9 +192,9 @@ class Hunk:
                     orig_count_ratio >= missing_line_count_ratio
                     and orig_count_ratio >= false_line_count_ratio
                 ):
-                    # This means that accounting for neither  scenario 1 nor 2 improved the situation
-                    raise ValueError(
-                        f"The trail of the diff, {forward_block}, does not match the code {forward_code}."
+                    return (
+                        False,
+                        f"In {self.hunk_to_string()}:The trail of the diff, {forward_block}, does not match the code {forward_code}.",
                     )
                 elif missing_line_count_ratio > false_line_count_ratio:
                     self.add_retained_line(lines_dict[file_ind], hunk_ind)
@@ -204,11 +206,6 @@ class Hunk:
                 else:
                     self.pop_line(self.lines[hunk_ind], hunk_ind)
 
-                # if we don't, we have a problem
-                # else:
-                #     raise ValueError(
-                #         f"The line {self.lines[hunk_ind][1]} in the diff cannot be found in the code"
-                #     )
             else:
                 hunk_ind += 1
                 file_ind += 1
@@ -218,8 +215,10 @@ class Hunk:
                 f"{line_type}: {line_content}"
                 for line_type, line_content in self.lines[file_ind + 1 :]
             )
-            raise ValueError(
-                f"Hunk validation stopped before the lines {remaining_lines} were validated. The diff is incorrect"
+
+            return (
+                False,
+                f"In {self.hunk_to_string()}:Hunk validation stopped before the lines {remaining_lines} were validated. The diff is incorrect",
             )
 
 
