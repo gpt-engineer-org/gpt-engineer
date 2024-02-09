@@ -54,6 +54,7 @@ Welcome to GPT-ENGINEER's Documentation
    roadmap_link
    code_conduct_link
    disclaimer_link
+   terms_link
 
 .. toctree::
    :maxdepth: 2

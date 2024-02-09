@@ -201,3 +201,5 @@ autosummary_generate = True
 myst_enable_extensions = [
     "colon_fence",
 ]
+
+myst_all_links_external = True
