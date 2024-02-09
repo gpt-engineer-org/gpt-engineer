@@ -7,7 +7,6 @@ Welcome to GPT-ENGINEER's Documentation
 
    intro/quick_overview.md
    intro/repository_stats.md
-   results_link
    intro/main_script.md
    intro/scripts.md
    intro/preprompts.md
@@ -55,6 +54,7 @@ Welcome to GPT-ENGINEER's Documentation
    roadmap_link
    code_conduct_link
    disclaimer_link
+   terms_link
 
 .. toctree::
    :maxdepth: 2

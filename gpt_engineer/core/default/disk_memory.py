@@ -34,7 +34,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, Union
 
 from gpt_engineer.core.base_memory import BaseMemory
-from gpt_engineer.tools.experimental.supported_languages import SUPPORTED_LANGUAGES
+from gpt_engineer.tools.supported_languages import SUPPORTED_LANGUAGES
 
 
 # This class represents a simple database that stores its tools as files in a directory.
