@@ -11,7 +11,7 @@ GPT-engineer lets you:
 
 ## Getting Started
 
-### Install gpt-engineer
+### Install gpt-engineer...
 
 For **stable** release:
 
