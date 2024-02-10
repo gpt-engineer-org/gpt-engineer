@@ -1,7 +1,6 @@
 import logging
 
 from collections import Counter
-from typing import Optional, Tuple
 
 RETAIN = "retain"
 ADD = "add"
@@ -71,14 +70,13 @@ class Hunk:
         return forward_block
 
     def validate_and_correct(
-        self, lines_dict: dict, forward_block_len: int = 10
-    ) -> Tuple[bool, Optional[str]]:
+        self, lines_dict: dict, problems: list, forward_block_len: int = 10
+    ) -> bool:
         # salvaging correct hunks
-        error_message: Optional[str] = None
         # rule out the case that its a new file
         if self.is_new_file:
             # this hunk cannot be falsified and is by definition true
-            return True, error_message
+            return True
         # check the location of the actual starting line:
         start_true = is_similar(self.lines[0][1], lines_dict[self.start_line_pre_edit])
 
@@ -122,10 +120,10 @@ class Hunk:
                     return self.validate_and_correct(lines_dict, forward_block_len)
 
                 else:
-                    return (
-                        False,
-                        f"In {self.hunk_to_string()}:The starting line of the diff {self.hunk_to_string()} does not exist in the code",
+                    problems.append(
+                        f"In {self.hunk_to_string()}:The starting line of the diff {self.hunk_to_string()} does not exist in the code"
                     )
+                    return False
             elif sum_of_matches == 1:
                 start_ind = list(pot_start_lines.keys())[
                     list(pot_start_lines.values()).index(True)
@@ -192,10 +190,11 @@ class Hunk:
                     orig_count_ratio >= missing_line_count_ratio
                     and orig_count_ratio >= false_line_count_ratio
                 ):
-                    return (
-                        False,
-                        f"In {self.hunk_to_string()}:The trail of the diff, {forward_block}, does not match the code {forward_code}.",
+                    problems.append(
+                        f"In {self.hunk_to_string()}:The trail of the diff, {forward_block}, does not match the code {forward_code}."
                     )
+                    return False
+
                 elif missing_line_count_ratio > false_line_count_ratio:
                     self.add_retained_line(lines_dict[file_ind], hunk_ind)
                     hunk_ind += 1
@@ -215,11 +214,10 @@ class Hunk:
                 f"{line_type}: {line_content}"
                 for line_type, line_content in self.lines[file_ind + 1 :]
             )
-
-            return (
-                False,
-                f"In {self.hunk_to_string()}:Hunk validation stopped before the lines {remaining_lines} were validated. The diff is incorrect",
+            problems.append(
+                f"In {self.hunk_to_string()}:Hunk validation stopped before the lines {remaining_lines} were validated. The diff is incorrect"
             )
+            return False
 
 
 class Diff:
@@ -239,6 +237,7 @@ class Diff:
         return string.strip()
 
     def validate_and_correct(self, lines_dict: dict):
+        problems = []
         past_hunk = None
         cut_lines_dict = lines_dict.copy()
         for hunk in self.hunks:
@@ -251,7 +250,10 @@ class Diff:
                 cut_lines_dict = {
                     key: val for key, val in cut_lines_dict.items() if key >= (cut_ind)
                 }
-            hunk.validate_and_correct(cut_lines_dict)
+            is_valid = hunk.validate_and_correct(cut_lines_dict, problems)
+            if not is_valid and len(problems) > 0:
+                print(f"Invalid hunk: {hunk.hunk_to_string()}")
+                self.hunks.remove(hunk)
             # now correct the numbers, assuming the start line pre-edit has been fixed
             hunk.hunk_len_pre_edit = (
                 hunk.category_counts[RETAIN] + hunk.category_counts[REMOVE]
@@ -270,6 +272,7 @@ class Diff:
             else:
                 hunk.start_line_post_edit = hunk.start_line_pre_edit
             past_hunk = hunk
+        return problems
 
 
 def is_similar(str1, str2, similarity_threshold=0.9):

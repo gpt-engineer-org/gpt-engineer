@@ -2,7 +2,7 @@ import inspect
 import re
 
 from pathlib import Path
-from typing import MutableMapping, Union
+from typing import List, MutableMapping, Union
 
 from langchain.schema import HumanMessage, SystemMessage
 from termcolor import colored
@@ -139,36 +139,12 @@ def improve(
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=f"Request: {prompt}"))
-    problems = [""]
-
+    problems = []
     # check edit correctness
     edit_refinements = 0
-    while len(problems) > 0 and edit_refinements <= MAX_EDIT_REFINEMENT_STEPS:
+    while edit_refinements <= MAX_EDIT_REFINEMENT_STEPS:
         messages = ai.next(messages, step_name=curr_fn())
-        chat = messages[-1].content.strip()
-
-        diffs = parse_diffs(chat)
-
-        # validate and correct diffs
-        problems = []
-        for file_name, diff in diffs.items():
-            # if diff is a new file, validation and correction is unnecessary
-            if diff.is_new_file():
-                files_dict = apply_diffs(diffs, files_dict)
-                return files_dict
-
-            else:
-                is_valid, error_message = diff.validate_and_correct(
-                    file_to_lines_dict(files_dict[diff.filename_pre])
-                )
-                # apply diff if valid
-                if is_valid:
-                    files_dict = apply_diffs(diffs, files_dict)
-                    memory[IMPROVE_LOG_FILE] = chat
-                    return files_dict
-                else:
-                    # collect problems and ask for new diffs
-                    problems.append(error_message)
+        files_dict = salvage_correct_hunks(messages, files_dict, memory, problems)
 
         if len(problems) > 0:
             messages.append(
@@ -178,5 +154,33 @@ def improve(
                     + "\n Please ONLY provide the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
                 )
             )
-        edit_refinements += 1
-        # Todo: parse corrected diffs and apply them, discard invalid ones
+            messages = ai.next(messages, step_name=curr_fn())
+            edit_refinements += 1
+            files_dict = salvage_correct_hunks(messages, files_dict, memory, problems)
+        return files_dict
+
+
+def salvage_correct_hunks(
+    messages: List,
+    files_dict: FilesDict,
+    memory: MutableMapping[str | Path, str],
+    error_message: List,
+) -> FilesDict:
+    chat = messages[-1].content.strip()
+
+    diffs = parse_diffs(chat)
+
+    # validate and correct diffs
+
+    for file_name, diff in diffs.items():
+        # if diff is a new file, validation and correction is unnecessary
+        if diff.is_new_file():
+            files_dict = apply_diffs(diffs, files_dict)
+        else:
+            problems = diff.validate_and_correct(
+                file_to_lines_dict(files_dict[diff.filename_pre])
+            )
+            error_message.extend(problems)
+    files_dict = apply_diffs(diffs, files_dict)
+    memory[IMPROVE_LOG_FILE] = chat
+    return files_dict
