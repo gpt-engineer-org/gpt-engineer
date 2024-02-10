@@ -91,7 +91,6 @@ autodoc_default_options = {
     "show-inheritance": True,
     "inherited-members": "BaseModel",
     "undoc-members": True,
-    "special-members": "__call__",
 }
 
 # Add any paths that contain templates here, relative to this directory.
