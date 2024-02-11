@@ -1,5 +1,5 @@
-from pathlib import Path
 from collections import OrderedDict
+from pathlib import Path
 
 
 # class Code(MutableMapping[str | Path, str]):
