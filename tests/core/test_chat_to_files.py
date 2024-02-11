@@ -276,8 +276,8 @@ def test_complex_task_master_diff():
     load_and_test_diff("diff_task_master", "task_master_code")
 
 
-def test_complex_task_master_diff():
-    load_and_test_diff("wheaties_example_code", "wheaties_example_diff")
+def test_long_file_diff():
+    load_and_test_diff("wheaties_example_diff", "wheaties_example_code")
 
 
 def load_and_test_diff(
@@ -302,15 +302,41 @@ def load_and_test_diff(
 
 
 # Test diff application
-def test_valiation_and_apply_diff():
+def test_validation_and_apply_complex_diff():
     task_master_diff, task_master_code, diffs = load_and_test_diff(
         "diff_task_master", "task_master_code"
     )
-    list(diffs.values())[0].validate_and_correct(file_to_lines_dict(task_master_code))
-
     files = FilesDict({"taskmaster.py": task_master_code})
-    refactored_file_dict = apply_diffs(diffs, files)
-    print(refactored_file_dict["taskmaster.py"])
+    for file_name, diff in diffs.items():
+        # if diff is a new file, validation and correction is unnecessary
+        if diff.is_new_file():
+            files = apply_diffs(diffs, files)
+        else:
+            problems = diff.validate_and_correct(
+                file_to_lines_dict(files["taskmaster.py"])
+            )
+            print(problems)
+
+    apply_diffs(diffs, files)
+
+
+def test_validation_and_apply_long_diff():
+    wheaties_diff, wheaties_code, diffs = load_and_test_diff(
+        "wheaties_example_diff", "wheaties_example_code"
+    )
+
+    files = FilesDict({"VMClonetest.ps1": wheaties_code})
+    for file_name, diff in diffs.items():
+        # if diff is a new file, validation and correction is unnecessary
+        if diff.is_new_file():
+            files = apply_diffs(diffs, files)
+        else:
+            problems = diff.validate_and_correct(
+                file_to_lines_dict(files["VMClonetest.ps1"])
+            )
+            print(problems)
+
+    apply_diffs(diffs, files)
 
 
 if __name__ == "__main__":
