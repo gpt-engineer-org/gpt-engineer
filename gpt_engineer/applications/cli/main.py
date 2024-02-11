@@ -57,9 +57,9 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def load_prompt(input_repo: DiskMemory, improve_mode):
+def load_prompt(input_repo: DiskMemory, improve_mode, direct_prompt: Optional[str] = None):
     if input_repo.get("prompt"):
-        return input_repo.get("prompt")
+        return direct_prompt if direct_prompt is not None else input_repo.get("prompt")
 
     if not improve_mode:
         input_repo["prompt"] = input(
@@ -67,7 +67,7 @@ def load_prompt(input_repo: DiskMemory, improve_mode):
         )
     else:
         input_repo["prompt"] = input("\nHow do you want to improve the application?\n")
-    return input_repo.get("prompt")
+    return direct_prompt if direct_prompt is not None else input_repo.get("prompt")
 
 
 def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
@@ -87,7 +87,11 @@ def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
 
 @app.command()
 def main(
-    project_path: str = typer.Argument("projects/example", help="path"),
+    interactive: bool = typer.Option(False, "--interactive", "-i", help="Enter interactive mode to chat with the codebase."),
+    create_new: bool = typer.Option(False, "--create", "-n", help="Create a new codebase."),
+    improve_existing: bool = typer.Option(False, "--improve", "-e", help="Improve an existing codebase."),
+    project_path: str = typer.Option(None, prompt="Enter the directory path for the codebase:", help="The directory path where the new or existing codebase is located."),
+    direct_prompt: Optional[str] = typer.Option(None, prompt="Enter your prompt:", help="Directly input the prompt instead of using a prompt file."),
     model: str = typer.Argument("gpt-4-1106-preview", help="model id string"),
     temperature: float = 0.1,
     improve_mode: bool = typer.Option(
@@ -138,7 +142,17 @@ def main(
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
     #
 
-    if improve_mode:
+    if improve_existing:
+        if project_path is None:
+            project_path = input("Enter the directory path for the existing codebase to improve:")
+        improve_mode = True
+    elif create_new:
+        if project_path is None:
+            project_path = input("Enter the directory path where the new codebase should be created:")
+        improve_mode = False
+    else:
+        typer.echo("You must choose to either create a new codebase or improve an existing one.")
+        raise typer.Exit()
         assert not (
             clarify_mode or lite_mode
         ), "Clarify and lite mode are not active for improve mode"
@@ -153,7 +167,7 @@ def main(
 
     path = Path(project_path)
     print("Running gpt-engineer in", path.absolute(), "\n")
-    prompt = load_prompt(DiskMemory(path), improve_mode)
+    prompt = load_prompt(DiskMemory(path), improve_mode, direct_prompt)
 
     # configure generation function
     if clarify_mode:
@@ -185,7 +199,10 @@ def main(
     )
 
     store = FileStore(project_path)
-    if improve_mode:
+    if interactive:
+        start_interactive_session(agent, path)
+        return
+    elif improve_mode:
         fileselector = FileSelector(project_path)
         files_dict = fileselector.ask_for_files()
         files_dict = agent.improve(files_dict, prompt)
@@ -199,6 +216,16 @@ def main(
 
     print("Total api cost: $ ", ai.token_usage_log.usage_cost())
 
+
+def start_interactive_session(agent: CliAgent, project_path: Path):
+    """Starts an interactive session for live codebase interaction."""
+    typer.echo("Entering interactive mode. Type 'exit' to end the session.")
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() == 'exit':
+            break
+        response = agent.interact(user_input)
+        typer.echo(f"AI: {response}")
 
 if __name__ == "__main__":
     app()
