@@ -103,7 +103,7 @@ class Hunk:
                             self.start_line_pre_edit = start_line
                             self.add_retained_line(lines_dict[start_line], 0)
                             return self.validate_and_correct(
-                                lines_dict, forward_block_len
+                                lines_dict, problems, forward_block_len
                             )
 
             pot_start_lines = {
@@ -117,7 +117,9 @@ class Hunk:
                     # if it is, we can mark it as an ADD lines
                     self.relabel_line(0, ADD)
                     # and restart the validation at the next line
-                    return self.validate_and_correct(lines_dict, forward_block_len)
+                    return self.validate_and_correct(
+                        lines_dict, problems, forward_block_len
+                    )
 
                 else:
                     problems.append(
@@ -218,6 +220,7 @@ class Hunk:
                 f"In {self.hunk_to_string()}:Hunk validation stopped before the lines {remaining_lines} were validated. The diff is incorrect"
             )
             return False
+        return True
 
 
 class Diff:

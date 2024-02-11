@@ -142,10 +142,6 @@ def parse_diffs(diff_string: str) -> dict:
     )
 
     diffs = {}
-    matches1 = diff_block_pattern.findall(diff_string)
-    # Check if two separate diffs are matched
-    print("Number of matches in test string 1:", len(matches1))
-    # Find all diff blocks in the input string
     for block in diff_block_pattern.finditer(diff_string):
         diff_block = block.group()
 
