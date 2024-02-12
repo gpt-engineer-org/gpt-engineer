@@ -19,16 +19,36 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: pip
+          # Removed the cache line that was here
 
-      - name: Install build tool
-        run: pip install build
+      # Install Poetry
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
 
+      # Add Poetry to PATH
+      - name: Add Poetry to PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      # Cache Poetry's dependencies based on the lock file
+      - name: Set up Poetry cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      # Install dependencies using Poetry (if any)
+      - name: Install dependencies
+        run: poetry install
+
+      # Build package using Poetry
       - name: Build package
-        run: python -m build
+        run: poetry build --format sdist
 
-      - name: Upload package as build artifact
-        uses: actions/upload-artifact@v3
+      # Upload package as build artifact
+      - uses: actions/upload-artifact@v3
         with:
           name: package
           path: dist/
@@ -42,11 +62,12 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - name: Collect packages to release
-        uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v3
         with:
           name: package
           path: dist/
 
       - name: Publish packages to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}

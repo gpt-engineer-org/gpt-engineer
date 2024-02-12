@@ -1,17 +1,7 @@
-Think step by step and reason yourself to the right decisions to make sure we get it right.
+Think step by step and reason yourself to the correct decisions to make sure we get it right.
 First lay out the names of the core classes, functions, methods that will be necessary, As well as a quick comment on their purpose.
 
-Then you will output the content of each file including ALL code.
-Each file must strictly follow a markdown code block format, where the following tokens must be replaced such that
-FILENAME is the lowercase file name including the file extension,
-LANG is the markup code block language for the code's language, and CODE is the code:
-
-FILENAME
-```LANG
-CODE
-```
-
-Do not comment on what every file does. Please note that the code should be fully functional. No placeholders.
+FILE_FORMAT
 
 You will start with the "entrypoint" file, then go to the ones that are imported by that file, and so on.
 Please note that the code should be fully functional. No placeholders.
@@ -21,3 +11,5 @@ Make sure that files contain all imports, types etc.  The code should be fully f
 Ensure to implement all code, if you are unsure, write a plausible implementation.
 Include module dependency or package manager dependency definition file.
 Before you finish, double check that all parts of the architecture is present in the files.
+
+When you are done, write finish with "this concludes a fully working implementation".

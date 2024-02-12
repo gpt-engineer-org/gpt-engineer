@@ -32,14 +32,32 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone https://github.com/AntonOsika/gpt-engineer.git
+    $ git clone https://github.com/gpt-engineer-org/gpt-engineer.git
 
 Once you have a copy of the source, you can install it with:
 
 .. code-block:: console
 
     $ cd gpt-engineer
-    $ pip install -e .
+    $ poetry install
+    $ poetry shell
 
 
-.. _Github repo: https://github.com/AntonOsika/gpt-engineer.git
+.. _Github repo: https://github.com/gpt-engineer-org/gpt-engineer.git
+
+Troubleshooting
+-------------
+
+For mac and linux system, there are sometimes slim python installations that do not include the gpt-engineer requirement tkinter, which is a standard library and thus not pip installable.
+
+To install tkinter on mac, you can for example use brew:
+
+.. code-block:: console
+
+    $ brew install python-tk
+
+On debian-based linux systems you can use:
+
+.. code-block:: console
+
+    $ sudo apt-get install python3-tk

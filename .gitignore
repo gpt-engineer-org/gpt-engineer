@@ -17,6 +17,7 @@ build/
 .env.sh
 venv/
 ENV/
+venv_test_installation/
 
 # IDE-specific files
 .vscode/
@@ -47,35 +48,41 @@ archive
 todo
 scratchpad
 
-# Ignore GPT Engineer files
-projects
-!projects/example
-
 # Pyenv
 .python-version
 
-# Benchmark files
-benchmark
-!benchmark/*/prompt
-
 .gpte_consent
 
-.gpte_consent
+# projects folder apart from default prompt
+
+projects/*
+!projects/example/prompt
+!projects/example-improve
 
 # docs
 
 docs/_build
-docs/__init__
-docs/ai
-docs/chat_to_files
-docs/collect
-docs/learning
-docs/main
-docs/steps/
-docs/db
-docs/db/
+docs/applications
+docs/benchmark
+docs/cli
+docs/core
+docs/intro
+docs/tools
 
-# poetry
-
-poetry.lock
+# coding assistants
 .aider*
+.gpteng
+
+# webapp specific
+webapp/node_modules
+webapp/package-lock.json
+
+webapp/.next/
+
+.langchain.db
+
+# TODO files
+/!todo*
+
+#ignore tox files
+.tox
