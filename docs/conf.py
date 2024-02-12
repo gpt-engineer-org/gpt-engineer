@@ -90,7 +90,7 @@ autodoc_default_options = {
     "members": True,
     "show-inheritance": True,
     "inherited-members": "BaseModel",
-    "undoc-members": True,
+    "undoc-members": False,
 }
 
 # Add any paths that contain templates here, relative to this directory.
