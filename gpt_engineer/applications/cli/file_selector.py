@@ -88,10 +88,7 @@ class FileSelector:
         FilesDict
             A dictionary with file paths as keys and file contents as values.
         """
-        """
-        Asks the user to select files for the purpose of context improvement.
-        It supports selection from the terminal or using a previously saved list.
-        """
+
         if os.getenv("GPTE_TEST_MODE"):
             # In test mode, retrieve files from a predefined TOML configuration
             assert self.FILE_LIST_NAME in self.metadata_db
@@ -135,10 +132,7 @@ class FileSelector:
         List[str]
             A list of strings representing the paths of selected files.
         """
-        """
-        Provides an interactive file selection interface by generating a tree representation in a .toml file.
-        Allows users to select or deselect files for the context improvement process.
-        """
+
         root_path = Path(input_path)
         tree_dict = {}
         toml_file = DiskMemory(metadata_path(input_path)).path / "file_selection.toml"
@@ -205,9 +199,7 @@ class FileSelector:
         file_path : Union[str, Path]
             The path to the file to be opened in the text editor.
         """
-        """
-        Attempts to open the specified file using the system's default text editor or a common fallback editor.
-        """
+
         editors = [
             "gedit",
             "notepad",
@@ -249,10 +241,7 @@ class FileSelector:
         bool
             True if the file is UTF-8 encoded, False otherwise.
         """
-        """
-        Determines if the file is UTF-8 encoded by trying to read and decode it.
-        Useful for ensuring that files are in a readable and compatible format.
-        """
+
         try:
             with open(file_path, "rb") as file:
                 file.read().decode("utf-8")
