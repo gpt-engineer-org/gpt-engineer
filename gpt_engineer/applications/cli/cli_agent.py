@@ -78,15 +78,6 @@ class CliAgent(BaseAgent):
         The function used for processing code.
     preprompts_holder : PrepromptsHolder
         The holder for preprompt templates.
-
-    Methods
-    -------
-    with_default_config(...)
-        Class method to create a new instance of CliAgent with default configurations.
-    init(prompt)
-        Generates a new piece of code based on the provided prompt.
-    improve(files_dict, prompt, execution_command)
-        Improves an existing piece of code based on the provided prompt.
     """
 
     def __init__(
