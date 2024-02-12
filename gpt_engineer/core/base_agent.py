@@ -19,13 +19,6 @@ class BaseAgent(ABC):
 
     Defines the interface for agents capable of initializing and improving code based on a given prompt.
     Implementations of this class are expected to provide concrete methods for these actions.
-
-    Methods
-    -------
-    init(self, prompt: str) -> FilesDict
-        Initialize a new piece of code based on the given prompt and return a FilesDict object.
-    improve(self, files_dict: FilesDict, prompt: str) -> FilesDict
-        Improve an existing piece of code based on the given prompt and return the updated FilesDict object.
     """
 
     @abstractmethod

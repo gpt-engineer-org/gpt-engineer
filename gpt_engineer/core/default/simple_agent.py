@@ -5,15 +5,6 @@ This module provides a class that represents an agent capable of initializing an
 a codebase using AI. It handles interactions with the AI model, memory, and execution
 environment to generate and refine code based on user prompts.
 
-Classes
--------
-SimpleAgent : class
-    An agent that uses AI to generate and improve code based on a given prompt.
-
-Functions
----------
-default_config_agent : function
-    Creates an instance of SimpleAgent with default configuration.
 """
 
 import tempfile
@@ -50,17 +41,6 @@ class SimpleAgent(BaseAgent):
         The AI model used for generating and improving code.
     preprompts_holder : PrepromptsHolder
         The holder for preprompt messages that guide the AI model.
-
-    Methods
-    -------
-    __init__(self, memory: BaseMemory, execution_env: BaseExecutionEnv, ai: AI, preprompts_holder: PrepromptsHolder):
-        Initializes a new instance of SimpleAgent.
-    with_default_config(cls, path: str, ai: AI, preprompts_holder: PrepromptsHolder) -> "SimpleAgent":
-        Creates a new instance of SimpleAgent with default configuration.
-    init(self, prompt: str) -> FilesDict:
-        Initializes a codebase from a prompt and returns the generated files.
-    improve(self, files_dict: FilesDict, prompt: str, execution_command: Optional[str]) -> FilesDict:
-        Improves an existing codebase based on a prompt and returns the updated files.
     """
 
     def __init__(

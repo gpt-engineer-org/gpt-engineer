@@ -15,7 +15,6 @@ Usage:
 Typically used in project setup or management phases for selecting specific files.
 It operates within the GPT-Engineer environment, relying on core functionalities for
 file handling and persistence.
-
 """
 
 import os
@@ -47,11 +46,6 @@ class FileSelector:
         The name of the file that stores the selected files list.
     COMMENT : str
         The comment string to be added to the top of the file selection list.
-
-    Parameters
-    ----------
-    project_path : Union[str, Path]
-        The path to the project directory where file selection is to be performed.
     """
 
     IGNORE_FOLDERS = {"site-packages", "node_modules", "venv", "__pycache__"}
@@ -388,17 +382,6 @@ class DisplayablePath(object):
 
     This class is used to visually represent the structure of directories and files
     in a way that is similar to a file explorer's tree view.
-
-    Attributes
-    ----------
-    display_filename_prefix_middle : str
-        The prefix for non-last items in the tree display.
-    display_filename_prefix_last : str
-        The prefix for the last item in the tree display.
-    display_parent_prefix_middle : str
-        The prefix for non-last parent items in the tree display.
-    display_parent_prefix_last : str
-        The prefix for the last parent item in the tree display.
     """
 
     display_filename_prefix_middle = "├── "

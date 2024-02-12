@@ -43,20 +43,6 @@ class DiskMemory(BaseMemory):
     ----------
     path : Path
         The directory path where the database files are stored.
-
-    Methods
-    -------
-    __contains__(key: str) -> bool:
-        Check if a file (key) exists in the database.
-
-    __getitem__(key: str) -> str:
-        Retrieve the content of a file (value) based on its name (key).
-
-    get(key: str, default: Optional[Any] = None) -> Any:
-        Fetch content of a file or return a default value if it doesn't exist.
-
-    __setitem__(key: Union[str, Path], val: str):
-        Set or update the content of a file in the database.
     """
 
     def __init__(self, path: Union[str, Path]):

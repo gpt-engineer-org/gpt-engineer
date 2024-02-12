@@ -23,13 +23,6 @@ class FilesDict(dict):
     representing filenames and their corresponding code content. It provides methods
     to format its contents for chat-based interaction with an AI agent and to enforce
     type checks on keys and values.
-
-    Methods
-    -------
-    __setitem__(self, key, value)
-        Set the code content for the given filename, enforcing type checks on the key and value.
-    to_chat(self)
-        Format the code files for chat-based interaction, returning a string suitable for AI input.
     """
 
     def __setitem__(self, key: Union[str, Path], value: str):

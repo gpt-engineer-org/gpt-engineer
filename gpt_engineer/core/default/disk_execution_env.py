@@ -47,21 +47,6 @@ class DiskExecutionEnv(BaseExecutionEnv):
     store : FileStore
         An instance of FileStore that manages the storage of files in the execution
         environment.
-
-    Methods
-    -------
-    upload(files: FilesDict) -> "DiskExecutionEnv":
-        Uploads a collection of files to the execution environment.
-
-    download() -> FilesDict:
-        Downloads all files from the execution environment as a FilesDict.
-
-    popen(command: str) -> subprocess.Popen:
-        Starts a subprocess with the given command and returns the Popen object.
-
-    run(command: str, timeout: Optional[int] = None) -> Tuple[str, str, int]:
-        Executes the given command in the execution environment and returns the
-        standard output, standard error, and return code.
     """
 
     def __init__(self, path: Union[str, Path, None] = None):

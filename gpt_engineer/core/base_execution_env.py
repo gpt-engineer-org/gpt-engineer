@@ -11,17 +11,6 @@ class BaseExecutionEnv(ABC):
 
     This class defines the interface for execution environments that can execute commands,
     handle processes, and manage file uploads and downloads.
-
-    Methods
-    -------
-    run(command: str, timeout: Optional[int]) -> Tuple[str, str, int]
-        Abstract method to run a command in the execution environment.
-    popen(command: str) -> Popen
-        Abstract method to start a process for a command in the execution environment.
-    upload(files: FilesDict) -> BaseExecutionEnv
-        Abstract method to upload files to the execution environment.
-    download() -> FilesDict
-        Abstract method to download files from the execution environment.
     """
 
     @abstractmethod
