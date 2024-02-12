@@ -220,7 +220,7 @@ class AI:
         """
         if self.azure_endpoint:
             return AzureChatOpenAI(
-                openai_api_base=self.azure_endpoint,
+                azure_endpoint=self.azure_endpoint,
                 openai_api_version=os.getenv("OPENAI_API_VERSION", "2023-05-15"),
                 deployment_name=self.model_name,
                 openai_api_type="azure",
