@@ -53,10 +53,7 @@ class CachingAI(AI):
         List[Message]
             The updated list of messages in the conversation.
         """
-        """
-        Advances the conversation by sending message history
-        to LLM and updating with the response.
-        """
+
         if prompt:
             messages.append(HumanMessage(content=prompt))
 

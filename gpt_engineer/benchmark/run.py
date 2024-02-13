@@ -1,3 +1,17 @@
+"""
+Module for running benchmarks.
+
+This module defines functions to run benchmarks using a given agent and to print
+the results of the benchmark tasks.
+
+Functions
+---------
+run : function
+    Runs the benchmark tasks using the provided agent and returns a list of TaskResult objects.
+
+print_results : function
+    Prints the results of the benchmark tasks to the console.
+"""
 import time
 
 from typing import List, Optional
@@ -13,6 +27,25 @@ def run(
     task_name: Optional[str] = None,
     verbose=False,
 ) -> List[TaskResult]:
+    """
+    Runs the benchmark tasks using the provided agent and returns a list of TaskResult objects.
+
+    Parameters
+    ----------
+    agent : BaseAgent
+        The agent to use for running the benchmark tasks.
+    benchmark : Benchmark
+        The benchmark containing the tasks to run.
+    task_name : Optional[str], default=None
+        An optional name of a specific task to run within the benchmark.
+    verbose : bool, default=False
+        A flag to indicate whether to print verbose output during the benchmark.
+
+    Returns
+    -------
+    List[TaskResult]
+        A list of TaskResult objects representing the results of the benchmark tasks.
+    """
     task_results = []
     for task in benchmark.tasks:
         t0 = time.time()
@@ -52,6 +85,18 @@ def run(
 
 
 def print_results(results: list[TaskResult]):
+    """
+    Prints the results of the benchmark tasks to the console.
+
+    Parameters
+    ----------
+    results : list[TaskResult]
+        A list of TaskResult objects representing the results of the benchmark tasks.
+
+    Returns
+    -------
+    None
+    """
     for task_result in results:
         print(f"\n--- Results for {task_result.task_name} ---")
         print(f"{task_result.task_name} ({task_result.duration:.2f}s)")

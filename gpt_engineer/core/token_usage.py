@@ -27,6 +27,27 @@ logger = logging.getLogger(__name__)
 @dataclass
 class TokenUsage:
     """
+    Dataclass representing token usage statistics for a conversation step.
+
+    Attributes
+    ----------
+    step_name : str
+        The name of the conversation step.
+    in_step_prompt_tokens : int
+        The number of prompt tokens used in the step.
+    in_step_completion_tokens : int
+        The number of completion tokens used in the step.
+    in_step_total_tokens : int
+        The total number of tokens used in the step.
+    total_prompt_tokens : int
+        The cumulative number of prompt tokens used up to this step.
+    total_completion_tokens : int
+        The cumulative number of completion tokens used up to this step.
+    total_tokens : int
+        The cumulative total number of tokens used up to this step.
+    """
+
+    """
     Represents token usage statistics for a conversation step.
     """
 
