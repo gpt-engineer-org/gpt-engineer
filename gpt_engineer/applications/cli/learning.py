@@ -117,6 +117,8 @@ TERM_CHOICES = (
     + "(ncertain): "
 )
 
+VALID_INPUTS = ("y", "n", "u")
+
 
 def human_review_input() -> Optional[Review]:
     """
@@ -139,30 +141,30 @@ def human_review_input() -> Optional[Review]:
     print()
 
     ran = input("Did the generated code run at all? " + TERM_CHOICES)
-    while ran not in ("y", "n", "u"):
-        ran = input("Invalid input. Please enter y, n, or u: ")
-
-    perfect = ""
-    useful = ""
+    ran = ask_for_valid_input(ran, VALID_INPUTS)
 
     if ran == "y":
         perfect = input(
             "Did the generated code do everything you wanted? " + TERM_CHOICES
         )
-        while perfect not in ("y", "n", "u"):
-            perfect = input("Invalid input. Please enter y, n, or u: ")
+        perfect = ask_for_valid_input(perfect, VALID_INPUTS)
 
         if perfect != "y":
             useful = input("Did the generated code do anything useful? " + TERM_CHOICES)
-            while useful not in ("y", "n", "u"):
-                useful = input("Invalid input. Please enter y, n, or u: ")
+            useful = ask_for_valid_input(useful, VALID_INPUTS)
+        else:
+            useful = ""
+    else:
+        perfect = ""
+        useful = ""
 
-    comments = ""
     if perfect != "y":
         comments = input(
             "If you have time, please explain what was not working "
             + colored("(ok to leave blank)\n", "light_green")
         )
+    else:
+        comments = ""
 
     return Review(
         raw=", ".join([ran, perfect, useful]),
@@ -171,6 +173,12 @@ def human_review_input() -> Optional[Review]:
         perfect={"y": True, "n": False, "u": None, "": None}[perfect],
         comments=comments,
     )
+
+
+def ask_for_valid_input(ran, valid_inputs):
+    while ran not in valid_inputs:
+        ran = input("Invalid input. Please enter y, n, or u: ")
+    return ran
 
 
 def check_collection_consent() -> bool:
@@ -258,7 +266,7 @@ def extract_learning(
     Learning
         An instance of Learning containing all the session details and user feedback.
     """
-    learning = Learning(
+    return Learning(
         prompt=prompt,
         model=model,
         temperature=temperature,
@@ -267,7 +275,6 @@ def extract_learning(
         logs=memory.to_json(),
         review=review,
     )
-    return learning
 
 
 def get_session() -> str:
