@@ -163,14 +163,8 @@ def main(
     # Check if there's a git repo and verify that there aren't any uncommitted changes
     if is_git_installed():
         if not is_git_repo(path) and not improve_mode:
-            repo_created = (
-                input(
-                    "The path does not contain a git repository. Do you want to initialize one? (y/N) "
-                ).lower()
-                == "y"
-            )
-            if repo_created:
-                init_git_repo(path)
+            print("Initializing an empty git repository")
+            init_git_repo(path)
         if is_git_repo(path) and has_uncommitted_changes(path):
             continue_despite_uncommitted_changes = (
                 input(
