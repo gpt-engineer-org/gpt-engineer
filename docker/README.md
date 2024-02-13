@@ -53,9 +53,3 @@ Building the image:
 
 - Subsequent runs can just run `docker-compose -f dc.yml up -d' to start and 'docker-compose -f dc.yml down' to shutdown
 
-
-
-
-
-
-
