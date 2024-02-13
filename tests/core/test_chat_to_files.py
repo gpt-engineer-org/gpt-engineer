@@ -212,7 +212,7 @@ def test_correct_distorted_numbers():
     # This is a test in its own right since it full of exceptions, would something go wrong
     list(diffs.values())[0].validate_and_correct(lines_dict)
     correct_diff = "\n".join(example_diff.strip().split("\n")[4:-1])
-    assert diffs["example.txt"].diff_to_string() + "\n" == correct_diff
+    assert diffs["example.txt"].diff_to_string() == correct_diff
 
 
 def test_correct_skipped_lines():
@@ -230,10 +230,7 @@ def test_correct_skipped_lines():
         "r",
     ) as f:
         corrected_diff_from_missing_lines = f.read()
-    assert (
-        diffs["example.txt"].diff_to_string() + "\n"
-        == corrected_diff_from_missing_lines
-    )
+    assert diffs["example.txt"].diff_to_string() == corrected_diff_from_missing_lines
 
 
 def test_correct_skipped_lines_and_number_correction():
