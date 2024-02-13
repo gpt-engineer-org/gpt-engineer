@@ -24,7 +24,7 @@ Set the OPENAI_API_KEY in docker/docker-compose.yml using .env file or environme
 
 
 **Running using compose dc.yaml incorporating ollma and litellm**:
-This compose file runs an ollama server which is read by litellm 
+This compose file runs an ollama server which is read by litellm
 gpt engineers uses only openai commands to interact with litellm
 Grabbing and experimenting with different models is as simple as ollama pull "modelname"
 In detail you would exec into the container created by the compose file - the models will be persisted
@@ -37,7 +37,7 @@ Building the image:
 
 There are 3 sections some variables are used by multiple containers
 
-- OLLAMA 
+- OLLAMA
 -    set the OLLAMA_SOURCE_DIR to a folder on your machine with enough space to hold the models
     e.g. mistral needs 5GB free
     in order not to break machines with limited disk space we set the defaul to use tinyllama
