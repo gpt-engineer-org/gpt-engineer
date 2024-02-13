@@ -55,5 +55,3 @@ There are 3 sections some variables are used by multiple containers
 - Subsequent runs can just run `docker-compose -f dc.yml up -d' to start and 'docker-compose -f dc.yml down' to shutdown
 
 ###
-
-

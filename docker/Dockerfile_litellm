@@ -14,4 +14,3 @@ RUN python3 -m pip install -r requirements_litellm.txt && python3 -m pip install
 ENTRYPOINT ["litellm", "--config", "litellm_config.yaml", "--debug"]
 #CMD ["--port", "8000", "--model", "ollama/mistral", "--detailed_debug", "--run_gunicorn"]
 EXPOSE 8000
-

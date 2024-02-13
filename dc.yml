@@ -55,4 +55,3 @@ services:
       - litellm
     entrypoint: ["/bin/bash", "-c"]
     command: ["tail -f /dev/null"]
-
