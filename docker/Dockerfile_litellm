@@ -1,0 +1,16 @@
+FROM python:3.11-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+COPY docker/requirements_litellm.txt /app
+COPY docker/litellm_config.yaml /app
+
+# Install any needed packages specified in requirements.txt
+
+RUN python3 -m pip install -r requirements_litellm.txt && python3 -m pip install litellm
+
+ENTRYPOINT ["litellm", "--config", "litellm_config.yaml", "--debug"]
+#CMD ["--port", "8000", "--model", "ollama/mistral", "--detailed_debug", "--run_gunicorn"]
+EXPOSE 8000

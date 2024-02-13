@@ -1,0 +1,58 @@
+version: "3"
+
+services:
+  ollama:
+    image: ollama/ollama
+    env_file:
+      - .env
+    volumes:
+      - $OLLAMA_SOURCE_DIR:/OLLAMA_DIR
+      - ./docker/ollama_start.sh:/start.sh
+    entrypoint: ["/bin/bash","/start.sh"]
+    #ports:
+    #  - 11434:11434
+
+
+  litellm:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile_litellm
+    #image: ghcr.io/berriai/litellm:main-latest
+    image: litellm
+    env_file:
+      - .env
+    #ports:
+    #  - 8000:8000
+    #environment:
+    #  - OLLAMA_URL=http://ollama:11434
+    volumes:
+     - ./docker:/docker
+     - $OLLAMA_SOURCE_DIR:/OLLAMA_DIR
+    depends_on:
+      - ollama
+    #entrypoint: ["litellm", "--config", "/docker/litellm_config.yaml","--api_base", "http://ollama:11434", "--debug"]
+    entrypoint: ["litellm", "--model", "ollama/$DEFAULT_MODEL", "--api_base", "http://ollama:11434", "--debug"]
+    #command: ["--model", "ollama/mistral","--api_base","http://0.0.0.0:11434"]
+    #command: ["--model", "ollama/mistral"]
+
+  gpt-engineer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    stdin_open: true
+    tty: true
+    # Set the API key from the .env file
+    # env_file:
+    #  - .env
+    ##  OR set the API key directly
+    environment:
+       - OPENAI_API_KEY=skdummy
+       - OPENAI_API_BASE=http://litellm:8000
+    image: gpt-engineer
+    volumes:
+      - $GPTE_PROJECT_DIR:/project
+    depends_on:
+      - litellm
+    entrypoint: ["/bin/bash", "-c"]
+    command: ["tail -f /dev/null"]
+

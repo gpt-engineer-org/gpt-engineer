@@ -1,0 +1,20 @@
+litellm_settings: # module level litellm settings - https://github.com/BerriAI/litellm/blob/main/litellm/__init__.py
+  #master_key: sk-1234 #
+#  drop_params: True
+  set_verbose: True
+#  api_base: http://0.0.0.0:8000
+#router_settings:
+#  routing_strategy: "least-busy"
+#  num_retries: 3
+#  timeout: 70
+model_list:
+  - model_name: tiny
+    litellm_params:
+      model: ollama/tinyllama
+      api_base: http://ollama:11434
+#      api_key: sk-123
+#      organization: org-ikDc4ex8NB
+      headers: {
+        "HTTP-Referer": "litellm.ai",
+        "X-Title": "LiteLLM Server"
+      }
