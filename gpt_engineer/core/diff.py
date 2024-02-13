@@ -77,8 +77,13 @@ class Hunk:
         if self.is_new_file:
             # this hunk cannot be falsified and is by definition true
             return True
-        # check the location of the actual starting line:
-        start_true = is_similar(self.lines[0][1], lines_dict[self.start_line_pre_edit])
+        if self.start_line_pre_edit in lines_dict:
+            # check the location of the actual starting line:
+            start_true = is_similar(
+                self.lines[0][1], lines_dict[self.start_line_pre_edit]
+            )
+        else:
+            start_true = False
 
         if not start_true:
             # now find the true starting line compare to all lines and see how many matches we get

@@ -217,7 +217,7 @@ def test_correct_distorted_numbers():
 
 def test_correct_skipped_lines():
     distorted_example = insert_string_in_lined_string(
-        file_example, "\n#comment\n\n", 14
+        file_example, "#\n#comment\n#\n#", 14
     )
     diffs = parse_diffs(example_diff)
     list(diffs.values())[0].validate_and_correct(file_to_lines_dict(distorted_example))
@@ -235,7 +235,7 @@ def test_correct_skipped_lines():
 
 def test_correct_skipped_lines_and_number_correction():
     distorted_example = insert_string_in_lined_string(
-        file_example, "\n#comment\n\n", 14
+        file_example, "#\n#comment\n#\n#", 14
     )
     diffs = parse_diffs(example_line_dist_diff)
     list(diffs.values())[0].validate_and_correct(file_to_lines_dict(distorted_example))

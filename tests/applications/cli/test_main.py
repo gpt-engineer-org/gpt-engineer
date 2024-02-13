@@ -80,8 +80,8 @@ class TestMain:
         meta_p.mkdir(parents=True)
         (meta_p / "file_selection.toml").write_text(
             """
-        [files."main.py"]
-        selected = true
+        [files]
+        "main.py" = "selected"
                     """
         )
         os.environ["GPTE_TEST_MODE"] = "True"
