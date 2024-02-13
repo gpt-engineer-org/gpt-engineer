@@ -266,10 +266,12 @@ class TestImprove:
         # Mock the AI class
         ai_patch = """
 Some introductory text.
-```python
-File: main.py
-1 -print('Hello, World!')
-1 +print('Goodbye, World!')
+```diff
+--- main.py
++++ main.py
+@@ -1,1 +1,1 @@
+-print('Hello, World!')
++print('Goodbye, World!')
 ```
 """
         ai_mock = MagicMock(spec=AI)
