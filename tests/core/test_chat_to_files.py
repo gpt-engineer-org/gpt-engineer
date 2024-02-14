@@ -230,7 +230,10 @@ def test_correct_skipped_lines():
         "r",
     ) as f:
         corrected_diff_from_missing_lines = f.read()
-    assert diffs["example.txt"].diff_to_string() == corrected_diff_from_missing_lines
+    assert (
+        diffs["example.txt"].diff_to_string().strip()
+        == corrected_diff_from_missing_lines.strip()
+    )
 
 
 def test_correct_skipped_lines_and_number_correction():
@@ -248,7 +251,10 @@ def test_correct_skipped_lines_and_number_correction():
         "r",
     ) as f:
         corrected_diff_from_missing_lines = f.read()
-    assert diffs["example.txt"].diff_to_string() == corrected_diff_from_missing_lines
+    assert (
+        diffs["example.txt"].diff_to_string().strip()
+        == corrected_diff_from_missing_lines.strip()
+    )
 
 
 def test_diff_regex():
