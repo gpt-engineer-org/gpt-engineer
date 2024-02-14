@@ -1,8 +1,10 @@
 """
-This module provides advanced utilities for processing and managing chat content,
-specifically in GPT Engineer projects ("workspaces"). Its main focus is on the extraction
-and manipulation of code blocks from chat messages. Key functionalities include parsing chat
-content to identify and extract code blocks, then integrating them into workspaces.
+Chat to Files Module
+
+This module provides utilities to handle and process chat content, especially for extracting code blocks
+and managing them within a specified GPT Engineer project ("workspace"). It offers functionalities like parsing chat messages to
+retrieve code blocks, storing these blocks into a workspace, and overwriting workspace content based on
+new chat messages. Moreover, it aids in formatting and reading file content for an AI agent's input.
 
 Key Features:
 - Efficient extraction of code blocks from chat messages for workspace integration.
@@ -11,16 +13,20 @@ Key Features:
 - Retrieval of specific files and content for detailed analysis.
 
 Dependencies:
-- `os` and `pathlib`: Handle file system operations and path manipulations.
-- `re`: Employed for regex-based parsing to extract code blocks and edits.
-- `gpt_engineer.core.db`: Database functionalities for workspace management.
-- `gpt_engineer.cli.file_selector`: Constants and utilities for file selection.
+- `os` and `pathlib`: For handling OS-level operations and path manipulations.
+- `re`: For regex-based parsing of chat content.
+- `gpt_engineer.core.db`: Database handling functionalities for the workspace.
+- `gpt_engineer.cli.file_selector`: Constants related to file selection.
 
-Core Functions:
-- chat_to_files_dict: Extracts code blocks and organizes them for access.
-- overwrite_code_with_edits: Updates workspace files with chat-derived edits.
-- parse_edits: Parses and structures code edits from chats.
-- apply_edits: Applies edits to workspace files, maintaining their relevance.
+Functions:
+- chat_to_files_dict(chat: str) -> FilesDict
+    Extracts code blocks from a chat and returns them as a FilesDict object.
+- overwrite_code_with_edits(chat: str, files_dict: FilesDict)
+    Overwrites code with edits extracted from chat.
+- parse_edits(chat: str) -> List[Edit]
+    Parses edits from a chat string and returns them as a list of Edit objects.
+- apply_edits(edits: List[Edit], files_dict: FilesDict)
+    Applies a list of edits to the given code object.
 """
 
 import logging
@@ -35,10 +41,14 @@ from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 logger = logging.getLogger(__name__)
 
 
-def chat_to_files_dict(chat) -> FilesDict:
+def chat_to_files_dict(chat: str) -> FilesDict:
     """
+
     Extracts code blocks from a chat string and returns a FilesDict object containing
     (filename, codeblock) pairs.
+    Extracts all code blocks from a chat and returns them as a FilesDict object.
+    Parses the chat string to identify and extract code blocks, which are then stored in a FilesDict
+    object with filenames as keys and code content as values.
 
     Parameters
     ----------
@@ -48,7 +58,7 @@ def chat_to_files_dict(chat) -> FilesDict:
     Returns
     -------
     FilesDict
-        A FilesDict object with filenames as keys and their respective code blocks as values.
+        A FilesDict object containing the extracted code blocks, with filenames as keys.
     """
     # Regular expression pattern to identify code blocks and preceding filenames
     regex = r"(\S+)\n\s*```[^\n]*\n(.+?)```"
@@ -70,10 +80,10 @@ def chat_to_files_dict(chat) -> FilesDict:
 
     return files_dict
 
-
 def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
     """
     Applies a set of diffs to a FilesDict object and returns the modified FilesDict.
+
 
     Parameters
     ----------

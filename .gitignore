@@ -62,15 +62,12 @@ projects/*
 # docs
 
 docs/_build
-docs/__init__
-docs/ai
-docs/chat_to_files
-docs/collect
-docs/learning
-docs/main
-docs/steps/
-docs/db
-docs/db/
+docs/applications
+docs/benchmark
+docs/cli
+docs/core
+docs/intro
+docs/tools
 
 # coding assistants
 .aider*

@@ -36,7 +36,7 @@ with open("../pyproject.toml") as f:
 master_doc = "index"
 
 # General information about the project.
-project = data["project"]["name"]
+project = data["tool"]["poetry"]["name"]
 copyright = "2023 Anton Osika"
 author = " Anton Osika & Contributors"
 
@@ -45,9 +45,9 @@ author = " Anton Osika & Contributors"
 # the built documents.
 #
 # The short X.Y version.
-version = data["project"]["version"]
+version = data["tool"]["poetry"]["version"]
 # The full version, including alpha/beta/rc tags.
-release = data["project"]["version"]
+release = data["tool"]["poetry"]["version"]
 
 
 # -- General configuration ---------------------------------------------
@@ -65,7 +65,6 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx_copybutton",
-    "sphinx_panels",
     "myst_parser",
     "IPython.sphinxext.ipython_console_highlighting",
 ]
@@ -91,8 +90,7 @@ autodoc_default_options = {
     "members": True,
     "show-inheritance": True,
     "inherited-members": "BaseModel",
-    "undoc-members": True,
-    "special-members": "__call__",
+    "undoc-members": False,
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -107,7 +105,7 @@ templates_path = ["_templates"]
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -138,7 +136,7 @@ html_theme = "sphinx_rtd_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+# html_static_path = ["_static"]
 
 
 # -- Options for HTMLHelp output ---------------------------------------
@@ -202,3 +200,5 @@ autosummary_generate = True
 myst_enable_extensions = [
     "colon_fence",
 ]
+
+myst_all_links_external = True

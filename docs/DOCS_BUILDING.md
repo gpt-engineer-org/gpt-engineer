@@ -13,11 +13,6 @@ A basic Sphinx project lives in `docs/`, it was generated using Sphinx defaults.
 Read the Docs Build configuration is stored in `.readthedocs.yaml`.
 
 
-📍 [docs/requirements.txt](https://docs.readthedocs.io/en/stable/config-file/v2.html)<br>
-Python dependencies are [pinned](https://docs.readthedocs.io/en/latest/guides/reproducible-builds.html) (uses [pip-tools](https://pip-tools.readthedocs.io/en/latest/)) here. Make sure to add your Python dependencies to `requirements.txt` or if you choose [pip-tools](https://pip-tools.readthedocs.io/en/latest/), edit `docs/requirements.txt`.
-
-
-
 Example Project usage
 ---------------------
 
@@ -40,6 +35,9 @@ python create_api_rst.py
 
 # Build the docs
 make html
+
+## Alternatively, to rebuild the docs on changes with live-reload in the browser
+sphinx-autobuild docs _build/html
 ```
 
 Project Docs Structure
@@ -52,7 +50,7 @@ Below is the rundown of documentation structure for `pandasai`, you need to know
 2. copy `.readthedocs.yaml` and the `docs/` folder into your project root.
 3. `docs/api_reference.rst` contains the API documentation created using `docstring`.  Run the `create_api_rst.py` to update the API reference file.
 4. Project is using standard Google Docstring Style.
-5. Rebuild the documenation locally to see that it works.
+5. Rebuild the documentation locally to see that it works.
 6. Documentation are hosted on [Read the Docs tutorial](https://docs.readthedocs.io/en/stable/tutorial/)
 
 

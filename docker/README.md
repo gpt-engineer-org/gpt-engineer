@@ -3,7 +3,7 @@
 **Running using docker cli**:
 
 Building the image:
-- `git clone https://github.com/AntonOsika/gpt-engineer.git`
+- `git clone https://github.com/gpt-engineer-org/gpt-engineer.git`
 - `cd gpt-engineer`
 - `docker build --rm -t gpt-engineer -f docker/Dockerfile .`
 
@@ -15,7 +15,7 @@ The `-v` flag mounts the `your-project` folder into the container. Make sure to 
 **Running using docker-compose cli**:
 
 Building the image:
-- `git clone https://github.com/AntonOsika/gpt-engineer.git`
+- `git clone https://github.com/gpt-engineer-org/gpt-engineer.git`
 - `cd gpt-engineer`
 - `docker-compose -f docker-compose.yml build`
 - `docker-compose run --rm gpt-engineer`

@@ -1,8 +1,28 @@
+"""
+Module for loading GPT-Me evaluation tasks.
+
+This module provides functionality to load tasks for evaluating GPT-based models
+on smaller, more focused tasks. It defines a set of tasks with predefined prompts
+and assertions to benchmark the performance of AI models.
+
+Functions
+---------
+load_gptme : function
+    Loads the GPT-Me benchmark, which consists of a series of tasks for evaluation.
+"""
 from gpt_engineer.benchmark.types import Benchmark, Task
 from gpt_engineer.core.files_dict import FilesDict
 
 
 def load_gptme():
+    """
+    Loads the GPT-Me benchmark, which consists of a series of tasks for evaluation.
+
+    Returns
+    -------
+    Benchmark
+        A Benchmark object containing a list of Task objects for the GPT-Me evaluation.
+    """
     return Benchmark(
         name="gptme",
         tasks=[

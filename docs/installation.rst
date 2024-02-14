@@ -32,7 +32,7 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone https://github.com/AntonOsika/gpt-engineer.git
+    $ git clone https://github.com/gpt-engineer-org/gpt-engineer.git
 
 Once you have a copy of the source, you can install it with:
 
@@ -43,10 +43,10 @@ Once you have a copy of the source, you can install it with:
     $ poetry shell
 
 
-.. _Github repo: https://github.com/AntonOsika/gpt-engineer.git
+.. _Github repo: https://github.com/gpt-engineer-org/gpt-engineer.git
 
 Troubleshooting
--------------
+---------------
 
 For mac and linux system, there are sometimes slim python installations that do not include the gpt-engineer requirement tkinter, which is a standard library and thus not pip installable.
 

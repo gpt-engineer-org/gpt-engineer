@@ -23,7 +23,7 @@ For **development**:
 - `poetry install`
 - `poetry shell` to activate the virtual environment
 
-We actively support Python 3.10 - 3.11. The last version to support python 3.8 - 3.9 was [0.2.6](https://pypi.org/project/gpt-engineer/0.2.6/).
+We actively support Python 3.10 - 3.12. The last version to support python 3.8 - 3.9 was [0.2.6](https://pypi.org/project/gpt-engineer/0.2.6/).
 
 ### Setup API Key
 
@@ -43,13 +43,13 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 - Do everything in your browser:
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/gpt-engineer-org/gpt-engineer/codespaces)
 
-### Creating new code (default usage)
+### Create new code (default usage)
 - Create an empty folder for your project anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions
 - Run `gpte <project_dir>` with a relative path to your folder
   - For example: `gpte projects/my-new-project` from the gpt-engineer directory root with your new folder in `projects/`
 
-### Improving Existing Code
+### Improve Existing Code
 - Locate a folder with code which you want to improve anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions for how you want to improve the code
 - Run `gpte <project_dir> -i` with a relative path to your folder
@@ -57,21 +57,18 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 
 By running gpt-engineer you agree to our [terms](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
-### Note
-
-- To run this tool, the new command `gpte` is recommended for better user experience. However, the earlier default commands `gpt-engineer` and `ge` are also supported.
 
 ## Relation to gptengineer.app
-[gptengineer.app](https://gptengineer.app/) is a commercial project for automatic generation of web-apps. It emerged from gpt-engineer and is committed to giving back to the open source community.  A portion of gptengineer.app’s revenue will fund a full-time role and infrastructure for maintaining open-source tools for code generation.
+[gptengineer.app](https://gptengineer.app/) is a commercial project for automatic generation of web-apps.
+It features a UI for non-technical users, connected to a git controlled codebase.
+The gptengineer.app team is actively supporting the open source community.
 
 
 ## Features
 
-You can specify the "identity" of the AI agent by editing the files in the `preprompts` folder.
+You can specify the "identity" of the AI agent by overriding the `preprompts` folder, with your own version of the `preprompts`, using the `--use-custom-preprompts` argument.
 
-Editing the `preprompts`, and evolving how you write the project prompt, is how you make the agent remember things between projects.
-
-You can also automatically copy all `preprompts` files into your project folder using the cli parameter `--use-custom-preprompts`. This way you can have custom preprompts for all of your projects without the need to edit the main files.
+Editing the `preprompts` is how you make the agent remember things between projects.
 
 You can also run with open source models, like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
 
