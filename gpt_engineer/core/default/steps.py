@@ -25,8 +25,6 @@ execute_entrypoint : function
 setup_sys_prompt_existing_code : function
     Sets up the system prompt for improving existing code.
 
-incorrect_edit : function
-    Identifies incorrect edits in the generated code.
 
 improve : function
     Improves the code based on user input and returns the updated files.
@@ -247,42 +245,6 @@ def setup_sys_prompt_existing_code(
         + "\nUseful to know:\n"
         + preprompts["philosophy"]
     )
-
-def incorrect_edit(files_dict: FilesDict, chat: str) -> List[str,]:
-    """
-    Identifies incorrect edits in the generated code.
-
-    Parameters
-    ----------
-    files_dict : FilesDict
-        The dictionary of file names to their respective source code content.
-    chat : str
-        The chat content containing the edits.
-
-    Returns
-    -------
-    List[str]
-        A list of problems identified in the edits.
-    """
-    problems = []
-    try:
-        edits = parse_edits(chat)
-    except ValueError as problem:
-        print("Not possible to parse chat to edits")
-        problems.append(str(problem))
-        return problems
-
-    for edit in edits:
-        # only trigger for existing files
-        if edit.filename in files_dict:
-            if edit.before not in files_dict[edit.filename]:
-                problems.append(
-                    "This section, assigned to be exchanged for an edit block, does not have an exact match in the code: "
-                    + edit.before
-                    + "\nThis is often a result of placeholders, such as ... or references to 'existing code' or 'rest of function' etc, which cannot be used the HEAD part of the edit blocks. Also, to get a match, all comments, including long doc strings may have to be reproduced in the patch HEAD"
-                )
-    return problems
-
 
 
 def improve(

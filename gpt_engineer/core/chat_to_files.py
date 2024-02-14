@@ -80,6 +80,7 @@ def chat_to_files_dict(chat: str) -> FilesDict:
 
     return files_dict
 
+
 def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
     """
     Applies a set of diffs to a FilesDict object and returns the modified FilesDict.

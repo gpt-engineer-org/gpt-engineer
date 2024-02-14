@@ -72,34 +72,10 @@ class FilesDict(dict):
         return f"```\n{chat_str}```"
 
 
-
 def file_to_lines_dict(file_content: str) -> dict:
     """
     Converts file content into a dictionary where each line number is a key
     and the corresponding line content is the value.
-
-            Takes the name and content of a file and formats it into a string that is suitable
-            for input to an AI agent, enclosed within markdown code block fences.
-
-            Parameters
-            ----------
-            file_name : str
-                The name of the file to format.
-            file_content : str
-                The content of the file to format.
-
-            Returns
-            -------
-            str
-                The formatted file string, ready for AI input.
-            """
-            file_str = f"""
-{file_name}
-```
-{file_content}
-            ```
-            """
-            return file_str
 
     Parameters
     ----------
