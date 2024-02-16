@@ -47,6 +47,8 @@ from gpt_engineer.core.git import (
     init_git_repo,
     is_git_installed,
     is_git_repo,
+    filter_files_with_uncommitted_changes,
+    stage_uncommitted_files,
 )
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
@@ -165,15 +167,6 @@ def main(
         if not is_git_repo(path) and not improve_mode:
             print("Initializing an empty git repository")
             init_git_repo(path)
-        if is_git_repo(path) and has_uncommitted_changes(path):
-            continue_despite_uncommitted_changes = (
-                input(
-                    "Your project has uncommitted changes. Are you sure you want to continue? (y/N) "
-                ).lower()
-                == "y"
-            )
-            if not continue_despite_uncommitted_changes:
-                return
 
     prompt = load_prompt(DiskMemory(path), improve_mode)
 
@@ -216,6 +209,19 @@ def main(
         # collect user feedback if user consents
         config = (code_gen_fn.__name__, execution_fn.__name__)
         collect_and_send_human_review(prompt, model, temperature, config, agent.memory)
+
+    if is_git_repo(path):
+        # Ask whether user wants to stage uncommitted files before overwriting them
+        modified_files = filter_files_with_uncommitted_changes(path, files_dict)
+        if modified_files:
+            stage_uncommitted = (
+                input(
+                    f"gpt-engineer is about to overwrite {len(modified_files)} file{'' if len(modified_files) == 1 else 's'} that have uncommitted changes. Do you want to stage these files before overwriting them? (y/N) "
+                ).lower()
+                == "y"
+            )
+            if stage_uncommitted:
+                stage_uncommitted_files(path, modified_files)
 
     store.upload(files_dict)
 

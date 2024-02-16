@@ -1,7 +1,10 @@
 import shutil
 import subprocess
 
+from gpt_engineer.core.files_dict import FilesDict
+
 from pathlib import Path
+from typing import List
 
 
 def is_git_installed():
@@ -9,7 +12,15 @@ def is_git_installed():
 
 
 def is_git_repo(path: Path):
-    return (path / ".git").exists()
+    return (
+        subprocess.run(
+            ["git", "rev-parse", "--is-inside-work-tree"],
+            cwd=path,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        ).returncode
+        == 0
+    )
 
 
 def init_git_repo(path: Path):
@@ -27,16 +38,55 @@ def has_uncommitted_changes(path: Path):
     )
 
 
+def filter_files_with_uncommitted_changes(
+    basepath: Path, files_dict: FilesDict
+) -> List[Path]:
+    files_with_diff = (
+        subprocess.run(
+            ["git", "diff", "--name-only"], cwd=basepath, stdout=subprocess.PIPE
+        )
+        .stdout.decode()
+        .splitlines()
+    )
+    return [f for f in files_dict.keys() if f in files_with_diff]
+
+
 def get_gitignore_rules(path: Path):
-    gitignore = path / ".gitignore"
-    ret = []
-    if gitignore.exists():
+    # Get .gitignore files until git repo root
+    gitignore_files = []
+    while True:
+        gitignore = path / ".gitignore"
+        if gitignore.exists():
+            gitignore_files.append(gitignore)
+        if (path / ".git").exists():
+            break
+        path = path.parent
+    # Read all rules
+    rules = []
+    for gitignore in gitignore_files:
         with gitignore.open() as f:
             # Read lines, strip whitespace, remove empty lines and filter out comments
-            ret = list(
+            rules.extend(
                 filter(
                     lambda x: x and not x.startswith("#"),
                     map(lambda x: x.strip(), f.readlines()),
                 )
             )
-    return ret
+    return rules
+
+
+def stage_uncommitted_files(path: Path, files):
+    subprocess.run(["git", "add", *files], cwd=path)
+
+
+def filter_by_gitignore(path: Path, file_list: List[str]) -> List[str]:
+    out = subprocess.run(
+        ["git", "-C", ".", "check-ignore", "--no-index", "--stdin"],
+        cwd=path,
+        input="\n".join(file_list).encode(),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    paths = out.stdout.decode().splitlines()
+    # return file_list but filter out the results from git check-ignore
+    return [f for f in file_list if f not in paths]

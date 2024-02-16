@@ -30,7 +30,7 @@ import toml
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import metadata_path
 from gpt_engineer.core.files_dict import FilesDict
-from gpt_engineer.core.git import get_gitignore_rules
+from gpt_engineer.core.git import get_gitignore_rules, is_git_repo, filter_by_gitignore
 
 
 class FileSelector:
@@ -257,14 +257,10 @@ class FileSelector:
         ).resolve()  # Ensure path is absolute and resolved
 
         file_list = project_path.glob("**/*")
-        gitignore_rules = get_gitignore_rules(project_path)
 
         for path in file_list:  # Recursively list all files
             if path.is_file():
                 relpath = path.relative_to(project_path)
-                if self.should_filter_file(relpath, gitignore_rules):
-                    continue
-
                 parts = relpath.parts
                 if any(part.startswith(".") for part in parts):
                     continue  # Skip hidden files
@@ -272,6 +268,9 @@ class FileSelector:
                     continue
 
                 all_files.append(str(relpath))
+
+        if is_git_repo(project_path):
+            all_files = filter_by_gitignore(project_path, all_files)
 
         return all_files
 
