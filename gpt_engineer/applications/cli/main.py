@@ -43,11 +43,10 @@ from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.core.default.steps import execute_entrypoint, gen_code, improve
 from gpt_engineer.core.git import (
-    has_uncommitted_changes,
+    filter_files_with_uncommitted_changes,
     init_git_repo,
     is_git_installed,
     is_git_repo,
-    filter_files_with_uncommitted_changes,
     stage_uncommitted_files,
 )
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder

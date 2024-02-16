@@ -1,10 +1,10 @@
 import shutil
 import subprocess
 
-from gpt_engineer.core.files_dict import FilesDict
-
 from pathlib import Path
 from typing import List
+
+from gpt_engineer.core.files_dict import FilesDict
 
 
 def is_git_installed():
