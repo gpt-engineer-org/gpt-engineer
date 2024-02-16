@@ -1,3 +1,8 @@
+"""
+This module provides functionality to clean up benchmark directories by removing
+all files and folders except for 'prompt' and 'main_prompt'.
+"""
+
 # list all folders in benchmark folder
 # for each folder, run the benchmark
 
@@ -10,6 +15,12 @@ from typer import run
 
 
 def main():
+    """
+    Main function that iterates through all directories in the 'benchmark' folder
+    and cleans them by removing all files and directories except for 'prompt' and
+    'main_prompt'.
+    """
+
     benchmarks = Path("benchmark")
 
     for benchmark in benchmarks.iterdir():

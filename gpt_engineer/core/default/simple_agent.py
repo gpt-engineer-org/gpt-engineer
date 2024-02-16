@@ -1,3 +1,12 @@
+"""
+Module for defining a simple agent that uses AI to manage code generation and improvement.
+
+This module provides a class that represents an agent capable of initializing and improving
+a codebase using AI. It handles interactions with the AI model, memory, and execution
+environment to generate and refine code based on user prompts.
+
+"""
+
 import tempfile
 
 from typing import Optional
@@ -22,10 +31,16 @@ class SimpleAgent(BaseAgent):
     codebase based on user input. It uses an AI model to generate and refine code, and it
     interacts with a repository and an execution environment to manage and execute the code.
 
-    Attributes:
-        memory (BaseRepository): The repository where the code and related data are stored.
-        execution_env (BaseExecutionEnv): The environment in which the code is executed.
-        ai (AI): The AI model used for generating and improving code.
+    Attributes
+    ----------
+    memory : BaseMemory
+        The memory interface where the code and related data are stored.
+    execution_env : BaseExecutionEnv
+        The execution environment in which the code is executed.
+    ai : AI
+        The AI model used for generating and improving code.
+    preprompts_holder : PrepromptsHolder
+        The holder for preprompt messages that guide the AI model.
     """
 
     def __init__(
@@ -73,4 +88,12 @@ class SimpleAgent(BaseAgent):
 
 
 def default_config_agent():
+    """
+    Creates an instance of SimpleAgent with default configuration.
+
+    Returns
+    -------
+    SimpleAgent
+        An instance of SimpleAgent with a temporary directory as its base path.
+    """
     return SimpleAgent.with_default_config(tempfile.mkdtemp())

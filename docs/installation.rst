@@ -46,7 +46,7 @@ Once you have a copy of the source, you can install it with:
 .. _Github repo: https://github.com/gpt-engineer-org/gpt-engineer.git
 
 Troubleshooting
--------------
+---------------
 
 For mac and linux system, there are sometimes slim python installations that do not include the gpt-engineer requirement tkinter, which is a standard library and thus not pip installable.
 
