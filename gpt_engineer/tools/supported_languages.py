@@ -1,3 +1,10 @@
+"""
+This module defines the supported programming languages for document chunking.
+
+Variables:
+    SUPPORTED_LANGUAGES (list): A list of dictionaries defining supported languages.
+"""
+
 SUPPORTED_LANGUAGES = [
     {"name": "Python", "extensions": [".py"], "tree_sitter_name": "python"},
     {
