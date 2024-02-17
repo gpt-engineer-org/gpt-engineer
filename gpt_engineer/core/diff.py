@@ -1,6 +1,40 @@
+"""
+File Overview:
+
+This Python module is designed for processing and analyzing diffs in source code files. Diffs represent the changes between two versions of a file, which are crucial in version control systems for tracking file modifications. The module focuses on the detailed examination of these diffs, enabling users to understand, validate, and correct changes between file versions.
+
+Key Features:
+
+1. The `Hunk` class encapsulates a contiguous block of changes within a file. It includes detailed information such as start lines before and after edits, lengths of change blocks, and specific line changes categorized as additions, deletions, or unchanged.
+
+2. The `Diff` class represents a complete set of changes across a file and may contain multiple `Hunk` objects. It facilitates operations like generating string representations of diffs, and validating and correcting hunks based on the original file content.
+
+3. Functions within the module allow for the validation of hunks against original files, identifying mismatches, and making necessary corrections. This feature ensures that diffs are accurate and reflect true changes.
+
+4. Utility functions `is_similar` and `count_ratio` offer the capability to compare strings for similarity, accounting for variations in spacing and case. This aids in the validation process by allowing a flexible comparison of code lines.
+
+Dependencies:
+
+- `logging`: Utilized for logging warnings and errors encountered during the validation and correction process.
+- `collections.Counter`: Used for counting occurrences of characters in strings, supporting the string similarity assessment functions.
+
+Functions and Classes:
+
+1. `Hunk`: Class representing a block of changes within a file, with methods for managing and validating these changes.
+
+2. `Diff`: Class representing the entire set of changes in a file, containing multiple `Hunk` instances and methods for overall diff management.
+
+3. `is_similar(str1, str2, similarity_threshold)`: Function to compare two strings for similarity, useful in validating line changes in hunks.
+
+4. `count_ratio(str1, str2)`: Function that computes the ratio of common characters to the length of the longer string, aiding in the assessment of line similarity.
+
+This module is essential for developers and teams utilizing version control systems, providing tools for a deeper analysis and correction of diffs, ensuring the integrity and accuracy of code changes.
+
+"""
 import logging
 
 from collections import Counter
+from typing import List
 
 RETAIN = "retain"
 ADD = "add"
@@ -8,6 +42,19 @@ REMOVE = "remove"
 
 
 class Hunk:
+    """
+    Represents a section of a file diff, containing changes made to that section.
+
+    Attributes:
+        start_line_pre_edit (int): The starting line number in the original file.
+        hunk_len_pre_edit (int): The length of the hunk in the original file.
+        start_line_post_edit (int): The starting line number in the edited file.
+        hunk_len_post_edit (int): The length of the hunk in the edited file.
+        lines (list): A list of tuples representing the lines in the hunk and their types (RETAIN, ADD, REMOVE).
+        category_counts (dict): A count of lines by their type.
+        is_new_file (bool): Flag indicating if the hunk represents a new file.
+    """
+
     def __init__(
         self,
         start_line_pre_edit,
@@ -15,7 +62,7 @@ class Hunk:
         start_line_post_edit,
         hunk_len_post_edit,
         lines,
-    ):
+    ) -> None:
         self.start_line_pre_edit = start_line_pre_edit
         self.hunk_len_pre_edit = hunk_len_pre_edit
         self.start_line_post_edit = start_line_post_edit
@@ -29,27 +76,32 @@ class Hunk:
         else:
             self.is_new_file = False
 
-    def add_retained_line(self, line, index):
+    def add_retained_line(self, line, index) -> None:
+        """Adds a retained line to the hunk at the specified index."""
         self.lines.insert(index, (RETAIN, line))
         self.category_counts[RETAIN] += 1
 
-    def relabel_line(self, index, new_label):
+    def relabel_line(self, index, new_label) -> None:
+        """Changes the label of a line at the specified index."""
         old_label = self.lines[index][0]
         self.lines[index] = (new_label, self.lines[index][1])
         self.category_counts[old_label] -= 1
         self.category_counts[new_label] += 1
 
-    def pop_line(self, line, index):
+    def pop_line(self, line, index) -> None:
+        """Removes a line from the hunk at the specified index."""
         self.lines.pop(index)
         assert self.category_counts[line[0]] > 0
         self.category_counts[line[0]] -= 1
 
-    def add_lines(self, new_lines):
+    def add_lines(self, new_lines) -> None:
+        """Adds multiple lines to the hunk."""
         for line in new_lines:
             self.lines.append(line)
             self.category_counts[line[0]] += 1
 
-    def hunk_to_string(self):
+    def hunk_to_string(self) -> str:
+        """Converts the hunk to a string representation."""
         string = f"@@ -{self.start_line_pre_edit},{self.hunk_len_pre_edit} +{self.start_line_post_edit},{self.hunk_len_post_edit} @@\n"
         for line_type, line_content in self.lines:
             line_prefix = (
@@ -58,11 +110,8 @@ class Hunk:
             string += f"{line_prefix}{line_content}\n"
         return string
 
-    # @staticmethod
-    # def future_line_match(line, lines_dict):
-    #     return any([is_similar(line, file_line) for file_line in lines_dict.values()])
-
     def make_forward_block(self, hunk_ind: int, forward_block_len) -> str:
+        """Creates a block of lines for forward comparison."""
         forward_lines = [
             line[1] for line in self.lines[hunk_ind:] if not line[0] == ADD
         ]
@@ -72,8 +121,12 @@ class Hunk:
     def validate_and_correct(
         self, lines_dict: dict, problems: list, forward_block_len: int = 10
     ) -> bool:
-        # salvaging correct hunks
-        # rule out the case that its a new file
+        """
+        Validates and corrects the hunk based on the original lines.
+
+        This function attempts to validate the hunk by comparing its lines to the original file and making corrections
+        where necessary. It also identifies problems such as non-matching lines or incorrect line types.
+        """
         if self.is_new_file:
             # this hunk cannot be falsified and is by definition true
             return True
@@ -229,22 +282,33 @@ class Hunk:
 
 
 class Diff:
-    def __init__(self, filename_pre, filename_post):
+    """
+    Represents a file diff, containing multiple hunks of changes.
+
+    Attributes:
+        filename_pre (str): The name of the original file.
+        filename_post (str): The name of the edited file.
+        hunks (list): A list of Hunk objects representing the changes in the diff.
+    """
+
+    def __init__(self, filename_pre, filename_post) -> None:
         self.filename_pre = filename_pre
         self.filename_post = filename_post
         self.hunks = []
 
-    def is_new_file(self):
-        return any([hunk.is_new_file for hunk in self.hunks])
+    def is_new_file(self) -> bool:
+        """Determines if the diff represents a new file."""
+        return any(hunk.is_new_file for hunk in self.hunks)
 
-    def diff_to_string(self):
-        string = f"--- {self.filename_pre}\n"
-        string += f"+++ {self.filename_post}\n"
+    def diff_to_string(self) -> str:
+        """Converts the diff to a string representation."""
+        string = f"--- {self.filename_pre}\n+++ {self.filename_post}\n"
         for hunk in self.hunks:
             string += hunk.hunk_to_string()
         return string.strip()
 
-    def validate_and_correct(self, lines_dict: dict):
+    def validate_and_correct(self, lines_dict: dict) -> List[str]:
+        """Validates and corrects each hunk in the diff."""
         problems = []
         past_hunk = None
         cut_lines_dict = lines_dict.copy()
@@ -283,7 +347,7 @@ class Diff:
         return problems
 
 
-def is_similar(str1, str2, similarity_threshold=0.9):
+def is_similar(str1, str2, similarity_threshold=0.9) -> bool:
     """
     Compares two strings for similarity, ignoring spaces and case.
 
@@ -303,7 +367,16 @@ def is_similar(str1, str2, similarity_threshold=0.9):
     return count_ratio(str1, str2) >= similarity_threshold
 
 
-def count_ratio(str1, str2):
+def count_ratio(str1, str2) -> float:
+    """
+    Computes the ratio of common characters to the length of the longer string, ignoring spaces and case.
+
+    Parameters:
+    - str1, str2 (str): The strings to compare.
+
+    Returns:
+    - float: The ratio of common characters to the length of the longer string.
+    """
     str1, str2 = str1.replace(" ", "").lower(), str2.replace(" ", "").lower()
 
     counter1, counter2 = Counter(str1), Counter(str2)
