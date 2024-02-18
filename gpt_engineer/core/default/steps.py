@@ -281,7 +281,7 @@ def improve(
     ]
 
     # Add files as input
-    messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
+    messages.append(SystemMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=f"Request: {prompt}"))
     problems = []
     # check edit correctness
