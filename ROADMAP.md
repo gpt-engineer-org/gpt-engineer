@@ -5,9 +5,9 @@
 
 This document is a general roadmap guide to the gpt-engineer project's strategic direction. 
 Our goal is to continually improve by focusing on three main pillars: 
-- User Experience, 
-- Technical Features, and 
-- Performance Tracking/Testing. 
+- User Experience,
+- Technical Features, and
+- Performance Tracking/Testing.
 
 Each pillar is supported by a set of epics, reflecting our major goals and initiatives.
 
