@@ -352,6 +352,8 @@ class FileSelector:
                     continue  # Skip hidden fileso
                 if any(part in self.IGNORE_FOLDERS for part in parts):
                     continue
+                if relpath.name == "prompt":
+                    continue  # Skip files named 'prompt'
 
                 all_files.append(str(relpath))
 

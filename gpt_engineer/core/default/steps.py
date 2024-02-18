@@ -25,8 +25,6 @@ execute_entrypoint : function
 setup_sys_prompt_existing_code : function
     Sets up the system prompt for improving existing code.
 
-incorrect_edit : function
-    Identifies incorrect edits in the generated code.
 
 improve : function
     Improves the code based on user input and returns the updated files.
@@ -44,11 +42,7 @@ from termcolor import colored
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.base_memory import BaseMemory
-from gpt_engineer.core.chat_to_files import (
-    chat_to_files_dict,
-    overwrite_code_with_edits,
-    parse_edits,
-)
+from gpt_engineer.core.chat_to_files import apply_diffs, chat_to_files_dict, parse_diffs
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
@@ -56,7 +50,7 @@ from gpt_engineer.core.default.paths import (
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE,
 )
-from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
 
@@ -253,42 +247,6 @@ def setup_sys_prompt_existing_code(
     )
 
 
-def incorrect_edit(files_dict: FilesDict, chat: str) -> List[str,]:
-    """
-    Identifies incorrect edits in the generated code.
-
-    Parameters
-    ----------
-    files_dict : FilesDict
-        The dictionary of file names to their respective source code content.
-    chat : str
-        The chat content containing the edits.
-
-    Returns
-    -------
-    List[str]
-        A list of problems identified in the edits.
-    """
-    problems = []
-    try:
-        edits = parse_edits(chat)
-    except ValueError as problem:
-        print("Not possible to parse chat to edits")
-        problems.append(str(problem))
-        return problems
-
-    for edit in edits:
-        # only trigger for existing files
-        if edit.filename in files_dict:
-            if edit.before not in files_dict[edit.filename]:
-                problems.append(
-                    "This section, assigned to be exchanged for an edit block, does not have an exact match in the code: "
-                    + edit.before
-                    + "\nThis is often a result of placeholders, such as ... or references to 'existing code' or 'rest of function' etc, which cannot be used the HEAD part of the edit blocks. Also, to get a match, all comments, including long doc strings may have to be reproduced in the patch HEAD"
-                )
-    return problems
-
-
 def improve(
     ai: AI,
     prompt: str,
@@ -303,7 +261,7 @@ def improve(
     ----------
     ai : AI
         The AI model used for improving code.
-    prompt : str
+    prompt :str
         The user prompt to improve the code.
     files_dict : FilesDict
         The dictionary of file names to their respective source code content.
@@ -325,23 +283,48 @@ def improve(
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=f"Request: {prompt}"))
-    problems = [""]
-
+    problems = []
     # check edit correctness
     edit_refinements = 0
-    while len(problems) > 0 and edit_refinements <= MAX_EDIT_REFINEMENT_STEPS:
+    while edit_refinements <= MAX_EDIT_REFINEMENT_STEPS:
         messages = ai.next(messages, step_name=curr_fn())
-        chat = messages[-1].content.strip()
-        problems = incorrect_edit(files_dict, chat)
+        files_dict = salvage_correct_hunks(messages, files_dict, memory, problems)
+
         if len(problems) > 0:
             messages.append(
                 HumanMessage(
-                    content="Some previously produced edits were not on the requested format, or the HEAD part was not found in the code. Details: "
+                    content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details: "
                     + "\n".join(problems)
-                    + "\n Please provide ALL the edits again, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
+                    + "\n Please ONLY provide the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
                 )
             )
-        edit_refinements += 1
-    overwrite_code_with_edits(chat, files_dict)
+            messages = ai.next(messages, step_name=curr_fn())
+            edit_refinements += 1
+            files_dict = salvage_correct_hunks(messages, files_dict, memory, problems)
+        return files_dict
+
+
+def salvage_correct_hunks(
+    messages: List,
+    files_dict: FilesDict,
+    memory: MutableMapping[str | Path, str],
+    error_message: List,
+) -> FilesDict:
+    chat = messages[-1].content.strip()
+
+    diffs = parse_diffs(chat)
+
+    # validate and correct diffs
+
+    for file_name, diff in diffs.items():
+        # if diff is a new file, validation and correction is unnecessary
+        if diff.is_new_file():
+            files_dict = apply_diffs(diffs, files_dict)
+        else:
+            problems = diff.validate_and_correct(
+                file_to_lines_dict(files_dict[diff.filename_pre])
+            )
+            error_message.extend(problems)
+    files_dict = apply_diffs(diffs, files_dict)
     memory[IMPROVE_LOG_FILE] = chat
     return files_dict

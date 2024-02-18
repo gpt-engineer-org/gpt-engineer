@@ -1,206 +1,238 @@
 """
-Chat to Files Module
+This Python script provides functionalities for parsing chat transcripts that contain file paths and code blocks,
+applying diffs to these files, and parsing unified git diff format strings. The script is designed to work within
+a larger system that involves processing and manipulating code files based on chat inputs and diff information.
 
-This module provides utilities to handle and process chat content, especially for extracting code blocks
-and managing them within a specified GPT Engineer project ("workspace"). It offers functionalities like parsing chat messages to
-retrieve code blocks, storing these blocks into a workspace, and overwriting workspace content based on
-new chat messages. Moreover, it aids in formatting and reading file content for an AI agent's input.
+Key Components:
+- chat_to_files_dict: Parses a chat transcript, extracting file paths and associated code blocks, and organizes
+  them into a FilesDict object, which is a custom dictionary format designed to hold file contents keyed by their paths.
 
-Key Features:
-- Parse and extract code blocks from chat messages.
-- Store and overwrite files within a workspace based on chat content.
-- Format files to be used as inputs for AI agents.
-- Retrieve files and their content based on a provided list.
+- apply_diffs: Takes a dictionary of Diff objects (which represent changes to be made to files) and a FilesDict
+  object containing the current state of files. It applies the changes described by the Diff objects to the
+  corresponding files in the FilesDict, updating the file contents as specified by the diffs.
 
-Dependencies:
-- `os` and `pathlib`: For handling OS-level operations and path manipulations.
-- `re`: For regex-based parsing of chat content.
-- `gpt_engineer.core.db`: Database handling functionalities for the workspace.
-- `gpt_engineer.cli.file_selector`: Constants related to file selection.
+- parse_diffs: Parses a string containing diffs in the unified git diff format, extracting the changes described
+  in the diffs and organizing them into a dictionary of Diff objects, keyed by the filename to which each diff applies.
 
-Functions:
-- chat_to_files_dict(chat: str) -> FilesDict
-    Extracts code blocks from a chat and returns them as a FilesDict object.
-- overwrite_code_with_edits(chat: str, files_dict: FilesDict)
-    Overwrites code with edits extracted from chat.
-- parse_edits(chat: str) -> List[Edit]
-    Parses edits from a chat string and returns them as a list of Edit objects.
-- apply_edits(edits: List[Edit], files_dict: FilesDict)
-    Applies a list of edits to the given code object.
+- parse_diff_block: Parses a single block of text from a diff string, translating it into a Diff object that
+  represents the changes described in that block of text.
+
+This script is intended for use in environments where code collaboration or review is conducted through chat interfaces,
+allowing for the dynamic application of changes to code bases and the efficient handling of file and diff information in chat transcripts.
 """
 
 import logging
 import re
 
-from dataclasses import dataclass
-from typing import List
+from typing import Dict, Tuple
 
-from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.diff import ADD, REMOVE, RETAIN, Diff, Hunk
+from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 
+# Initialize a logger for this module
 logger = logging.getLogger(__name__)
 
 
 def chat_to_files_dict(chat: str) -> FilesDict:
     """
-    Extracts all code blocks from a chat and returns them as a FilesDict object.
+    Converts a chat string containing file paths and code blocks into a FilesDict object.
 
-    Parses the chat string to identify and extract code blocks, which are then stored in a FilesDict
-    object with filenames as keys and code content as values.
+    Args:
+    - chat (str): The chat string containing file paths and code blocks.
 
-    Parameters
-    ----------
-    chat : str
-        The chat string to extract code blocks from.
-
-    Returns
-    -------
-    FilesDict
-        A FilesDict object containing the extracted code blocks, with filenames as keys.
+    Returns:
+    - FilesDict: A dictionary with file paths as keys and code blocks as values.
     """
-    # Get all ``` blocks and preceding filenames
+    # Regex to match file paths and associated code blocks
     regex = r"(\S+)\n\s*```[^\n]*\n(.+?)```"
     matches = re.finditer(regex, chat, re.DOTALL)
 
     files_dict = FilesDict()
     for match in matches:
-        # Strip the filename of any non-allowed characters and convert / to \
+        # Clean and standardize the file path
         path = re.sub(r'[\:<>"|?*]', "", match.group(1))
-
-        # Remove leading and trailing brackets
         path = re.sub(r"^\[(.*)\]$", r"\1", path)
-
-        # Remove leading and trailing backticks
         path = re.sub(r"^`(.*)`$", r"\1", path)
-
-        # Remove trailing ]
         path = re.sub(r"[\]\:]$", "", path)
 
-        # Get the code
+        # Extract and clean the code content
         content = match.group(2)
 
-        # Add the file to the list
+        # Add the cleaned path and content to the FilesDict
         files_dict[path.strip()] = content.strip()
 
-    return FilesDict(files_dict)
+    return files_dict
 
 
-def overwrite_code_with_edits(chat: str, files_dict: FilesDict):
+def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
     """
-    Overwrite code with edits extracted from chat.
+    Applies diffs to the provided files.
 
-    Takes a chat string, parses it for edits using the `parse_edits` function, and applies those edits
-    to the provided FilesDict object using the `apply_edits` function.
+    Args:
+    - diffs (Dict[str, Diff]): A dictionary of diffs to apply, keyed by filename.
+    - files (FilesDict): The original files to which diffs will be applied.
 
-    Parameters
-    ----------
-    chat : str
-        The chat content containing code edits.
-    files_dict : FilesDict
-        The FilesDict object to apply edits to.
+    Returns:
+    - FilesDict: The updated files after applying diffs.
     """
-    edits = parse_edits(chat)
-    apply_edits(edits, files_dict)
-
-
-@dataclass
-class Edit:
-    filename: str
-    before: str
-    after: str
-
-
-def parse_edits(chat: str) -> List[Edit]:
-    """
-    Parse edits from a chat string.
-
-    Extracts code edits from a chat string and returns them as a list of Edit objects. Each Edit object
-    contains the filename, the original code block, and the updated code block.
-
-    Parameters
-    ----------
-    chat : str
-        The chat content containing code edits.
-
-    Returns
-    -------
-    List[Edit]
-        A list of Edit objects representing the parsed code edits.
-
-    Raises
-    ------
-    ValueError
-        If the text cannot be parsed as a code edit.
-    """
-
-    def parse_one_edit(lines):
-        HEAD = "<<<<<<< HEAD"
-        DIVIDER = "\n=======\n"
-        UPDATE = ">>>>>>> updated"
-
-        filename = lines.pop(0)
-        text = "\n".join(lines)
-        splits = text.split(DIVIDER)
-        if len(splits) != 2:
-            raise ValueError(f"Could not parse following text as code edit: \n{text}")
-        before, after = splits
-
-        before = before.replace(HEAD, "").strip()
-        after = after.replace(UPDATE, "").strip()
-
-        return Edit(filename, before, after)
-
-    edits = []
-    current_edit = []
-    in_fence = False
-
-    for line in chat.split("\n"):
-        if line.startswith("```") and in_fence:
-            edits.append(parse_one_edit(current_edit))
-            current_edit = []
-            in_fence = False
-            continue
-        elif line.startswith("```") and not in_fence:
-            in_fence = True
-            continue
-
-        if in_fence:
-            current_edit.append(line)
-
-    return edits
-
-
-def apply_edits(edits: List[Edit], files_dict: FilesDict):
-    """
-    Apply a list of edits to the given FilesDict object.
-
-    Takes a list of Edit objects and applies each edit to the FilesDict object. It handles the creation
-    of new files and the modification of existing files based on the edits.
-
-    Parameters
-    ----------
-    edits : List[Edit]
-        A list of Edit objects representing the code edits to apply.
-    files_dict : FilesDict
-        The FilesDict object to apply edits to.
-    """
-    for edit in edits:
-        filename = edit.filename
-        if edit.before == "":
-            if filename in files_dict:
-                logger.warning(
-                    f"The edit to be applied wants to create a new file `{filename}`, but that already exists. The file will be overwritten. See `.gpteng/memory` for previous version."
-                )
-            files_dict[filename] = edit.after  # new file
+    REMOVE_FLAG = "<REMOVE_LINE>"  # Placeholder to mark lines for removal
+    for diff in diffs.values():
+        if diff.is_new_file():
+            # If it's a new file, create it with the content from the diff
+            files[diff.filename_post] = "\n".join(
+                line[1] for hunk in diff.hunks for line in hunk.lines
+            )
         else:
-            occurrences_cnt = files_dict[filename].count(edit.before)
-            if occurrences_cnt == 0:
-                logger.warning(
-                    f"While applying an edit to `{filename}`, the code block to be replaced was not found. No instances will be replaced."
-                )
-            if occurrences_cnt > 1:
-                logger.warning(
-                    f"While applying an edit to `{filename}`, the code block to be replaced was found multiple times. All instances will be replaced."
-                )
-            files_dict[filename] = files_dict[filename].replace(
-                edit.before, edit.after
-            )  # existing file
+            # Convert the file content to a dictionary of lines
+            line_dict = file_to_lines_dict(files[diff.filename_pre])
+            for hunk in diff.hunks:
+                current_line = hunk.start_line_pre_edit
+                for line in hunk.lines:
+                    if line[0] == RETAIN:
+                        current_line += 1
+                    elif line[0] == ADD:
+                        # Handle added lines
+                        current_line -= 1
+                        if (
+                            current_line in line_dict.keys()
+                            and line_dict[current_line] != REMOVE_FLAG
+                        ):
+                            line_dict[current_line] += "\n" + line[1]
+                        else:
+                            line_dict[current_line] = line[1]
+                        print(
+                            f"\nAdded line {line[1]} to {diff.filename_post} at line {current_line} end"
+                        )
+                        current_line += 1
+                    elif line[0] == REMOVE:
+                        # Mark removed lines with REMOVE_FLAG
+                        line_dict[current_line] = REMOVE_FLAG
+                        print(
+                            f"\nRemoved line {line[1]} from {diff.filename_post} at line {current_line}"
+                        )
+                        current_line += 1
+
+            # Remove lines marked for removal
+            line_dict = {
+                key: line_content
+                for key, line_content in line_dict.items()
+                if REMOVE_FLAG not in line_content
+            }
+            # Reassemble the file content
+            files[diff.filename_post] = "\n".join(line_dict.values())
+    return files
+
+
+def parse_diffs(diff_string: str) -> dict:
+    """
+    Parses a diff string in the unified git diff format.
+
+    Args:
+    - diff_string (str): The diff string to parse.
+
+    Returns:
+    - dict: A dictionary of Diff objects keyed by filename.
+    """
+    # Regex to match individual diff blocks
+    diff_block_pattern = re.compile(
+        r"```.*?\n\s*?--- .*?\n\s*?\+\+\+ .*?\n(?:@@ .*? @@\n(?:[-+ ].*?\n)*?)*?```",
+        re.DOTALL,
+    )
+
+    diffs = {}
+    for block in diff_block_pattern.finditer(diff_string):
+        diff_block = block.group()
+
+        # Parse individual diff blocks and update the diffs dictionary
+        diffs.update(parse_diff_block(diff_block))
+
+    if not diffs:
+        raise ValueError(
+            f"The diff {diff_string} is not a valid diff in the unified git diff format"
+        )
+
+    return diffs
+
+
+def parse_diff_block(diff_block: str) -> dict:
+    """
+    Parses a block of diff text into a Diff object.
+
+    Args:
+    - diff_block (str): A single block of diff text.
+
+    Returns:
+    - dict: A dictionary containing a single Diff object keyed by the post-edit filename.
+    """
+    lines = diff_block.strip().split("\n")[1:-1]  # Exclude the opening and closing ```
+    diffs = {}
+    current_diff = None
+    hunk_lines = []
+    filename_pre = None
+    filename_post = None
+    hunk_header = None
+
+    for line in lines:
+        if line.startswith("--- "):
+            # Pre-edit filename
+            filename_pre = line[4:]
+        elif line.startswith("+++ "):
+            # Post-edit filename and initiation of a new Diff object
+            if (
+                filename_post is not None
+                and current_diff is not None
+                and hunk_header is not None
+            ):
+                current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
+                hunk_lines = []
+            filename_post = line[4:]
+            current_diff = Diff(filename_pre, filename_post)
+            diffs[filename_post] = current_diff
+        elif line.startswith("@@ "):
+            # Start of a new hunk in the diff
+            if hunk_lines and current_diff is not None and hunk_header is not None:
+                current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
+                hunk_lines = []
+            hunk_header = parse_hunk_header(line)
+        elif line.startswith("+"):
+            # Added line
+            hunk_lines.append((ADD, line[1:]))
+        elif line.startswith("-"):
+            # Removed line
+            hunk_lines.append((REMOVE, line[1:]))
+        else:
+            # Retained line
+            hunk_lines.append((RETAIN, line[1:]))
+
+    # Append the last hunk if any
+    if current_diff is not None and hunk_lines and hunk_header is not None:
+        current_diff.hunks.append(Hunk(*hunk_header, hunk_lines))
+
+    return diffs
+
+
+def parse_hunk_header(header_line) -> Tuple[int, int, int, int]:
+    """
+    Parses the header of a hunk from a diff.
+
+    Args:
+    - header_line (str): The header line of a hunk.
+
+    Returns:
+    - tuple: A tuple containing start and length information for pre- and post-edit.
+    """
+    pattern = re.compile(r"^@@ -\d{1,},\d{1,} \+\d{1,},\d{1,} @@$")
+
+    if not pattern.match(header_line):
+        # Return a default value if the header does not match the expected format
+        return 0, 0, 0, 0
+
+    pre, post = header_line.split(" ")[1:3]
+    start_line_pre_edit, hunk_len_pre_edit = map(int, pre[1:].split(","))
+    start_line_post_edit, hunk_len_post_edit = map(int, post[1:].split(","))
+    return (
+        start_line_pre_edit,
+        hunk_len_pre_edit,
+        start_line_post_edit,
+        hunk_len_post_edit,
+    )

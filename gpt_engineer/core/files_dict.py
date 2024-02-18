@@ -9,6 +9,7 @@ with an AI agent and to enforce type checks on keys and values.
 Classes:
     FilesDict: A dictionary-based container for managing code files.
 """
+from collections import OrderedDict
 from pathlib import Path
 from typing import Union
 
@@ -52,36 +53,46 @@ class FilesDict(dict):
         super().__setitem__(key, value)
 
     def to_chat(self):
-        def format_file_to_input(file_name: str, file_content: str) -> str:
-            """
-            Format a file string to use as input to the AI agent.
+        """
+        Formats the items of the object (assuming file name and content pairs)
+        into a string suitable for chat display.
 
-            Takes the name and content of a file and formats it into a string that is suitable
-            for input to an AI agent, enclosed within markdown code block fences.
+        Returns
+        -------
+        str
+            A string representation of the files.
+        """
+        chat_str = ""
+        for file_name, file_content in self.items():
+            lines_dict = file_to_lines_dict(file_content)
+            chat_str += f"File: {file_name}\n"
+            for line_number, line_content in lines_dict.items():
+                chat_str += f"{line_number} {line_content}\n"
+            chat_str += "\n"
+        return f"```\n{chat_str}```"
 
-            Parameters
-            ----------
-            file_name : str
-                The name of the file to format.
-            file_content : str
-                The content of the file to format.
 
-            Returns
-            -------
-            str
-                The formatted file string, ready for AI input.
-            """
-            file_str = f"""
-{file_name}
-```
-{file_content}
-            ```
-            """
-            return file_str
+def file_to_lines_dict(file_content: str) -> dict:
+    """
+    Converts file content into a dictionary where each line number is a key
+    and the corresponding line content is the value.
 
-        return "\n".join(
-            [
-                format_file_to_input(file_name, file_content) + "\n"
-                for file_name, file_content in self.items()
-            ]
-        )
+    Parameters
+    ----------
+    file_name : str
+        The name of the file.
+    file_content : str
+        The content of the file.
+
+    Returns
+    -------
+    dict
+        A dictionary with file names as keys and dictionaries (line numbers as keys and line contents as values) as values.
+    """
+    lines_dict = OrderedDict(
+        {
+            line_number: line_content
+            for line_number, line_content in enumerate(file_content.split("\n"), 1)
+        }
+    )
+    return lines_dict

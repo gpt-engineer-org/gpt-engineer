@@ -1,0 +1,84 @@
+I apologize for the oversight. Let's correct the `calculator.py` file with the proper git diff format, ensuring that the context lines match the original code exactly.
+
+```diff
+--- calculator.py
++++ calculator.py
+@@ -1,24 +1,24 @@
+ class Calculator:
+-    def add(self, a, b):
+-        return a - b  # Logical
++    def add(self, a, b):  # Adds two numbers
++        return a + b
+
+-    def subtract(self, a, b)
++    def subtract(self, a, b):  # Subtracts second number from first
++        return a - b
+
+-    def multiply(self, a, b):
+-        return lambda a, b: sum(a for _ in range(abs(b))) * (1 if b >= 0 else -1) #unncessary
++    def multiply(self, a, b):  # Multiplies two numbers
++        return a * b
+
+     def divide(self, a, b):
+         if b == 0:
+             raise ValueError("Cannot divide by zero.")
+         return a / b
+
+-    def modulo(self, a, b):
+-        if b = 0:  # Syntax
+-            return None  # Logical
++    def modulo(self, a, b):  # Finds the remainder of division of two numbers
++        if b == 0:
++            raise ValueError("Cannot modulo by zero.")
+         return a % b
+
+     def power(self, a, b):  # Raises a number to the power of another
+         result = 1
+-        for i in range(b):  # Logical
++        for i in range(abs(b)):
+             result *= a
+-        return result
++        return result if b >= 0 else 1 / result
+```
+
+Now, let's create the `main.py` file with the correct git diff format:
+
+```diff
+--- /dev/null
++++ main.py
+@@ -0,0 +1,30 @@
++from calculator import Calculator
++
++# Function to demonstrate the usage of the Calculator class
++def main():
++    calc = Calculator()
++    while True:
++        try:
++            a = float(input("Enter the first number: "))
++            b = float(input("Enter the second number: "))
++            operation = input("Enter an operation (add, subtract, multiply, divide, modulo, power): ").lower()
++            if operation == 'add':
++                print("Result:", calc.add(a, b))
++            elif operation == 'subtract':
++                print("Result:", calc.subtract(a, b))
++            elif operation == 'multiply':
++                print("Result:", calc.multiply(a, b))
++            elif operation == 'divide':
++                print("Result:", calc.divide(a, b))
++            elif operation == 'modulo':
++                print("Result:", calc.modulo(a, b))
++            elif operation == 'power':
++                print("Result:", calc.power(a, b))
++            else:
++                print("Invalid operation.")
++
++            if input("Do you want to perform another calculation? (yes/no): ").lower() != 'yes':
++                break
++        except Exception as e:
++            print("Error:", e)
++
++if __name__ == "__main__":
++    main()
+```
+
+These changes should now correctly apply to the provided code and create a simple calculator program with a command-line interface.
