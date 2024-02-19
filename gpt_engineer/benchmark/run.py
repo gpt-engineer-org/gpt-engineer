@@ -57,6 +57,8 @@ def run(
 
         if task.command:
             p = env.popen(task.command)
+            if task.input:
+                p.stdin.write(task.input.encode())
             stdout, stderr = p.communicate(benchmark.timeout)
             stdout, stderr = stdout.decode("utf-8"), stderr.decode("utf-8")
         else:

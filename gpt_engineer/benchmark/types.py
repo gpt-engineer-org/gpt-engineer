@@ -57,6 +57,7 @@ class Task:
     initial_code: Optional[FilesDict]
     command: Optional[str]
     prompt: str
+    input: Optional[str]
     assertions: Optional[Dict[str, Assertion]]
 
 
