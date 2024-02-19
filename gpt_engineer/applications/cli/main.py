@@ -155,7 +155,7 @@ def main(
         False,
         "--improve",
         "-i",
-        help="Improve files_dict from existing project.",
+        help="Improve mode - improve files_dict from existing project.",
     ),
     lite_mode: bool = typer.Option(
         False,
@@ -167,13 +167,13 @@ def main(
         False,
         "--clarify",
         "-c",
-        help="Lite mode - discuss specification with AI before implementation.",
+        help="Clarify mode - discuss specification with AI before implementation.",
     ),
     self_heal_mode: bool = typer.Option(
         False,
         "--self-heal",
         "-sh",
-        help="Lite mode - discuss specification with AI before implementation.",
+        help="Self-heal mode - fix the code by itself when it fails.",
     ),
     azure_endpoint: str = typer.Option(
         "",
