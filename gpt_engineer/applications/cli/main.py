@@ -125,6 +125,10 @@ def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
             (custom_preprompts_path / file.name).write_text(file.read_text())
     return custom_preprompts_path
 
+def prompt_yesno(question: str) -> bool:
+    question += " [y/N] "
+    answer = input(question).strip().lower()
+    return answer in ["y", "yes"]
 
 @app.command()
 def main(
@@ -169,6 +173,7 @@ def main(
           Copies all original preprompts to the project's workspace if they don't exist there.""",
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
+    yes: bool = typer.Option(False, "--yes", "-y"),
 ):
     """
     The main entry point for the CLI tool that generates or improves a project.
@@ -265,6 +270,8 @@ def main(
         fileselector = FileSelector(project_path)
         files_dict = fileselector.ask_for_files()
         files_dict = agent.improve(files_dict, prompt)
+        if files_dict and not prompt_yesno("\nDo you want to apply these changes?"):
+            return
     else:
         files_dict = agent.init(prompt)
         # collect user feedback if user consents
@@ -275,14 +282,8 @@ def main(
         # Ask whether user wants to stage uncommitted files before overwriting them
         modified_files = filter_files_with_uncommitted_changes(path, files_dict)
         if modified_files:
-            stage_uncommitted = (
-                input(
-                    f"gpt-engineer is about to overwrite {len(modified_files)} file{'' if len(modified_files) == 1 else 's'} that have uncommitted changes. Do you want to stage these files before overwriting them? (y/N) "
-                ).lower()
-                == "y"
-            )
-            if stage_uncommitted:
-                stage_uncommitted_files(path, modified_files)
+            print("Staging the following uncommitted files before overwriting: ", ", ".join(modified_files))
+            stage_uncommitted_files(path, modified_files)
 
     store.upload(files_dict)
 
