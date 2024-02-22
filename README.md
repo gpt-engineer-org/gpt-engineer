@@ -53,7 +53,7 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 - Locate a folder with code which you want to improve anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions for how you want to improve the code
 - Run `gpte <project_dir> -i` with a relative path to your folder
-  - For example: `gpte projects/my-old-project` from the gpt-engineer directory root with your folder in `projects/`
+  - For example: `gpte projects/my-old-project -i` from the gpt-engineer directory root with your folder in `projects/`
 
 By running gpt-engineer you agree to our [terms](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
