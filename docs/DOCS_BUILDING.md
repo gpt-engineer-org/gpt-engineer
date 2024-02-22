@@ -16,15 +16,15 @@ Read the Docs Build configuration is stored in `.readthedocs.yaml`.
 Example Project usage
 ---------------------
 
-`Poetry` is the package manager for `gpt-engineer`. In order to build documentation, we have to add docs requirements in
+``Poetry`` is the package manager for ``gpt-engineer``. In order to build documentation, we have to add docs requirements in
 development environment.
 
 This project has a standard readthedocs layout which is built by Read the Docs almost the same way that you would build it
 locally (on your own laptop!).
 
-You can build and view this documentation project locally - we recommend that you activate a `poetry shell`.
+You can build and view this documentation project locally - we recommend that you activate a ``poetry shell``.
 
-Update `repository_stats.md` file under `docs/intro`
+Update ``repository_stats.md`` file under ``docs/intro``
 
 ```console
 # Install required Python dependencies (MkDocs etc.)

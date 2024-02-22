@@ -1,5 +1,5 @@
 # Introduction
-GPT-Engineer is a project that uses LLMs (such as GPT-4) to automate the process of software engineering. It includes several Python scripts that interact with the LLM to generate code, clarify requirements, generate specifications, and more.
+``gpt-engineer`` is a project that uses LLMs (such as GPT-4) to automate the process of software engineering. It includes several Python scripts that interact with the LLM to generate code, clarify requirements, generate specifications, and more.
 
 <br>
 
