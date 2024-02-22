@@ -1,9 +1,9 @@
-=====
+==========
 Quickstart
-=====
+==========
 
 Setup API Key
-=====
+=============
 
 Choose one of the following:
 
