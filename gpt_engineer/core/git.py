@@ -51,31 +51,7 @@ def filter_files_with_uncommitted_changes(
     return [f for f in files_dict.keys() if f in files_with_diff]
 
 
-def get_gitignore_rules(path: Path):
-    # Get .gitignore files until git repo root
-    gitignore_files = []
-    while True:
-        gitignore = path / ".gitignore"
-        if gitignore.exists():
-            gitignore_files.append(gitignore)
-        if (path / ".git").exists():
-            break
-        path = path.parent
-    # Read all rules
-    rules = []
-    for gitignore in gitignore_files:
-        with gitignore.open() as f:
-            # Read lines, strip whitespace, remove empty lines and filter out comments
-            rules.extend(
-                filter(
-                    lambda x: x and not x.startswith("#"),
-                    map(lambda x: x.strip(), f.readlines()),
-                )
-            )
-    return rules
-
-
-def stage_uncommitted_files(path: Path, files):
+def stage_files(path: Path, files: List[str]):
     subprocess.run(["git", "add", *files], cwd=path)
 
 

@@ -44,7 +44,7 @@ from gpt_engineer.core.git import (
     init_git_repo,
     is_git_installed,
     is_git_repo,
-    stage_uncommitted_files,
+    stage_files,
 )
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
@@ -288,7 +288,7 @@ def main(
                 "Staging the following uncommitted files before overwriting: ",
                 ", ".join(modified_files),
             )
-            stage_uncommitted_files(path, modified_files)
+            stage_files(path, modified_files)
 
     store.upload(files_dict)
 
