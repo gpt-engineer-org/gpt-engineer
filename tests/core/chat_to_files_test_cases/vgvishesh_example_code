@@ -1,0 +1,12 @@
+import React from 'react';
+
+export const SocialLinks: React.FC = () => {
+  const profiles = {
+    linkedIn: 'https://www.linkedin.com/',
+    github: 'https://github.com/',
+    whatsapp: 'https://',
+    twitter: 'https://twitter.com/',
+  };
+
+  return (
+    <div className="social-links">
