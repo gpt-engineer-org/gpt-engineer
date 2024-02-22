@@ -1,59 +1,32 @@
 Welcome to GPT-ENGINEER's Documentation
-========================================
+=======================================
 
 .. toctree::
    :maxdepth: 2
-   :caption: INTRODUCTION:
+   :caption: GET STARTED:
 
-   intro/quick_overview.md
-   intro/repository_stats.md
-   intro/main_script.md
-   intro/scripts.md
-   intro/preprompts.md
+   introduction.md
+   installation
+   usage
 
 .. toctree::
    :maxdepth: 2
    :caption: USER GUIDES:
 
-   installation
-   usage
-   readme_link
    windows_readme_link
+   custom_steps.md
    open_models.md
    tracing_debugging.md
 
-
 .. toctree::
    :maxdepth: 2
-   :caption: CORE COMPONENTS:
-
-   intro/gate.md
-   intro/ai_class.md
-   intro/db_class.md
-   intro/steps_module.md
-
-
-.. toctree::
-   :maxdepth: 2
-   :caption: HARMONY OF AI, DB, & STEPS:
-
-   intro/harmony_db_ai_steps.md
-
-.. toctree::
-   :maxdepth: 2
-   :caption: CHAT PARSING & SELF EXECUTION:
-
-   intro/chat_parsing.md
-
-.. toctree::
-   :maxdepth: 2
-   :caption: CONTRIBUTING GUIDES:
+   :caption: CONTRIBUTE:
 
    contributing_link
-   DOCS_BUILDING.md
    roadmap_link
    code_conduct_link
    disclaimer_link
+   docs_building.md
    terms_link
 
 .. toctree::
