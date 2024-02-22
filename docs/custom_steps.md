@@ -1,6 +1,6 @@
 # Customizing steps
 
-### How Each Step is Made
+## How Each Step is Made
 Each step in the steps module is a function that takes an AI and a set of databases as arguments. The function performs a specific task, such as generating code or clarifying instructions, and returns a list of messages. The messages are then saved to the databases and used in subsequent steps.
 
 Here is an example of a step function:
@@ -22,7 +22,7 @@ This function uses the AI to generate code based on the main prompt. It reads th
 
 <br>
 
-### How to Make Your Own Step
+## How to Make Your Own Step
 To make your own step, you need to define a function that takes an AI and a set of databases as arguments. Inside the function, you can use the AI to generate responses and the databases to store and retrieve data. Here is an example:
 
 <br>
