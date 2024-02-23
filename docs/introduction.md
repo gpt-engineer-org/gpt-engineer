@@ -3,6 +3,11 @@
 
 <br>
 
+### Get started
+[Here’s](/installation.html) how to install ``gpt-engineer``, set up your environment, and start building.
+
+We recommend following our [Quickstart](/quickstart.html) guide to familiarize yourself with the framework by building your first application with ``gpt-engineer``.
+
 ## Core Components
 
 (ai_class)=
@@ -57,10 +62,6 @@ The main steps are:
 
 ### 6. Main Script (`gpt_engineer/applications/cli/main.py`)
 The main script is the is the entry point of the application and uses the `Typer` library to create a command-line interface. It sets up instances of an [`AI`](ai_class), a [`Files Dictionary`](files_dictionary_class), a `BaseMemory`, a `BaseExecutionEnv` and an [`Agent`](agent_class) that runs a series of [steps](steps) based on the provided configuration.
-
-## Repository Overview
-
-The GPT-Engineer repository is a project developed by Anton Osika, which uses GPT-4 to automate the process of software engineering. The repository is written in Python and is publicly available on GitHub.
 
 <br>
 

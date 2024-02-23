@@ -2,6 +2,17 @@
 Quickstart
 ==========
 
+Installation
+============
+
+To install LangChain run:
+
+.. code-block:: console
+
+    $ python -m pip install gpt-engineer
+
+For more details, see our [Installation guide](/instllation.html).
+
 Setup API Key
 =============
 
@@ -13,7 +24,7 @@ Choose one of the following:
 
       $ export OPENAI_API_KEY=[your api key]
 
-- Add it to the .env file:
+- Add it to the ``.env`` file:
 
   - Create a copy of ``.env.template`` named ``.env``
   - Add your ``OPENAI_API_KEY`` in .env
@@ -22,8 +33,8 @@ Choose one of the following:
 
 - To set API key on windows check the `Windows README <./windows_readme_link.html>`_.
 
-Run
-===
+Building with ``gpt-engineer``
+==============================
 
 Create new code (default usage)
 -------------------------------

@@ -7,15 +7,15 @@ Welcome to GPT-ENGINEER's Documentation
 
    introduction.md
    installation
-   usage
+   quickstart
 
 .. toctree::
    :maxdepth: 2
    :caption: USER GUIDES:
 
    windows_readme_link
-   custom_steps.md
    open_models.md
+   custom_steps.md
    tracing_debugging.md
 
 .. toctree::
