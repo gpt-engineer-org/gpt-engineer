@@ -303,7 +303,7 @@ def load_and_test_diff(
 
     # Parse the diffs and validate & correct them
     diffs = parse_diffs(diff_content)
-    list(diffs.values())[0].validate_and_correct(file_to_lines_dict(code_content))
+    # list(diffs.values())[0].validate_and_correct(file_to_lines_dict(code_content))
     return diff_content, code_content, diffs
 
 
@@ -315,9 +315,7 @@ def test_validation_and_apply_complex_diff():
     files = FilesDict({"taskmaster.py": task_master_code})
     for file_name, diff in diffs.items():
         # if diff is a new file, validation and correction is unnecessary
-        if diff.is_new_file():
-            files = apply_diffs(diffs, files)
-        else:
+        if not diff.is_new_file():
             problems = diff.validate_and_correct(
                 file_to_lines_dict(files["taskmaster.py"])
             )
@@ -334,9 +332,7 @@ def test_validation_and_apply_long_diff():
     files = FilesDict({"VMClonetest.ps1": wheaties_code})
     for file_name, diff in diffs.items():
         # if diff is a new file, validation and correction is unnecessary
-        if diff.is_new_file():
-            files = apply_diffs(diffs, files)
-        else:
+        if not diff.is_new_file():
             problems = diff.validate_and_correct(
                 file_to_lines_dict(files["VMClonetest.ps1"])
             )
@@ -347,14 +343,12 @@ def test_validation_and_apply_long_diff():
 
 def test_validation_and_apply_wrong_diff():
     example_diff, example_code, diffs = load_and_test_diff(
-        "vgvishesh_exmaple_diff", "vgvishesh_example_code"
+        "vgvishesh_example_diff", "vgvishesh_example_code"
     )
     files = FilesDict({"src/components/SocialLinks.tsx": example_code})
     for file_name, diff in diffs.items():
         # if diff is a new file, validation and correction is unnecessary
-        if diff.is_new_file():
-            files = apply_diffs(diffs, files)
-        else:
+        if not diff.is_new_file():
             problems = diff.validate_and_correct(
                 file_to_lines_dict(files["src/components/SocialLinks.tsx"])
             )

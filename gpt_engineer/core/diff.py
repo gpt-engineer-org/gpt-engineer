@@ -251,7 +251,7 @@ class Hunk:
                     and orig_count_ratio >= false_line_count_ratio
                 ):
                     problems.append(
-                        f"In {self.hunk_to_string()}:The trail of the diff, {forward_block}, does not match the code {forward_code}."
+                        f"In Hunk:{self.hunk_to_string()}, there was at least one mismatch."
                     )
                     return False
 

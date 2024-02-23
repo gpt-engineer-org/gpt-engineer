@@ -1,3 +1,6 @@
+Planning:
+........
+
 ```diff
 --- src/components/SocialLinks.tsx
 +++ src/components/SocialLinks.tsx
