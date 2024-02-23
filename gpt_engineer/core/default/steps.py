@@ -301,7 +301,7 @@ def improve(
             messages = ai.next(messages, step_name=curr_fn())
             edit_refinements += 1
             files_dict = salvage_correct_hunks(messages, files_dict, memory, problems)
-    return files_dict
+        return files_dict
 
 
 def salvage_correct_hunks(
