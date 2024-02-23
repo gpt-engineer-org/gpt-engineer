@@ -24,6 +24,7 @@ def test_init_git_repo():
         init_git_repo(path)
         assert is_git_repo(path)
 
+
 def test_stage_files():
     with tempfile.TemporaryDirectory() as tmpdir:
         path = Path(tmpdir)
@@ -36,7 +37,17 @@ def test_stage_files():
         stage_files(path, ["test.txt"])
 
         # Check if the file is staged
-        assert subprocess.run(["git", "diff", "--cached", "--name-only"], cwd=path, stdout=subprocess.PIPE).stdout.decode().strip() == "test.txt"
+        assert (
+            subprocess.run(
+                ["git", "diff", "--cached", "--name-only"],
+                cwd=path,
+                stdout=subprocess.PIPE,
+            )
+            .stdout.decode()
+            .strip()
+            == "test.txt"
+        )
+
 
 def test_filter_by_gitignore():
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -47,6 +58,7 @@ def test_filter_by_gitignore():
         gitignore = path / ".gitignore"
         gitignore.write_text("*.txt")
         assert filter_by_gitignore(path, ["test.txt"]) == []
+
 
 def test_filter_by_uncommitted_changes():
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -64,7 +76,10 @@ def test_filter_by_uncommitted_changes():
         file.write_text("test2")
 
         # Check if the file is staged
-        assert filter_files_with_uncommitted_changes(path, {"test.txt": "test"}) == ["test.txt"]
+        assert filter_files_with_uncommitted_changes(path, {"test.txt": "test"}) == [
+            "test.txt"
+        ]
+
 
 def test_filter_by_uncommitted_changes_ignore_staged_files():
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -79,6 +94,7 @@ def test_filter_by_uncommitted_changes_ignore_staged_files():
         # Check if the file is staged
         assert filter_files_with_uncommitted_changes(path, {"test.txt": "test"}) == []
 
+
 def test_filter_by_uncommitted_changes_ignore_untracked():
     with tempfile.TemporaryDirectory() as tmpdir:
         path = Path(tmpdir)
@@ -90,4 +106,3 @@ def test_filter_by_uncommitted_changes_ignore_untracked():
 
         # Check if the file is staged
         assert filter_files_with_uncommitted_changes(path, {"test.txt": "test"}) == []
-
