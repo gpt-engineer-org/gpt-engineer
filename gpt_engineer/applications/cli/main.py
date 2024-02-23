@@ -39,6 +39,13 @@ from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.core.default.steps import execute_entrypoint, gen_code, improve
+from gpt_engineer.core.git import (
+    filter_files_with_uncommitted_changes,
+    init_git_repo,
+    is_git_installed,
+    is_git_repo,
+    stage_files,
+)
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
 
@@ -119,6 +126,12 @@ def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
     return custom_preprompts_path
 
 
+def prompt_yesno(question: str) -> bool:
+    question += " [y/N] "
+    answer = input(question).strip().lower()
+    return answer in ["y", "yes"]
+
+
 @app.command()
 def main(
     project_path: str = typer.Argument("projects/example", help="path"),
@@ -162,6 +175,7 @@ def main(
           Copies all original preprompts to the project's workspace if they don't exist there.""",
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
+    yes: bool = typer.Option(False, "--yes", "-y"),
 ):
     """
     The main entry point for the CLI tool that generates or improves a project.
@@ -215,6 +229,13 @@ def main(
 
     path = Path(project_path)
     print("Running gpt-engineer in", path.absolute(), "\n")
+
+    # Check if there's a git repo and verify that there aren't any uncommitted changes
+    if is_git_installed():
+        if not is_git_repo(path) and not improve_mode:
+            print("Initializing an empty git repository")
+            init_git_repo(path)
+
     prompt = load_prompt(DiskMemory(path), improve_mode)
 
     # configure generation function
@@ -251,11 +272,23 @@ def main(
         fileselector = FileSelector(project_path)
         files_dict = fileselector.ask_for_files()
         files_dict = agent.improve(files_dict, prompt)
+        if files_dict and not prompt_yesno("\nDo you want to apply these changes?"):
+            return
     else:
         files_dict = agent.init(prompt)
         # collect user feedback if user consents
         config = (code_gen_fn.__name__, execution_fn.__name__)
         collect_and_send_human_review(prompt, model, temperature, config, agent.memory)
+
+    if is_git_repo(path):
+        # Ask whether user wants to stage uncommitted files before overwriting them
+        modified_files = filter_files_with_uncommitted_changes(path, files_dict)
+        if modified_files:
+            print(
+                "Staging the following uncommitted files before overwriting: ",
+                ", ".join(modified_files),
+            )
+            stage_files(path, modified_files)
 
     store.upload(files_dict)
 
