@@ -1,7 +1,17 @@
-from gpt_engineer.core.git import is_git_installed, is_git_repo, init_git_repo, stage_files, filter_files_with_uncommitted_changes, filter_by_gitignore
-from pathlib import Path
 import subprocess
 import tempfile
+
+from pathlib import Path
+
+from gpt_engineer.core.git import (
+    filter_by_gitignore,
+    filter_files_with_uncommitted_changes,
+    init_git_repo,
+    is_git_installed,
+    is_git_repo,
+    stage_files,
+)
+
 
 def test_verify_git_installed():
     # If git isn't installed we can't run any git tests either way
