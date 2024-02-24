@@ -241,7 +241,10 @@ def test_correct_skipped_lines_and_number_correction():
         file_example, "#\n#comment\n#\n#", 14
     )
     diffs = parse_diffs(example_line_dist_diff)
-    list(diffs.values())[0].validate_and_correct(file_to_lines_dict(distorted_example))
+    # list(diffs.values())[0].validate_and_correct(file_to_lines_dict(distorted_example))
+    for diff in diffs.values():
+        problems = diff.validate_and_correct(file_to_lines_dict(distorted_example))
+        print(problems)
     with open(
         os.path.join(
             THIS_FILE_DIR,
@@ -351,6 +354,22 @@ def test_validation_and_apply_wrong_diff():
         if not diff.is_new_file():
             problems = diff.validate_and_correct(
                 file_to_lines_dict(files["src/components/SocialLinks.tsx"])
+            )
+            print(problems)
+
+    apply_diffs(diffs, files)
+
+
+def test_validation_and_apply_non_change_diff():
+    example_diff, example_code, diffs = load_and_test_diff(
+        "vgvishesh_example_2_diff", "vgvishesh_example_2_code"
+    )
+    files = FilesDict({"src/App.tsx": example_code})
+    for file_name, diff in diffs.items():
+        # if diff is a new file, validation and correction is unnecessary
+        if not diff.is_new_file():
+            problems = diff.validate_and_correct(
+                file_to_lines_dict(files["src/App.tsx"])
             )
             print(problems)
 

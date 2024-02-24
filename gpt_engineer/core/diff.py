@@ -70,6 +70,7 @@ class Hunk:
         self.category_counts = {RETAIN: 0, ADD: 0, REMOVE: 0}
         self.lines = list()
         self.add_lines(lines)
+        self.forward_block_len = 10
         # Note that this assumption should not be done on hunk level, however, if the below is true, no validation is possible anyway.
         if self.category_counts[RETAIN] == 0 and self.category_counts[REMOVE] == 0:
             self.is_new_file = True
@@ -118,8 +119,20 @@ class Hunk:
         forward_block = "\n".join(forward_lines[0:forward_block_len])
         return forward_block
 
+    def check_start_line(self, lines_dict: dict) -> bool:
+        if self.is_new_file:
+            # this hunk cannot be falsified and is by definition true
+            return True
+        if self.start_line_pre_edit in lines_dict:
+            # check the location of the actual starting line:
+            is_similar(self.lines[0][1], lines_dict[self.start_line_pre_edit])
+        else:
+            pass
+
     def validate_and_correct(
-        self, lines_dict: dict, problems: list, forward_block_len: int = 10
+        self,
+        lines_dict: dict,
+        problems: list,
     ) -> bool:
         """
         Validates and corrects the hunk based on the original lines.
@@ -127,16 +140,7 @@ class Hunk:
         This function attempts to validate the hunk by comparing its lines to the original file and making corrections
         where necessary. It also identifies problems such as non-matching lines or incorrect line types.
         """
-        if self.is_new_file:
-            # this hunk cannot be falsified and is by definition true
-            return True
-        if self.start_line_pre_edit in lines_dict:
-            # check the location of the actual starting line:
-            start_true = is_similar(
-                self.lines[0][1], lines_dict[self.start_line_pre_edit]
-            )
-        else:
-            start_true = False
+        start_true = self.check_start_line(lines_dict)
 
         if not start_true:
             # now find the true starting line compare to all lines and see how many matches we get
@@ -159,11 +163,15 @@ class Hunk:
                         else:
                             # the line prior to the start line is found now we insert it to the first place as the start line
                             self.start_line_pre_edit = start_line
-                            self.add_retained_line(lines_dict[start_line], 0)
-                            return self.validate_and_correct(
-                                lines_dict, problems, forward_block_len
-                            )
-
+                            retain_line = lines_dict.get(start_line, "")
+                            if retain_line:
+                                self.add_retained_line(lines_dict[start_line], 0)
+                                return self.validate_and_correct(lines_dict, problems)
+                            else:
+                                problems.append(
+                                    f"In {self.hunk_to_string()}:The starting line of the diff {self.hunk_to_string()} does not exist in the code"
+                                )
+                                return False
             pot_start_lines = {
                 key: is_similar(self.lines[0][1], line)
                 for key, line in lines_dict.items()
@@ -175,9 +183,7 @@ class Hunk:
                     # if it is, we can mark it as an ADD lines
                     self.relabel_line(0, ADD)
                     # and restart the validation at the next line
-                    return self.validate_and_correct(
-                        lines_dict, problems, forward_block_len
-                    )
+                    return self.validate_and_correct(lines_dict, problems)
 
                 else:
                     problems.append(
@@ -219,18 +225,23 @@ class Hunk:
                         lines_dict[ind]
                         for ind in range(
                             file_ind,
-                            min(file_ind + forward_block_len, max(lines_dict.keys())),
+                            min(
+                                file_ind + self.forward_block_len,
+                                max(lines_dict.keys()),
+                            ),
                         )
                     ]
                 )
                 # make the original forward block for quantitative comparison
-                forward_block = self.make_forward_block(hunk_ind, forward_block_len)
+                forward_block = self.make_forward_block(
+                    hunk_ind, self.forward_block_len
+                )
                 orig_count_ratio = count_ratio(forward_block, forward_code)
                 # Here we have 2 cases
                 # 1) some lines were simply skipped in the diff and we should add them to the diff
                 # If this is the case, adding the line to the diff, should give an improved forward diff
                 forward_block_missing_line = self.make_forward_block(
-                    hunk_ind, forward_block_len - 1
+                    hunk_ind, self.forward_block_len - 1
                 )
                 # insert the missing line in front of the block
                 forward_block_missing_line = "\n".join(
@@ -241,7 +252,7 @@ class Hunk:
                 )
                 # 2) Additional lines, not belonging to the code were added to the diff
                 forward_block_false_line = self.make_forward_block(
-                    hunk_ind + 1, forward_block_len
+                    hunk_ind + 1, self.forward_block_len
                 )
                 false_line_count_ratio = count_ratio(
                     forward_block_false_line, forward_code
