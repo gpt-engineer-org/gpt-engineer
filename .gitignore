@@ -86,3 +86,6 @@ webapp/.next/
 
 #ignore tox files
 .tox
+
+#ignore log files
+*.log
