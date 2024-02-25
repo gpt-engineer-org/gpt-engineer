@@ -120,6 +120,7 @@ class Hunk:
         return forward_block
 
     def check_start_line(self, lines_dict: dict) -> bool:
+        """Check if the starting line of a hunk is present in the original code and returns a boolean value accordingly."""
         if self.is_new_file:
             # this hunk cannot be falsified and is by definition true
             return True
@@ -130,10 +131,11 @@ class Hunk:
             pass
 
     def find_start_line(self, lines_dict: dict, problems: list) -> bool:
-        # now find the true starting line compare to all lines and see how many matches we get
+        """Finds the starting line of the hunk in the original code and returns a boolean value accordingly. If the starting line is not found, it appends a problem message to the problems list."""
+
         # ToDo handle the case where the start line is 0 or 1 characters separately
-        # handle the case where the start line is an add
         if self.lines[0][0] == ADD:
+            # handle the case where the start line is an add
             start_line = None
             # find the first line that is not an add
             for index, line in enumerate(self.lines):
@@ -192,24 +194,8 @@ class Hunk:
         assert is_similar(self.lines[0][1], lines_dict[self.start_line_pre_edit])
         return True
 
-    def validate_and_correct(
-        self,
-        lines_dict: dict,
-        problems: list,
-    ) -> bool:
-        """
-        Validates and corrects the hunk based on the original lines.
-
-        This function attempts to validate the hunk by comparing its lines to the original file and making corrections
-        where necessary. It also identifies problems such as non-matching lines or incorrect line types.
-        """
-        start_true = self.check_start_line(lines_dict)
-
-        if not start_true:
-            if not self.find_start_line(lines_dict, problems):
-                return False
-
-        # Now we should be able to validate the hunk line by line and add missing line
+    def validate_lines(self, lines_dict: dict, problems: list) -> bool:
+        """Validates the lines of the hunk against the original file and returns a boolean value accordingly. If the lines do not match, it appends a problem message to the problems list."""
         hunk_ind = 0
         file_ind = self.start_line_pre_edit
         # make an orig hunk lines for logging
@@ -294,6 +280,29 @@ class Hunk:
                 f"In {self.hunk_to_string()}:Hunk validation stopped before the lines {remaining_lines} were validated. The diff is incorrect"
             )
             return False
+        return True
+
+    def validate_and_correct(
+        self,
+        lines_dict: dict,
+        problems: list,
+    ) -> bool:
+        """
+        Validates and corrects the hunk based on the original lines.
+
+        This function attempts to validate the hunk by comparing its lines to the original file and making corrections
+        where necessary. It also identifies problems such as non-matching lines or incorrect line types.
+        """
+        start_true = self.check_start_line(lines_dict)
+
+        if not start_true:
+            if not self.find_start_line(lines_dict, problems):
+                return False
+
+        # Now we should be able to validate the hunk line by line and add missing line
+        if not self.validate_lines(lines_dict, problems):
+            return False
+        # Pass the validation
         return True
 
 
