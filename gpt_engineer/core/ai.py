@@ -277,6 +277,7 @@ class AI:
             )
 
         return ChatOpenAI(
+            openai_api_base=os.getenv("openai_api_base"),
             model=self.model_name,
             temperature=self.temperature,
             streaming=self.streaming,
