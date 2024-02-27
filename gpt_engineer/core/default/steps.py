@@ -34,6 +34,7 @@ import inspect
 import re
 
 from pathlib import Path
+from platform import platform
 from typing import List, MutableMapping, Union
 
 from langchain.schema import HumanMessage, SystemMessage
@@ -145,7 +146,7 @@ def gen_entrypoint(
     """
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
-        system=(preprompts["entrypoint"]),
+        system=(preprompts["entrypoint"]).format(platform=platform()),
         user="Information about the codebase:\n\n" + files_dict.to_chat(),
         step_name=curr_fn(),
     )
