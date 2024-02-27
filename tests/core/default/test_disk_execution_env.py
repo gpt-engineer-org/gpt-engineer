@@ -1,3 +1,4 @@
+import os
 import tempfile
 import unittest
 
@@ -74,6 +75,13 @@ class TestOnDiskExecutionEnv(unittest.TestCase):
             stdout, stderr = process.communicate()
             self.assertEqual(stdout, b"Out\n")
             self.assertEqual(stderr, b"Error\n")
+
+    def test_entrypoint_file(self):
+        if os.name == "nt":
+            expected = "run.bat"
+        else:
+            expected = "run.sh"
+        self.assertEqual(ENTRYPOINT_FILE, expected)
 
 
 if __name__ == "__main__":
