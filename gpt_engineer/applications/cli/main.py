@@ -33,7 +33,7 @@ from dotenv import load_dotenv
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
 from gpt_engineer.applications.cli.file_selector import FileSelector
-from gpt_engineer.core.ai import AI
+from gpt_engineer.core.ai import AI, ClipboardAI
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.file_store import FileStore
@@ -174,6 +174,11 @@ def main(
         help="""Use your project's custom preprompts instead of the default ones.
           Copies all original preprompts to the project's workspace if they don't exist there.""",
     ),
+    llm_via_clipboard: bool = typer.Option(
+        False,
+        "--llm-via-clipboard",
+        help="Use the clipboard to communicate with the AI.",
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
     yes: bool = typer.Option(False, "--yes", "-y"),
 ):
@@ -221,11 +226,14 @@ def main(
 
     load_env_if_needed()
 
-    ai = AI(
-        model_name=model,
-        temperature=temperature,
-        azure_endpoint=azure_endpoint,
-    )
+    if llm_via_clipboard:
+        ai = ClipboardAI()
+    else:
+        ai = AI(
+            model_name=model,
+            temperature=temperature,
+            azure_endpoint=azure_endpoint,
+        )
 
     path = Path(project_path)
     print("Running gpt-engineer in", path.absolute(), "\n")
