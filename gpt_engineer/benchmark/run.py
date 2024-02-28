@@ -47,29 +47,23 @@ def run(
         A list of TaskResult objects representing the results of the benchmark tasks.
     """
     task_results = []
+    retry_id = 0
     for task in benchmark.tasks:
         t0 = time.time()
         files_dict = agent.improve(task.initial_code, task.prompt, task.command)
         t1 = time.time()
 
-        env = DiskExecutionEnv()
-        env.upload(files_dict)
+        exec_result = run_and_get_result(files_dict, task, benchmark)
 
-        if task.command:
-            p = env.popen(task.command)
-            if task.input:
-                p.stdin.write(task.input.encode())
-            stdout, stderr = p.communicate(benchmark.timeout)
-            stdout, stderr = stdout.decode("utf-8"), stderr.decode("utf-8")
-        else:
-            p, stdout, stderr = None, None, None
-        exec_result = Assertable(
-            files=files_dict,
-            env=env,
-            process=p,
-            stdout=stdout,
-            stderr=stderr,
-        )
+        print(f'Actual output: {exec_result.stdout}')
+        print(f'Actual error: {exec_result.stderr}')
+
+        # Retry if task is retryable and given agent implements `self.self_heal`
+        if exec_result.stderr and callable(getattr(agent, 'self_heal')):
+            for idx in range(0, task.retries or 0):
+                retry_id = idx
+                files_dict = agent.self_heal(files_dict, task.prompt, exec_result.stdout, exec_result.stderr, exec_result.process)
+                exec_result = run_and_get_result(files_dict, task, benchmark)
 
         task_results.append(
             TaskResult(
@@ -79,12 +73,32 @@ def run(
                     for assertion_name, assertion in task.assertions.items()
                 },
                 duration=t1 - t0,
+                retry_id=retry_id,
             )
         )
         if verbose:
             print_results(task_results)
     return task_results
 
+
+def run_and_get_result(files_dict, task, benchmark) -> Assertable:
+    env = DiskExecutionEnv()
+    env.upload(files_dict)
+
+    if task.command:
+        p = env.popen(task.command)
+        stdout, stderr = p.communicate(benchmark.timeout)
+        stdout, stderr = stdout.decode("utf-8"), stderr.decode("utf-8")
+    else:
+        p, stdout, stderr = None, None, None
+
+    return Assertable(
+        files=files_dict,
+        env=env,
+        process=p,
+        stdout=stdout,
+        stderr=stderr,
+    )
 
 def print_results(results: list[TaskResult]):
     """

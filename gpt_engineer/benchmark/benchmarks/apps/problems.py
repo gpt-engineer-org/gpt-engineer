@@ -6,4 +6,4 @@ COMPETITION_PROBLEM_IDS = list()
 
 # TODO: Pick problems
 # Temporary testing against these problems
-PROBLEM_IDS = [1, 19, 52, 67, 14]
+PROBLEM_IDS = [1, 2, 3, 4, 5, 6]

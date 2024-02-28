@@ -56,17 +56,21 @@ def load_apps():
         if len(problem.starter_code):  # TODO: Temporary skip; Handle these too
             continue
 
+        command_line_arguments = problem.inputs[0].replace('\n', ' ').strip()
+
+        print(f"python main.py {command_line_arguments}")
+        print(f"expected output {problem.outputs[0].replace(' ', '')}")
         tasks.append(
             Task(
                 name=str(problem.id),
                 initial_code=FilesDict({"main.py": ''}),
-                command="python main.py",
+                command=f"python main.py {command_line_arguments}",
                 prompt=problem.question,
-                input=problem.inputs[0],
                 assertions={
                     "correct output": lambda
                         assertable: problem.outputs[0].replace(' ', '') in assertable.stdout.replace(' ', ''),
                 },
+                retries=1,  # TODO: Fix other benchmarks
             ),
         )
 
