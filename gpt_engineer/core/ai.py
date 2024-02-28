@@ -305,7 +305,7 @@ class ClipboardAI(AI):
             except EOFError:
                 break
             content.append(line)
-        return content
+        return "\n".join(content)
 
     def next(
         self,
@@ -332,10 +332,6 @@ class ClipboardAI(AI):
         )
 
         response = self.multiline_input()
-
-        self.token_usage_log.update_log(
-            messages=messages, answer=response, step_name=step_name
-        )
 
         messages.append(AIMessage(content=response))
         logger.debug(f"Chat completion finished: {messages}")
