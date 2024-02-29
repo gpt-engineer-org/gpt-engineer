@@ -54,7 +54,21 @@ Use the largest model possible that your hardware allows you to run. Sure the re
 Running the Example
 ==================
 
-To see that your setup works see [test open LLM](examples/test_open_llm/README.md).
+To see that your setup works see [test open LLM](examples/test_open_llm/README.md). 
+
+If the tests work, run the LLM in separate terminal:
+
+```bash
+python -m llama_cpp.server --model $model_path
+```
+
+Then run `gpt-engineer` with the following environment variables:
+
+```bash
+export OPENAI_API_BASE="http://localhost:8000/v1"
+export OPENAI_API_KEY="sk-xxx"
+gpte <project_dir>
+```
 
 On other inference libraries
 -------------------
