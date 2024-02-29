@@ -5,9 +5,10 @@ client = OpenAI(base_url="http://localhost:8000/v1", api_key="sk-xxx")
 response = client.chat.completions.create(
     model="llama2",
     messages=[
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What is the meaning of life?"},
+        {"role": "user", "content": "Provide me with the code for a simple HTML web site."},
     ],
+    temperature=0.7,
+    max_tokens=200,
 )
 
-print(response)
+print(response.choices[0].message.content)
