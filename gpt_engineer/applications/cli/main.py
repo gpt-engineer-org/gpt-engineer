@@ -62,7 +62,7 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY", default=None)
 
     local_server_url = os.getenv("OPENAI_API_BASE")
-    
+
 
     if local_server_url:
         openai.api_base = local_server_url
