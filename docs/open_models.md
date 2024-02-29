@@ -1,6 +1,8 @@
 Using with open/local models
 ============================
 
+At the moment the best option for coding is still the use of `gpt-4` models provided by OpenAI. But open models are catching up and are a good free and privacy-oriented alternative if you possess the proper hardware.
+
 You can integrate `gpt-engineer` with open-source models by leveraging an OpenAI-compatible API.
 
 We provide the minimal and cleanest solution below. It's not the only way to use open/local models but the one we recommend and tested.
