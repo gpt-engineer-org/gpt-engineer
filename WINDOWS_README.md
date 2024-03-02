@@ -27,7 +27,7 @@ Or:
 
 For **development**:
 
-- `git clone git@github.com:AntonOsika/gpt-engineer.git`
+- `git clone git@github.com:gpt-engineer-org/gpt-engineer.git`
 - `cd gpt-engineer`
 - `poetry install`
 - `poetry shell` to activate the virtual environment
