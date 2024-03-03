@@ -212,7 +212,12 @@ def main(
     None
     """
 
-    logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
+    logging.basicConfig(
+        level=logging.DEBUG if verbose else logging.INFO,
+        filename="logfile.log",
+        filemode="a",
+        format="%(levelname)-7s %(asctime)s.%(msecs)03d %(pathname)s:%(lineno)d(%(funcName)s) %(message)s",
+    )
 
     if improve_mode:
         assert not (
