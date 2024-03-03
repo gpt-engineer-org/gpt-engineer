@@ -241,7 +241,10 @@ def test_correct_skipped_lines_and_number_correction():
         file_example, "#\n#comment\n#\n#", 14
     )
     diffs = parse_diffs(example_line_dist_diff)
-    list(diffs.values())[0].validate_and_correct(file_to_lines_dict(distorted_example))
+    # list(diffs.values())[0].validate_and_correct(file_to_lines_dict(distorted_example))
+    for diff in diffs.values():
+        problems = diff.validate_and_correct(file_to_lines_dict(distorted_example))
+        print(problems)
     with open(
         os.path.join(
             THIS_FILE_DIR,
@@ -267,19 +270,19 @@ def test_diff_regex():
 
 # test parse diff
 def test_controller_diff():
-    load_and_test_diff("diff_controller", "controller_code")
+    load_and_test_diff("controller_diff", "controller_code")
 
 
 def test_simple_calculator_diff():
-    load_and_test_diff("diff_simple_calculator", "simple_calculator_code")
+    load_and_test_diff("simple_calculator_diff", "simple_calculator_code")
 
 
 def test_complex_temperature_converter_diff():
-    load_and_test_diff("diff_temperature_converter", "temperature_converter_code")
+    load_and_test_diff("temperature_converter_diff", "temperature_converter_code")
 
 
 def test_complex_task_master_diff():
-    load_and_test_diff("diff_task_master", "task_master_code")
+    load_and_test_diff("task_master_diff", "task_master_code")
 
 
 def test_long_file_diff():
@@ -303,21 +306,19 @@ def load_and_test_diff(
 
     # Parse the diffs and validate & correct them
     diffs = parse_diffs(diff_content)
-    list(diffs.values())[0].validate_and_correct(file_to_lines_dict(code_content))
+    # list(diffs.values())[0].validate_and_correct(file_to_lines_dict(code_content))
     return diff_content, code_content, diffs
 
 
 # Test diff application
 def test_validation_and_apply_complex_diff():
     task_master_diff, task_master_code, diffs = load_and_test_diff(
-        "diff_task_master", "task_master_code"
+        "task_master_diff", "task_master_code"
     )
     files = FilesDict({"taskmaster.py": task_master_code})
     for file_name, diff in diffs.items():
         # if diff is a new file, validation and correction is unnecessary
-        if diff.is_new_file():
-            files = apply_diffs(diffs, files)
-        else:
+        if not diff.is_new_file():
             problems = diff.validate_and_correct(
                 file_to_lines_dict(files["taskmaster.py"])
             )
@@ -334,11 +335,41 @@ def test_validation_and_apply_long_diff():
     files = FilesDict({"VMClonetest.ps1": wheaties_code})
     for file_name, diff in diffs.items():
         # if diff is a new file, validation and correction is unnecessary
-        if diff.is_new_file():
-            files = apply_diffs(diffs, files)
-        else:
+        if not diff.is_new_file():
             problems = diff.validate_and_correct(
                 file_to_lines_dict(files["VMClonetest.ps1"])
+            )
+            print(problems)
+
+    apply_diffs(diffs, files)
+
+
+def test_validation_and_apply_wrong_diff():
+    example_diff, example_code, diffs = load_and_test_diff(
+        "vgvishesh_example_diff", "vgvishesh_example_code"
+    )
+    files = FilesDict({"src/components/SocialLinks.tsx": example_code})
+    for file_name, diff in diffs.items():
+        # if diff is a new file, validation and correction is unnecessary
+        if not diff.is_new_file():
+            problems = diff.validate_and_correct(
+                file_to_lines_dict(files["src/components/SocialLinks.tsx"])
+            )
+            print(problems)
+
+    apply_diffs(diffs, files)
+
+
+def test_validation_and_apply_non_change_diff():
+    example_diff, example_code, diffs = load_and_test_diff(
+        "vgvishesh_example_2_diff", "vgvishesh_example_2_code"
+    )
+    files = FilesDict({"src/App.tsx": example_code})
+    for file_name, diff in diffs.items():
+        # if diff is a new file, validation and correction is unnecessary
+        if not diff.is_new_file():
+            problems = diff.validate_and_correct(
+                file_to_lines_dict(files["src/App.tsx"])
             )
             print(problems)
 

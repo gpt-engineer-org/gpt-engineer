@@ -1,0 +1,20 @@
+Planning:
+........
+
+```diff
+--- src/components/SocialLinks.tsx
++++ src/components/SocialLinks.tsx
+@@ -1,10 +1,11 @@
+ import React from 'react';
+
++export const profiles = {
+-  const profiles = {
+     linkedIn: 'https://www.linkedin.com/',
+     github: 'https://github.com/',
+     whatsapp: 'https://',
+     twitter: 'https://twitter.com/',
+-  };
++};
+
+ export const SocialLinks: React.FC = () => {
+```

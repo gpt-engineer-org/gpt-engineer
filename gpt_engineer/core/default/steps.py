@@ -295,7 +295,7 @@ def improve(
                 HumanMessage(
                     content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details: "
                     + "\n".join(problems)
-                    + "\n Please ONLY provide the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
+                    + "\n Please FOCUS ON the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
                 )
             )
             messages = ai.next(messages, step_name=curr_fn())
@@ -318,9 +318,7 @@ def salvage_correct_hunks(
 
     for file_name, diff in diffs.items():
         # if diff is a new file, validation and correction is unnecessary
-        if diff.is_new_file():
-            files_dict = apply_diffs(diffs, files_dict)
-        else:
+        if not diff.is_new_file():
             problems = diff.validate_and_correct(
                 file_to_lines_dict(files_dict[diff.filename_pre])
             )
