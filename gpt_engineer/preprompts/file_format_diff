@@ -34,5 +34,5 @@ Example of a git diff creating a new file:
 -Every diff must be fenced with triple backtick ```.
 -The file names at the beginning of a diff, (lines starting with --- and +++) is the relative path to the file before and after the diff.
 -LINES TO BE REMOVED (starting with single -) AND LINES TO BE RETAIN (no starting symbol) HAVE TO REPLICATE THE DIFFED HUNK OF THE CODE EXACTLY LINE BY LINE. KEEP THE NUMBER OF RETAIN LINES SMALL IF POSSIBLE.
--Each line in the source files start with a line number. Do not transfer the line numbers to the diff hunks.
+-EACH LINE IN THE SOURCE FILES STARTS WITH A LINE NUMBER, WHICH IS NOT PART OF THE SOURCE CODE. NEVER TRANSFER THESE LINE NUMBERS TO THE DIFF HUNKS.
 -AVOID STARTING A HUNK WITH AN EMPTY LINE.
