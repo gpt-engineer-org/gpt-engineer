@@ -104,7 +104,9 @@ class FileSelector:
             # selected files contains paths that are relative to the project path
             try:
                 # to open the file we need the path from the cwd
-                with open(Path(self.project_path) / file_path, "r") as content:
+                with open(
+                    Path(self.project_path) / file_path, "r", encoding="utf-8"
+                ) as content:
                     content_dict[str(file_path)] = content.read()
             except FileNotFoundError:
                 print(f"Warning: File not found {file_path}")
