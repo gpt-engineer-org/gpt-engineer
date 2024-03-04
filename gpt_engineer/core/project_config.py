@@ -4,7 +4,7 @@ Functions for reading and writing the `gpt-engineer.toml` configuration file.
 The `gpt-engineer.toml` file is a TOML file that contains project-specific configuration used by the GPT Engineer CLI and gptengineer.app.
 """
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 import tomlkit
@@ -74,8 +74,8 @@ def filter_none(d: dict) -> dict:
 class Config:
     """Configuration for the GPT Engineer CLI and gptengineer.app via `gpt-engineer.toml`."""
 
-    project: _ProjectConfig = _ProjectConfig()
-    run: _RunConfig = _RunConfig()
+    project: _ProjectConfig = field(default_factory=_ProjectConfig)
+    run: _RunConfig = field(default_factory=_RunConfig)
     gptengineer_app: _GptEngineerAppConfig | None = None
 
     @classmethod
