@@ -33,6 +33,7 @@ Functions
     applications.cli.collect.collect_learnings
     applications.cli.collect.send_learning
     applications.cli.learning.ask_collection_consent
+    applications.cli.learning.ask_for_valid_input
     applications.cli.learning.check_collection_consent
     applications.cli.learning.extract_learning
     applications.cli.learning.get_session
@@ -103,10 +104,11 @@ Functions
     :toctree: core
 
     core.ai.serialize_messages
-    core.chat_to_files.apply_edits
+    core.chat_to_files.apply_diffs
     core.chat_to_files.chat_to_files_dict
-    core.chat_to_files.overwrite_code_with_edits
-    core.chat_to_files.parse_edits
+    core.chat_to_files.parse_diff_block
+    core.chat_to_files.parse_diffs
+    core.chat_to_files.parse_hunk_header
     core.default.paths.memory_path
     core.default.paths.metadata_path
     core.default.simple_agent.default_config_agent
@@ -115,9 +117,12 @@ Functions
     core.default.steps.gen_code
     core.default.steps.gen_entrypoint
     core.default.steps.improve
-    core.default.steps.incorrect_edit
+    core.default.steps.salvage_correct_hunks
     core.default.steps.setup_sys_prompt
     core.default.steps.setup_sys_prompt_existing_code
+    core.diff.count_ratio
+    core.diff.is_similar
+    core.files_dict.file_to_lines_dict
 
 :mod:`gpt_engineer.tools`: Tools
 =================================

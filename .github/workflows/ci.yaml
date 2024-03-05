@@ -30,3 +30,7 @@ jobs:
 
     - name: Run tox
       run: tox
+
+    - name: Report coverage
+      run: |
+        bash <(curl -s https://codecov.io/bash)
