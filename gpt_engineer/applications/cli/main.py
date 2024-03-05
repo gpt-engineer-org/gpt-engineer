@@ -180,7 +180,6 @@ def main(
         help="Use the clipboard to communicate with the AI.",
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
-    yes: bool = typer.Option(False, "--yes", "-y"),
 ):
     """
     The main entry point for the CLI tool that generates or improves a project.
