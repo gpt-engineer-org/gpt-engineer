@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import List, Optional, Union
 
 import backoff
+from langchain_anthropic import ChatAnthropic
 import openai
 import pyperclip
 
@@ -34,7 +35,6 @@ from langchain.schema import (
     messages_from_dict,
     messages_to_dict,
 )
-from langchain_anthropic import ChatAnthropic
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 
 from gpt_engineer.core.token_usage import TokenUsageLog
@@ -166,6 +166,8 @@ class AI:
 
         logger.debug(f"Creating a new chat completion: {messages}")
 
+        messages = self._collapse_messages(messages)
+
         response = self.backoff_inference(messages)
 
         self.token_usage_log.update_log(
@@ -175,6 +177,42 @@ class AI:
         logger.debug(f"Chat completion finished: {messages}")
 
         return messages
+
+    def _collapse_messages(self, messages: List[Message]):
+        """
+        Combine consecutive messages of the same type into a single message.
+
+        This method iterates through the list of messages, combining consecutive messages of the same type
+        by joining their content with a newline character. This reduces the number of messages and simplifies
+        the conversation for processing.
+
+        Parameters
+        ----------
+        messages : List[Message]
+            The list of messages to collapse.
+
+        Returns
+        -------
+        List[Message]
+            The list of messages after collapsing consecutive messages of the same type.
+        """
+        collapsed_messages = []
+        if not messages:
+            return collapsed_messages
+
+        previous_message = messages[0]
+        combined_content = previous_message.content
+
+        for current_message in messages[1:]:
+            if current_message.type == previous_message.type:
+                combined_content += "\n\n" + current_message.content
+            else:
+                collapsed_messages.append(previous_message.__class__(content=combined_content))
+                previous_message = current_message
+                combined_content = current_message.content
+
+        collapsed_messages.append(previous_message.__class__(content=combined_content))
+        return collapsed_messages
 
     @backoff.on_exception(backoff.expo, openai.RateLimitError, max_tries=7, max_time=45)
     def backoff_inference(self, messages):
@@ -279,11 +317,11 @@ class AI:
                 callbacks=[StreamingStdOutCallbackHandler()],
             )
 
-        if "claude" in self.model_name:
+        if 'claude' in self.model_name:
             return ChatAnthropic(
                 model=self.model_name,
                 temperature=self.temperature,
-                callbacks=[StreamingStdOutCallbackHandler()],
+                callbacks=[StreamingStdOutCallbackHandler()]
             )
 
         return ChatOpenAI(
