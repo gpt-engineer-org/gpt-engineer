@@ -52,7 +52,7 @@ class TestMain:
     #  Runs gpt-engineer with default settings and generates a project in the specified path.
     def test_default_settings_generate_project(self, tmp_path, monkeypatch):
         gen = input_generator()
-        monkeypatch.setattr("builtins.input", lambda _: next(gen))
+        monkeypatch.setattr("builtins.input", lambda: next(gen))
         p = tmp_path / "projects/example"
         p.mkdir(parents=True)
         (p / "prompt").write_text(prompt_text)
