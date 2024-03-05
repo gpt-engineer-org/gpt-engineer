@@ -291,6 +291,10 @@ def serialize_messages(messages: List[Message]) -> str:
 
 
 class ClipboardAI(AI):
+    # Ignore not init superclass
+    def __init__(self, **_):  # type: ignore
+        pass
+
     @staticmethod
     def serialize_messages(messages: List[Message]) -> str:
         return "\n\n".join([f"{m.type}:\n{m.content}" for m in messages])
