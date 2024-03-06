@@ -32,8 +32,8 @@ from langchain.schema import (
     messages_from_dict,
     messages_to_dict,
 )
-from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
 
 from gpt_engineer.core.token_usage import TokenUsageLog
 
