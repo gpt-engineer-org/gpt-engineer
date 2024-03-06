@@ -147,8 +147,8 @@ def parse_diffs(diff_string: str) -> dict:
         diffs.update(parse_diff_block(diff_block))
 
     if not diffs:
-        raise ValueError(
-            f"The diff {diff_string} is not a valid diff in the unified git diff format"
+        print(
+            "GPT did not provide any proposed changes. Please try to reselect the files for uploading and edit your prompt file."
         )
 
     return diffs
