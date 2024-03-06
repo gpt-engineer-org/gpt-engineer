@@ -110,6 +110,8 @@ class FileSelector:
                     content_dict[str(file_path)] = content.read()
             except FileNotFoundError:
                 print(f"Warning: File not found {file_path}")
+            except UnicodeDecodeError:
+                print(f"Warning: File not UTF-8 encoded {file_path}, skipping")
         return FilesDict(content_dict)
 
     def editor_file_selector(
