@@ -3,6 +3,7 @@ This module provides the CliAgent class which manages the lifecycle of code gene
 using an AI model. It includes functionalities to initialize code generation, improve existing code,
 and process the code through various steps defined in the step bundle.
 """
+import platform
 
 from typing import Callable, Optional, TypeVar
 
@@ -166,7 +167,11 @@ class CliAgent(BaseAgent):
             self.ai, prompt, self.memory, self.preprompts_holder
         )
         entrypoint = gen_entrypoint(
-            self.ai, files_dict, self.memory, self.preprompts_holder
+            self.ai,
+            files_dict,
+            self.memory,
+            self.preprompts_holder,
+            system=platform.system(),
         )
         combined_dict = {**files_dict, **entrypoint}
         files_dict = FilesDict(combined_dict)

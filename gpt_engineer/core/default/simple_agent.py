@@ -6,7 +6,7 @@ a codebase using AI. It handles interactions with the AI model, memory, and exec
 environment to generate and refine code based on user prompts.
 
 """
-
+import platform
 import tempfile
 
 from typing import Optional
@@ -69,7 +69,11 @@ class SimpleAgent(BaseAgent):
     def init(self, prompt: str) -> FilesDict:
         files_dict = gen_code(self.ai, prompt, self.memory, self.preprompts_holder)
         entrypoint = gen_entrypoint(
-            self.ai, files_dict, self.memory, self.preprompts_holder
+            self.ai,
+            files_dict,
+            self.memory,
+            self.preprompts_holder,
+            system=platform.system(),
         )
         combined_dict = {**files_dict, **entrypoint}
         files_dict = FilesDict(combined_dict)

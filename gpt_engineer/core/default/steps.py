@@ -34,7 +34,6 @@ import inspect
 import re
 
 from pathlib import Path
-from platform import platform
 from typing import List, MutableMapping, Union
 
 from langchain.schema import HumanMessage, SystemMessage
@@ -53,6 +52,8 @@ from gpt_engineer.core.default.paths import (
 )
 from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+
+SUPPORTED_PLATFORMS = ["Windows", "Darwin", "Linux"]
 
 
 def curr_fn() -> str:
@@ -124,6 +125,7 @@ def gen_entrypoint(
     files_dict: FilesDict,
     memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
+    system: str,
 ) -> FilesDict:
     """
     Generates an entrypoint for the codebase and returns the entrypoint files.
@@ -146,7 +148,7 @@ def gen_entrypoint(
     """
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
-        system=(preprompts["entrypoint"]).format(platform=platform()),
+        system=(preprompts["entrypoint"]).format(platform=system),
         user="Information about the codebase:\n\n" + files_dict.to_chat(),
         step_name=curr_fn(),
     )
