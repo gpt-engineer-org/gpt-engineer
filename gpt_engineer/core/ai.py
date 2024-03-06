@@ -33,6 +33,7 @@ from langchain.schema import (
     messages_to_dict,
 )
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 from gpt_engineer.core.token_usage import TokenUsageLog
 
@@ -272,6 +273,16 @@ class AI:
                 openai_api_version=os.getenv("OPENAI_API_VERSION", "2023-05-15"),
                 deployment_name=self.model_name,
                 openai_api_type="azure",
+                streaming=self.streaming,
+                callbacks=[StreamingStdOutCallbackHandler()],
+            )
+
+        elif os.getenv("GOOGLE_API_KEY") is not None:
+            return ChatGoogleGenerativeAI(
+                model=self.model_name,
+                transport="rest",
+                convert_system_message_to_human=True,
+                temperature=self.temperature,
                 streaming=self.streaming,
                 callbacks=[StreamingStdOutCallbackHandler()],
             )

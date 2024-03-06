@@ -1,5 +1,5 @@
 import logging
-
+import os
 from dataclasses import dataclass
 from typing import List, Union
 
@@ -193,7 +193,11 @@ class TokenUsageLog:
         float
             Cost in USD.
         """
+        if os.getenv("GOOGLE_API_KEY") is not None:
+            return 0
+
         result = 0
+
         for log in self.log():
             result += get_openai_token_cost_for_model(
                 self.model_name, log.total_prompt_tokens, is_completion=False
