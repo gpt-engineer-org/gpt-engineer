@@ -33,10 +33,9 @@ ARGUMENT_ERRORS = [
 ]
 
 # TODO: Suit for other benchmarks or call class `BenchmarkAppsAgent`
-POST_PROMPT = f"When run with `python main.py`, the program should not require user " \
-              "input and instead read undefined amount of command-line arguments " \
-              "passed one by one and delimited with whitespace as in the following example: " \
-              "`python main.py 59 9 11 'string_argument'`"
+POST_PROMPT = "\nThe program, including its inputs, should be run from the command " \
+              "line like 'python main \"input1 input2 etc \"', with all inputs inside " \
+              "the quotation marks. The program should not read inputs from stdin."
 
 
 class BenchmarkAgent(BaseAgent, SelfHealingAgent):
@@ -91,10 +90,8 @@ class BenchmarkAgent(BaseAgent, SelfHealingAgent):
         prompt: str,
         execution_command: Optional[str] = None,
     ) -> FilesDict:
-        benchmark_prompt = f"{prompt}. {POST_PROMPT}"
-
         files_dict = improve(
-            self.ai, benchmark_prompt, files_dict, self.memory, self.preprompts_holder
+            self.ai, prompt, files_dict, self.memory, self.preprompts_holder
         )
 
         return files_dict
@@ -107,6 +104,7 @@ class BenchmarkAgent(BaseAgent, SelfHealingAgent):
                   ) -> FilesDict:
         self.execution_env.upload(files_dict)  # Load into execution_env in case it was cleared
 
+        # Fix argument issues if they were met
         if any(error in stderr_full for error in ARGUMENT_ERRORS):
             stdout_full = f"{stdout_full}. {POST_PROMPT}"
 

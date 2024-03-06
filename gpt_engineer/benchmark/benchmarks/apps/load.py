@@ -10,6 +10,7 @@ Functions
 load_apps : function
     Loads the APPS benchmark, which consists of a series coding problems.
 """
+from collections import OrderedDict
 from typing import Union
 
 from gpt_engineer.benchmark.benchmarks.apps.problem import Problem
@@ -19,6 +20,15 @@ from gpt_engineer.core.files_dict import FilesDict
 from datasets import load_dataset, load_from_disk, Dataset, DatasetDict
 
 DATASET_PATH = "gpt_engineer/benchmark/benchmarks/apps/dataset"
+MAX_N_TEST_EXAMPLES = 10
+
+
+class AppsAssertion:
+    def __init__(self, reference):
+        self.reference = reference.replace(" ", "").replace("\n", "")
+
+    def evaluate(self, assertable):
+        return self.reference in assertable.stdout.replace(" ", "").replace("\n", "")
 
 
 def _get_dataset() -> Union[Dataset, DatasetDict]:
@@ -56,22 +66,23 @@ def load_apps():
         if len(problem.starter_code):  # TODO: Temporary skip; Handle these too
             continue
 
-        command_line_arguments = problem.inputs[0].replace('\n', ' ').strip()
-
-        print(f"python main.py {command_line_arguments}")
-        print(f"expected output {problem.outputs[0].replace(' ', '')}")
         tasks.append(
             Task(
                 name=str(problem.id),
-                initial_code=FilesDict({"main.py": ''}),
-                command=f"python main.py {command_line_arguments}",
-                prompt=problem.question,
-                assertions={
-                    "correct output": lambda
-                        assertable: problem.outputs[0].replace(' ', '') in assertable.stdout.replace(' ', ''),
-                },
-                retries=1,  # TODO: Fix other benchmarks
-            ),
+                initial_code=FilesDict({"main.py": ""}),
+                command="python main.py",
+                prompt=problem.question + "\nThe program, including its inputs, should be run from the command "
+                                          "line like 'python main \"input1 input2 etc \"', with all inputs inside "
+                                          "the quotation marks. The program should not read inputs from stdin.",
+                inputs=problem.inputs[0:MAX_N_TEST_EXAMPLES],
+                assertions=[
+                    OrderedDict(
+                        {"correct output": AppsAssertion(problem.outputs[i]).evaluate}
+                    )
+                    for i in range(min(len(problem.outputs), MAX_N_TEST_EXAMPLES))
+                ],
+                retries=2,
+            )
         )
 
     return Benchmark(

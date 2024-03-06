@@ -7,19 +7,9 @@ environment to generate and refine code based on user prompts.
 
 """
 
-import tempfile
-from subprocess import Popen
-
-from typing import Optional
-
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.base_agent import BaseAgent
-from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.base_memory import BaseMemory
-from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
-from gpt_engineer.core.default.disk_memory import DiskMemory
-from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
-from gpt_engineer.core.default.steps import gen_code, gen_entrypoint, improve
+from gpt_engineer.core.default.steps import improve
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
@@ -44,7 +34,9 @@ class SelfHealingAgent:
         Attempts to execute the code and if it fails,
         sends the error output back to the AI with instructions to fix.
         """
-        new_prompt = f"A program with this specification was requested:\n{prompt}\n, but running it produced the following output:\n{stdout_full}\n and the following errors:\n{stderr_full}. Please change it so that it fulfills the requirements."
+        new_prompt = f"A program with this specification was requested:\n{prompt}\n, " \
+                     f"but running it produced the following output:\n{stdout_full}\n and the " \
+                     f"following errors:\n{stderr_full}. Please change it so that it fulfills the requirements."
 
         return improve(
             self.ai, new_prompt, files_dict, self.memory, self.preprompts_holder
