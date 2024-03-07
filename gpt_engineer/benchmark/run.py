@@ -12,12 +12,14 @@ run : function
 print_results : function
     Prints the results of the benchmark tasks to the console.
 """
+import subprocess
 import time
 
 from typing import List, Optional
 
 from gpt_engineer.benchmark.types import Assertable, Benchmark, TaskResult
 from gpt_engineer.core.base_agent import BaseAgent
+from gpt_engineer.core.chat_to_files import DiffError
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 
 
@@ -51,6 +53,7 @@ def run(
     for task in benchmark.tasks:
         current_task_results = []
 
+        print(f'--> Running task: {task.name}\n')
         if task.inputs is not None and task.assertions is not None:
             assert len(task.inputs) == len(task.assertions)
 
@@ -64,14 +67,22 @@ def run(
                 break
 
             t0 = time.time()
-            if is_first_run:
-                files_dict = agent.improve(task.initial_code, task.prompt)
-            else:
-                last_result = exec_results[-1]
-                files_dict = agent.self_heal(files_dict, task.prompt, last_result.stdout, last_result.stderr)
+            try:
+                if is_first_run:
+                    files_dict = agent.improve(task.initial_code, task.prompt)
+                else:
+                    last_result = exec_results[-1]
+                    files_dict = agent.self_heal(files_dict, task.prompt, last_result.stdout, last_result.stderr)
+            except DiffError as e:  # Temporary catch errors related to git diffs
+                print(e)
+                continue
             t1 = time.time()
 
-            exec_results = run_and_get_result(files_dict, task, benchmark)
+            try:
+                exec_results = run_and_get_result(files_dict, task, benchmark)
+            except subprocess.TimeoutExpired as e:
+                print(e)
+                continue
 
             current_task_results.append(
                 TaskResult(
@@ -88,10 +99,26 @@ def run(
                 )
             )
 
-        # append task result with the highest success rate
-        task_results.append(
-            max(current_task_results, key=lambda x: x.success_rate)
-        )
+        if current_task_results:
+            task_results.append(
+                # append task result with the highest success rate
+                max(current_task_results, key=lambda x: x.success_rate)
+            )
+        else:
+            task_results.append(
+                TaskResult(
+                    task_name=task.name,
+                    assertion_results=[
+                        {
+                            key: False for key, _assertion in task.assertions[i].items()
+                        }
+                        for i in range(len(task.assertions))
+                    ],
+                    duration=0,
+                    retry_id=retry_id,
+                )
+            )
+
         if verbose:
             print_results(task_results)
     return task_results
@@ -106,7 +133,7 @@ def run_and_get_result(files_dict, task, benchmark) -> List[Assertable]:
         for i, input_pars in enumerate(task.inputs or [""]):
             print(i, input_pars)
             p = env.popen(task.command + ' "' + input_pars + '"')
-            stdout, stderr = p.communicate(benchmark.timeout)
+            stdout, stderr = p.communicate(timeout=benchmark.timeout)
             stdout, stderr = stdout.decode("utf-8"), stderr.decode("utf-8")
             exec_results.append(
                 Assertable(
@@ -154,6 +181,9 @@ def print_results(results: list[TaskResult]):
             print()
         print()
 
+    success_rates = [task_result.success_rate for task_result in results]
+    avg_success_rate = sum(success_rates) / len(results)
+
     total_time = sum(task_result.duration for task_result in results)
 
     correct_assertions = sum(
@@ -165,14 +195,15 @@ def print_results(results: list[TaskResult]):
         for task_result in results
     )
     total_assertions = sum(
-        len(assertion_results_dict)
-        for task_result in results
+        len(assertion_results_dict) for task_result in results
         for assertion_results_dict in task_result.assertion_results
     )
+    correct_tasks = [task_result for task_result in results if task_result.success_rate == 1]
 
-    correct_tasks = sum([task_result for task_result in results if task_result.success_rate == 1])
-
-    print(f"Total correct assertions: {correct_assertions}/{total_assertions}")
+    print("--- Results ---")
     print(f"Total time: {total_time:.2f}s")
-    print(f"Correct tasks: {correct_tasks}/{len(results)}")
+    print(f"Completely correct tasks: {len(correct_tasks)}/{len(results)}")
+    print(f"Total correct assertions: {correct_assertions}/{total_assertions}")
+    print(f"Average success rate: {avg_success_rate * 100}% on {len(results)} tasks")
+    print("--- Results ---")
     print()

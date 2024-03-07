@@ -31,6 +31,7 @@ langchain = "^0.1"
 langchain_openai = "*"
 toml = ">=0.10.2"
 datasets = "^2.17.1"
+regex = "^2023.12.25"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.3.1"

@@ -26,11 +26,17 @@ import re
 
 from typing import Dict, Tuple
 
+import regex
+
 from gpt_engineer.core.diff import ADD, REMOVE, RETAIN, Diff, Hunk
 from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 
 # Initialize a logger for this module
 logger = logging.getLogger(__name__)
+
+
+class DiffError(ValueError):
+    pass
 
 
 def chat_to_files_dict(chat: str) -> FilesDict:
@@ -134,20 +140,25 @@ def parse_diffs(diff_string: str) -> dict:
     - dict: A dictionary of Diff objects keyed by filename.
     """
     # Regex to match individual diff blocks
-    diff_block_pattern = re.compile(
+    diff_block_pattern = regex.compile(
         r"```.*?\n\s*?--- .*?\n\s*?\+\+\+ .*?\n(?:@@ .*? @@\n(?:[-+ ].*?\n)*?)*?```",
         re.DOTALL,
     )
 
     diffs = {}
-    for block in diff_block_pattern.finditer(diff_string):
-        diff_block = block.group()
+    try:
+        for block in diff_block_pattern.finditer(diff_string, timeout=1):
+            diff_block = block.group()
 
-        # Parse individual diff blocks and update the diffs dictionary
-        diffs.update(parse_diff_block(diff_block))
+            # Parse individual diff blocks and update the diffs dictionary
+            diffs.update(parse_diff_block(diff_block))
+    except TimeoutError:
+        raise DiffError(
+            '`diff_block_pattern.finditer` has timed out'
+        )
 
     if not diffs:
-        raise ValueError(
+        raise DiffError(
             f"The diff {diff_string} is not a valid diff in the unified git diff format"
         )
 

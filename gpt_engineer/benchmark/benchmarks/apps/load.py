@@ -63,13 +63,10 @@ def load_apps():
     ) for problem in dataset['test'] if problem['problem_id'] in PROBLEM_IDS]
 
     for problem in problems:
-        if len(problem.starter_code):  # TODO: Temporary skip; Handle these too
-            continue
-
         tasks.append(
             Task(
                 name=str(problem.id),
-                initial_code=FilesDict({"main.py": ""}),
+                initial_code=FilesDict({"main.py": problem.starter_code}),
                 command="python main.py",
                 prompt=problem.question + "\nThe program, including its inputs, should be run from the command "
                                           "line like 'python main \"input1 input2 etc \"', with all inputs inside "
@@ -87,5 +84,6 @@ def load_apps():
 
     return Benchmark(
         name="APPS",
-        tasks=tasks
+        tasks=tasks,
+        timeout=2
     )
