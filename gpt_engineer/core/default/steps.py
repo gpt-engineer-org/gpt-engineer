@@ -34,7 +34,7 @@ import inspect
 import re
 
 from pathlib import Path
-from typing import List, MutableMapping, Union
+from typing import List, Tuple, MutableMapping, Union
 
 from langchain.schema import HumanMessage, SystemMessage
 from termcolor import colored
@@ -52,6 +52,7 @@ from gpt_engineer.core.default.paths import (
 )
 from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.prompt import Prompt
 
 
 def curr_fn() -> str:
@@ -89,7 +90,7 @@ def setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
 
 
 def gen_code(
-    ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder
+    ai: AI, prompt: Prompt, memory: BaseMemory, preprompts_holder: PrepromptsHolder
 ) -> FilesDict:
     """
     Generates code from a prompt using AI and returns the generated files.
@@ -246,10 +247,9 @@ def setup_sys_prompt_existing_code(
         + preprompts["philosophy"]
     )
 
-
 def improve(
     ai: AI,
-    prompt: str,
+    prompt: Prompt,
     files_dict: FilesDict,
     memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
@@ -282,7 +282,7 @@ def improve(
 
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
-    messages.append(HumanMessage(content=f"Request: {prompt}"))
+    messages.append(HumanMessage(content=prompt.to_langchain_content()))
     problems = []
     # check edit correctness
     edit_refinements = 0
