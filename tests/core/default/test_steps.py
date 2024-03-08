@@ -8,6 +8,7 @@ import pytest
 from langchain.schema import SystemMessage
 
 from gpt_engineer.core.ai import AI
+from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
@@ -88,7 +89,7 @@ class TestGenCode:
                 return [SystemMessage(content=factorial_program)]
 
         ai = MockAI()
-        prompt = "Write a function that calculates the factorial of a number."
+        prompt = Prompt("Write a function that calculates the factorial of a number.")
 
         memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
@@ -107,7 +108,7 @@ class TestGenCode:
                 return [SystemMessage(content=factorial_program)]
 
         ai = MockAI()
-        prompt = "Write a function that calculates the factorial of a number."
+        prompt = Prompt("Write a function that calculates the factorial of a number.")
         memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         code = gen_code(ai, prompt, memory, preprompts_holder)
@@ -125,7 +126,7 @@ class TestGenCode:
                 return [SystemMessage(content=factorial_program)]
 
         ai = MockAI()
-        prompt = "Write a function that calculates the factorial of a number."
+        prompt = Prompt("Write a function that calculates the factorial of a number.")
         memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         with pytest.raises(TypeError):
@@ -140,7 +141,7 @@ class TestGenCode:
                 return [SystemMessage(content=factorial_program)]
 
         ai = MockAI()
-        prompt = "Write a function that calculates the factorial of a number."
+        prompt = Prompt("Write a function that calculates the factorial of a number.")
         memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         with pytest.raises(TypeError):
@@ -155,7 +156,7 @@ class TestGenCode:
                 return [SystemMessage(content=factorial_program)]
 
         ai = MockAI()
-        prompt = "Write a function that calculates the factorial of a number."
+        prompt = Prompt("Write a function that calculates the factorial of a number.")
         memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         with pytest.raises(KeyError):
@@ -292,7 +293,7 @@ Some introductory text.
         memory = DiskMemory(tmp_path)
 
         # Define the user prompt
-        prompt = (
+        prompt = Prompt(
             "Change the program to print 'Goodbye, World!' instead of 'Hello, World!'"
         )
 

@@ -4,6 +4,7 @@ import tempfile
 import pytest
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
+from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
 
@@ -115,7 +116,7 @@ def test_improve_standard_config(monkeypatch):
     cli_agent = CliAgent.with_default_config(memory, execution_env, ai=CachingAI())
     code = cli_agent.improve(
         code,
-        "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",
+        Prompt("Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'"),
     )
 
     env = DiskExecutionEnv()
