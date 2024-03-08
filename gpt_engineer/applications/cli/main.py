@@ -19,6 +19,7 @@ Notes
 - The default project path is `projects/example`.
 - When using the `azure_endpoint` parameter, provide the Azure OpenAI service endpoint URL.
 """
+
 import logging
 import os
 
@@ -31,17 +32,13 @@ from dotenv import load_dotenv
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
-from gpt_engineer.core.ai import AI
+from gpt_engineer.applications.cli.file_selector import FileSelector
+from gpt_engineer.core.ai import AI, ClipboardAI
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
-from gpt_engineer.core.default.steps import (
-    execute_entrypoint,
-    gen_code,
-    handle_improve_mode,
-    improve,
-)
+from gpt_engineer.core.default.steps import execute_entrypoint, gen_code, improve
 from gpt_engineer.core.git import (
     filter_files_with_uncommitted_changes,
     init_git_repo,
@@ -177,8 +174,12 @@ def main(
         help="""Use your project's custom preprompts instead of the default ones.
           Copies all original preprompts to the project's workspace if they don't exist there.""",
     ),
+    llm_via_clipboard: bool = typer.Option(
+        False,
+        "--llm-via-clipboard",
+        help="Use the clipboard to communicate with the AI.",
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
-    yes: bool = typer.Option(False, "--yes", "-y"),
 ):
     """
     The main entry point for the CLI tool that generates or improves a project.
@@ -224,11 +225,14 @@ def main(
 
     load_env_if_needed()
 
-    ai = AI(
-        model_name=model,
-        temperature=temperature,
-        azure_endpoint=azure_endpoint,
-    )
+    if llm_via_clipboard:
+        ai = ClipboardAI()
+    else:
+        ai = AI(
+            model_name=model,
+            temperature=temperature,
+            azure_endpoint=azure_endpoint,
+        )
 
     path = Path(project_path)
     print("Running gpt-engineer in", path.absolute(), "\n")
@@ -272,11 +276,11 @@ def main(
 
     store = FileStore(project_path)
     if improve_mode:
-        files_dict = handle_improve_mode(project_path, prompt, agent, memory)
-
+        fileselector = FileSelector(project_path)
+        files_dict = fileselector.ask_for_files()
+        files_dict = agent.improve(files_dict, prompt)
         if files_dict and not prompt_yesno("\nDo you want to apply these changes?"):
             return
-
     else:
         files_dict = agent.init(prompt)
         # collect user feedback if user consents

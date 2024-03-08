@@ -36,6 +36,7 @@ def simplified_main(path: str, mode: str = ""):
         azure_endpoint=azure_endpoint,
         use_custom_preprompts=False,
         verbose=verbose,
+        llm_via_clipboard=False,
     )
 
 
