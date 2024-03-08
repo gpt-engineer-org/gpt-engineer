@@ -36,7 +36,7 @@ import re
 import sys
 
 from pathlib import Path
-from typing import List, MutableMapping, Union
+from typing import List, Tuple, MutableMapping, Union
 
 from langchain.schema import HumanMessage, SystemMessage
 from termcolor import colored
@@ -54,6 +54,7 @@ from gpt_engineer.core.default.paths import (
 )
 from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.prompt import Prompt
 
 
 def curr_fn() -> str:
@@ -115,7 +116,7 @@ def setup_sys_prompt_existing_code(
 
 
 def gen_code(
-    ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder
+    ai: AI, prompt: Prompt, memory: BaseMemory, preprompts_holder: PrepromptsHolder
 ) -> FilesDict:
     """
     Generates code from a prompt using AI and returns the generated files.
@@ -250,9 +251,32 @@ def execute_entrypoint(
     return files_dict
 
 
+def setup_sys_prompt_existing_code(
+    preprompts: MutableMapping[Union[str, Path], str]
+) -> str:
+    """
+    Sets up the system prompt for improving existing code.
+
+    Parameters
+    ----------
+    preprompts : MutableMapping[Union[str, Path], str]
+        A mapping of preprompt messages to guide the AI model.
+
+    Returns
+    -------
+    str
+        The system prompt message for the AI model to improve existing code.
+    """
+    return (
+        preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format"])
+        + "\nUseful to know:\n"
+        + preprompts["philosophy"]
+    )
+
+
 def improve(
     ai: AI,
-    prompt: str,
+    prompt: Prompt,
     files_dict: FilesDict,
     memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
@@ -284,6 +308,7 @@ def improve(
     ]
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
+    messages.append(HumanMessage(content=prompt.to_langchain_content()))
     messages.append(HumanMessage(content=f"Request: {prompt}"))
     memory[DEBUG_LOG_FILE] = (
         "UPLOADED FILES:\n" + files_dict.to_log() + "\nPROMPT:\n" + prompt

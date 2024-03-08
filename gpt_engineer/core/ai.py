@@ -86,10 +86,11 @@ class AI:
 
     def __init__(
         self,
-        model_name="gpt-4-1106-preview",
+        model_name="gpt-4-0125-preview",
         temperature=0.1,
         azure_endpoint="",
         streaming=True,
+        vision = False,
     ):
         """
         Initialize the AI class.
@@ -105,6 +106,7 @@ class AI:
         self.azure_endpoint = azure_endpoint
         self.model_name = model_name
         self.streaming = streaming
+        self.vision = "vision" in model_name
         self.llm = self._create_chat_model()
         self.token_usage_log = TokenUsageLog(model_name)
 

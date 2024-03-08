@@ -52,6 +52,7 @@ from gpt_engineer.core.git import (
     stage_files,
 )
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
 
 app = typer.Typer()  # creates a CLI app
@@ -73,7 +74,7 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def load_prompt(input_repo: DiskMemory, improve_mode):
+def load_prompt(input_repo: DiskMemory, improve_mode) -> Prompt:
     """
     Load or request a prompt from the user based on the mode.
 
@@ -89,17 +90,21 @@ def load_prompt(input_repo: DiskMemory, improve_mode):
     str
         The loaded or inputted prompt.
     """
-    if input_repo.get("prompt"):
-        return input_repo.get("prompt")
+    repoResult = input_repo.get("prompt")
+    if not repoResult:
+        if not improve_mode:
+            input_repo["prompt/text"] = input(
+                "\nWhat application do you want gpt-engineer to generate?\n"
+            )
+        else:
+            input_repo["prompt/text"] = input("\nHow do you want to improve the application?\n")
+    
+    repoResult = input_repo.get("prompt")
 
-    if not improve_mode:
-        input_repo["prompt"] = input(
-            "\nWhat application do you want gpt-engineer to generate?\n"
-        )
-    else:
-        input_repo["prompt"] = input("\nHow do you want to improve the application?\n")
-    return input_repo.get("prompt")
-
+    if isinstance(repoResult, DiskMemory): # If prompt is in folder format
+        return Prompt(repoResult.get("text"), repoResult.get("images").to_dict())
+    else: 
+        return Prompt(repoResult)
 
 def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
     """
@@ -140,7 +145,7 @@ def prompt_yesno(question: str) -> bool:
 @app.command()
 def main(
     project_path: str = typer.Argument("projects/example", help="path"),
-    model: str = typer.Argument("gpt-4-1106-preview", help="model id string"),
+    model: str = typer.Argument("gpt-4-0125-preview", help="model id string"),
     temperature: float = 0.1,
     improve_mode: bool = typer.Option(
         False,
@@ -249,6 +254,8 @@ def main(
             init_git_repo(path)
 
     prompt = load_prompt(DiskMemory(path), improve_mode)
+    # todo: prompt_images = load_prompt_images(DiskMemory(path), improve_mode)
+    # todo: if ai.vision is false and not llm_via_clipboard - ask if they would like to use gpt-4-vision-preview instead? If so recreate AI
 
     # configure generation function
     if clarify_mode:
