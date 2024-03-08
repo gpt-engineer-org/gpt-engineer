@@ -31,7 +31,9 @@ improve : function
 """
 
 import inspect
+import io
 import re
+import sys
 
 from pathlib import Path
 from typing import List, MutableMapping, Union
@@ -39,6 +41,7 @@ from typing import List, MutableMapping, Union
 from langchain.schema import HumanMessage, SystemMessage
 from termcolor import colored
 
+from gpt_engineer.applications.cli.file_selector import FileSelector
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.base_memory import BaseMemory
@@ -46,6 +49,7 @@ from gpt_engineer.core.chat_to_files import apply_diffs, chat_to_files_dict, par
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
+    CONSOLE_OUTPUT_FILE,
     ENTRYPOINT_FILE,
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE,
@@ -326,4 +330,43 @@ def salvage_correct_hunks(
             error_message.extend(problems)
     files_dict = apply_diffs(diffs, files_dict)
     memory[IMPROVE_LOG_FILE] = chat
+    return files_dict
+
+
+class Tee(object):
+    def __init__(self, *files):
+        self.files = files
+
+    def write(self, obj):
+        for file in self.files:
+            file.write(obj)
+
+    def flush(self):
+        for file in self.files:
+            file.flush()
+
+
+def handle_improve_mode(project_path, prompt, agent, memory):
+    captured_output = io.StringIO()
+    old_stdout = sys.stdout
+    sys.stdout = Tee(sys.stdout, captured_output)
+
+    try:
+        fileselector = FileSelector(project_path)
+        files_dict = fileselector.ask_for_files()
+        files_dict = agent.improve(files_dict, prompt)
+    except Exception as e:
+        print(
+            f"Error while improving the project: {e} , could you please upload all the files in XX folder to github?"
+        )
+        files_dict = None
+    finally:
+        # Reset stdout
+        sys.stdout = old_stdout
+
+        # Get the captured output
+        captured_string = captured_output.getvalue()
+        print(captured_string)
+        memory[CONSOLE_OUTPUT_FILE] = captured_string
+
     return files_dict

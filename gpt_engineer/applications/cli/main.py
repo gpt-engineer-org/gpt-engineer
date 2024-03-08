@@ -19,7 +19,6 @@ Notes
 - The default project path is `projects/example`.
 - When using the `azure_endpoint` parameter, provide the Azure OpenAI service endpoint URL.
 """
-
 import logging
 import os
 
@@ -32,13 +31,17 @@ from dotenv import load_dotenv
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
-from gpt_engineer.applications.cli.file_selector import FileSelector
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
-from gpt_engineer.core.default.steps import execute_entrypoint, gen_code, improve
+from gpt_engineer.core.default.steps import (
+    execute_entrypoint,
+    gen_code,
+    handle_improve_mode,
+    improve,
+)
 from gpt_engineer.core.git import (
     filter_files_with_uncommitted_changes,
     init_git_repo,
@@ -269,11 +272,11 @@ def main(
 
     store = FileStore(project_path)
     if improve_mode:
-        fileselector = FileSelector(project_path)
-        files_dict = fileselector.ask_for_files()
-        files_dict = agent.improve(files_dict, prompt)
+        files_dict = handle_improve_mode(project_path, prompt, agent, memory)
+
         if files_dict and not prompt_yesno("\nDo you want to apply these changes?"):
             return
+
     else:
         files_dict = agent.init(prompt)
         # collect user feedback if user consents
