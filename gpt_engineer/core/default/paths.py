@@ -44,8 +44,9 @@ META_DATA_REL_PATH = ".gpteng"
 MEMORY_REL_PATH = os.path.join(META_DATA_REL_PATH, "memory")
 CODE_GEN_LOG_FILE = "all_output.txt"
 IMPROVE_LOG_FILE = "improve.txt"
-ENTRYPOINT_FILE = "run.sh"
+DIFF_LOG_FILE = "diff_errors.txt"
 ENTRYPOINT_LOG_FILE = "gen_entrypoint_chat.txt"
+ENTRYPOINT_FILE = "run.sh"
 PREPROMPTS_PATH = Path(__file__).parent.parent.parent / "preprompts"
 
 

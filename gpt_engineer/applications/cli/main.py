@@ -28,6 +28,7 @@ Notes
 import difflib
 import logging
 import os
+import sys
 
 from pathlib import Path
 
@@ -166,7 +167,7 @@ def prompt_yesno() -> bool:
 
 @app.command()
 def main(
-    project_path: str = typer.Argument("projects/example", help="path"),
+    project_path: str = typer.Argument(".", help="path"),
     model: str = typer.Argument("gpt-4-1106-preview", help="model id string"),
     temperature: float = typer.Option(
         0.1,
@@ -219,6 +220,9 @@ def main(
     verbose: bool = typer.Option(
         False, "--verbose", "-v", help="Enable verbose logging for debugging."
     ),
+    debug: bool = typer.Option(
+        False, "--debug", "-d", help="Enable debug mode for debugging."
+    ),
 ):
     """
     The main entry point for the CLI tool that generates or improves a project.
@@ -255,23 +259,18 @@ def main(
     None
     """
 
+    if debug:
+        import pdb
+
+        sys.excepthook = lambda *_: pdb.pm()
+
     # Validate arguments
     if improve_mode and (clarify_mode or lite_mode):
         typer.echo("Error: Clarify and lite mode are not compatible with improve mode.")
         raise typer.Exit(code=1)
 
-    if not project_path:
-        project_path = typer.prompt(
-            "Please enter the project path", default="projects/example"
-        )
-
     # Set up logging
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
-
-    if improve_mode:
-        assert not (
-            clarify_mode or lite_mode
-        ), "Clarify and lite mode are not active for improve mode"
 
     load_env_if_needed()
 
@@ -306,7 +305,10 @@ def main(
     preprompts_holder = PrepromptsHolder(
         get_preprompts_path(use_custom_preprompts, Path(project_path))
     )
+
     memory = DiskMemory(memory_path(project_path))
+    memory.archive_logs()
+
     execution_env = DiskExecutionEnv()
     agent = CliAgent.with_default_config(
         memory,
@@ -335,13 +337,16 @@ def main(
         files_dict = agent.init(prompt)
         # collect user feedback if user consents
         config = (code_gen_fn.__name__, execution_fn.__name__)
-        collect_and_send_human_review(prompt, model, temperature, config, agent.memory)
+        collect_and_send_human_review(prompt, model, temperature, config, memory)
 
     stage_uncommitted_to_git(path, files_dict, improve_mode)
 
     files.push(files_dict)
 
-    print("Total api cost: $ ", ai.token_usage_log.usage_cost())
+    if ai.token_usage_log.is_openai_model():
+        print("Total api cost: $ ", ai.token_usage_log.usage_cost())
+    else:
+        print("Total tokens used: ", ai.token_usage_log.total_tokens())
 
 
 if __name__ == "__main__":

@@ -72,7 +72,7 @@ def stage_uncommitted_to_git(path, files_dict, improve_mode):
     # Check if there's a git repo and verify that there aren't any uncommitted changes
     if is_git_installed() and not improve_mode:
         if not is_git_repo(path):
-            print("Initializing an empty git repository")
+            print("\nInitializing an empty git repository")
             init_git_repo(path)
 
     if is_git_repo(path):

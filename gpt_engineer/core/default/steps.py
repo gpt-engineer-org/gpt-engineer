@@ -46,6 +46,7 @@ from gpt_engineer.core.chat_to_files import apply_diffs, chat_to_files_dict, par
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
+    DIFF_LOG_FILE,
     ENTRYPOINT_FILE,
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE,
@@ -324,5 +325,6 @@ def salvage_correct_hunks(
             )
             error_message.extend(problems)
     files_dict = apply_diffs(diffs, files_dict)
-    memory[IMPROVE_LOG_FILE] = chat
+    memory.log(IMPROVE_LOG_FILE, chat)
+    memory.log(DIFF_LOG_FILE, "\n\n".join(error_message))
     return files_dict
