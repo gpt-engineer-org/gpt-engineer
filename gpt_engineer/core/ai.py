@@ -329,6 +329,7 @@ class AI:
                 streaming=self.streaming,
                 callbacks=[StreamingStdOutCallbackHandler()],
                 max_tokens=4096,  # vision models default to low max token limits
+            )
 
         if "claude" in self.model_name:
             return ChatAnthropic(
