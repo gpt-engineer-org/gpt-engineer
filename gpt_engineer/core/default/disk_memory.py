@@ -20,9 +20,9 @@ DiskMemory
     A file-based key-value store where keys correspond to filenames and values to file contents.
 """
 
+import base64
 import json
 import shutil
-import base64
 
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, Union
@@ -103,15 +103,14 @@ class DiskMemory(BaseMemory):
         if not full_path.is_file():
             raise KeyError(f"File '{key}' could not be found in '{self.path}'")
 
-        if full_path.suffix in ['.png', '.jpeg', '.jpg']:
+        if full_path.suffix in [".png", ".jpeg", ".jpg"]:
             with full_path.open("rb") as image_file:
-                encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+                encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
                 mime_type = "image/png" if full_path.suffix == ".png" else "image/jpeg"
                 return f"data:{mime_type};base64,{encoded_string}"
         else:
             with full_path.open("r", encoding="utf-8") as f:
                 return f.read()
-
 
     def get(self, key: str, default: Optional[Any] = None) -> Any:
         """

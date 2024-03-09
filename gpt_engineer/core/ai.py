@@ -19,7 +19,7 @@ import logging
 import os
 
 from pathlib import Path
-from typing import List, Optional, Union, Any
+from typing import Any, List, Optional, Union
 
 import backoff
 import openai
@@ -89,7 +89,7 @@ class AI:
         temperature=0.1,
         azure_endpoint="",
         streaming=True,
-        vision = False,
+        vision=False,
     ):
         """
         Initialize the AI class.
@@ -134,7 +134,8 @@ class AI:
             SystemMessage(content=system),
             HumanMessage(content=user),
         ]
-        return self.next(messages, step_name=step_name)    
+        return self.next(messages, step_name=step_name)
+
     def next(
         self,
         messages: List[Message],
@@ -278,22 +279,21 @@ class AI:
                 streaming=self.streaming,
                 callbacks=[StreamingStdOutCallbackHandler()],
             )
-        
-        if (self.vision):
-            return ChatOpenAI(
-            model=self.model_name,
-            temperature=self.temperature,
-            streaming=self.streaming,
-            callbacks=[StreamingStdOutCallbackHandler()],
-            max_tokens=4096 #vision models default to low max token limits
-        )
 
+        if self.vision:
+            return ChatOpenAI(
+                model=self.model_name,
+                temperature=self.temperature,
+                streaming=self.streaming,
+                callbacks=[StreamingStdOutCallbackHandler()],
+                max_tokens=4096,  # vision models default to low max token limits
+            )
 
         return ChatOpenAI(
             model=self.model_name,
             temperature=self.temperature,
             streaming=self.streaming,
-            callbacks=[StreamingStdOutCallbackHandler()]
+            callbacks=[StreamingStdOutCallbackHandler()],
         )
 
 

@@ -1,8 +1,7 @@
-import logging
 import base64
-import math
-from PIL import Image
 import io
+import logging
+import math
 
 from dataclasses import dataclass
 from typing import List, Union
@@ -10,6 +9,7 @@ from typing import List, Union
 import tiktoken
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from PIL import Image
 
 # workaround for function moved in:
 # https://github.com/langchain-ai/langchain/blob/535db72607c4ae308566ede4af65295967bb33a8/libs/community/langchain_community/callbacks/openai_info.py
@@ -92,49 +92,51 @@ class Tokenizer:
             The number of tokens in the text.
         """
         return len(self._tiktoken_tokenizer.encode(txt))
-    
-    def num_tokens_for_base64_image(self,image_base64: str, detail: str = 'high') -> int:
+
+    def num_tokens_for_base64_image(
+        self, image_base64: str, detail: str = "high"
+    ) -> int:
         """
         Calculate the token size for a base64 encoded image based on OpenAI's token calculation rules.
-        
+
         Parameters:
         - image_base64 (str): The base64 encoded string of the image.
         - detail (str): The detail level of the image, 'low' or 'high'.
-        
+
         Returns:
         - int: The token size of the image.
         """
-        
-        if detail == 'low':
+
+        if detail == "low":
             return 85  # Fixed cost for low detail images
-        
+
         # Decode image from base64
         image_data = base64.b64decode(image_base64)
-        
+
         # Convert byte data to image for size extraction
         image = Image.open(io.BytesIO(image_data))
-        
+
         # Calculate the initial scale to fit within 2048 square while maintaining aspect ratio
         max_dimension = max(image.size)
         scale_factor = min(2048 / max_dimension, 1)  # Ensure we don't scale up
         new_width = int(image.size[0] * scale_factor)
         new_height = int(image.size[1] * scale_factor)
-        
+
         # Scale such that the shortest side is 768px
         shortest_side = min(new_width, new_height)
         if shortest_side > 768:
             resize_factor = 768 / shortest_side
             new_width = int(new_width * resize_factor)
             new_height = int(new_height * resize_factor)
-        
+
         # Calculate the number of 512px tiles needed
         width_tiles = math.ceil(new_width / 512)
         height_tiles = math.ceil(new_height / 512)
         total_tiles = width_tiles * height_tiles
-        
+
         # Each tile costs 170 tokens, plus a base cost of 85 tokens for high detail
         token_cost = total_tiles * 170 + 85
-        
+
         return token_cost
 
     def num_tokens_from_messages(self, messages: List[Message]) -> int:
@@ -161,16 +163,19 @@ class Tokenizer:
             elif isinstance(message.content, list):
                 # Content is a list, potentially mixed with text and images
                 for item in message.content:
-                    if item.get('type') == 'text':
-                        n_tokens += self.num_tokens(item['text'])
-                    elif item.get('type') == 'image_url':
-                        image_detail = item['image_url'].get('detail', 'high')
-                        image_base64 = item['image_url'].get('url')
-                        n_tokens += self.num_tokens_for_base64_image(image_base64, detail=image_detail)
+                    if item.get("type") == "text":
+                        n_tokens += self.num_tokens(item["text"])
+                    elif item.get("type") == "image_url":
+                        image_detail = item["image_url"].get("detail", "high")
+                        image_base64 = item["image_url"].get("url")
+                        n_tokens += self.num_tokens_for_base64_image(
+                            image_base64, detail=image_detail
+                        )
 
             n_tokens += 2  # Account for assistant's reply framing tokens
 
         return n_tokens
+
 
 class TokenUsageLog:
     """
@@ -261,7 +266,3 @@ class TokenUsageLog:
                 self.model_name, log.total_completion_tokens, is_completion=True
             )
         return result
-    
-
-   
-

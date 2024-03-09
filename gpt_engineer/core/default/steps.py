@@ -34,7 +34,7 @@ import inspect
 import re
 
 from pathlib import Path
-from typing import List, Tuple, MutableMapping, Union
+from typing import List, MutableMapping, Union
 
 from langchain.schema import HumanMessage, SystemMessage
 from termcolor import colored
@@ -112,7 +112,9 @@ def gen_code(
         A dictionary of file names to their respective source code content.
     """
     preprompts = preprompts_holder.get_preprompts()
-    messages = ai.start(setup_sys_prompt(preprompts), prompt.to_langchain_content(), step_name=curr_fn())
+    messages = ai.start(
+        setup_sys_prompt(preprompts), prompt.to_langchain_content(), step_name=curr_fn()
+    )
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files_dict = chat_to_files_dict(chat)
@@ -246,6 +248,7 @@ def setup_sys_prompt_existing_code(
         + "\nUseful to know:\n"
         + preprompts["philosophy"]
     )
+
 
 def improve(
     ai: AI,
