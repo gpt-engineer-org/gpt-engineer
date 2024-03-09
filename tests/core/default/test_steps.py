@@ -8,7 +8,6 @@ import pytest
 from langchain.schema import SystemMessage
 
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
@@ -26,6 +25,7 @@ from gpt_engineer.core.default.steps import (
 )
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.prompt import Prompt
 
 factorial_program = """
 To implement a function that calculates the factorial of a number in Python, we will create a simple Python module with a single function `factorial`. The factorial of a non-negative integer `n` is the product of all positive integers less than or equal to `n`. It is denoted by `n!`. The factorial of 0 is defined to be 1.

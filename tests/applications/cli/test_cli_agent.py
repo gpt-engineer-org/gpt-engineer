@@ -4,13 +4,13 @@ import tempfile
 import pytest
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
-from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
 
 # from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, memory_path
 from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen
 from tests.caching_ai import CachingAI
 
@@ -24,7 +24,9 @@ def test_init_standard_config(monkeypatch):
     outfile = "output.txt"
     os.path.join(temp_dir, outfile)
     code = cli_agent.init(
-        Prompt(f"Make a program that prints 'Hello World!' to a file called '{outfile}'")
+        Prompt(
+            f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
+        )
     )
 
     env = DiskExecutionEnv()
@@ -47,7 +49,9 @@ def test_init_lite_config(monkeypatch):
     outfile = "output.txt"
     os.path.join(temp_dir, outfile)
     code = cli_agent.init(
-        Prompt(f"Make a program that prints 'Hello World!' to a file called '{outfile}'")
+        Prompt(
+            f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
+        )
     )
 
     env = DiskExecutionEnv()
@@ -68,7 +72,9 @@ def test_init_clarified_gen_config(monkeypatch):
     )
     outfile = "output.txt"
     code = cli_agent.init(
-        Prompt(f"Make a program that prints 'Hello World!' to a file called '{outfile} either using python or javascript'")
+        Prompt(
+            f"Make a program that prints 'Hello World!' to a file called '{outfile} either using python or javascript'"
+        )
     )
 
     env = DiskExecutionEnv()
@@ -77,6 +83,7 @@ def test_init_clarified_gen_config(monkeypatch):
 
     assert outfile in code
     assert code[outfile].strip() == "Hello World!"
+
 
 def test_improve_standard_config(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda _: "y")
@@ -94,7 +101,9 @@ def test_improve_standard_config(monkeypatch):
     cli_agent = CliAgent.with_default_config(memory, execution_env, ai=CachingAI())
     code = cli_agent.improve(
         code,
-        Prompt("Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'"),
+        Prompt(
+            "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'"
+        ),
     )
 
     env = DiskExecutionEnv()

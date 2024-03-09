@@ -206,5 +206,5 @@ class CliAgent(BaseAgent):
         files_dict = self.improve_fn(
             self.ai, prompt, files_dict, self.memory, self.preprompts_holder
         )
-        
+
         return files_dict

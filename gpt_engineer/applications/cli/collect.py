@@ -33,6 +33,7 @@ from gpt_engineer.applications.cli.learning import (
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.prompt import Prompt
 
+
 def send_learning(learning: Learning):
     """
     Send the learning data to RudderStack for analysis.

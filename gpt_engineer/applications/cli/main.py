@@ -97,14 +97,17 @@ def load_prompt(input_repo: DiskMemory, improve_mode) -> Prompt:
                 "\nWhat application do you want gpt-engineer to generate?\n"
             )
         else:
-            input_repo["prompt/text"] = input("\nHow do you want to improve the application?\n")
-    
+            input_repo["prompt/text"] = input(
+                "\nHow do you want to improve the application?\n"
+            )
+
     repoResult = input_repo.get("prompt")
 
-    if isinstance(repoResult, DiskMemory): # If prompt is in folder format
+    if isinstance(repoResult, DiskMemory):  # If prompt is in folder format
         return Prompt(repoResult.get("text"), repoResult.get("images").to_dict())
-    else: 
+    else:
         return Prompt(repoResult)
+
 
 def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
     """
@@ -254,7 +257,7 @@ def main(
             init_git_repo(path)
 
     prompt = load_prompt(DiskMemory(path), improve_mode)
-    
+
     # todo: if ai.vision is false and not llm_via_clipboard - ask if they would like to use gpt-4-vision-preview instead? If so recreate AI
     if not ai.vision:
         prompt.image_urls = None
