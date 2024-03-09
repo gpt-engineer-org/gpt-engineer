@@ -196,7 +196,10 @@ class TestStepUtilities:
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         preprompts = preprompts_holder.get_preprompts()
         expected_prompt = (
-            preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format"])
+            preprompts["roadmap"]
+            + preprompts["improve"].replace(
+                "FILE_FORMAT", preprompts["file_format_diff"]
+            )
             + "\nUseful to know:\n"
             + preprompts["philosophy"]
         )

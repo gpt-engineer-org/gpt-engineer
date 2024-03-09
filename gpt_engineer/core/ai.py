@@ -171,6 +171,8 @@ class AI:
 
         messages = self._collapse_messages(messages)
 
+        messages = self._collapse_messages(messages)
+
         response = self.backoff_inference(messages)
 
         self.token_usage_log.update_log(
@@ -328,6 +330,14 @@ class AI:
                 temperature=self.temperature,
                 callbacks=[StreamingStdOutCallbackHandler()],
                 streaming=True,
+                max_tokens_to_sample=4096,
+            )
+
+        if "claude" in self.model_name:
+            return ChatAnthropic(
+                model=self.model_name,
+                temperature=self.temperature,
+                callbacks=[StreamingStdOutCallbackHandler()],
                 max_tokens_to_sample=4096,
             )
 
