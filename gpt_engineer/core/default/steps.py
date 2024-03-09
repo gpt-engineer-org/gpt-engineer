@@ -112,7 +112,7 @@ def gen_code(
         A dictionary of file names to their respective source code content.
     """
     preprompts = preprompts_holder.get_preprompts()
-    messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
+    messages = ai.start(setup_sys_prompt(preprompts), prompt.to_langchain_content(), step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files_dict = chat_to_files_dict(chat)
@@ -310,10 +310,9 @@ def salvage_correct_hunks(
     memory: MutableMapping[str | Path, str],
     error_message: List,
 ) -> FilesDict:
-    chat = messages[-1].content.strip()
+    ai_response = messages[-1].content.strip()
 
-    diffs = parse_diffs(chat)
-
+    diffs = parse_diffs(ai_response)
     # validate and correct diffs
 
     for file_name, diff in diffs.items():
@@ -324,5 +323,5 @@ def salvage_correct_hunks(
             )
             error_message.extend(problems)
     files_dict = apply_diffs(diffs, files_dict)
-    memory[IMPROVE_LOG_FILE] = chat
+    memory[IMPROVE_LOG_FILE] = ai_response
     return files_dict

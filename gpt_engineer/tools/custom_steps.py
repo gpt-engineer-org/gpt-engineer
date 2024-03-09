@@ -13,6 +13,7 @@ from gpt_engineer.core.default.paths import CODE_GEN_LOG_FILE, ENTRYPOINT_FILE
 from gpt_engineer.core.default.steps import curr_fn, setup_sys_prompt
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.prompt import Prompt
 
 # Type hint for chat messages
 Message = Union[AIMessage, HumanMessage, SystemMessage]
@@ -137,7 +138,7 @@ def self_heal(
 
 
 def clarified_gen(
-    ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder
+    ai: AI, prompt: Prompt, memory: BaseMemory, preprompts_holder: PrepromptsHolder
 ) -> FilesDict:
     """
     Generates code based on clarifications obtained from the user and saves it to a specified workspace.
@@ -161,7 +162,7 @@ def clarified_gen(
 
     preprompts = preprompts_holder.get_preprompts()
     messages: List[Message] = [SystemMessage(content=preprompts["clarify"])]
-    user_input = prompt
+    user_input = prompt.text # clarify does not work with vision right now
     while True:
         messages = ai.next(messages, user_input, step_name=curr_fn())
         msg = messages[-1].content.strip()
@@ -213,7 +214,7 @@ def clarified_gen(
 
 
 def lite_gen(
-    ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder
+    ai: AI, prompt: Prompt, memory: BaseMemory, preprompts_holder: PrepromptsHolder
 ) -> FilesDict:
     """
     Executes the AI model using the main prompt and saves the generated results to the specified workspace.
@@ -241,7 +242,7 @@ def lite_gen(
     """
 
     preprompts = preprompts_holder.get_preprompts()
-    messages = ai.start(prompt, preprompts["file_format"], step_name=curr_fn())
+    messages = ai.start(prompt.to_langchain_content(), preprompts["file_format"], step_name=curr_fn())
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files_dict = chat_to_files_dict(chat)

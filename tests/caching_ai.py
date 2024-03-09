@@ -18,6 +18,7 @@ class CachingAI(AI):
         self.temperature = 0.1
         self.azure_endpoint = ""
         self.streaming = False
+        self.vision = False
         try:
             self.model_name = "gpt-4-1106-preview"
             self.llm = self._create_chat_model()
