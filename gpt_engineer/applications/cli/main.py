@@ -1,7 +1,12 @@
 """
 Entrypoint for the CLI tool.
 
-This module serves as the entry point for a command-line interface (CLI) tool designed to interact with OpenAI's language models. It provides functionality to load necessary environment variables, configure various parameters for the AI interaction, and manage the generation or improvement of code projects.
+This module serves as the entry point for a command-line interface (CLI) tool.
+It is designed to interact with OpenAI's language models.
+The module provides functionality to:
+- Load necessary environment variables,
+- Configure various parameters for the AI interaction,
+- Manage the generation or improvement of code projects.
 
 Main Functionality
 ------------------
@@ -95,9 +100,11 @@ def load_prompt(input_repo: DiskMemory, improve_mode):
     else:
         input_repo["prompt"] = input("\nHow do you want to improve the application?\n")
 
+    print("Prompt saved.")
     print(
-        colored(
-            f"Prompt saved. You need to remove/edit the file: {input_repo.path}/prompt to use a different prompt",
+        "If you want to use a different prompt later "
+        + colored(
+            f"you need to remove/edit the file: {input_repo.path}/prompt",
             "red",
         )
     )
@@ -156,30 +163,35 @@ def prompt_yesno() -> bool:
 def main(
     project_path: str = typer.Argument("projects/example", help="path"),
     model: str = typer.Argument("gpt-4-1106-preview", help="model id string"),
-    temperature: float = 0.1,
+    temperature: float = typer.Option(
+        0.1,
+        "--temperature",
+        "-t",
+        help="Controls randomness: lower values for more focused, deterministic outputs",
+    ),
     improve_mode: bool = typer.Option(
         False,
         "--improve",
         "-i",
-        help="Improve files_dict from existing project.",
+        help="Improve an existing project by modifying the files.",
     ),
     lite_mode: bool = typer.Option(
         False,
         "--lite",
         "-l",
-        help="Lite mode - run only the main prompt.",
+        help="Lite mode: run a generation using only the main prompt.",
     ),
     clarify_mode: bool = typer.Option(
         False,
         "--clarify",
         "-c",
-        help="Lite mode - discuss specification with AI before implementation.",
+        help="Clarify mode: have the AI discuss and clarify the specification before implementation.",
     ),
     self_heal_mode: bool = typer.Option(
         False,
         "--self-heal",
         "-sh",
-        help="Lite mode - discuss specification with AI before implementation.",
+        help="Self-heal mode: enable the AI to attempt to fix errors encountered during execution.",
     ),
     azure_endpoint: str = typer.Option(
         "",
@@ -199,7 +211,9 @@ def main(
         "--llm-via-clipboard",
         help="Use the clipboard to communicate with the AI.",
     ),
-    verbose: bool = typer.Option(False, "--verbose", "-v"),
+    verbose: bool = typer.Option(
+        False, "--verbose", "-v", help="Enable verbose logging for debugging."
+    ),
 ):
     """
     The main entry point for the CLI tool that generates or improves a project.
@@ -236,6 +250,17 @@ def main(
     None
     """
 
+    # Validate arguments
+    if improve_mode and (clarify_mode or lite_mode):
+        typer.echo("Error: Clarify and lite mode are not compatible with improve mode.")
+        raise typer.Exit(code=1)
+
+    if not project_path:
+        project_path = typer.prompt(
+            "Please enter the project path", default="projects/example"
+        )
+
+    # Set up logging
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
     if improve_mode:
