@@ -90,8 +90,8 @@ def load_prompt(input_repo: DiskMemory, improve_mode) -> Prompt:
     str
         The loaded or inputted prompt.
     """
-    repoResult = input_repo.get("prompt")
-    if not repoResult:
+    repo_result = input_repo.get("prompt")
+    if not repo_result:
         if not improve_mode:
             input_repo["prompt/text"] = input(
                 "\nWhat application do you want gpt-engineer to generate?\n"
@@ -101,12 +101,12 @@ def load_prompt(input_repo: DiskMemory, improve_mode) -> Prompt:
                 "\nHow do you want to improve the application?\n"
             )
 
-    repoResult = input_repo.get("prompt")
+    repo_result = input_repo.get("prompt")
 
-    if isinstance(repoResult, DiskMemory):  # If prompt is in folder format
-        return Prompt(repoResult.get("text"), repoResult.get("images").to_dict())
+    if isinstance(repo_result, DiskMemory):  # If prompt is in folder format
+        return Prompt(repo_result.get("text"), repo_result.get("images").to_dict())
     else:
-        return Prompt(repoResult)
+        return Prompt(repo_result)
 
 
 def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
