@@ -18,7 +18,7 @@ from gpt_engineer.core.default.steps import (
     execute_entrypoint,
     gen_code,
     gen_entrypoint,
-    improve,
+    improve_fn,
 )
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
@@ -86,7 +86,7 @@ class CliAgent(BaseAgent):
         execution_env: BaseExecutionEnv,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
-        improve_fn: ImproveType = improve,
+        improve_fn: ImproveType = improve_fn,
         process_code_fn: CodeProcessor = execute_entrypoint,
         preprompts_holder: PrepromptsHolder = None,
     ):
@@ -105,7 +105,7 @@ class CliAgent(BaseAgent):
         execution_env: DiskExecutionEnv,
         ai: AI = None,
         code_gen_fn: CodeGenType = gen_code,
-        improve_fn: ImproveType = improve,
+        improve_fn: ImproveType = improve_fn,
         process_code_fn: CodeProcessor = execute_entrypoint,
         preprompts_holder: PrepromptsHolder = None,
     ):

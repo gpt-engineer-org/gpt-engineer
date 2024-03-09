@@ -20,7 +20,7 @@ from gpt_engineer.core.default.steps import (
     curr_fn,
     gen_code,
     gen_entrypoint,
-    improve,
+    improve_fn,
     setup_sys_prompt,
     setup_sys_prompt_existing_code,
 )
@@ -296,7 +296,7 @@ Some introductory text.
 
         # Call the improve function
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
-        improved_code = improve(ai_mock, prompt, code, memory, preprompts_holder)
+        improved_code = improve_fn(ai_mock, prompt, code, memory, preprompts_holder)
 
         # Assert that the code was improved correctly
         expected_code = FilesDict(

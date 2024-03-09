@@ -48,7 +48,7 @@ from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.core.default.steps import (
     execute_entrypoint,
     gen_code,
-    improve as improve_fn,
+    improve_fn as improve_fn,
 )
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.git import stage_uncommitted_to_git
@@ -66,12 +66,17 @@ def load_env_if_needed():
     and if not, it attempts to load it from a .env file in the current working
     directory. It then sets the openai.api_key for use in the application.
     """
+    # We have all these checks for legacy reasons...
     if os.getenv("OPENAI_API_KEY") is None:
         load_dotenv()
     if os.getenv("OPENAI_API_KEY") is None:
-        # if there is no .env file, try to load from the current working directory
         load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
     openai.api_key = os.getenv("OPENAI_API_KEY")
+
+    if os.getenv("ANTHROPIC_API_KEY") is None:
+        load_dotenv()
+    if os.getenv("ANTHROPIC_API_KEY") is None:
+        load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
 
 
 def load_prompt(input_repo: DiskMemory, improve_mode):
