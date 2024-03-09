@@ -41,7 +41,6 @@ from typing import List, MutableMapping, Union
 from langchain.schema import HumanMessage, SystemMessage
 from termcolor import colored
 
-from gpt_engineer.applications.cli.file_selector import FileSelector
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.base_memory import BaseMemory
@@ -288,6 +287,7 @@ def improve(
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=f"Request: {prompt}"))
+    memory[UPLOADED_FILES] = files_dict.to_chat() + "\nPROMPT:\n" + prompt
     return _improve_loop(ai, files_dict, memory, messages)
 
 
@@ -295,7 +295,7 @@ def _improve_loop(
     ai: AI, files_dict: FilesDict, memory: BaseMemory, messages: List
 ) -> FilesDict:
     problems = []
-    memory[UPLOADED_FILES] = files_dict.to_chat() + "\nPROMPT:\n" + prompt
+
     # check edit correctness
     edit_refinements = 0
     while edit_refinements <= MAX_EDIT_REFINEMENT_STEPS:
@@ -353,18 +353,16 @@ class Tee(object):
             file.flush()
 
 
-def handle_improve_mode(project_path, prompt, agent, memory):
+def handle_improve_mode(prompt, agent, memory, files_dict):
     captured_output = io.StringIO()
     old_stdout = sys.stdout
     sys.stdout = Tee(sys.stdout, captured_output)
 
     try:
-        fileselector = FileSelector(project_path)
-        files_dict = fileselector.ask_for_files()
         files_dict = agent.improve(files_dict, prompt)
     except Exception as e:
         print(
-            f"Error while improving the project: {e} , could you please upload all the files in XX folder to github?"
+            f"Error while improving the project: {e} , could you please upload all the files in {memory.path} folder to github?"
         )
         files_dict = None
     finally:
