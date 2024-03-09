@@ -6,10 +6,11 @@ from typing import List, Optional, Union
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
-from gpt_engineer.core.ai import AI
-from gpt_engineer.core.token_usage import TokenUsageLog
-from gpt_engineer.core.prompt import Prompt
 import gpt_engineer.applications.cli.main as main
+
+from gpt_engineer.core.ai import AI
+from gpt_engineer.core.prompt import Prompt
+from gpt_engineer.core.token_usage import TokenUsageLog
 
 # Type hint for a chat message
 Message = Union[AIMessage, HumanMessage, SystemMessage]
@@ -58,9 +59,9 @@ class CachingAI(AI):
         List[Message]
             The updated list of messages in the conversation.
         """
-        if  isinstance(prompt, str):
+        if isinstance(prompt, str):
             messages.append(HumanMessage(content=prompt))
-        if  isinstance(prompt, Prompt):
+        if isinstance(prompt, Prompt):
             messages.append(HumanMessage(content=prompt.to_langchain_content()))
 
         # read cache file if it exists
