@@ -9,6 +9,7 @@ from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.token_usage import TokenUsageLog
 from gpt_engineer.core.prompt import Prompt
+import gpt_engineer.applications.cli.main as main
 
 # Type hint for a chat message
 Message = Union[AIMessage, HumanMessage, SystemMessage]
@@ -16,6 +17,7 @@ Message = Union[AIMessage, HumanMessage, SystemMessage]
 
 class CachingAI(AI):
     def __init__(self, *args, **kwargs):
+        main.load_env_if_needed()
         self.temperature = 0.1
         self.azure_endpoint = ""
         self.streaming = False

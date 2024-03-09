@@ -88,7 +88,7 @@ class AI:
         self,
         model_name="gpt-4-0125-preview",
         temperature=0.1,
-        azure_endpoint="",
+        azure_endpoint=None,
         streaming=True,
         vision=False,
     ):
