@@ -179,8 +179,8 @@ class AI:
         logger.debug(f"Chat completion finished: {messages}")
 
         return messages
-    
-    def _extract_content(self,content):
+
+    def _extract_content(self, content):
         """
         Extracts text content from a message, supporting both string and list types.
 
@@ -200,7 +200,7 @@ class AI:
             # Assuming the structure of list content is [{'type': 'text', 'text': 'Some text'}, ...]
             return content[0]["text"]
         else:
-            return "" 
+            return ""
 
     def _collapse_messages(self, messages: List[Message]):
         """
@@ -230,7 +230,9 @@ class AI:
 
         for current_message in messages[1:]:
             if current_message.type == previous_message.type:
-                combined_content += "\n\n" + self._extract_content(current_message.content)
+                combined_content += "\n\n" + self._extract_content(
+                    current_message.content
+                )
             else:
                 collapsed_messages.append(
                     previous_message.__class__(content=combined_content)
