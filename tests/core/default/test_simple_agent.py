@@ -16,7 +16,9 @@ def test_init():
     lean_agent = SimpleAgent.with_default_config(temp_dir, CachingAI())
     outfile = "output.txt"
     code = lean_agent.init(
-        Prompt(f"Make a program that prints 'Hello World!' to a file called '{outfile}'")
+        Prompt(
+            f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
+        )
     )
 
     env = DiskExecutionEnv()
@@ -39,7 +41,9 @@ def test_improve():
     lean_agent = SimpleAgent.with_default_config(temp_dir, CachingAI())
     lean_agent.improve(
         code,
-        Prompt("Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'"),
+        Prompt(
+            "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'"
+        ),
         f"bash {ENTRYPOINT_FILE}",
     )
 

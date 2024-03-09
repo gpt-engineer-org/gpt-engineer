@@ -23,6 +23,7 @@ from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.prompt import Prompt
 
+
 class SimpleAgent(BaseAgent):
     """
     An agent that uses AI to generate and improve code based on a given prompt.

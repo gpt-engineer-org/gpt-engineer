@@ -162,7 +162,7 @@ def clarified_gen(
 
     preprompts = preprompts_holder.get_preprompts()
     messages: List[Message] = [SystemMessage(content=preprompts["clarify"])]
-    user_input = prompt.text # clarify does not work with vision right now
+    user_input = prompt.text  # clarify does not work with vision right now
     while True:
         messages = ai.next(messages, user_input, step_name=curr_fn())
         msg = messages[-1].content.strip()
@@ -242,7 +242,9 @@ def lite_gen(
     """
 
     preprompts = preprompts_holder.get_preprompts()
-    messages = ai.start(prompt.to_langchain_content(), preprompts["file_format"], step_name=curr_fn())
+    messages = ai.start(
+        prompt.to_langchain_content(), preprompts["file_format"], step_name=curr_fn()
+    )
     chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = chat
     files_dict = chat_to_files_dict(chat)
