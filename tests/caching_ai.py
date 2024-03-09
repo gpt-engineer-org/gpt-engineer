@@ -69,6 +69,7 @@ class CachingAI(AI):
             cache = dict()
 
         messages_key = self.serialize_messages(messages)
+        print(messages_key)
         if messages_key not in cache:
             print("calling backoff inference")
             response = self.backoff_inference(messages)
