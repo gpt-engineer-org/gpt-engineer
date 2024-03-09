@@ -114,7 +114,7 @@ def gen_code(
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
     chat = messages[-1].content.strip()
-    memory[CODE_GEN_LOG_FILE] = chat
+    memory.log(CODE_GEN_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
     files_dict = chat_to_files_dict(chat)
     return files_dict
 
@@ -157,7 +157,7 @@ def gen_entrypoint(
     entrypoint_code = FilesDict(
         {ENTRYPOINT_FILE: "\n".join(match.group(1) for match in matches)}
     )
-    memory[ENTRYPOINT_LOG_FILE] = chat
+    memory.log(ENTRYPOINT_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
     return entrypoint_code
 
 
@@ -317,7 +317,7 @@ def salvage_correct_hunks(
 
     # validate and correct diffs
 
-    for file_name, diff in diffs.items():
+    for _, diff in diffs.items():
         # if diff is a new file, validation and correction is unnecessary
         if not diff.is_new_file():
             problems = diff.validate_and_correct(
@@ -325,6 +325,6 @@ def salvage_correct_hunks(
             )
             error_message.extend(problems)
     files_dict = apply_diffs(diffs, files_dict)
-    memory.log(IMPROVE_LOG_FILE, chat)
+    memory.log(IMPROVE_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
     memory.log(DIFF_LOG_FILE, "\n\n".join(error_message))
     return files_dict

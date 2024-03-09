@@ -207,7 +207,7 @@ def clarified_gen(
     )
     print()
     chat = messages[-1].content.strip()
-    memory[CODE_GEN_LOG_FILE] = chat
+    memory.log(CODE_GEN_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
     files_dict = chat_to_files_dict(chat)
     return files_dict
 
@@ -243,6 +243,6 @@ def lite_gen(
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(prompt, preprompts["file_format"], step_name=curr_fn())
     chat = messages[-1].content.strip()
-    memory[CODE_GEN_LOG_FILE] = chat
+    memory.log(CODE_GEN_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
     files_dict = chat_to_files_dict(chat)
     return files_dict
