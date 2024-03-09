@@ -149,17 +149,35 @@ def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
 
 
 def compare(f1: FilesDict, f2: FilesDict):
+    def colored_diff(s1, s2):
+        lines1 = s1.splitlines()
+        lines2 = s2.splitlines()
+
+        diff = difflib.unified_diff(lines1, lines2, lineterm="")
+
+        RED = "\033[38;5;202m"
+        GREEN = "\033[92m"
+        RESET = "\033[0m"
+
+        colored_lines = []
+        for line in diff:
+            if line.startswith("+"):
+                colored_lines.append(GREEN + line + RESET)
+            elif line.startswith("-"):
+                colored_lines.append(RED + line + RESET)
+            else:
+                colored_lines.append(line)
+
+        return "\n".join(colored_lines)
+
     for file in sorted(set(f1) | set(f2)):
         print(f"Changes to {file}:")
-        diff = difflib.unified_diff(
-            f1.get(file, "").splitlines(), f2.get(file, "").splitlines()
-        )
-        for line in diff:
-            print(line)
+        diff = colored_diff(f1.get(file, ""), f2.get(file, ""))
+        print(diff)
 
 
 def prompt_yesno() -> bool:
-    TERM_CHOICES = colored("y", "green") + "/" + colored("n", "red")
+    TERM_CHOICES = colored("y", "green") + "/" + colored("n", "red") + " "
     while answer := input(TERM_CHOICES).strip().lower() not in ["y", "yes", "n", "no"]:
         print("Please respond with 'y' or 'n'")
     return answer in ["y", "yes"]
