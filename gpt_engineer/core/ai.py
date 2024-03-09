@@ -22,7 +22,6 @@ from pathlib import Path
 from typing import List, Optional, Union
 
 import backoff
-from langchain_anthropic import ChatAnthropic
 import openai
 import pyperclip
 
@@ -35,6 +34,7 @@ from langchain.schema import (
     messages_from_dict,
     messages_to_dict,
 )
+from langchain_anthropic import ChatAnthropic
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 
 from gpt_engineer.core.token_usage import TokenUsageLog
@@ -207,7 +207,9 @@ class AI:
             if current_message.type == previous_message.type:
                 combined_content += "\n\n" + current_message.content
             else:
-                collapsed_messages.append(previous_message.__class__(content=combined_content))
+                collapsed_messages.append(
+                    previous_message.__class__(content=combined_content)
+                )
                 previous_message = current_message
                 combined_content = current_message.content
 
@@ -317,11 +319,12 @@ class AI:
                 callbacks=[StreamingStdOutCallbackHandler()],
             )
 
-        if 'claude' in self.model_name:
+        if "claude" in self.model_name:
             return ChatAnthropic(
                 model=self.model_name,
                 temperature=self.temperature,
-                callbacks=[StreamingStdOutCallbackHandler()]
+                callbacks=[StreamingStdOutCallbackHandler()],
+                max_tokens_to_sample=4096,
             )
 
         return ChatOpenAI(
