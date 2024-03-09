@@ -30,7 +30,6 @@ class CachingAI(AI):
         self.streaming = False
         self.token_usage_log = TokenUsageLog("gpt-4-1106-preview")
         self.cache_file = Path(__file__).parent / "ai_cache.json"
-        print(self.llm)
 
     def next(
         self,
