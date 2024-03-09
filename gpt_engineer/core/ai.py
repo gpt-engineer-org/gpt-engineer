@@ -19,7 +19,7 @@ import logging
 import os
 
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Any
 
 import backoff
 import openai
@@ -112,7 +112,7 @@ class AI:
 
         logger.debug(f"Using model {self.model_name}")
 
-    def start(self, system: str, user: str, step_name: str) -> List[Message]:
+    def start(self, system: str, user: Any, step_name: str) -> List[Message]:
         """
         Start the conversation with a system message and a user message.
 
@@ -135,8 +135,7 @@ class AI:
             SystemMessage(content=system),
             HumanMessage(content=user),
         ]
-        return self.next(messages, step_name=step_name)
-
+        return self.next(messages, step_name=step_name)    
     def next(
         self,
         messages: List[Message],
@@ -320,6 +319,16 @@ class AI:
                 streaming=self.streaming,
                 callbacks=[StreamingStdOutCallbackHandler()],
             )
+        
+        if (self.vision):
+            return ChatOpenAI(
+            model=self.model_name,
+            temperature=self.temperature,
+            streaming=self.streaming,
+            callbacks=[StreamingStdOutCallbackHandler()],
+            max_tokens=4096 #vision models default to low max token limits
+        )
+
 
         if "claude" in self.model_name:
             return ChatAnthropic(
@@ -333,7 +342,7 @@ class AI:
             model=self.model_name,
             temperature=self.temperature,
             streaming=self.streaming,
-            callbacks=[StreamingStdOutCallbackHandler()],
+            callbacks=[StreamingStdOutCallbackHandler()]
         )
 
 

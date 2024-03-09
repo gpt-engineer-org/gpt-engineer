@@ -16,7 +16,7 @@ check_collection_consent() -> bool
     Checks if the user has previously given consent to store their data and, if not, asks for it.
 ask_collection_consent() -> bool
     Prompts the user for consent to store their data for the purpose of improving GPT Engineer.
-extract_learning(prompt: str, model: str, temperature: float, config: Tuple[str, ...], memory: DiskMemory, review: Review) -> Learning
+extract_learning(prompt: Prompt, model: str, temperature: float, config: Tuple[str, ...], memory: DiskMemory, review: Review) -> Learning
     Extracts feedback and session details to create a Learning instance based on the provided parameters.
 get_session() -> str
     Retrieves a unique identifier for the current user session, creating one if it does not exist.
@@ -40,6 +40,7 @@ from dataclasses_json import dataclass_json
 from termcolor import colored
 
 from gpt_engineer.core.default.disk_memory import DiskMemory
+from gpt_engineer.core.prompt import Prompt
 
 
 @dataclass_json
@@ -97,7 +98,7 @@ class Learning:
         The version of the learning data schema.
     """
 
-    prompt: str
+    prompt: Prompt
     model: str
     temperature: float
     config: str
@@ -236,7 +237,7 @@ def ask_collection_consent() -> bool:
 
 
 def extract_learning(
-    prompt: str,
+    prompt: Prompt,
     model: str,
     temperature: float,
     config: Tuple[str, ...],

@@ -254,8 +254,10 @@ def main(
             init_git_repo(path)
 
     prompt = load_prompt(DiskMemory(path), improve_mode)
-    # todo: prompt_images = load_prompt_images(DiskMemory(path), improve_mode)
+    
     # todo: if ai.vision is false and not llm_via_clipboard - ask if they would like to use gpt-4-vision-preview instead? If so recreate AI
+    if not ai.vision:
+        prompt.image_urls = None
 
     # configure generation function
     if clarify_mode:

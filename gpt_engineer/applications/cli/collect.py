@@ -31,7 +31,7 @@ from gpt_engineer.applications.cli.learning import (
     human_review_input,
 )
 from gpt_engineer.core.default.disk_memory import DiskMemory
-
+from gpt_engineer.core.prompt import Prompt
 
 def send_learning(learning: Learning):
     """
@@ -62,7 +62,7 @@ def send_learning(learning: Learning):
 
 
 def collect_learnings(
-    prompt: str,
+    prompt: Prompt,
     model: str,
     temperature: float,
     config: any,
@@ -138,7 +138,7 @@ def collect_learnings(
 
 
 def collect_and_send_human_review(
-    prompt: str,
+    prompt: Prompt,
     model: str,
     temperature: float,
     config: Tuple[str, ...],
