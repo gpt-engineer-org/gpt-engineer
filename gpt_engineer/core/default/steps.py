@@ -93,6 +93,30 @@ def setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
     )
 
 
+def setup_sys_prompt_existing_code(
+    preprompts: MutableMapping[Union[str, Path], str]
+) -> str:
+    """
+    Sets up the system prompt for improving existing code.
+
+    Parameters
+    ----------
+    preprompts : MutableMapping[Union[str, Path], str]
+        A mapping of preprompt messages to guide the AI model.
+
+    Returns
+    -------
+    str
+        The system prompt message for the AI model to improve existing code.
+    """
+    return (
+        preprompts["roadmap"]
+        + preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format_diff"])
+        + "\nUseful to know:\n"
+        + preprompts["philosophy"]
+    )
+
+
 def gen_code(
     ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder
 ) -> FilesDict:
@@ -229,29 +253,6 @@ def execute_entrypoint(
     return files_dict
 
 
-def setup_sys_prompt_existing_code(
-    preprompts: MutableMapping[Union[str, Path], str]
-) -> str:
-    """
-    Sets up the system prompt for improving existing code.
-
-    Parameters
-    ----------
-    preprompts : MutableMapping[Union[str, Path], str]
-        A mapping of preprompt messages to guide the AI model.
-
-    Returns
-    -------
-    str
-        The system prompt message for the AI model to improve existing code.
-    """
-    return (
-        preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format"])
-        + "\nUseful to know:\n"
-        + preprompts["philosophy"]
-    )
-
-
 def improve(
     ai: AI,
     prompt: str,
@@ -287,6 +288,12 @@ def improve(
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=f"Request: {prompt}"))
+    return _improve_loop(ai, files_dict, memory, messages)
+
+
+def _improve_loop(
+    ai: AI, files_dict: FilesDict, memory: BaseMemory, messages: List
+) -> FilesDict:
     problems = []
     memory[UPLOADED_FILES] = files_dict.to_chat() + "\nPROMPT:\n" + prompt
     # check edit correctness
