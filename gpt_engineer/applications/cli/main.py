@@ -20,6 +20,7 @@ Notes
 - When using the `azure_endpoint` parameter, provide the Azure OpenAI service endpoint URL.
 """
 
+import difflib
 import logging
 import os
 
@@ -29,6 +30,7 @@ import openai
 import typer
 
 from dotenv import load_dotenv
+from termcolor import colored
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
@@ -38,14 +40,13 @@ from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
-from gpt_engineer.core.default.steps import execute_entrypoint, gen_code, improve
-from gpt_engineer.core.git import (
-    filter_files_with_uncommitted_changes,
-    init_git_repo,
-    is_git_installed,
-    is_git_repo,
-    stage_files,
+from gpt_engineer.core.default.steps import (
+    execute_entrypoint,
+    gen_code,
+    improve as improve_fn,
 )
+from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.git import stage_uncommitted_to_git
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
 
@@ -93,6 +94,14 @@ def load_prompt(input_repo: DiskMemory, improve_mode):
         )
     else:
         input_repo["prompt"] = input("\nHow do you want to improve the application?\n")
+
+    print(
+        colored(
+            f"Prompt saved. You need to remove/edit the file: {input_repo.path}/prompt to use a different prompt",
+            "red",
+        )
+    )
+
     return input_repo.get("prompt")
 
 
@@ -126,9 +135,20 @@ def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
     return custom_preprompts_path
 
 
-def prompt_yesno(question: str) -> bool:
-    question += " [y/N] "
-    answer = input(question).strip().lower()
+def compare(f1: FilesDict, f2: FilesDict):
+    for file in sorted(set(f1) | set(f2)):
+        print(f"Changes to {file}:")
+        diff = difflib.unified_diff(
+            f1.get(file, "").splitlines(), f2.get(file, "").splitlines()
+        )
+        for line in diff:
+            print(line)
+
+
+def prompt_yesno() -> bool:
+    TERM_CHOICES = colored("y", "green") + "/" + colored("n", "red")
+    while answer := input(TERM_CHOICES).strip().lower() not in ["y", "yes", "n", "no"]:
+        print("Please respond with 'y' or 'n'")
     return answer in ["y", "yes"]
 
 
@@ -237,12 +257,6 @@ def main(
     path = Path(project_path)
     print("Running gpt-engineer in", path.absolute(), "\n")
 
-    # Check if there's a git repo and verify that there aren't any uncommitted changes
-    if is_git_installed():
-        if not is_git_repo(path) and not improve_mode:
-            print("Initializing an empty git repository")
-            init_git_repo(path)
-
     prompt = load_prompt(DiskMemory(path), improve_mode)
 
     # configure generation function
@@ -252,16 +266,16 @@ def main(
         code_gen_fn = lite_gen
     else:
         code_gen_fn = gen_code
+
     # configure execution function
     if self_heal_mode:
         execution_fn = self_heal
     else:
         execution_fn = execute_entrypoint
 
-    improve_fn = improve
-
-    preprompts_path = get_preprompts_path(use_custom_preprompts, Path(project_path))
-    preprompts_holder = PrepromptsHolder(preprompts_path)
+    preprompts_holder = PrepromptsHolder(
+        get_preprompts_path(use_custom_preprompts, Path(project_path))
+    )
     memory = DiskMemory(memory_path(project_path))
     execution_env = DiskExecutionEnv()
     agent = CliAgent.with_default_config(
@@ -274,12 +288,18 @@ def main(
         preprompts_holder=preprompts_holder,
     )
 
-    store = FileStore(project_path)
+    files = FileStore(project_path)
     if improve_mode:
         fileselector = FileSelector(project_path)
-        files_dict = fileselector.ask_for_files()
-        files_dict = agent.improve(files_dict, prompt)
-        if files_dict and not prompt_yesno("\nDo you want to apply these changes?"):
+        files_dict_before = fileselector.ask_for_files()
+        files_dict = agent.improve(files_dict_before, prompt)
+
+        print("\nChanges to be made:")
+        compare(files_dict_before, files_dict)
+
+        print()
+        print(colored("Do you want to apply these changes?", "light_green"))
+        if prompt_yesno():
             return
     else:
         files_dict = agent.init(prompt)
@@ -287,17 +307,9 @@ def main(
         config = (code_gen_fn.__name__, execution_fn.__name__)
         collect_and_send_human_review(prompt, model, temperature, config, agent.memory)
 
-    if is_git_repo(path):
-        # Ask whether user wants to stage uncommitted files before overwriting them
-        modified_files = filter_files_with_uncommitted_changes(path, files_dict)
-        if modified_files:
-            print(
-                "Staging the following uncommitted files before overwriting: ",
-                ", ".join(modified_files),
-            )
-            stage_files(path, modified_files)
+    stage_uncommitted_to_git(path, files_dict, improve_mode)
 
-    store.upload(files_dict)
+    files.push(files_dict)
 
     print("Total api cost: $ ", ai.token_usage_log.usage_cost())
 
