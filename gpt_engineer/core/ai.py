@@ -321,7 +321,6 @@ class AI:
                 callbacks=[StreamingStdOutCallbackHandler()],
             )
 
-
         if self.vision:
             return ChatOpenAI(
                 model=self.model_name,
