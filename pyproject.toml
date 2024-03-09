@@ -31,6 +31,7 @@ langchain = "^0.1"
 langchain_openai = "*"
 toml = ">=0.10.2"
 pyperclip = "^1.8.2"
+langchain-anthropic = "^0.1.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.3.1"
