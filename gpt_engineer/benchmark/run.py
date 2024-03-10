@@ -51,21 +51,29 @@ def run(
     task_results = []
     for task in benchmark.tasks:
         print(f'--> Running task: {task.name}\n')
-        if task.inputs is not None and task.assertions is not None:
-            assert len(task.inputs) == len(task.assertions)
 
         t0 = time.time()
         try:
             files_dict = agent.improve(task.initial_code, task.prompt)
         except DiffError as e:  # Temporary catch errors related to git diffs
-            print(e)
+            task_results.append(TaskResult(
+                task_name=task.name,
+                exception=e,
+                duration=time.time() - t0,
+                assertion_results=[],
+            ))
             continue
         t1 = time.time()
 
         try:
             exec_results = run_and_get_result(files_dict, task, benchmark)
         except subprocess.TimeoutExpired as e:
-            print(e)
+            task_results.append(TaskResult(
+                task_name=task.name,
+                exception=e,
+                duration=t1 - t0,
+                assertion_results=[],
+            ))
             continue
 
         task_results.append(
@@ -81,6 +89,15 @@ def run(
                 duration=t1 - t0,
             )
         )
+        task_results.append(TaskResult(
+            task_name=task.name,
+            assertion_results=[
+                {assertion.title: assertion(exec_results[i])}
+                for i, assertion in enumerate(task.assertions)
+            ],
+            duration=t1 - t0,
+            exception=None,
+        ))
 
         if verbose:
             print_results(task_results)
@@ -96,6 +113,21 @@ def run_and_get_result(files_dict, task, benchmark) -> List[Assertable]:
         for i, input_pars in enumerate(task.inputs or [""]):
             print(i, input_pars)
             p = env.popen(task.command + ' "' + input_pars + '"')
+        p = env.popen(task.command)
+        stdout, stderr = p.communicate(timeout=benchmark.timeout)
+        stdout, stderr = stdout.decode("utf-8"), stderr.decode("utf-8")
+        exec_results.append(
+            Assertable(
+                files=files_dict,
+                env=env,
+                process=p,
+                stdout=stdout,
+                stderr=stderr,
+            )
+        )
+    elif all(hasattr(assertion, 'command') for assertion in task.assertions):
+        for i, assertion in enumerate(task.assertions or [""]):
+            print(i, assertion.command)  # TODO: Remove
             stdout, stderr = p.communicate(timeout=benchmark.timeout)
             stdout, stderr = stdout.decode("utf-8"), stderr.decode("utf-8")
             exec_results.append(

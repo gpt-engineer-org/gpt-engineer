@@ -10,12 +10,11 @@ Functions
 load_apps : function
     Loads the APPS benchmark, which consists of a series coding problems.
 """
-from collections import OrderedDict
 from typing import Union
 
 from gpt_engineer.benchmark.benchmarks.apps.problem import Problem
 from gpt_engineer.benchmark.benchmarks.apps.problems import PROBLEM_IDS
-from gpt_engineer.benchmark.types import Benchmark, Task
+from gpt_engineer.benchmark.types import Benchmark, Task, Assertion
 from gpt_engineer.core.files_dict import FilesDict
 from datasets import load_dataset, load_from_disk, Dataset, DatasetDict
 
@@ -67,16 +66,16 @@ def load_apps():
             Task(
                 name=str(problem.id),
                 initial_code=FilesDict({"main.py": problem.starter_code}),
-                command="python main.py",
+                command=None,  # Explicitly setting `None` because each assertion specifies its command
                 prompt=problem.question + "\nThe program, including its inputs, should be run from the command "
                                           "line like 'python main \"input1 input2 etc \"', with all inputs inside "
                                           "the quotation marks. The program should not read inputs from stdin.",
-                inputs=problem.inputs[0:MAX_N_TEST_EXAMPLES],
                 assertions=[
-                    OrderedDict(
-                        {"correct output": AppsAssertion(problem.outputs[i]).evaluate}
-                    )
-                    for i in range(min(len(problem.outputs), MAX_N_TEST_EXAMPLES))
+                    Assertion(
+                        title="correct output",
+                        command="python main.py" + ' "' + problem.inputs[i] + '"',
+                        assertion_lambda=AppsAssertion(problem.outputs[i]).evaluate,
+                    ) for i in range(min(len(problem.outputs), MAX_N_TEST_EXAMPLES))
                 ],
             )
         )
