@@ -64,7 +64,6 @@ class DiskExecutionEnv(BaseExecutionEnv):
             command,
             shell=True,
             cwd=self.store.working_dir,
-            stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )

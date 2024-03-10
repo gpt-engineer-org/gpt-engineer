@@ -14,10 +14,6 @@ from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
 
-SUCCESS = 0
-NO_RESPONSE = 2
-
-
 class SelfHealingAgent:
     ai: AI
     memory: BaseMemory
