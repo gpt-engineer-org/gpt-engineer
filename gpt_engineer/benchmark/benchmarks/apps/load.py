@@ -78,7 +78,6 @@ def load_apps():
                     )
                     for i in range(min(len(problem.outputs), MAX_N_TEST_EXAMPLES))
                 ],
-                retries=2,
             )
         )
 

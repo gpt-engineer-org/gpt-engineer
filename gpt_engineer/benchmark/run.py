@@ -49,75 +49,38 @@ def run(
         A list of TaskResult objects representing the results of the benchmark tasks.
     """
     task_results = []
-    retry_id = 0
     for task in benchmark.tasks:
-        current_task_results = []
-
         print(f'--> Running task: {task.name}\n')
         if task.inputs is not None and task.assertions is not None:
             assert len(task.inputs) == len(task.assertions)
 
-        exec_results: List[Assertable] = []
-        tries = 1 if not callable(getattr(agent, 'self_heal')) else task.retries or 1
-        for idx in range(0, task.retries or tries):
-            is_first_run = len(current_task_results) == 0
+        t0 = time.time()
+        try:
+            files_dict = agent.improve(task.initial_code, task.prompt)
+        except DiffError as e:  # Temporary catch errors related to git diffs
+            print(e)
+            continue
+        t1 = time.time()
 
-            # Stop if task was completely solved
-            if not is_first_run and current_task_results[-1].success_rate == 1.0:
-                break
+        try:
+            exec_results = run_and_get_result(files_dict, task, benchmark)
+        except subprocess.TimeoutExpired as e:
+            print(e)
+            continue
 
-            t0 = time.time()
-            try:
-                if is_first_run:
-                    files_dict = agent.improve(task.initial_code, task.prompt)
-                else:
-                    last_result = exec_results[-1]
-                    files_dict = agent.self_heal(files_dict, task.prompt, last_result.stdout, last_result.stderr)
-            except DiffError as e:  # Temporary catch errors related to git diffs
-                print(e)
-                continue
-            t1 = time.time()
-
-            try:
-                exec_results = run_and_get_result(files_dict, task, benchmark)
-            except subprocess.TimeoutExpired as e:
-                print(e)
-                continue
-
-            current_task_results.append(
-                TaskResult(
-                    task_name=task.name,
-                    assertion_results=[
-                        {
-                            key: assertion(exec_results[i])
-                            for key, assertion in task.assertions[i].items()
-                        }
-                        for i in range(len(task.assertions))
-                    ],
-                    duration=t1 - t0,
-                    retry_id=retry_id,
-                )
+        task_results.append(
+            TaskResult(
+                task_name=task.name,
+                assertion_results=[
+                    {
+                        key: assertion(exec_results[i])
+                        for key, assertion in task.assertions[i].items()
+                    }
+                    for i in range(len(task.assertions))
+                ],
+                duration=t1 - t0,
             )
-
-        if current_task_results:
-            task_results.append(
-                # append task result with the highest success rate
-                max(current_task_results, key=lambda x: x.success_rate)
-            )
-        else:
-            task_results.append(
-                TaskResult(
-                    task_name=task.name,
-                    assertion_results=[
-                        {
-                            key: False for key, _assertion in task.assertions[i].items()
-                        }
-                        for i in range(len(task.assertions))
-                    ],
-                    duration=0,
-                    retry_id=retry_id,
-                )
-            )
+        )
 
         if verbose:
             print_results(task_results)

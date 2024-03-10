@@ -59,7 +59,6 @@ class Task:
     prompt: str
     inputs: Optional[List[str]]
     assertions: Optional[List[OrderedDict[str, Assertion]]]
-    retries: Optional[int]
 
 
 @dataclass
@@ -76,7 +75,6 @@ class TaskResult:
     task_name: str
     assertion_results: List[dict[str, bool]]
     duration: float
-    retry_id: int
 
     # Returns success rate from 0.00 up to 1.00
     @property
