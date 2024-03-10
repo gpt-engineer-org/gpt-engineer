@@ -76,19 +76,6 @@ def run(
             ))
             continue
 
-        task_results.append(
-            TaskResult(
-                task_name=task.name,
-                assertion_results=[
-                    {
-                        key: assertion(exec_results[i])
-                        for key, assertion in task.assertions[i].items()
-                    }
-                    for i in range(len(task.assertions))
-                ],
-                duration=t1 - t0,
-            )
-        )
         task_results.append(TaskResult(
             task_name=task.name,
             assertion_results=[
@@ -110,9 +97,6 @@ def run_and_get_result(files_dict, task, benchmark) -> List[Assertable]:
 
     exec_results = []
     if task.command:
-        for i, input_pars in enumerate(task.inputs or [""]):
-            print(i, input_pars)
-            p = env.popen(task.command + ' "' + input_pars + '"')
         p = env.popen(task.command)
         stdout, stderr = p.communicate(timeout=benchmark.timeout)
         stdout, stderr = stdout.decode("utf-8"), stderr.decode("utf-8")
@@ -127,7 +111,7 @@ def run_and_get_result(files_dict, task, benchmark) -> List[Assertable]:
         )
     elif all(hasattr(assertion, 'command') for assertion in task.assertions):
         for i, assertion in enumerate(task.assertions or [""]):
-            print(i, assertion.command)  # TODO: Remove
+            p = env.popen(assertion.command)
             stdout, stderr = p.communicate(timeout=benchmark.timeout)
             stdout, stderr = stdout.decode("utf-8"), stderr.decode("utf-8")
             exec_results.append(
