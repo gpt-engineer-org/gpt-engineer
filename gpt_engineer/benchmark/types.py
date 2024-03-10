@@ -22,7 +22,7 @@ Classes:
 """
 from dataclasses import dataclass
 from subprocess import Popen
-from typing import Callable, Optional, List, OrderedDict
+from typing import Callable, Optional, List
 
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.files_dict import FilesDict
@@ -48,7 +48,14 @@ class Assertable:
     stderr: Optional[str]
 
 
-Assertion = Callable[[Assertable], bool]
+@dataclass
+class Assertion:
+    title: str
+    command: Optional[str]
+    assertion_lambda: Callable[[Assertable], bool]
+
+    def __call__(self, assertable: Assertable) -> bool:
+        return self.assertion_lambda(assertable)
 
 
 @dataclass
@@ -57,8 +64,7 @@ class Task:
     initial_code: Optional[FilesDict]
     command: Optional[str]
     prompt: str
-    inputs: Optional[List[str]]
-    assertions: Optional[List[OrderedDict[str, Assertion]]]
+    assertions: Optional[List[Assertion]]
 
 
 @dataclass
@@ -75,10 +81,14 @@ class TaskResult:
     task_name: str
     assertion_results: List[dict[str, bool]]
     duration: float
+    exception: Optional[Exception]
 
     # Returns success rate from 0.00 up to 1.00
     @property
     def success_rate(self) -> float:
+        if self.exception:
+            return 0.0
+
         succeeded = len([result for result in self.assertion_results if list(result.values())[0]])
 
         return succeeded / len(self.assertion_results)
