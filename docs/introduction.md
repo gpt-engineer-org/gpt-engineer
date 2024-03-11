@@ -4,9 +4,9 @@
 <br>
 
 ## Get started
-[Here’s]({doc}`/installation.html`) how to install ``gpt-engineer``, set up your environment, and start building.
+[Here’s](/en/latest/installation.html) how to install ``gpt-engineer``, set up your environment, and start building.
 
-We recommend following our [Quickstart]({doc}`/quickstart.html`) guide to familiarize yourself with the framework by building your first application with ``gpt-engineer``.
+We recommend following our [Quickstart](/en/latest/quickstart.html) guide to familiarize yourself with the framework by building your first application with ``gpt-engineer``.
 
 <br>
 
