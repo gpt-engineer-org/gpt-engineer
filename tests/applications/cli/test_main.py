@@ -4,7 +4,11 @@ import os
 import gpt_engineer.applications.cli.main as main
 
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
-from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, META_DATA_REL_PATH
+from gpt_engineer.core.default.paths import (
+    DEBUG_LOG_FILE,
+    ENTRYPOINT_FILE,
+    META_DATA_REL_PATH,
+)
 from tests.caching_ai import CachingAI
 
 main.AI = CachingAI
@@ -130,3 +134,41 @@ class TestMain:
         assert (p / "output.txt").exists()
         text = (p / "output.txt").read_text().strip()
         assert text == "hello"
+
+    #  Tests the creation of a log file in improve mode.
+    def test_log_creation_in_improve_mode(self, tmp_path, monkeypatch):
+        def improve_generator():
+            yield "y"
+            while True:
+                yield "n"  # Subsequent responses
+
+        gen = improve_generator()
+        monkeypatch.setattr("builtins.input", lambda _: next(gen))
+        p = tmp_path / "projects/example"
+        p.mkdir(parents=True)
+        (p / "prompt").write_text(prompt_text)
+        (p / "main.py").write_text("The program will be written in this file")
+        meta_p = p / META_DATA_REL_PATH
+        meta_p.mkdir(parents=True)
+        (meta_p / "file_selection.toml").write_text(
+            """
+        [files]
+        "main.py" = "selected"
+                    """
+        )
+        os.environ["GPTE_TEST_MODE"] = "True"
+        simplified_main(str(p), "improve")
+        DiskExecutionEnv(path=p)
+        assert (
+            (p / f".gpteng/memory/{DEBUG_LOG_FILE}").read_text().strip()
+            == """UPLOADED FILES:
+```
+File: main.py
+1 The program will be written in this file
+
+```
+PROMPT:
+Make a python program that writes 'hello' to a file called 'output.txt'
+CONSOLE OUTPUT:"""
+        )
+        del os.environ["GPTE_TEST_MODE"]
