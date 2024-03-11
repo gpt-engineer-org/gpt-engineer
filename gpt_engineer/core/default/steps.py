@@ -48,11 +48,9 @@ from gpt_engineer.core.chat_to_files import apply_diffs, chat_to_files_dict, par
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
-    CONSOLE_OUTPUT_FILE,
+    DEBUG_LOG_FILE,
     ENTRYPOINT_FILE,
     ENTRYPOINT_LOG_FILE,
-    IMPROVE_LOG_FILE,
-    UPLOADED_FILES,
 )
 from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
@@ -287,7 +285,9 @@ def improve(
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=f"Request: {prompt}"))
-    memory[UPLOADED_FILES] = files_dict.to_chat() + "\nPROMPT:\n" + prompt
+    memory[DEBUG_LOG_FILE] = (
+        "UPLOADED FILES:\n" + files_dict.to_chat() + "\nPROMPT:\n" + prompt
+    )
     return _improve_loop(ai, files_dict, memory, messages)
 
 
@@ -336,7 +336,6 @@ def salvage_correct_hunks(
             )
             error_message.extend(problems)
     files_dict = apply_diffs(diffs, files_dict)
-    memory[IMPROVE_LOG_FILE] = chat
     return files_dict
 
 
@@ -362,7 +361,7 @@ def handle_improve_mode(prompt, agent, memory, files_dict):
         files_dict = agent.improve(files_dict, prompt)
     except Exception as e:
         print(
-            f"Error while improving the project: {e} , could you please upload all the files in {memory.path} folder to github?"
+            f"Error while improving the project: {e} , could you please upload the debug_log_file.txt in {memory.path} folder to github?"
         )
         files_dict = None
     finally:
@@ -372,6 +371,6 @@ def handle_improve_mode(prompt, agent, memory, files_dict):
         # Get the captured output
         captured_string = captured_output.getvalue()
         print(captured_string)
-        memory[CONSOLE_OUTPUT_FILE] = captured_string
+        memory[DEBUG_LOG_FILE] += "\nCONSOLE OUTPUT:\n" + captured_string
 
     return files_dict
