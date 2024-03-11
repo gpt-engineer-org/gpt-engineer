@@ -16,8 +16,8 @@ MEMORY_REL_PATH : str
 CODE_GEN_LOG_FILE : str
     The filename for the log file that contains all output from code generation.
 
-IMPROVE_LOG_FILE : str
-    The filename for the log file that contains all output from code improvement.
+DEBUG_LOG_FILE : str
+    The filename for the log file that contains debug information.
 
 ENTRYPOINT_FILE : str
     The filename for the entrypoint script that is executed to run the application.
