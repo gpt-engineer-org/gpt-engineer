@@ -18,10 +18,12 @@ import json
 import logging
 import os
 
+from pathlib import Path
 from typing import List, Optional, Union
 
 import backoff
 import openai
+import pyperclip
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.chat_models.base import BaseChatModel
@@ -32,6 +34,7 @@ from langchain.schema import (
     messages_from_dict,
     messages_to_dict,
 )
+from langchain_anthropic import ChatAnthropic
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 
 from gpt_engineer.core.token_usage import TokenUsageLog
@@ -163,6 +166,8 @@ class AI:
 
         logger.debug(f"Creating a new chat completion: {messages}")
 
+        messages = self._collapse_messages(messages)
+
         response = self.backoff_inference(messages)
 
         self.token_usage_log.update_log(
@@ -172,6 +177,44 @@ class AI:
         logger.debug(f"Chat completion finished: {messages}")
 
         return messages
+
+    def _collapse_messages(self, messages: List[Message]):
+        """
+        Combine consecutive messages of the same type into a single message.
+
+        This method iterates through the list of messages, combining consecutive messages of the same type
+        by joining their content with a newline character. This reduces the number of messages and simplifies
+        the conversation for processing.
+
+        Parameters
+        ----------
+        messages : List[Message]
+            The list of messages to collapse.
+
+        Returns
+        -------
+        List[Message]
+            The list of messages after collapsing consecutive messages of the same type.
+        """
+        collapsed_messages = []
+        if not messages:
+            return collapsed_messages
+
+        previous_message = messages[0]
+        combined_content = previous_message.content
+
+        for current_message in messages[1:]:
+            if current_message.type == previous_message.type:
+                combined_content += "\n\n" + current_message.content
+            else:
+                collapsed_messages.append(
+                    previous_message.__class__(content=combined_content)
+                )
+                previous_message = current_message
+                combined_content = current_message.content
+
+        collapsed_messages.append(previous_message.__class__(content=combined_content))
+        return collapsed_messages
 
     @backoff.on_exception(backoff.expo, openai.RateLimitError, max_tries=7, max_time=45)
     def backoff_inference(self, messages):
@@ -276,6 +319,14 @@ class AI:
                 callbacks=[StreamingStdOutCallbackHandler()],
             )
 
+        if "claude" in self.model_name:
+            return ChatAnthropic(
+                model=self.model_name,
+                temperature=self.temperature,
+                callbacks=[StreamingStdOutCallbackHandler()],
+                max_tokens_to_sample=4096,
+            )
+
         return ChatOpenAI(
             model=self.model_name,
             temperature=self.temperature,
@@ -286,3 +337,56 @@ class AI:
 
 def serialize_messages(messages: List[Message]) -> str:
     return AI.serialize_messages(messages)
+
+
+class ClipboardAI(AI):
+    # Ignore not init superclass
+    def __init__(self, **_):  # type: ignore
+        pass
+
+    @staticmethod
+    def serialize_messages(messages: List[Message]) -> str:
+        return "\n\n".join([f"{m.type}:\n{m.content}" for m in messages])
+
+    @staticmethod
+    def multiline_input():
+        print("Enter/Paste your content. Ctrl-D or Ctrl-Z ( windows ) to save it.")
+        content = []
+        while True:
+            try:
+                line = input()
+            except EOFError:
+                break
+            content.append(line)
+        return "\n".join(content)
+
+    def next(
+        self,
+        messages: List[Message],
+        prompt: Optional[str] = None,
+        *,
+        step_name: str,
+    ) -> List[Message]:
+        """
+        Not yet fully supported
+        """
+        if prompt:
+            messages.append(HumanMessage(content=prompt))
+
+        logger.debug(f"Creating a new chat completion: {messages}")
+
+        msgs = self.serialize_messages(messages)
+        pyperclip.copy(msgs)
+        Path("clipboard.txt").write_text(msgs)
+        print(
+            "Messages copied to clipboard and written to clipboard.txt,",
+            len(msgs),
+            "characters in total",
+        )
+
+        response = self.multiline_input()
+
+        messages.append(AIMessage(content=response))
+        logger.debug(f"Chat completion finished: {messages}")
+
+        return messages
