@@ -11,23 +11,16 @@ load_apps : function
     Loads the APPS benchmark, which consists of a series coding problems.
 """
 from typing import Union
+from typing import Union, Callable
 
 from gpt_engineer.benchmark.benchmarks.apps.problem import Problem
 from gpt_engineer.benchmark.benchmarks.apps.problems import PROBLEM_IDS
-from gpt_engineer.benchmark.types import Benchmark, Task, Assertion
+from gpt_engineer.benchmark.types import Benchmark, Task, Assertion, Assertable
 from gpt_engineer.core.files_dict import FilesDict
 from datasets import load_dataset, load_from_disk, Dataset, DatasetDict
 
 DATASET_PATH = "gpt_engineer/benchmark/benchmarks/apps/dataset"
 MAX_N_TEST_EXAMPLES = 10
-
-
-class AppsAssertion:
-    def __init__(self, reference):
-        self.reference = reference.replace(" ", "").replace("\n", "")
-
-    def evaluate(self, assertable):
-        return self.reference in assertable.stdout.replace(" ", "").replace("\n", "")
 
 
 def _get_dataset() -> Union[Dataset, DatasetDict]:
@@ -40,6 +33,16 @@ def _get_dataset() -> Union[Dataset, DatasetDict]:
     dataset.save_to_disk(DATASET_PATH)
 
     return dataset
+
+
+def format_str(string: str) -> str:
+    return string.replace(" ", "").replace("\n", "")
+
+
+def compare_with(output: str) -> Callable[[Assertable], bool]:
+    formatted_output = format_str(output)
+
+    return lambda assertable: formatted_output in format_str(assertable.stdout)
 
 
 def load_apps():
@@ -74,7 +77,7 @@ def load_apps():
                     Assertion(
                         title="correct output",
                         command="python main.py" + ' "' + problem.inputs[i] + '"',
-                        assertion_lambda=AppsAssertion(problem.outputs[i]).evaluate,
+                        assertion_lambda=compare_with(problem.outputs[i]),
                     ) for i in range(min(len(problem.outputs), MAX_N_TEST_EXAMPLES))
                 ],
             )
