@@ -284,7 +284,9 @@ def main(
         fileselector = FileSelector(project_path)
         files_dict = fileselector.ask_for_files()
         files_dict = handle_improve_mode(prompt, agent, memory, files_dict)
-        if files_dict and not prompt_yesno("\nDo you want to apply these changes?"):
+        if not files_dict:
+            return
+        if not prompt_yesno("\nDo you want to apply these changes?"):
             return
 
     else:

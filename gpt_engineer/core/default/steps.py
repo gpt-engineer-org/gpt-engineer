@@ -300,7 +300,7 @@ def _improve_loop(
     edit_refinements = 0
     while edit_refinements <= MAX_EDIT_REFINEMENT_STEPS:
         messages = ai.next(messages, step_name=curr_fn())
-        files_dict = salvage_correct_hunks(messages, files_dict, memory, problems)
+        files_dict = salvage_correct_hunks(messages, files_dict, problems)
 
         if len(problems) > 0:
             messages.append(
@@ -312,14 +312,13 @@ def _improve_loop(
             )
             messages = ai.next(messages, step_name=curr_fn())
             edit_refinements += 1
-            files_dict = salvage_correct_hunks(messages, files_dict, memory, problems)
+            files_dict = salvage_correct_hunks(messages, files_dict, problems)
         return files_dict
 
 
 def salvage_correct_hunks(
     messages: List,
     files_dict: FilesDict,
-    memory: MutableMapping[str | Path, str],
     error_message: List,
 ) -> FilesDict:
     chat = messages[-1].content.strip()
