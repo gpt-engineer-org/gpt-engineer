@@ -282,9 +282,12 @@ def main(
     store = FileStore(project_path)
     if improve_mode:
         fileselector = FileSelector(project_path)
-        files_dict = fileselector.ask_for_files()
-        files_dict = handle_improve_mode(prompt, agent, memory, files_dict)
-        if not files_dict:
+        original_files_dict = fileselector.ask_for_files()
+        files_dict = handle_improve_mode(prompt, agent, memory, original_files_dict)
+        if not files_dict or original_files_dict == files_dict:
+            print(
+                f"No changes applied. Could you please upload the debug_log_file.txt in {memory.path} folder to github?"
+            )
             return
         if not prompt_yesno("\nDo you want to apply these changes?"):
             return
