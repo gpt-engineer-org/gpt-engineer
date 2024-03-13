@@ -12,9 +12,9 @@ import tomlkit
 default_config_filename = "gpt-engineer.toml"
 
 example_config = """
-[project]
-base_dir = "./frontend"  # base directory to operate in (for monorepos)
-src_dir = "./src"        # source directory (under the base directory) from which context will be retrieved
+[paths]
+base = "./frontend"  # base directory to operate in (for monorepos)
+src = "./src"        # source directory (under the base directory) from which context will be retrieved
 
 [run]
 build = "npm run build"
