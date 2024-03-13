@@ -249,3 +249,52 @@ Invalid hunk: @@ -0,0 +1,9 @@
 -create falling diff"""
         )
         del os.environ["GPTE_TEST_MODE"]
+
+    def test_log_creation_in_improve_mode_with_unexpected_exceptions(
+        self, tmp_path, monkeypatch
+    ):
+        def improve_generator():
+            yield "y"
+            while True:
+                yield "n"  # Subsequent responses
+
+        def mock_salvage_correct_hunks(
+            messages: List, files_dict: FilesDict, error_message: List
+        ) -> FilesDict:
+            raise Exception("Mock exception in salvage_correct_hunks")
+
+        gen = improve_generator()
+        monkeypatch.setattr("builtins.input", lambda _: next(gen))
+        monkeypatch.setattr(
+            "gpt_engineer.core.default.steps.salvage_correct_hunks",
+            mock_salvage_correct_hunks,
+        )
+        p = tmp_path / "projects/example"
+        p.mkdir(parents=True)
+        (p / "prompt").write_text(prompt_text)
+        (p / "main.py").write_text("The program will be written in this file")
+        meta_p = p / META_DATA_REL_PATH
+        meta_p.mkdir(parents=True)
+        (meta_p / "file_selection.toml").write_text(
+            """
+        [files]
+        "main.py" = "selected"
+                    """
+        )
+        os.environ["GPTE_TEST_MODE"] = "True"
+        simplified_main(str(p), "improve")
+        DiskExecutionEnv(path=p)
+        assert (
+            (p / f".gpteng/memory/{DEBUG_LOG_FILE}").read_text().strip()
+            == """UPLOADED FILES:
+```
+File: main.py
+1 The program will be written in this file
+
+```
+PROMPT:
+Make a python program that writes 'hello' to a file called 'output.txt'
+CONSOLE OUTPUT:
+Error while improving the project: Mock exception in salvage_correct_hunks"""
+        )
+        del os.environ["GPTE_TEST_MODE"]
