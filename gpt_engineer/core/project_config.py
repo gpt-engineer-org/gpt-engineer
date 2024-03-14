@@ -3,7 +3,6 @@ Functions for reading and writing the `gpt-engineer.toml` configuration file.
 
 The `gpt-engineer.toml` file is a TOML file that contains project-specific configuration used by the GPT Engineer CLI and gptengineer.app.
 """
-
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -12,14 +11,14 @@ import tomlkit
 default_config_filename = "gpt-engineer.toml"
 
 example_config = """
-[paths]
-base = "./frontend"  # base directory to operate in (for monorepos)
-src = "./src"        # source directory (under the base directory) from which context will be retrieved
-
 [run]
 build = "npm run build"
 test = "npm run test"
 lint = "quick-lint-js"
+
+[paths]
+base = "./frontend"  # base directory to operate in (for monorepos)
+src = "./src"        # source directory (under the base directory) from which context will be retrieved
 
 [gptengineer-app]  # this namespace is used for gptengineer.app, may be used for internal experiments
 project_id = "..."
@@ -33,9 +32,9 @@ openapi = [
 
 
 @dataclass
-class _ProjectConfig:
-    base_dir: str | None = None
-    src_dir: str | None = None
+class _PathsConfig:
+    base: str | None = None
+    src: str | None = None
 
 
 @dataclass
@@ -74,7 +73,7 @@ def filter_none(d: dict) -> dict:
 class Config:
     """Configuration for the GPT Engineer CLI and gptengineer.app via `gpt-engineer.toml`."""
 
-    project: _ProjectConfig = field(default_factory=_ProjectConfig)
+    paths: _PathsConfig = field(default_factory=_PathsConfig)
     run: _RunConfig = field(default_factory=_RunConfig)
     gptengineer_app: _GptEngineerAppConfig | None = None
 
@@ -87,8 +86,8 @@ class Config:
 
     @classmethod
     def from_dict(cls, config_dict: dict):
-        project = _ProjectConfig(**config_dict.get("project", {}))
         run = _RunConfig(**config_dict.get("run", {}))
+        paths = _PathsConfig(**config_dict.get("paths", {}))
 
         # load optional gptengineer-app section
         gptengineer_app_dict = config_dict.get("gptengineer-app", {})
@@ -107,7 +106,7 @@ class Config:
                 or None,
             )
 
-        return cls(project=project, run=run, gptengineer_app=gptengineer_app)
+        return cls(paths=paths, run=run, gptengineer_app=gptengineer_app)
 
     def to_dict(self) -> dict:
         d = asdict(self)

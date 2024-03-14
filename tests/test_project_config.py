@@ -19,8 +19,8 @@ def test_config_load():
     # load the config from the file
     config = Config.from_toml(f.name)
 
-    assert config.project.base_dir == "./frontend"
-    assert config.project.src_dir == "./src"
+    assert config.paths.base == "./frontend"
+    assert config.paths.src == "./src"
     assert config.run.build == "npm run build"
     assert config.run.test == "npm run test"
     assert config.run.lint == "quick-lint-js"
@@ -44,7 +44,7 @@ def test_config_load():
 
 def test_config_defaults():
     config = Config()
-    assert config.project.base_dir is None
+    assert config.paths.base is None
     with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
         config.to_toml(f.name)
 
