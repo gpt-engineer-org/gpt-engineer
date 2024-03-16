@@ -158,6 +158,7 @@ def parse_diffs(diff_string: str) -> dict:
         )
 
     if not diffs:
+        # TODO: Deal with it
         raise DiffError(
             f"The diff {diff_string} is not a valid diff in the unified git diff format"
         )

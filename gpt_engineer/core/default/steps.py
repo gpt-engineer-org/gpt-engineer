@@ -31,7 +31,9 @@ improve : function
 """
 
 import inspect
+import io
 import re
+import sys
 
 from pathlib import Path
 from typing import List, MutableMapping, Union
@@ -46,9 +48,9 @@ from gpt_engineer.core.chat_to_files import apply_diffs, chat_to_files_dict, par
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
+    DEBUG_LOG_FILE,
     ENTRYPOINT_FILE,
     ENTRYPOINT_LOG_FILE,
-    IMPROVE_LOG_FILE,
 )
 from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
@@ -280,10 +282,12 @@ def improve(
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]
-
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=f"Request: {prompt}"))
+    memory[DEBUG_LOG_FILE] = (
+        "UPLOADED FILES:\n" + files_dict.to_chat() + "\nPROMPT:\n" + prompt
+    )
     return _improve_loop(ai, files_dict, memory, messages)
 
 
@@ -291,11 +295,12 @@ def _improve_loop(
     ai: AI, files_dict: FilesDict, memory: BaseMemory, messages: List
 ) -> FilesDict:
     problems = []
+
     # check edit correctness
     edit_refinements = 0
     while edit_refinements <= MAX_EDIT_REFINEMENT_STEPS:
         messages = ai.next(messages, step_name=curr_fn())
-        files_dict = salvage_correct_hunks(messages, files_dict, memory, problems)
+        files_dict = salvage_correct_hunks(messages, files_dict, problems)
 
         if len(problems) > 0:
             messages.append(
@@ -307,14 +312,13 @@ def _improve_loop(
             )
             messages = ai.next(messages, step_name=curr_fn())
             edit_refinements += 1
-            files_dict = salvage_correct_hunks(messages, files_dict, memory, problems)
+            files_dict = salvage_correct_hunks(messages, files_dict, problems)
         return files_dict
 
 
 def salvage_correct_hunks(
     messages: List,
     files_dict: FilesDict,
-    memory: MutableMapping[str | Path, str],
     error_message: List,
 ) -> FilesDict:
     chat = messages[-1].content.strip()
@@ -334,5 +338,39 @@ def salvage_correct_hunks(
                 raise DiffError
             error_message.extend(problems)
     files_dict = apply_diffs(diffs, files_dict)
-    memory[IMPROVE_LOG_FILE] = chat
+    return files_dict
+
+
+class Tee(object):
+    def __init__(self, *files):
+        self.files = files
+
+    def write(self, obj):
+        for file in self.files:
+            file.write(obj)
+
+    def flush(self):
+        for file in self.files:
+            file.flush()
+
+
+def handle_improve_mode(prompt, agent, memory, files_dict):
+    captured_output = io.StringIO()
+    old_stdout = sys.stdout
+    sys.stdout = Tee(sys.stdout, captured_output)
+
+    try:
+        files_dict = agent.improve(files_dict, prompt)
+    except Exception as e:
+        print(f"Error while improving the project: {e}")
+        files_dict = None
+    finally:
+        # Reset stdout
+        sys.stdout = old_stdout
+
+        # Get the captured output
+        captured_string = captured_output.getvalue()
+        print(captured_string)
+        memory[DEBUG_LOG_FILE] += "\nCONSOLE OUTPUT:\n" + captured_string
+
     return files_dict
