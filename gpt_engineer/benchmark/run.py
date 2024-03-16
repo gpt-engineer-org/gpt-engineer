@@ -64,46 +64,41 @@ def run(
             continue
         t1 = time.time()
 
-        exec_result = run_and_get_result(files_dict, task, benchmark)
+        env = DiskExecutionEnv()
+        env.upload(files_dict)
 
-        task_results.append(TaskResult(
-            task_name=task.name,
-            assertion_results=[
-                {
-                    key: assertion(exec_result)
-                    for key, assertion in task.assertions[i].items()
-                }
-                for i in range(len(task.assertions))
-            ],
-            duration=t1 - t0,
-            exception=None,
-        ))
+        if task.command:
+            p = env.popen(task.command)
+            stdout, stderr = p.communicate(benchmark.timeout)
+            stdout, stderr = stdout.decode("utf-8"), stderr.decode("utf-8")
+        else:
+            p, stdout, stderr = None, None, None
+
+        exec_result = Assertable(
+            files=files_dict,
+            env=env,
+            process=p,
+            stdout=stdout,
+            stderr=stderr,
+        )
+
+        task_results.append(
+            TaskResult(
+                task_name=task.name,
+                assertion_results=[
+                    {
+                        key: assertion(exec_result)
+                        for key, assertion in task.assertions[i].items()
+                    }
+                    for i in range(len(task.assertions))
+                ],
+                duration=t1 - t0,
+            )
+        )
 
         if verbose:
             print_results(task_results)
     return task_results
-
-
-def run_and_get_result(files_dict, task, benchmark) -> Assertable:
-    env = DiskExecutionEnv()
-    env.upload(files_dict)
-
-    if task.command:
-        p = env.popen(task.command)
-        stdout, stderr = p.communicate(benchmark.timeout)
-        stdout, stderr = stdout.decode("utf-8"), stderr.decode("utf-8")
-    else:
-        p, stdout, stderr = None, None, None
-
-    exec_result = Assertable(
-        files=files_dict,
-        env=env,
-        process=p,
-        stdout=stdout,
-        stderr=stderr,
-    )
-
-    return exec_result
 
 
 def print_results(results: list[TaskResult]):
