@@ -22,7 +22,7 @@ Classes:
 """
 from dataclasses import dataclass
 from subprocess import Popen
-from typing import Callable, Optional, List
+from typing import Callable, Optional, List, OrderedDict
 
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.files_dict import FilesDict
@@ -48,14 +48,7 @@ class Assertable:
     stderr: Optional[str]
 
 
-@dataclass
-class Assertion:
-    title: str
-    command: Optional[str]
-    assertion_lambda: Callable[[Assertable], bool]
-
-    def __call__(self, assertable: Assertable) -> bool:
-        return self.assertion_lambda(assertable)
+Assertion = Callable[[Assertable], bool]
 
 
 @dataclass
@@ -64,7 +57,7 @@ class Task:
     initial_code: Optional[FilesDict]
     command: Optional[str]
     prompt: str
-    assertions: Optional[List[Assertion]]
+    assertions: Optional[List[OrderedDict[str, Assertion]]]
 
 
 @dataclass
