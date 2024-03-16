@@ -49,18 +49,19 @@ def run(
     """
     task_results = []
     for task in benchmark.tasks:
-        print(f'--> Running task: {task.name}\n')
+        print(f"--> Running task: {task.name}\n")
 
         t0 = time.time()
         try:
             files_dict = agent.improve(task.initial_code, task.prompt)
-        except DiffError as e:  # Temporary catch errors related to git diffs
-            task_results.append(TaskResult(
-                task_name=task.name,
-                exception=e,
-                duration=time.time() - t0,
-                assertion_results=[],
-            ))
+        except DiffError:  # Temporary catch errors related to git diffs
+            task_results.append(
+                TaskResult(
+                    task_name=task.name,
+                    duration=time.time() - t0,
+                    assertion_results=[],
+                )
+            )
             continue
         t1 = time.time()
 
@@ -138,10 +139,13 @@ def print_results(results: list[TaskResult]):
         for task_result in results
     )
     total_assertions = sum(
-        len(assertion_results_dict) for task_result in results
+        len(assertion_results_dict)
+        for task_result in results
         for assertion_results_dict in task_result.assertion_results
     )
-    correct_tasks = [task_result for task_result in results if task_result.success_rate == 1]
+    correct_tasks = [
+        task_result for task_result in results if task_result.success_rate == 1
+    ]
 
     print("--- Results ---")
     print(f"Total time: {total_time:.2f}s")

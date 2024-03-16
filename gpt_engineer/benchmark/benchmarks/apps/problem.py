@@ -1,4 +1,5 @@
 import json
+
 from dataclasses import dataclass
 from functools import cached_property
 from typing import List
@@ -13,13 +14,12 @@ class Problem:
 
     @property
     def inputs(self) -> List[str]:
-        return self._parsed_inputs_outputs['inputs']
+        return self._parsed_inputs_outputs["inputs"]
 
     @property
     def outputs(self) -> List[str]:
-        return self._parsed_inputs_outputs['outputs']
+        return self._parsed_inputs_outputs["outputs"]
 
     @cached_property
     def _parsed_inputs_outputs(self):
-        return json.loads(self.input_output.replace('\n', ''))
-
+        return json.loads(self.input_output.replace("\n", ""))

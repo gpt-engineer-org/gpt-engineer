@@ -22,7 +22,7 @@ Classes:
 """
 from dataclasses import dataclass
 from subprocess import Popen
-from typing import Callable, Optional, List, OrderedDict
+from typing import Callable, List, Optional, OrderedDict
 
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.files_dict import FilesDict
@@ -78,7 +78,8 @@ class TaskResult:
     # Returns success rate from 0.00 up to 1.00
     @property
     def success_rate(self) -> float:
-        succeeded = len([result for result in self.assertion_results if list(result.values())[0]])
+        succeeded = len(
+            [result for result in self.assertion_results if list(result.values())[0]]
+        )
 
         return succeeded / len(self.assertion_results)
-

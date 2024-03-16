@@ -44,7 +44,12 @@ from termcolor import colored
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.base_memory import BaseMemory
-from gpt_engineer.core.chat_to_files import apply_diffs, chat_to_files_dict, parse_diffs, DiffError
+from gpt_engineer.core.chat_to_files import (
+    DiffError,
+    apply_diffs,
+    chat_to_files_dict,
+    parse_diffs,
+)
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,

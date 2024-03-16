@@ -153,14 +153,12 @@ def parse_diffs(diff_string: str) -> dict:
             # Parse individual diff blocks and update the diffs dictionary
             diffs.update(parse_diff_block(diff_block))
     except TimeoutError:
-        raise DiffError(
-            '`diff_block_pattern.finditer` has timed out'
-        )
+        raise DiffError("`diff_block_pattern.finditer` has timed out")
 
     if not diffs:
-        # TODO: Deal with it
         raise DiffError(
-            f"The diff {diff_string} is not a valid diff in the unified git diff format"
+            "GPT did not provide any proposed changes. "
+            "Please try to reselect the files for uploading and edit your prompt file."
         )
 
     return diffs
