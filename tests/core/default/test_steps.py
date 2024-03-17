@@ -13,7 +13,6 @@ from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
     ENTRYPOINT_FILE,
     ENTRYPOINT_LOG_FILE,
-    IMPROVE_LOG_FILE,
     PREPROMPTS_PATH,
 )
 from gpt_engineer.core.default.steps import (
@@ -310,7 +309,3 @@ Some introductory text.
             }
         )
         assert improved_code == expected_code
-
-        # Assert that the improvement process was logged in the memory
-        assert IMPROVE_LOG_FILE in memory
-        assert memory[IMPROVE_LOG_FILE] == ai_patch.strip()

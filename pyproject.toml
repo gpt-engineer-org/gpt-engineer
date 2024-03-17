@@ -42,7 +42,7 @@ ruff = ">=0.0.272"
 pre-commit = "3.3.3"
 tox = ">=3.0.0"
 
-# docs
+[tool.poetry.group.docs.dependencies]
 autodoc_pydantic = ">=1.8.0"
 myst_parser = ">=0.18.1"
 nbsphinx = ">=0.8.9"

@@ -49,7 +49,15 @@ from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.core.default.steps import (
     execute_entrypoint,
     gen_code,
+    handle_improve_mode,
     improve_fn as improve_fn,
+)
+from gpt_engineer.core.git import (
+    filter_files_with_uncommitted_changes,
+    init_git_repo,
+    is_git_installed,
+    is_git_repo,
+    stage_files,
 )
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.git import stage_uncommitted_to_git
@@ -80,7 +88,8 @@ def load_env_if_needed():
         load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
 
 
-def load_prompt(input_repo: DiskMemory, improve_mode):
+def load_prompt(input_repo: DiskMemory, 
+                _mode):
     """
     Load or request a prompt from the user based on the mode.
 
@@ -340,17 +349,22 @@ def main(
 
     files = FileStore(project_path)
     if improve_mode:
-        fileselector = FileSelector(project_path)
-        files_dict_before = fileselector.ask_for_files()
-        files_dict = agent.improve(files_dict_before, prompt)
+        files_dict_before = FileSelector(project_path).ask_for_files()
+        files_dict = handle_improve_mode(prompt, agent, memory, files_dict_before)
+        if not files_dict or files_dict_before == files_dict:
+            print(
+                f"No changes applied. Could you please upload the debug_log_file.txt in {memory.path} folder in a github issue?"
+            )
+        else:
+          print("\nChanges to be made:")
+          compare(files_dict_before, files_dict)
 
-        print("\nChanges to be made:")
-        compare(files_dict_before, files_dict)
+          print()
+          print(colored("Do you want to apply these changes?", "light_green"))
+          if not prompt_yesno():
+            files_dict = files_dict_before
+          
 
-        print()
-        print(colored("Do you want to apply these changes?", "light_green"))
-        if prompt_yesno():
-            return
     else:
         files_dict = agent.init(prompt)
         # collect user feedback if user consents
