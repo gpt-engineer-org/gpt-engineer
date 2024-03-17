@@ -267,7 +267,10 @@ def main(
 
     store.upload(files_dict)
 
-    print("Total api cost: $ ", ai.token_usage_log.usage_cost())
+    if openai.api_key == "sk-xxx":
+        print("Total api cost: $ 0.0 since we are using local LLM.")
+    else:
+        print("Total api cost: $ ", ai.token_usage_log.usage_cost())
 
 
 if __name__ == "__main__":
