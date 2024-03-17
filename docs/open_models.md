@@ -67,7 +67,9 @@ Then run `gpt-engineer` with the following environment variables:
 ```bash
 export OPENAI_API_BASE="http://localhost:8000/v1"
 export OPENAI_API_KEY="sk-xxx"
-gpte <project_dir>
+export model_name="llama2"
+
+gpte <project_dir> $model_name
 ```
 
 On other inference libraries
