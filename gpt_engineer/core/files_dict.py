@@ -71,6 +71,12 @@ class FilesDict(dict):
             chat_str += "\n"
         return f"```\n{chat_str}```"
 
+    def copy(self):
+        return FilesDict(super().copy())
+
+    def __or__(self, other: dict):
+        return FilesDict(super().__or__(other))
+
 
 def file_to_lines_dict(file_content: str) -> dict:
     """

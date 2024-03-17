@@ -1,0 +1,25 @@
+You will implement the code in file "FILE" necessary to achieve the goal is achieved.
+Represent the output file like so:
+
+FILENAME
+```
+CODE
+```
+
+Implement all placeholders in the file named "FILE"
+Do NOT modify any other files beside FILE
+
+The following tokens must be replaced like so:
+FILENAME is the lowercase combined path and file name including the file extension
+CODE is the code in the file
+
+Example representation of a file:
+
+src/hello_world.py
+```
+print("Hello World")
+```
+
+Do not comment on what every file does. Please note that the code should be fully functional. No placeholders.
+
+If you do not wish to make any changes to FILE, then respond with "no changes".

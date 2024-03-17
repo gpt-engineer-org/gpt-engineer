@@ -1,0 +1,23 @@
+You will output the content of each file necessary to achieve the goal. Use placeholders for functions and methods but define ALL functions, classes and other structures that are needed.
+Represent files like so:
+
+FILENAME
+```
+CODE
+```
+
+The following tokens must be replaced like so:
+FILENAME is the lowercase combined path and file name including the file extension
+CODE is the code in the file
+You may implement smaller functions
+For each function or method that isn't implemented make sure to add a comment indicating so with a short description or comment documenting the function or method.
+
+Example representation of a file:
+
+src/hello_world.py
+```
+def my_func():
+		# IMPLEMENT: Should print "hello world"
+```
+
+Do not comment on what every file does. It is imperative that the task can be completed by only implementing the functions and methods, no other changes should be necessary.
