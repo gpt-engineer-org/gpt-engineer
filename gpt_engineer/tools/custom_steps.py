@@ -273,7 +273,6 @@ def two_step_gen(
 
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(prompt, preprompts["boilerplate"], step_name=curr_fn())
-    user_input = prompt
     boilerplate_chat = messages[-1].content.strip()
     memory[CODE_GEN_LOG_FILE] = boilerplate_chat
     boilerplate_files_dict = chat_to_files_dict(boilerplate_chat)
@@ -282,7 +281,16 @@ def two_step_gen(
 
     for name, content in boilerplate_files_dict.items():
         print(f"Editing {name}")
-        impl_messages = ai.next([SystemMessage(prompt=prompt, content=preprompts["impl_boilerplate"].replace("FILE", name)), HumanMessage(content=ret_dict.to_chat())], step_name=curr_fn())
+        impl_messages = ai.next(
+            [
+                SystemMessage(
+                    prompt=prompt,
+                    content=preprompts["impl_boilerplate"].replace("FILE", name),
+                ),
+                HumanMessage(content=ret_dict.to_chat()),
+            ],
+            step_name=curr_fn(),
+        )
         impl_chat = impl_messages[-1].content.strip()
         impl_files_dict = chat_to_files_dict(impl_chat)
         ret_dict = ret_dict | impl_files_dict

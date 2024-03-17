@@ -47,7 +47,12 @@ from gpt_engineer.core.git import (
     stage_files,
 )
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
-from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal, two_step_gen
+from gpt_engineer.tools.custom_steps import (
+    clarified_gen,
+    lite_gen,
+    self_heal,
+    two_step_gen,
+)
 
 app = typer.Typer()  # creates a CLI app
 
