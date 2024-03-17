@@ -23,14 +23,6 @@ What is the current behavior?
 
 Information about the failure, including environment details, such as LLM used.
 
-### Steps to Reproduce
-
-If possible, provide detailed steps for reproducing the issue.
-
-1. step 1
-2. step 2
-3. you get it...
-
 ### Failure Logs
 
-Any relevant log snippets or files here.
+If your project includes a debug_log_file.txt, kindly upload it from your_project/.gpteng/memory/ directory. This file encompasses all the necessary logs. Should the file prove extensive, consider utilizing GitHub's "add files" functionality.
