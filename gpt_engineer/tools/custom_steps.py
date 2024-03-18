@@ -17,7 +17,7 @@ from gpt_engineer.core.prompt import Prompt
 
 # Type hint for chat messages
 Message = Union[AIMessage, HumanMessage, SystemMessage]
-MAX_SELF_HEAL_ATTEMPTS = 2
+MAX_SELF_HEAL_ATTEMPTS = 10
 
 
 def get_platform_info() -> str:
@@ -105,8 +105,8 @@ def self_heal(
 
         if (p.returncode != 0 and p.returncode != 2) and not timed_out:
             print("run.sh failed.  The log is:")
-            print(stdout_full)
-            print(stderr_full)
+            print(stdout_full.decode("utf-8"))
+            print(stderr_full.decode("utf-8"))
 
             new_prompt = Prompt(
                 f"A program with this specification was requested:\n{prompt}\n, but running it produced the following output:\n{stdout_full}\n and the following errors:\n{stderr_full}. Please change it so that it fulfills the requirements."
