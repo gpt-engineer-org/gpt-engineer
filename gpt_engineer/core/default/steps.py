@@ -178,12 +178,14 @@ def gen_entrypoint(
         user_prompt = """
         Make a unix script that
         a) installs dependencies
-        b) runs all necessary parts of the codebase (in parallel if necessary)\n
+        b) runs all necessary parts of the codebase (in parallel if necessary)
         """
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
         system=(preprompts["entrypoint"]),
-        user=user_prompt + "Information about the codebase:\n\n" + files_dict.to_chat(),
+        user=user_prompt
+        + "\nInformation about the codebase:\n\n"
+        + files_dict.to_chat(),
         step_name=curr_fn(),
     )
     print()
