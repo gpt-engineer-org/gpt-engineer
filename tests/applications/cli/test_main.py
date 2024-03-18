@@ -2,7 +2,7 @@ import os
 import tempfile
 
 from unittest.mock import patch
-
+import shutil
 import pytest
 
 import gpt_engineer.applications.cli.main as main
@@ -233,6 +233,7 @@ class TestLoadPrompt:
 
             improve_mode = False
             image_directory = "tests/test_data"
+            shutil.copytree(image_directory, os.path.join(tmp_dir, image_directory))
 
             result = load_prompt(input_repo, improve_mode, prompt_file, image_directory)
 
