@@ -27,7 +27,8 @@ from pathlib import Path
 
 import openai
 import typer
-
+from langchain.cache import SQLiteCache
+from langchain.globals import set_llm_cache
 from dotenv import load_dotenv
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
@@ -287,7 +288,7 @@ def main(
     """
 
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
-
+    set_llm_cache(SQLiteCache(database_path=".langchain.db"))
     if improve_mode:
         assert not (
             clarify_mode or lite_mode

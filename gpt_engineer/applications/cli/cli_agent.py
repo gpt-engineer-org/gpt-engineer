@@ -177,6 +177,7 @@ class CliAgent(BaseAgent):
             files_dict,
             preprompts_holder=self.preprompts_holder,
             prompt=prompt,
+            memory=self.memory,
         )
         return files_dict
 
