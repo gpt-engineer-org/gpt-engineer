@@ -10,7 +10,7 @@ from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.core.chat_to_files import chat_to_files_dict
 from gpt_engineer.core.default.paths import CODE_GEN_LOG_FILE, ENTRYPOINT_FILE
-from gpt_engineer.core.default.steps import curr_fn, setup_sys_prompt
+from gpt_engineer.core.default.steps import curr_fn, setup_sys_prompt, improve
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.prompt import Prompt
@@ -42,7 +42,9 @@ def self_heal(
     ai: AI,
     execution_env: BaseExecutionEnv,
     files_dict: FilesDict,
+    prompt: Prompt = None,
     preprompts_holder: PrepromptsHolder = None,
+    memory: BaseMemory = None,
 ) -> FilesDict:
     """
     Attempts to execute the code from the entrypoint and if it fails, sends the error output back to the AI with instructions to fix.
@@ -88,52 +90,30 @@ def self_heal(
         )
 
     attempts = 0
-    messages = []
     if preprompts_holder is None:
         raise AssertionError("Prepromptsholder required for self-heal")
-    preprompts = preprompts_holder.get_preprompts()
     while attempts < MAX_SELF_HEAL_ATTEMPTS:
-        command = files_dict[ENTRYPOINT_FILE]
-        print(
-            colored(
-                "Do you want to execute this code? (Y/n)",
-                "red",
-            )
-        )
-        print()
-        print(command)
-        print()
-        if input("").lower() not in ["", "y", "yes"]:
-            print("Ok, not executing the code.")
-            return files_dict
-        print("Executing the code...")
-        stdout_full, stderr_full, returncode = execution_env.upload(files_dict).run(
-            f"bash {ENTRYPOINT_FILE}"
-        )
-        # get the result and output
-        # step 2. if the return code not 0, package and send to the AI
-        if returncode != 0:
-            print("run.sh failed.  Let's fix it.")
-
-            # pack results in an AI prompt
-
-            # Using the log from the previous step has all the code and
-            # the gen_entrypoint prompt inside.
-            if attempts < 1:
-                messages: List[Message] = [SystemMessage(content=files_dict.to_chat())]
-                messages.append(SystemMessage(content=get_platform_info()))
-
-            messages.append(SystemMessage(content=stdout_full + "\n " + stderr_full))
-
-            messages = ai.next(
-                messages, preprompts["file_format_fix"], step_name=curr_fn()
-            )
-        else:  # the process did not fail, we are done here.
-            return files_dict
-
-        files_dict = {**files_dict, **chat_to_files_dict(messages[-1].content.strip())}
         attempts += 1
+        timed_out = False
 
+        # Start the process
+        execution_env.upload(files_dict)
+        p = execution_env.popen(files_dict[ENTRYPOINT_FILE])
+
+        # Wait for the process to complete and get output
+        stdout_full, stderr_full = p.communicate()
+
+        if (p.returncode != 0 and p.returncode != 2) and not timed_out:
+            print("run.sh failed.  The log is:")
+            print(stdout_full)
+            print(stderr_full)
+
+            new_prompt = Prompt(
+                f"A program with this specification was requested:\n{prompt}\n, but running it produced the following output:\n{stdout_full}\n and the following errors:\n{stderr_full}. Please change it so that it fulfills the requirements."
+            )
+            files_dict = improve(ai, new_prompt, files_dict, memory, preprompts_holder)
+        else:
+            break
     return files_dict
 
 

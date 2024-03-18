@@ -193,7 +193,9 @@ def execute_entrypoint(
     ai: AI,
     execution_env: BaseExecutionEnv,
     files_dict: FilesDict,
+    prompt: Prompt = None,
     preprompts_holder: PrepromptsHolder = None,
+    memory: BaseMemory = None,
 ) -> FilesDict:
     """
     Executes the entrypoint of the codebase.

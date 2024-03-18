@@ -176,6 +176,7 @@ class CliAgent(BaseAgent):
             self.execution_env,
             files_dict,
             preprompts_holder=self.preprompts_holder,
+            prompt=prompt,
         )
         return files_dict
 
