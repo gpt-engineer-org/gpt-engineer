@@ -60,7 +60,7 @@ class DiskMemory(BaseMemory):
 
         self.path.mkdir(parents=True, exist_ok=True)
 
-    def __contains__(self, key: str) -> bool:
+    def __contains__(self, key: Any) -> bool:
         """
         Determine whether the database contains a file with the specified key.
 
@@ -75,9 +75,11 @@ class DiskMemory(BaseMemory):
             Returns True if the file exists, False otherwise.
 
         """
+        if not isinstance(key, (str, Path)):
+            return False
         return (self.path / key).is_file()
 
-    def __getitem__(self, key: str) -> str:
+    def __getitem__(self, key: str | Path) -> str:
         """
         Retrieve the content of a file in the database corresponding to the given key.
 
@@ -104,7 +106,7 @@ class DiskMemory(BaseMemory):
         with full_path.open("r", encoding="utf-8") as f:
             return f.read()
 
-    def get(self, key: str, default: Optional[Any] = None) -> Any:
+    def get(self, key: str | Path, default: Optional[Any] = None) -> Any:
         """
         Retrieve the content of a file in the database, or return a default value if not found.
 

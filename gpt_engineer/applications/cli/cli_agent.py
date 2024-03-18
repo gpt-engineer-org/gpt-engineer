@@ -4,9 +4,8 @@ using an AI model. It includes functionalities to initialize code generation, im
 and process the code through various steps defined in the step bundle.
 """
 
-from typing import Callable, Optional, TypeVar
+from typing import Callable, Optional, TypeAlias
 
-# from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
@@ -23,13 +22,11 @@ from gpt_engineer.core.default.steps import (
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
-CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseMemory], FilesDict])
-CodeProcessor = TypeVar(
-    "CodeProcessor", bound=Callable[[AI, BaseExecutionEnv, FilesDict], FilesDict]
-)
-ImproveType = TypeVar(
-    "ImproveType", bound=Callable[[AI, str, FilesDict, BaseMemory], FilesDict]
-)
+# from gpt_engineer.core.default.git_version_manager import GitVersionManager
+
+CodeGenType: TypeAlias = Callable[[AI, str, BaseMemory], FilesDict]
+CodeProcessor: TypeAlias = Callable[[AI, BaseExecutionEnv, FilesDict], FilesDict]
+ImproveType: TypeAlias = Callable[[AI, str, FilesDict, BaseMemory], FilesDict]
 
 
 class CliAgent(BaseAgent):

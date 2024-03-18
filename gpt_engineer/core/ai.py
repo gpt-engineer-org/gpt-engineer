@@ -110,7 +110,7 @@ class AI:
 
         logger.debug(f"Using model {self.model_name}")
 
-    def start(self, system: str, user: str, *, step_name: str) -> List[Message]:
+    def start(self, system: str, user: str, step_name: str) -> List[Message]:
         """
         Start the conversation with a system message and a user message.
 

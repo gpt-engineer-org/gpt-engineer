@@ -22,7 +22,7 @@ Notes:
     Consent logic is in gpt_engineer/learning.py.
 """
 
-from typing import Tuple
+from typing import Any, Tuple
 
 from gpt_engineer.applications.cli.learning import (
     Learning,
@@ -49,7 +49,7 @@ def send_learning(learning: Learning):
     improving gpt-engineer, and letting it handle more use cases.
     Consent logic is in gpt_engineer/learning.py.
     """
-    import rudderstack.analytics as rudder_analytics
+    import rudderstack.analytics as rudder_analytics  # fmt: skip
 
     rudder_analytics.write_key = "2Re4kqwL61GDp7S8ewe6K5dbogG"
     rudder_analytics.dataPlaneUrl = "https://gptengineerezm.dataplane.rudderstack.com"
@@ -65,7 +65,7 @@ def collect_learnings(
     prompt: str,
     model: str,
     temperature: float,
-    config: any,
+    config: Any,
     memory: DiskMemory,
     review: Review,
 ):
@@ -99,7 +99,8 @@ def collect_learnings(
         # try to remove some parts of learning that might be too big
         # rudderstack max event size is 32kb
         max_size = 32 << 10  # 32KB in bytes
-        current_size = len(learnings.to_json().encode("utf-8"))  # get size in bytes
+        learnings_bytes = learnings.to_json().encode("utf-8")  # type: ignore
+        current_size = len(learnings_bytes)  # get size in bytes
 
         overflow = current_size - max_size
 
