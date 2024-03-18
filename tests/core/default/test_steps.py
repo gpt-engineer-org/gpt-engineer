@@ -223,9 +223,12 @@ class TestGenEntrypoint:
         code = FilesDict()
         tempdir = tempfile.mkdtemp()
         memory = DiskMemory(tempdir)
+        prompt = Prompt("")
         # Act
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
-        entrypoint_code = gen_entrypoint(ai_mock, code, memory, preprompts_holder)
+        entrypoint_code = gen_entrypoint(
+            ai_mock, prompt, code, memory, preprompts_holder
+        )
 
         # Assert
         assert ENTRYPOINT_FILE in entrypoint_code
@@ -250,10 +253,12 @@ pytest test_factorial.py
         code = FilesDict()
         tempdir = tempfile.mkdtemp()
         memory = DiskMemory(tempdir)
-
+        prompt = Prompt("")
         # Act
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
-        entrypoint_code = gen_entrypoint(ai_mock, code, memory, preprompts_holder)
+        entrypoint_code = gen_entrypoint(
+            ai_mock, prompt, code, memory, preprompts_holder
+        )
 
         # Assert
         assert ENTRYPOINT_FILE in entrypoint_code

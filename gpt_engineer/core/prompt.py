@@ -2,9 +2,15 @@ from typing import Dict, Optional
 
 
 class Prompt:
-    def __init__(self, text: str, image_urls: Optional[Dict[str, str]] = None):
+    def __init__(
+        self,
+        text: str,
+        image_urls: Optional[Dict[str, str]] = None,
+        entrypoint_prompt: str = "",
+    ):
         self.text = text
         self.image_urls = image_urls
+        self.entrypoint_prompt = entrypoint_prompt
 
     def __repr__(self):
         return f"Prompt(text={self.text!r}, image_urls={self.image_urls!r})"

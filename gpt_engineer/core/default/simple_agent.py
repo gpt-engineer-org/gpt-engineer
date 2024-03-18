@@ -70,7 +70,7 @@ class SimpleAgent(BaseAgent):
     def init(self, prompt: Prompt) -> FilesDict:
         files_dict = gen_code(self.ai, prompt, self.memory, self.preprompts_holder)
         entrypoint = gen_entrypoint(
-            self.ai, files_dict, self.memory, self.preprompts_holder
+            self.ai, prompt, files_dict, self.memory, self.preprompts_holder
         )
         combined_dict = {**files_dict, **entrypoint}
         files_dict = FilesDict(combined_dict)
