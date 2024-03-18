@@ -28,6 +28,7 @@ Notes
 import difflib
 import logging
 import os
+import pdb
 import sys
 
 from pathlib import Path
@@ -51,13 +52,6 @@ from gpt_engineer.core.default.steps import (
     gen_code,
     handle_improve_mode,
     improve_fn as improve_fn,
-)
-from gpt_engineer.core.git import (
-    filter_files_with_uncommitted_changes,
-    init_git_repo,
-    is_git_installed,
-    is_git_repo,
-    stage_files,
 )
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.git import stage_uncommitted_to_git
@@ -88,8 +82,7 @@ def load_env_if_needed():
         load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
 
 
-def load_prompt(input_repo: DiskMemory, 
-                _mode):
+def load_prompt(input_repo: DiskMemory, improve_mode):
     """
     Load or request a prompt from the user based on the mode.
 
@@ -287,8 +280,6 @@ def main(
     """
 
     if debug:
-        import pdb
-
         sys.excepthook = lambda *_: pdb.pm()
 
     # Validate arguments
@@ -356,14 +347,13 @@ def main(
                 f"No changes applied. Could you please upload the debug_log_file.txt in {memory.path} folder in a github issue?"
             )
         else:
-          print("\nChanges to be made:")
-          compare(files_dict_before, files_dict)
+            print("\nChanges to be made:")
+            compare(files_dict_before, files_dict)
 
-          print()
-          print(colored("Do you want to apply these changes?", "light_green"))
-          if not prompt_yesno():
-            files_dict = files_dict_before
-          
+            print()
+            print(colored("Do you want to apply these changes?", "light_green"))
+            if not prompt_yesno():
+                files_dict = files_dict_before
 
     else:
         files_dict = agent.init(prompt)
