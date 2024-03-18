@@ -208,18 +208,18 @@ class CliAgent(BaseAgent):
         files_dict = self.improve_fn(
             self.ai, prompt, files_dict, self.memory, self.preprompts_holder
         )
-        entrypoint = gen_entrypoint(
-            self.ai, prompt, files_dict, self.memory, self.preprompts_holder
-        )
-        combined_dict = {**files_dict, **entrypoint}
-        files_dict = FilesDict(combined_dict)
-        files_dict = self.process_code_fn(
-            self.ai,
-            self.execution_env,
-            files_dict,
-            preprompts_holder=self.preprompts_holder,
-            prompt=prompt,
-            memory=self.memory,
-        )
+        # entrypoint = gen_entrypoint(
+        #     self.ai, prompt, files_dict, self.memory, self.preprompts_holder
+        # )
+        # combined_dict = {**files_dict, **entrypoint}
+        # files_dict = FilesDict(combined_dict)
+        # files_dict = self.process_code_fn(
+        #     self.ai,
+        #     self.execution_env,
+        #     files_dict,
+        #     preprompts_holder=self.preprompts_holder,
+        #     prompt=prompt,
+        #     memory=self.memory,
+        # )
 
         return files_dict
