@@ -149,6 +149,7 @@ def gen_code(
 
 def gen_entrypoint(
     ai: AI,
+    prompt: Prompt,
     files_dict: FilesDict,
     memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
@@ -172,10 +173,17 @@ def gen_entrypoint(
     FilesDict
         A dictionary containing the entrypoint file.
     """
+    user_prompt = prompt.entrypoint_prompt
+    if not user_prompt:
+        user_prompt = """
+        Make a unix script that
+        a) installs dependencies
+        b) runs all necessary parts of the codebase (in parallel if necessary)\n
+        """
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
         system=(preprompts["entrypoint"]),
-        user="Information about the codebase:\n\n" + files_dict.to_chat(),
+        user=user_prompt + "Information about the codebase:\n\n" + files_dict.to_chat(),
         step_name=curr_fn(),
     )
     print()
