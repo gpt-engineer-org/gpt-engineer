@@ -1,1 +1,0 @@
-I want to have 2 new command line option invoked with --prompt_path and --image_directory. They should have default values "prompt" and "". They should passed to the load prompt function, such that the prompt is read from the right file and images are taken from the right repo, in case the --image-repository has been passed.
