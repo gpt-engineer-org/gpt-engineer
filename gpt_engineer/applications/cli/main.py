@@ -74,6 +74,18 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
+def concatenate_paths(base_path, sub_path):
+    # Compute the relative path from base_path to sub_path
+    relative_path = os.path.relpath(sub_path, base_path)
+
+    # If the relative path is not in the parent directory, use the original sub_path
+    if not relative_path.startswith(".."):
+        return sub_path
+
+    # Otherwise, concatenate base_path and sub_path
+    return os.path.normpath(os.path.join(base_path, sub_path))
+
+
 def load_prompt(
     input_repo: DiskMemory,
     improve_mode: bool,
@@ -109,19 +121,27 @@ def load_prompt(
             )
         else:
             prompt_str = input("\nHow do you want to improve the application?\n")
-    if os.path.isfile(entrypoint_prompt_file):
-        entrypoint_prompt = input_repo.get(entrypoint_prompt_file)
-    elif entrypoint_prompt_file == "":
+
+    if entrypoint_prompt_file == "":
         entrypoint_prompt = ""
     else:
-        raise ValueError("The provided file at --entrypoint-prompt does not exist")
+        full_entrypoint_prompt_file = concatenate_paths(
+            input_repo.path, entrypoint_prompt_file
+        )
+        if os.path.isfile(full_entrypoint_prompt_file):
+            entrypoint_prompt = input_repo.get(full_entrypoint_prompt_file)
+
+        else:
+            raise ValueError("The provided file at --entrypoint-prompt does not exist")
 
     if image_directory == "":
         return Prompt(prompt_str, entrypoint_prompt=entrypoint_prompt)
-    elif os.path.isdir(image_directory):
-        if len(os.listdir(image_directory)) == 0:
+
+    full_image_directory = concatenate_paths(input_repo.path, image_directory)
+    if os.path.isdir(full_image_directory):
+        if len(os.listdir(full_image_directory)) == 0:
             raise ValueError("The provided --image_directory is empty.")
-        image_repo = DiskMemory(image_directory)
+        image_repo = DiskMemory(full_image_directory)
         return Prompt(
             prompt_str,
             image_repo.get(".").to_dict(),
@@ -217,17 +237,17 @@ def main(
     prompt_file: str = typer.Option(
         "prompt",
         "--prompt",
-        help="Path to a text file containing a prompt.",
+        help="Relative path to a text file containing a prompt.",
     ),
     entrypoint_prompt_file: str = typer.Option(
         "prompt",
         "--entrypoint_prompt",
-        help="Path to a text file containing a file that specifies requirements for you entrypoint.",
+        help="Relative path to a text file containing a file that specifies requirements for you entrypoint.",
     ),
     image_directory: str = typer.Option(
         "",
         "--image_directory",
-        help="Path to a folder containing images.",
+        help="Relative path to a folder containing images.",
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
