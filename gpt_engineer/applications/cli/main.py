@@ -109,10 +109,12 @@ def load_prompt(
             )
         else:
             prompt_str = input("\nHow do you want to improve the application?\n")
-
-    entrypoint_prompt = input_repo.get(entrypoint_prompt_file)
-    if not entrypoint_prompt:
+    if os.path.isfile(entrypoint_prompt_file):
+        entrypoint_prompt = input_repo.get(entrypoint_prompt_file)
+    elif entrypoint_prompt_file == "":
         entrypoint_prompt = ""
+    else:
+        raise ValueError("The provided file at --entrypoint-prompt does not exist")
 
     if image_directory == "":
         return Prompt(prompt_str, entrypoint_prompt=entrypoint_prompt)
