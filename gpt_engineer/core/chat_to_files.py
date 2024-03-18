@@ -26,6 +26,8 @@ import re
 
 from typing import Dict, Tuple
 
+from regex import regex
+
 from gpt_engineer.core.diff import ADD, REMOVE, RETAIN, Diff, Hunk
 from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 
@@ -134,17 +136,20 @@ def parse_diffs(diff_string: str) -> dict:
     - dict: A dictionary of Diff objects keyed by filename.
     """
     # Regex to match individual diff blocks
-    diff_block_pattern = re.compile(
+    diff_block_pattern = regex.compile(
         r"```.*?\n\s*?--- .*?\n\s*?\+\+\+ .*?\n(?:@@ .*? @@\n(?:[-+ ].*?\n)*?)*?```",
         re.DOTALL,
     )
 
     diffs = {}
-    for block in diff_block_pattern.finditer(diff_string):
-        diff_block = block.group()
+    try:
+        for block in diff_block_pattern.finditer(diff_string, timeout=1):
+            diff_block = block.group()
 
-        # Parse individual diff blocks and update the diffs dictionary
-        diffs.update(parse_diff_block(diff_block))
+            # Parse individual diff blocks and update the diffs dictionary
+            diffs.update(parse_diff_block(diff_block))
+    except TimeoutError:
+        print("gpt-engineer timed out while parsing git diff")
 
     if not diffs:
         print(
