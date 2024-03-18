@@ -44,6 +44,7 @@ def simplified_main(path: str, mode: str = ""):
         use_custom_preprompts=False,
         prompt_file="prompt",
         image_directory="",
+        entrypoint_prompt_file="",
         verbose=verbose,
         llm_via_clipboard=False,
     )
