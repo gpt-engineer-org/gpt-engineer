@@ -75,7 +75,11 @@ def load_env_if_needed():
 
 
 def load_prompt(
-    input_repo: DiskMemory, improve_mode: bool, prompt_file: str, image_directory: str
+    input_repo: DiskMemory,
+    improve_mode: bool,
+    prompt_file: str,
+    image_directory: str,
+    entrypoint_prompt_file: str = "",
 ) -> Prompt:
     """
     Load or request a prompt from the user based on the mode.
@@ -105,13 +109,22 @@ def load_prompt(
             )
         else:
             prompt_str = input("\nHow do you want to improve the application?\n")
+
+    entrypoint_prompt = input_repo.get(entrypoint_prompt_file)
+    if not entrypoint_prompt:
+        entrypoint_prompt = ""
+
     if image_directory == "":
-        return Prompt(prompt_str)
+        return Prompt(prompt_str, entrypoint_prompt=entrypoint_prompt_file)
     elif os.path.isdir(image_directory):
         if len(os.listdir(image_directory)) == 0:
             raise ValueError("The provided --image_directory is empty.")
         image_repo = DiskMemory(image_directory)
-        return Prompt(prompt_str, image_repo.get(".").to_dict())
+        return Prompt(
+            prompt_str,
+            image_repo.get(".").to_dict(),
+            entrypoint_prompt=entrypoint_prompt_file,
+        )
     else:
         raise ValueError("The provided --image_directory is not a directory.")
 
@@ -204,6 +217,11 @@ def main(
         "--prompt",
         help="Path to a text file containing a prompt.",
     ),
+    entrypoint_prompt_file: str = typer.Option(
+        "prompt",
+        "--entrypoint_prompt",
+        help="Path to a text file containing a file that specifies requirements for you entrypoint.",
+    ),
     image_directory: str = typer.Option(
         "",
         "--image_directory",
@@ -273,7 +291,13 @@ def main(
             print("Initializing an empty git repository")
             init_git_repo(path)
 
-    prompt = load_prompt(DiskMemory(path), improve_mode, prompt_file, image_directory)
+    prompt = load_prompt(
+        DiskMemory(path),
+        improve_mode,
+        prompt_file,
+        image_directory,
+        entrypoint_prompt_file,
+    )
 
     # todo: if ai.vision is false and not llm_via_clipboard - ask if they would like to use gpt-4-vision-preview instead? If so recreate AI
     if not ai.vision:
