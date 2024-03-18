@@ -337,8 +337,6 @@ def salvage_correct_hunks(
             )
             error_message.extend(problems)
     files_dict = apply_diffs(diffs, files_dict)
-    memory.log(IMPROVE_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
-    memory.log(DIFF_LOG_FILE, "\n\n".join(error_message))
     return files_dict
 
 
