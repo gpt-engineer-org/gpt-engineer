@@ -115,7 +115,7 @@ def load_prompt(
         entrypoint_prompt = ""
 
     if image_directory == "":
-        return Prompt(prompt_str, entrypoint_prompt=entrypoint_prompt_file)
+        return Prompt(prompt_str, entrypoint_prompt=entrypoint_prompt)
     elif os.path.isdir(image_directory):
         if len(os.listdir(image_directory)) == 0:
             raise ValueError("The provided --image_directory is empty.")
@@ -123,7 +123,7 @@ def load_prompt(
         return Prompt(
             prompt_str,
             image_repo.get(".").to_dict(),
-            entrypoint_prompt=entrypoint_prompt_file,
+            entrypoint_prompt=entrypoint_prompt,
         )
     else:
         raise ValueError("The provided --image_directory is not a directory.")
