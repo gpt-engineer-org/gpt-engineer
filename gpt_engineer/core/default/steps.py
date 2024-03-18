@@ -253,29 +253,6 @@ def execute_entrypoint(
     return files_dict
 
 
-def setup_sys_prompt_existing_code(
-    preprompts: MutableMapping[Union[str, Path], str]
-) -> str:
-    """
-    Sets up the system prompt for improving existing code.
-
-    Parameters
-    ----------
-    preprompts : MutableMapping[Union[str, Path], str]
-        A mapping of preprompt messages to guide the AI model.
-
-    Returns
-    -------
-    str
-        The system prompt message for the AI model to improve existing code.
-    """
-    return (
-        preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format"])
-        + "\nUseful to know:\n"
-        + preprompts["philosophy"]
-    )
-
-
 def improve(
     ai: AI,
     prompt: Prompt,
@@ -361,7 +338,6 @@ def salvage_correct_hunks(
             )
             error_message.extend(problems)
     files_dict = apply_diffs(diffs, files_dict)
-    memory[IMPROVE_LOG_FILE] = ai_response
     return files_dict
 
 
