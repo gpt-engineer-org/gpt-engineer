@@ -300,7 +300,7 @@ def improve(
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=prompt.to_langchain_content()))
-    messages.append(HumanMessage(content=f"Request: {prompt}"))
+    # messages.append(HumanMessage(content=f"Request: {prompt}"))
     memory[DEBUG_LOG_FILE] = (
         "UPLOADED FILES:\n" + files_dict.to_log() + "\nPROMPT:\n" + prompt
     )
@@ -318,17 +318,17 @@ def _improve_loop(
         messages = ai.next(messages, step_name=curr_fn())
         files_dict = salvage_correct_hunks(messages, files_dict, problems)
 
-        if len(problems) > 0:
-            messages.append(
-                HumanMessage(
-                    content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details: "
-                    + "\n".join(problems)
-                    + "\n Only rewrite the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
-                )
-            )
-            messages = ai.next(messages, step_name=curr_fn())
-            edit_refinements += 1
-            files_dict = salvage_correct_hunks(messages, files_dict, problems)
+        # if len(problems) > 0:
+        #     messages.append(
+        #         HumanMessage(
+        #             content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details: "
+        #             + "\n".join(problems)
+        #             + "\n Only rewrite the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
+        #         )
+        #     )
+        #     messages = ai.next(messages, step_name=curr_fn())
+        #     edit_refinements += 1
+        #     files_dict = salvage_correct_hunks(messages, files_dict, problems)
         return files_dict
 
 
