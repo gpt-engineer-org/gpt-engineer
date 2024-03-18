@@ -74,7 +74,9 @@ def load_env_if_needed():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def load_prompt(input_repo: DiskMemory, improve_mode) -> Prompt:
+def load_prompt(
+    input_repo: DiskMemory, improve_mode: bool, prompt_file: str, image_directory: str
+) -> Prompt:
     """
     Load or request a prompt from the user based on the mode.
 
@@ -90,23 +92,28 @@ def load_prompt(input_repo: DiskMemory, improve_mode) -> Prompt:
     str
         The loaded or inputted prompt.
     """
-    repo_result = input_repo.get("prompt")
-    if not repo_result:
+
+    if os.path.isdir(prompt_file):
+        raise ValueError(
+            f"The path to the prompt, {prompt_file}, already exists as a directory. No prompt can be read from it. Please specify a prompt file using --prompt"
+        )
+    prompt_str = input_repo.get(prompt_file)
+    if not prompt_str:
         if not improve_mode:
-            input_repo["prompt/text"] = input(
+            prompt_str = input(
                 "\nWhat application do you want gpt-engineer to generate?\n"
             )
         else:
-            input_repo["prompt/text"] = input(
-                "\nHow do you want to improve the application?\n"
-            )
-
-    repo_result = input_repo.get("prompt")
-
-    if isinstance(repo_result, DiskMemory):  # If prompt is in folder format
-        return Prompt(repo_result.get("text"), repo_result.get("images").to_dict())
+            prompt_str = input("\nHow do you want to improve the application?\n")
+    if image_directory == "":
+        return Prompt(prompt_str)
+    elif os.path.isdir(image_directory):
+        if len(os.listdir(image_directory)) == 0:
+            raise ValueError("The provided --image_directory is empty.")
+        image_repo = DiskMemory(image_directory)
+        return Prompt(prompt_str, image_repo.get(".").to_dict())
     else:
-        return Prompt(repo_result)
+        raise ValueError("The provided --image_directory is not a directory.")
 
 
 def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
@@ -192,6 +199,16 @@ def main(
         "--llm-via-clipboard",
         help="Use the clipboard to communicate with the AI.",
     ),
+    prompt_file: str = typer.Option(
+        "prompt",
+        "--prompt",
+        help="Path to a text file containing a prompt.",
+    ),
+    image_directory: str = typer.Option(
+        "",
+        "--image_directory",
+        help="Path to a folder containing images.",
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     """
@@ -256,7 +273,7 @@ def main(
             print("Initializing an empty git repository")
             init_git_repo(path)
 
-    prompt = load_prompt(DiskMemory(path), improve_mode)
+    prompt = load_prompt(DiskMemory(path), improve_mode, prompt_file, image_directory)
 
     # todo: if ai.vision is false and not llm_via_clipboard - ask if they would like to use gpt-4-vision-preview instead? If so recreate AI
     if not ai.vision:

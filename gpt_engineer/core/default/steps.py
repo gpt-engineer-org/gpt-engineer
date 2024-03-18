@@ -334,7 +334,7 @@ def _improve_loop(
                 HumanMessage(
                     content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details: "
                     + "\n".join(problems)
-                    + "\n Please FOCUS ON the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
+                    + "\n Only rewrite the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
                 )
             )
             messages = ai.next(messages, step_name=curr_fn())
