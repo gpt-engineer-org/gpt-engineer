@@ -19,6 +19,7 @@ Attributes
 __name__ : str
     The standard boilerplate for invoking the main function when the script is executed.
 """
+
 import importlib
 
 from typing import Annotated, Optional
@@ -88,8 +89,7 @@ def main(
     """
     set_llm_cache(SQLiteCache(database_path=".langchain.db"))
 
-    benchmarks = benchmarks.split(",")
-    for benchmark_name in benchmarks:
+    for benchmark_name in benchmarks.split(","):
         benchmark = get_benchmark(benchmark_name)
         agent = get_agent(path_to_agent)
 
