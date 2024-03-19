@@ -3,14 +3,13 @@ from sys import version_info
 from typing import List, Union
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
-from termcolor import colored
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.core.chat_to_files import chat_to_files_dict
 from gpt_engineer.core.default.paths import CODE_GEN_LOG_FILE, ENTRYPOINT_FILE
-from gpt_engineer.core.default.steps import curr_fn, setup_sys_prompt, improve
+from gpt_engineer.core.default.steps import curr_fn, improve, setup_sys_prompt
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.prompt import Prompt
