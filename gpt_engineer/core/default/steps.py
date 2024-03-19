@@ -286,7 +286,7 @@ def improve(
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=f"Request: {prompt}"))
     memory[DEBUG_LOG_FILE] = (
-        "UPLOADED FILES:\n" + files_dict.to_chat() + "\nPROMPT:\n" + prompt
+        "UPLOADED FILES:\n" + files_dict.to_log() + "\nPROMPT:\n" + prompt
     )
     return _improve_loop(ai, files_dict, memory, messages)
 
@@ -359,8 +359,9 @@ def handle_improve_mode(prompt, agent, memory, files_dict):
     try:
         files_dict = agent.improve(files_dict, prompt)
     except Exception as e:
-        print(f"Error while improving the project: {e}")
-        files_dict = None
+        print(
+            f"Error while improving the project: {e}\nCould you please upload the debug_log_file.txt in {memory.path} folder to github?"
+        )
     finally:
         # Reset stdout
         sys.stdout = old_stdout

@@ -71,6 +71,23 @@ class FilesDict(dict):
             chat_str += "\n"
         return f"```\n{chat_str}```"
 
+    def to_log(self):
+        """
+        Formats the items of the object (assuming file name and content pairs)
+        into a string suitable for log display.
+
+        Returns
+        -------
+        str
+            A string representation of the files.
+        """
+        log_str = ""
+        for file_name, file_content in self.items():
+            log_str += f"File: {file_name}\n"
+            log_str += file_content
+            log_str += "\n"
+        return log_str
+
 
 def file_to_lines_dict(file_content: str) -> dict:
     """
