@@ -1,8 +1,9 @@
 import os
+import shutil
 import tempfile
 
 from unittest.mock import patch
-import shutil
+
 import pytest
 
 import gpt_engineer.applications.cli.main as main

@@ -27,9 +27,10 @@ from pathlib import Path
 
 import openai
 import typer
+
+from dotenv import load_dotenv
 from langchain.cache import SQLiteCache
 from langchain.globals import set_llm_cache
-from dotenv import load_dotenv
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
@@ -250,6 +251,11 @@ def main(
         "--image_directory",
         help="Relative path to a folder containing images.",
     ),
+    use_cache: bool = typer.Option(
+        False,
+        "--use-cache",
+        help="Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.",
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     """
@@ -288,7 +294,9 @@ def main(
     """
 
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
-    # set_llm_cache(SQLiteCache(database_path=".langchain.db"))
+
+    if use_cache:
+        set_llm_cache(SQLiteCache(database_path=".langchain.db"))
     if improve_mode:
         assert not (
             clarify_mode or lite_mode
