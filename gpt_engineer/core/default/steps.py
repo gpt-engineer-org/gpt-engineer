@@ -359,8 +359,9 @@ def handle_improve_mode(prompt, agent, memory, files_dict):
     try:
         files_dict = agent.improve(files_dict, prompt)
     except Exception as e:
-        print(f"Error while improving the project: {e}")
-        files_dict = None
+        print(
+            f"Error while improving the project: {e}\nCould you please upload the debug_log_file.txt in {memory.path} folder to github?"
+        )
     finally:
         # Reset stdout
         sys.stdout = old_stdout
