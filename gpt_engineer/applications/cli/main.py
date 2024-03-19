@@ -137,7 +137,16 @@ def prompt_yesno(question: str) -> bool:
     return answer in ["y", "yes"]
 
 
-@app.command()
+@app.command(
+    help="""
+        GPT-engineer lets you:
+
+        \b
+        - Specify a software in natural language
+        - Sit back and watch as an AI writes and executes the code
+        - Ask the AI to implement improvements
+    """
+)
 def main(
     project_path: str = typer.Argument("projects/example", help="path"),
     model: str = typer.Argument("gpt-4-1106-preview", help="model id string"),
