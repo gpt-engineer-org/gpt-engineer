@@ -286,7 +286,7 @@ def improve(
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=f"Request: {prompt}"))
     memory[DEBUG_LOG_FILE] = (
-        "UPLOADED FILES:\n" + files_dict.to_chat() + "\nPROMPT:\n" + prompt
+        "UPLOADED FILES:\n" + files_dict.to_log() + "\nPROMPT:\n" + prompt
     )
     return _improve_loop(ai, files_dict, memory, messages)
 
