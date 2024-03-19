@@ -238,11 +238,11 @@ def main(
     ),
     prompt_file: str = typer.Option(
         "prompt",
-        "--prompt",
+        "--prompt_file",
         help="Relative path to a text file containing a prompt.",
     ),
     entrypoint_prompt_file: str = typer.Option(
-        "prompt",
+        "",
         "--entrypoint_prompt",
         help="Relative path to a text file containing a file that specifies requirements for you entrypoint.",
     ),
@@ -253,7 +253,7 @@ def main(
     ),
     use_cache: bool = typer.Option(
         False,
-        "--use-cache",
+        "--use_cache",
         help="Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.",
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
@@ -285,6 +285,14 @@ def main(
         The endpoint for Azure OpenAI services.
     use_custom_preprompts : bool
         Flag indicating whether to use custom preprompts.
+    prompt_file : str
+        Relative path to a text file containing a prompt.
+    entrypoint_prompt_file: str
+        Relative path to a text file containing a file that specifies requirements for you entrypoint.
+    image_directory: str
+        Relative path to a folder containing images.
+    use_cache: bool
+        Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.
     verbose : bool
         Flag indicating whether to enable verbose logging.
 
