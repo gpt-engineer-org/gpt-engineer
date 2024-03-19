@@ -302,7 +302,7 @@ def improve(
     messages.append(HumanMessage(content=prompt.to_langchain_content()))
     # messages.append(HumanMessage(content=f"Request: {prompt}"))
     memory[DEBUG_LOG_FILE] = (
-        "UPLOADED FILES:\n" + files_dict.to_log() + "\nPROMPT:\n" + prompt
+        "UPLOADED FILES:\n" + files_dict.to_log() + "\nPROMPT:\n" + prompt.text
     )
     return _improve_loop(ai, files_dict, memory, messages)
 
