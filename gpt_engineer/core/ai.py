@@ -136,7 +136,7 @@ class AI:
             HumanMessage(content=user),
         ]
         return self.next(messages, step_name=step_name)
-    
+
     def _collapse_text_messages(self, messages: List[Message]):
         """
         Combine consecutive messages of the same type into a single message.
@@ -206,7 +206,7 @@ class AI:
 
         logger.debug(f"Creating a new chat completion: {messages}")
 
-        if not self.vision: 
+        if not self.vision:
             messages = self._collapse_text_messages(messages)
 
         response = self.backoff_inference(messages)
