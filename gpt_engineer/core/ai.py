@@ -136,6 +136,44 @@ class AI:
             HumanMessage(content=user),
         ]
         return self.next(messages, step_name=step_name)
+    
+    def _collapse_text_messages(self, messages: List[Message]):
+        """
+        Combine consecutive messages of the same type into a single message.
+
+        This method iterates through the list of messages, combining consecutive messages of the same type
+        by joining their content with a newline character. This reduces the number of messages and simplifies
+        the conversation for processing.
+
+        Parameters
+        ----------
+        messages : List[Message]
+            The list of messages to collapse.
+
+        Returns
+        -------
+        List[Message]
+            The list of messages after collapsing consecutive messages of the same type.
+        """
+        collapsed_messages = []
+        if not messages:
+            return collapsed_messages
+
+        previous_message = messages[0]
+        combined_content = previous_message.content
+
+        for current_message in messages[1:]:
+            if current_message.type == previous_message.type:
+                combined_content += "\n\n" + current_message.content
+            else:
+                collapsed_messages.append(
+                    previous_message.__class__(content=combined_content)
+                )
+                previous_message = current_message
+                combined_content = current_message.content
+
+        collapsed_messages.append(previous_message.__class__(content=combined_content))
+        return collapsed_messages
 
     def next(
         self,
@@ -168,7 +206,8 @@ class AI:
 
         logger.debug(f"Creating a new chat completion: {messages}")
 
-        messages = self._collapse_messages(messages)
+        if not self.vision: 
+            messages = self._collapse_text_messages(messages)
 
         response = self.backoff_inference(messages)
 
@@ -179,69 +218,6 @@ class AI:
         logger.debug(f"Chat completion finished: {messages}")
 
         return messages
-
-    def _extract_content(self, content):
-        """
-        Extracts text content from a message, supporting both string and list types.
-
-        Parameters
-        ----------
-        content : Union[str, List[dict]]
-            The content of a message, which could be a string or a list.
-
-        Returns
-        -------
-        str
-            The extracted text content.
-        """
-        if isinstance(content, str):
-            return content
-        elif isinstance(content, list) and content and "text" in content[0]:
-            # Assuming the structure of list content is [{'type': 'text', 'text': 'Some text'}, ...]
-            return content[0]["text"]
-        else:
-            return ""
-
-    def _collapse_messages(self, messages: List[Message]):
-        """
-        Combine consecutive messages of the same type into a single message, where if the message content
-        is a list type, the first text element's content is taken. This method keeps `combined_content` as a string.
-
-        This method iterates through the list of messages, combining consecutive messages of the same type
-        by joining their content with a newline character. If the content is a list, it extracts text from the first
-        text element's content. This reduces the number of messages and simplifies the conversation for processing.
-
-        Parameters
-        ----------
-        messages : List[Message]
-            The list of messages to collapse.
-
-        Returns
-        -------
-        List[Message]
-            The list of messages after collapsing consecutive messages of the same type.
-        """
-        collapsed_messages = []
-        if not messages:
-            return collapsed_messages
-
-        previous_message = messages[0]
-        combined_content = self._extract_content(previous_message.content)
-
-        for current_message in messages[1:]:
-            if current_message.type == previous_message.type:
-                combined_content += "\n\n" + self._extract_content(
-                    current_message.content
-                )
-            else:
-                collapsed_messages.append(
-                    previous_message.__class__(content=combined_content)
-                )
-                previous_message = current_message
-                combined_content = self._extract_content(current_message.content)
-
-        collapsed_messages.append(previous_message.__class__(content=combined_content))
-        return collapsed_messages
 
     @backoff.on_exception(backoff.expo, openai.RateLimitError, max_tries=7, max_time=45)
     def backoff_inference(self, messages):
