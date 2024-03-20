@@ -1,6 +1,8 @@
 import autopep8
 import jsbeautifier
 
+from gpt_engineer.core.files_dict import FilesDict
+
 
 class Linter:
     def __init__(self):
@@ -39,7 +41,7 @@ class Linter:
         """
         return jsbeautifier.beautify(code, self.js_opts)
 
-    def lint_files_dict(self, files_dict: dict) -> dict:
+    def lint_files_dict(self, files_dict: FilesDict) -> FilesDict:
         """
         Lints the given files dictionary. The dictionary keys are file names and the values are the file contents.
         The function supports linting for Python and JavaScript files.
@@ -54,12 +56,13 @@ class Linter:
         dict
             The dictionary containing linted file contents.
         """
-        formatted_files = {}
+
         for file_name, file_content in files_dict.items():
             if file_name.endswith(".py"):
-                formatted_files[file_name] = self.lint_python_code(file_content)
+                files_dict[file_name] = self.lint_python_code(file_content)
+                print(f"Formatted {file_name} with autopep8")
             elif file_name.endswith(".js"):
-                formatted_files[file_name] = self.lint_javascript_code(file_content)
-            else:
-                formatted_files[file_name] = file_content
-        return formatted_files
+                files_dict[file_name] = self.lint_javascript_code(file_content)
+                print(f"Formatted {file_name} with jsbeautifier")
+            print()
+        return files_dict
