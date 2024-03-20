@@ -11,6 +11,7 @@ Classes:
 from abc import ABC, abstractmethod
 
 from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.prompt import Prompt
 
 
 class BaseAgent(ABC):
@@ -22,9 +23,9 @@ class BaseAgent(ABC):
     """
 
     @abstractmethod
-    def init(self, prompt: str) -> FilesDict:
+    def init(self, prompt: Prompt) -> FilesDict:
         pass
 
     @abstractmethod
-    def improve(self, files_dict: FilesDict, prompt: str) -> FilesDict:
+    def improve(self, files_dict: FilesDict, prompt: Prompt) -> FilesDict:
         pass

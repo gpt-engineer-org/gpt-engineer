@@ -59,6 +59,7 @@ scratchpad
 projects/*
 !projects/example/prompt
 !projects/example-improve
+!projects/example-vision
 
 # docs
 

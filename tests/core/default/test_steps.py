@@ -25,6 +25,7 @@ from gpt_engineer.core.default.steps import (
 )
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.prompt import Prompt
 
 factorial_program = """
 To implement a function that calculates the factorial of a number in Python, we will create a simple Python module with a single function `factorial`. The factorial of a non-negative integer `n` is the product of all positive integers less than or equal to `n`. It is denoted by `n!`. The factorial of 0 is defined to be 1.
@@ -88,7 +89,7 @@ class TestGenCode:
                 return [SystemMessage(content=factorial_program)]
 
         ai = MockAI()
-        prompt = "Write a function that calculates the factorial of a number."
+        prompt = Prompt("Write a function that calculates the factorial of a number.")
 
         memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
@@ -107,7 +108,7 @@ class TestGenCode:
                 return [SystemMessage(content=factorial_program)]
 
         ai = MockAI()
-        prompt = "Write a function that calculates the factorial of a number."
+        prompt = Prompt("Write a function that calculates the factorial of a number.")
         memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         code = gen_code(ai, prompt, memory, preprompts_holder)
@@ -125,7 +126,7 @@ class TestGenCode:
                 return [SystemMessage(content=factorial_program)]
 
         ai = MockAI()
-        prompt = "Write a function that calculates the factorial of a number."
+        prompt = Prompt("Write a function that calculates the factorial of a number.")
         memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         with pytest.raises(TypeError):
@@ -140,7 +141,7 @@ class TestGenCode:
                 return [SystemMessage(content=factorial_program)]
 
         ai = MockAI()
-        prompt = "Write a function that calculates the factorial of a number."
+        prompt = Prompt("Write a function that calculates the factorial of a number.")
         memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         with pytest.raises(TypeError):
@@ -155,7 +156,7 @@ class TestGenCode:
                 return [SystemMessage(content=factorial_program)]
 
         ai = MockAI()
-        prompt = "Write a function that calculates the factorial of a number."
+        prompt = Prompt("Write a function that calculates the factorial of a number.")
         memory = DiskMemory(tempfile.mkdtemp())
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         with pytest.raises(KeyError):
@@ -222,9 +223,12 @@ class TestGenEntrypoint:
         code = FilesDict()
         tempdir = tempfile.mkdtemp()
         memory = DiskMemory(tempdir)
+        prompt = Prompt("")
         # Act
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
-        entrypoint_code = gen_entrypoint(ai_mock, code, memory, preprompts_holder)
+        entrypoint_code = gen_entrypoint(
+            ai_mock, prompt, code, memory, preprompts_holder
+        )
 
         # Assert
         assert ENTRYPOINT_FILE in entrypoint_code
@@ -249,10 +253,12 @@ pytest test_factorial.py
         code = FilesDict()
         tempdir = tempfile.mkdtemp()
         memory = DiskMemory(tempdir)
-
+        prompt = Prompt("")
         # Act
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
-        entrypoint_code = gen_entrypoint(ai_mock, code, memory, preprompts_holder)
+        entrypoint_code = gen_entrypoint(
+            ai_mock, prompt, code, memory, preprompts_holder
+        )
 
         # Assert
         assert ENTRYPOINT_FILE in entrypoint_code
@@ -292,7 +298,7 @@ Some introductory text.
         memory = DiskMemory(tmp_path)
 
         # Define the user prompt
-        prompt = (
+        prompt = Prompt(
             "Change the program to print 'Goodbye, World!' instead of 'Hello, World!'"
         )
 
