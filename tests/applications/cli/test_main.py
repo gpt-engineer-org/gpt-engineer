@@ -166,11 +166,9 @@ class TestMain:
         assert (
             (p / f".gpteng/memory/{DEBUG_LOG_FILE}").read_text().strip()
             == """UPLOADED FILES:
-```
 File: main.py
-1 The program will be written in this file
+The program will be written in this file
 
-```
 PROMPT:
 Make a python program that writes 'hello' to a file called 'output.txt'
 CONSOLE OUTPUT:"""
@@ -234,11 +232,9 @@ This concludes a fully working implementation."""
         assert (
             (p / f".gpteng/memory/{DEBUG_LOG_FILE}").read_text().strip()
             == """UPLOADED FILES:
-```
 File: main.py
-1 The program will be written in this file
+The program will be written in this file
 
-```
 PROMPT:
 Make a python program that writes 'hello' to a file called 'output.txt'
 CONSOLE OUTPUT:
@@ -285,16 +281,15 @@ Invalid hunk: @@ -0,0 +1,9 @@
         simplified_main(str(p), "improve")
         DiskExecutionEnv(path=p)
         assert (
-            (p / f".gpteng/memory/{DEBUG_LOG_FILE}").read_text().strip()
-            == """UPLOADED FILES:
-```
+            """UPLOADED FILES:
 File: main.py
-1 The program will be written in this file
+The program will be written in this file
 
-```
 PROMPT:
 Make a python program that writes 'hello' to a file called 'output.txt'
 CONSOLE OUTPUT:
-Error while improving the project: Mock exception in salvage_correct_hunks"""
+Error while improving the project: Mock exception in salvage_correct_hunks
+Could you please upload the debug_log_file.txt in"""
+            in (p / f".gpteng/memory/{DEBUG_LOG_FILE}").read_text().strip()
         )
         del os.environ["GPTE_TEST_MODE"]
