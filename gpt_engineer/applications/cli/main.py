@@ -113,7 +113,7 @@ def load_prompt(
 
     if os.path.isdir(prompt_file):
         raise ValueError(
-            f"The path to the prompt, {prompt_file}, already exists as a directory. No prompt can be read from it. Please specify a prompt file using --prompt"
+            f"The path to the prompt, {prompt_file}, already exists as a directory. No prompt can be read from it. Please specify a prompt file using --prompt_file"
         )
     prompt_str = input_repo.get(prompt_file)
     if not prompt_str:
