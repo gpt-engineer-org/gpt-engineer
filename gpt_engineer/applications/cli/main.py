@@ -189,7 +189,16 @@ def prompt_yesno(question: str) -> bool:
     return answer in ["y", "yes"]
 
 
-@app.command()
+@app.command(
+    help="""
+        GPT-engineer lets you:
+
+        \b
+        - Specify a software in natural language
+        - Sit back and watch as an AI writes and executes the code
+        - Ask the AI to implement improvements
+    """
+)
 def main(
     project_path: str = typer.Argument("projects/example", help="path"),
     model: str = typer.Argument("gpt-4-0125-preview", help="model id string"),
@@ -198,7 +207,7 @@ def main(
         False,
         "--improve",
         "-i",
-        help="Improve files_dict from existing project.",
+        help="Improve mode - improve files_dict from existing project.",
     ),
     lite_mode: bool = typer.Option(
         False,
@@ -210,13 +219,13 @@ def main(
         False,
         "--clarify",
         "-c",
-        help="Lite mode - discuss specification with AI before implementation.",
+        help="Clarify mode - discuss specification with AI before implementation.",
     ),
     self_heal_mode: bool = typer.Option(
         False,
         "--self-heal",
         "-sh",
-        help="Lite mode - discuss specification with AI before implementation.",
+        help="Self-heal mode - fix the code by itself when it fails.",
     ),
     azure_endpoint: str = typer.Option(
         "",
