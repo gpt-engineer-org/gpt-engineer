@@ -313,10 +313,8 @@ def improve_fn(
 def _improve_loop(
     ai: AI, files_dict: FilesDict, memory: BaseMemory, messages: List
 ) -> FilesDict:
-    messages = ai.next(messages, step_name=curr_fn())
-
-    # check edit correctness
-    for _ in range(MAX_EDIT_REFINEMENT_STEPS):
+    for _ in range(MAX_EDIT_REFINEMENT_STEPS + 1):
+        messages = ai.next(messages, step_name=curr_fn())
         files_dict, errors = salvage_correct_hunks(messages, files_dict, memory)
         if not errors:
             break
