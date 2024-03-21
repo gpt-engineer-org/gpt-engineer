@@ -248,7 +248,29 @@ class TokenUsageLog:
             result += f"{log.step_name},{log.in_step_prompt_tokens},{log.in_step_completion_tokens},{log.in_step_total_tokens},{log.total_prompt_tokens},{log.total_completion_tokens},{log.total_tokens}\n"
         return result
 
-    def usage_cost(self) -> float:
+    def is_openai_model(self) -> bool:
+        """
+        Check if the model is an OpenAI model.
+
+        Returns
+        -------
+        bool
+            True if the model is an OpenAI model, False otherwise.
+        """
+        return "gpt" in self.model_name.lower()
+
+    def total_tokens(self) -> int:
+        """
+        Return the total number of tokens used in the conversation.
+
+        Returns
+        -------
+        int
+            The total number of tokens used in the conversation.
+        """
+        return self._cumulative_total_tokens
+
+    def usage_cost(self) -> float | None:
         """
         Return the total cost in USD of the API usage.
 
@@ -257,6 +279,9 @@ class TokenUsageLog:
         float
             Cost in USD.
         """
+        if not self.is_openai_model():
+            return None
+
         result = 0
         for log in self.log():
             result += get_openai_token_cost_for_model(

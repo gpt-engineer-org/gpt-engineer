@@ -118,8 +118,6 @@ TERM_CHOICES = (
     + "(ncertain): "
 )
 
-VALID_INPUTS = ("y", "n", "u")
-
 
 def human_review_input() -> Optional[Review]:
     """
@@ -142,17 +140,17 @@ def human_review_input() -> Optional[Review]:
     print()
 
     ran = input("Did the generated code run at all? " + TERM_CHOICES)
-    ran = ask_for_valid_input(ran, VALID_INPUTS)
+    ran = ask_for_valid_input(ran)
 
     if ran == "y":
         perfect = input(
             "Did the generated code do everything you wanted? " + TERM_CHOICES
         )
-        perfect = ask_for_valid_input(perfect, VALID_INPUTS)
+        perfect = ask_for_valid_input(perfect)
 
         if perfect != "y":
             useful = input("Did the generated code do anything useful? " + TERM_CHOICES)
-            useful = ask_for_valid_input(useful, VALID_INPUTS)
+            useful = ask_for_valid_input(useful)
         else:
             useful = ""
     else:
@@ -176,8 +174,8 @@ def human_review_input() -> Optional[Review]:
     )
 
 
-def ask_for_valid_input(ran, valid_inputs):
-    while ran not in valid_inputs:
+def ask_for_valid_input(ran):
+    while ran not in ("y", "n", "u"):
         ran = input("Invalid input. Please enter y, n, or u: ")
     return ran
 

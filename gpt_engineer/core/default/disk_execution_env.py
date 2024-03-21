@@ -50,20 +50,20 @@ class DiskExecutionEnv(BaseExecutionEnv):
     """
 
     def __init__(self, path: Union[str, Path, None] = None):
-        self.store = FileStore(path)
+        self.files = FileStore(path)
 
     def upload(self, files: FilesDict) -> "DiskExecutionEnv":
-        self.store.upload(files)
+        self.files.push(files)
         return self
 
     def download(self) -> FilesDict:
-        return self.store.download()
+        return self.files.pull()
 
     def popen(self, command: str) -> subprocess.Popen:
         p = subprocess.Popen(
             command,
             shell=True,
-            cwd=self.store.working_dir,
+            cwd=self.files.working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
@@ -77,7 +77,7 @@ class DiskExecutionEnv(BaseExecutionEnv):
             command,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=self.store.working_dir,
+            cwd=self.files.working_dir,
             text=True,
             shell=True,
         )

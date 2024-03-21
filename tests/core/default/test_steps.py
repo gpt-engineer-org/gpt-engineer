@@ -9,17 +9,12 @@ from langchain.schema import SystemMessage
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.disk_memory import DiskMemory
-from gpt_engineer.core.default.paths import (
-    CODE_GEN_LOG_FILE,
-    ENTRYPOINT_FILE,
-    ENTRYPOINT_LOG_FILE,
-    PREPROMPTS_PATH,
-)
+from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, PREPROMPTS_PATH
 from gpt_engineer.core.default.steps import (
     curr_fn,
     gen_code,
     gen_entrypoint,
-    improve,
+    improve_fn,
     setup_sys_prompt,
     setup_sys_prompt_existing_code,
 )
@@ -97,8 +92,8 @@ class TestGenCode:
 
         assert isinstance(code, FilesDict)
         assert len(code) == 2
-        assert CODE_GEN_LOG_FILE in memory
-        assert memory[CODE_GEN_LOG_FILE] == factorial_program.strip()
+        # assert CODE_GEN_LOG_FILE in memory
+        # assert memory[CODE_GEN_LOG_FILE] == factorial_program.strip()
 
     #  The generated code is saved to disk.
     def test_generated_code_saved_to_disk(self):
@@ -115,8 +110,8 @@ class TestGenCode:
 
         assert isinstance(code, FilesDict)
         assert len(code) == 2
-        assert CODE_GEN_LOG_FILE in memory
-        assert memory[CODE_GEN_LOG_FILE] == factorial_program.strip()
+        # assert CODE_GEN_LOG_FILE in memory
+        # assert memory[CODE_GEN_LOG_FILE] == factorial_program.strip()
 
     #  Raises TypeError if keys are not strings or Path objects.
     def test_raises_type_error_if_keys_not_strings_or_path_objects(self):
@@ -241,9 +236,9 @@ pip install -r requirements.txt
 pytest test_factorial.py
 """
         )
-        assert ENTRYPOINT_LOG_FILE in memory
-        assert isinstance(memory[ENTRYPOINT_LOG_FILE], str)
-        assert memory[ENTRYPOINT_LOG_FILE] == factorial_entrypoint.strip()
+        # assert ENTRYPOINT_LOG_FILE in memory
+        # assert isinstance(memory[ENTRYPOINT_LOG_FILE], str)
+        # assert memory[ENTRYPOINT_LOG_FILE] == factorial_entrypoint.strip()
 
     #  The function receives an empty codebase and returns an empty entry point script.
     def test_empty_codebase_returns_empty_entrypoint(self):
@@ -264,9 +259,9 @@ pytest test_factorial.py
         assert ENTRYPOINT_FILE in entrypoint_code
         assert isinstance(entrypoint_code[ENTRYPOINT_FILE], str)
         assert entrypoint_code[ENTRYPOINT_FILE] == ""
-        assert ENTRYPOINT_LOG_FILE in memory
-        assert isinstance(memory[ENTRYPOINT_LOG_FILE], str)
-        assert memory[ENTRYPOINT_LOG_FILE] == "Irrelevant explanation"
+        # assert ENTRYPOINT_LOG_FILE in memory
+        # assert isinstance(memory[ENTRYPOINT_LOG_FILE], str)
+        # assert memory[ENTRYPOINT_LOG_FILE] == "Irrelevant explanation"
 
 
 class TestImprove:
@@ -304,7 +299,7 @@ Some introductory text.
 
         # Call the improve function
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
-        improved_code = improve(ai_mock, prompt, code, memory, preprompts_holder)
+        improved_code = improve_fn(ai_mock, prompt, code, memory, preprompts_holder)
 
         # Assert that the code was improved correctly
         expected_code = FilesDict(

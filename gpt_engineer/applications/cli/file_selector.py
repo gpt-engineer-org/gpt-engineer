@@ -22,7 +22,7 @@ import os
 import subprocess
 
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, Generator, List, Union
 
 import toml
 
@@ -288,14 +288,22 @@ class FileSelector:
         print(f"\nYou have selected the following files:\n{input_path}")
 
         project_path = Path(input_path).resolve()
-        all_paths = set(
+        selected_paths = set(
             project_path.joinpath(file).resolve(strict=False) for file in selected_files
         )
 
+        for displayable_path in DisplayablePath.make_tree(project_path):
+            if displayable_path.path in selected_paths:
+                p = displayable_path
+                while p.parent and p.parent.path not in selected_paths:
+                    selected_paths.add(p.parent.path)
+                    p = p.parent
+
         try:
             for displayable_path in DisplayablePath.make_tree(project_path):
-                if displayable_path.path in all_paths:
+                if displayable_path.path in selected_paths:
                     print(displayable_path.displayable())
+
         except FileNotFoundError:
             print("Specified path does not exist: ", project_path)
         except Exception as e:
@@ -378,24 +386,6 @@ class FileSelector:
 
         return all_files
 
-    def is_in_ignoring_extensions(self, path: Path) -> bool:
-        """
-        Checks if a file path should be ignored based on predefined criteria.
-
-        Parameters
-        ----------
-        path : Path
-            The path to the file to be checked.
-
-        Returns
-        -------
-        bool
-            True if the file should not be ignored, False otherwise.
-        """
-        is_hidden = not path.name.startswith(".")
-        is_pycache = "__pycache__" not in path.name
-        return is_hidden and is_pycache
-
 
 class DisplayablePath(object):
     """
@@ -444,7 +434,7 @@ class DisplayablePath(object):
     @classmethod
     def make_tree(
         cls, root: Union[str, Path], parent=None, is_last=False, criteria=None
-    ):
+    ) -> Generator["DisplayablePath", None, None]:
         """
         Creates a tree of DisplayablePath objects from a root directory.
 

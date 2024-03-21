@@ -77,6 +77,7 @@ def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
     Returns:
     - FilesDict: The updated files after applying diffs.
     """
+    files = FilesDict(files.copy())
     REMOVE_FLAG = "<REMOVE_LINE>"  # Placeholder to mark lines for removal
     for diff in diffs.values():
         if diff.is_new_file():
@@ -102,16 +103,10 @@ def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
                             line_dict[current_line] += "\n" + line[1]
                         else:
                             line_dict[current_line] = line[1]
-                        print(
-                            f"\nAdded line {line[1]} to {diff.filename_post} at line {current_line} end"
-                        )
                         current_line += 1
                     elif line[0] == REMOVE:
                         # Mark removed lines with REMOVE_FLAG
                         line_dict[current_line] = REMOVE_FLAG
-                        print(
-                            f"\nRemoved line {line[1]} from {diff.filename_post} at line {current_line}"
-                        )
                         current_line += 1
 
             # Remove lines marked for removal

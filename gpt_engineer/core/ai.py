@@ -112,7 +112,7 @@ class AI:
 
         logger.debug(f"Using model {self.model_name}")
 
-    def start(self, system: str, user: Any, step_name: str) -> List[Message]:
+    def start(self, system: str, user: Any, *, step_name: str) -> List[Message]:
         """
         Start the conversation with a system message and a user message.
 
@@ -227,7 +227,10 @@ class AI:
         if prompt:
             messages.append(HumanMessage(content=prompt))
 
-        logger.debug(f"Creating a new chat completion: {messages}")
+        logger.debug(
+            "Creating a new chat completion: %s",
+            "\n".join([m.pretty_repr() for m in messages]),
+        )
 
         if not self.vision:
             messages = self._collapse_text_messages(messages)
@@ -352,6 +355,15 @@ class AI:
                 streaming=self.streaming,
                 callbacks=[StreamingStdOutCallbackHandler()],
                 max_tokens=4096,  # vision models default to low max token limits
+            )
+
+        if "claude" in self.model_name:
+            return ChatAnthropic(
+                model=self.model_name,
+                temperature=self.temperature,
+                callbacks=[StreamingStdOutCallbackHandler()],
+                streaming=True,
+                max_tokens_to_sample=4096,
             )
 
         if "claude" in self.model_name:

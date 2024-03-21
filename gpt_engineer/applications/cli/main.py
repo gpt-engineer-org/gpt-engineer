@@ -1,7 +1,12 @@
 """
 Entrypoint for the CLI tool.
 
-This module serves as the entry point for a command-line interface (CLI) tool designed to interact with OpenAI's language models. It provides functionality to load necessary environment variables, configure various parameters for the AI interaction, and manage the generation or improvement of code projects.
+This module serves as the entry point for a command-line interface (CLI) tool.
+It is designed to interact with OpenAI's language models.
+The module provides functionality to:
+- Load necessary environment variables,
+- Configure various parameters for the AI interaction,
+- Manage the generation or improvement of code projects.
 
 Main Functionality
 ------------------
@@ -20,8 +25,10 @@ Notes
 - When using the `azure_endpoint` parameter, provide the Azure OpenAI service endpoint URL.
 """
 
+import difflib
 import logging
 import os
+import sys
 
 from pathlib import Path
 
@@ -31,6 +38,7 @@ import typer
 from dotenv import load_dotenv
 from langchain.cache import SQLiteCache
 from langchain.globals import set_llm_cache
+from termcolor import colored
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
@@ -44,15 +52,10 @@ from gpt_engineer.core.default.steps import (
     execute_entrypoint,
     gen_code,
     handle_improve_mode,
-    improve,
+    improve_fn as improve_fn,
 )
-from gpt_engineer.core.git import (
-    filter_files_with_uncommitted_changes,
-    init_git_repo,
-    is_git_installed,
-    is_git_repo,
-    stage_files,
-)
+from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.git import stage_uncommitted_to_git
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
@@ -68,12 +71,17 @@ def load_env_if_needed():
     and if not, it attempts to load it from a .env file in the current working
     directory. It then sets the openai.api_key for use in the application.
     """
+    # We have all these checks for legacy reasons...
     if os.getenv("OPENAI_API_KEY") is None:
         load_dotenv()
     if os.getenv("OPENAI_API_KEY") is None:
-        # if there is no .env file, try to load from the current working directory
         load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
     openai.api_key = os.getenv("OPENAI_API_KEY")
+
+    if os.getenv("ANTHROPIC_API_KEY") is None:
+        load_dotenv()
+    if os.getenv("ANTHROPIC_API_KEY") is None:
+        load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
 
 
 def concatenate_paths(base_path, sub_path):
@@ -116,7 +124,10 @@ def load_prompt(
             f"The path to the prompt, {prompt_file}, already exists as a directory. No prompt can be read from it. Please specify a prompt file using --prompt_file"
         )
     prompt_str = input_repo.get(prompt_file)
-    if not prompt_str:
+    if prompt_str:
+        print(colored("Using prompt from file:", "green"), prompt_file)
+        print(prompt_str)
+    else:
         if not improve_mode:
             prompt_str = input(
                 "\nWhat application do you want gpt-engineer to generate?\n"
@@ -183,10 +194,44 @@ def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
     return custom_preprompts_path
 
 
-def prompt_yesno(question: str) -> bool:
-    question += " [y/N] "
-    answer = input(question).strip().lower()
-    return answer in ["y", "yes"]
+def compare(f1: FilesDict, f2: FilesDict):
+    def colored_diff(s1, s2):
+        lines1 = s1.splitlines()
+        lines2 = s2.splitlines()
+
+        diff = difflib.unified_diff(lines1, lines2, lineterm="")
+
+        RED = "\033[38;5;202m"
+        GREEN = "\033[92m"
+        RESET = "\033[0m"
+
+        colored_lines = []
+        for line in diff:
+            if line.startswith("+"):
+                colored_lines.append(GREEN + line + RESET)
+            elif line.startswith("-"):
+                colored_lines.append(RED + line + RESET)
+            else:
+                colored_lines.append(line)
+
+        return "\n".join(colored_lines)
+
+    for file in sorted(set(f1) | set(f2)):
+        diff = colored_diff(f1.get(file, ""), f2.get(file, ""))
+        if diff:
+            print(f"Changes to {file}:")
+            print(diff)
+
+
+def prompt_yesno() -> bool:
+    TERM_CHOICES = colored("y", "green") + "/" + colored("n", "red") + " "
+    while True:
+        response = input(TERM_CHOICES).strip().lower()
+        if response in ["y", "yes"]:
+            return True
+        if response in ["n", "no"]:
+            break
+        print("Please respond with 'y' or 'n'")
 
 
 @app.command(
@@ -200,20 +245,25 @@ def prompt_yesno(question: str) -> bool:
     """
 )
 def main(
-    project_path: str = typer.Argument("projects/example", help="path"),
+    project_path: str = typer.Argument(".", help="path"),
     model: str = typer.Argument("gpt-4-0125-preview", help="model id string"),
-    temperature: float = 0.1,
+    temperature: float = typer.Option(
+        0.1,
+        "--temperature",
+        "-t",
+        help="Controls randomness: lower values for more focused, deterministic outputs",
+    ),
     improve_mode: bool = typer.Option(
         False,
         "--improve",
         "-i",
-        help="Improve mode - improve files_dict from existing project.",
+        help="Improve an existing project by modifying the files.",
     ),
     lite_mode: bool = typer.Option(
         False,
         "--lite",
         "-l",
-        help="Lite mode - run only the main prompt.",
+        help="Lite mode: run a generation using only the main prompt.",
     ),
     clarify_mode: bool = typer.Option(
         False,
@@ -245,6 +295,12 @@ def main(
         "--llm-via-clipboard",
         help="Use the clipboard to communicate with the AI.",
     ),
+    verbose: bool = typer.Option(
+        False, "--verbose", "-v", help="Enable verbose logging for debugging."
+    ),
+    debug: bool = typer.Option(
+        False, "--debug", "-d", help="Enable debug mode for debugging."
+    ),
     prompt_file: str = typer.Option(
         "prompt",
         "--prompt_file",
@@ -265,7 +321,6 @@ def main(
         "--use_cache",
         help="Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.",
     ),
-    verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     """
     The main entry point for the CLI tool that generates or improves a project.
@@ -310,8 +365,18 @@ def main(
     None
     """
 
-    logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
+    if debug:
+        import pdb
 
+        sys.excepthook = lambda *_: pdb.pm()
+
+    # Validate arguments
+    if improve_mode and (clarify_mode or lite_mode):
+        typer.echo("Error: Clarify and lite mode are not compatible with improve mode.")
+        raise typer.Exit(code=1)
+
+    # Set up logging
+    logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
     if use_cache:
         set_llm_cache(SQLiteCache(database_path=".langchain.db"))
     if improve_mode:
@@ -333,12 +398,6 @@ def main(
     path = Path(project_path)
     print("Running gpt-engineer in", path.absolute(), "\n")
 
-    # Check if there's a git repo and verify that there aren't any uncommitted changes
-    if is_git_installed():
-        if not is_git_repo(path) and not improve_mode:
-            print("Initializing an empty git repository")
-            init_git_repo(path)
-
     prompt = load_prompt(
         DiskMemory(path),
         improve_mode,
@@ -358,17 +417,20 @@ def main(
         code_gen_fn = lite_gen
     else:
         code_gen_fn = gen_code
+
     # configure execution function
     if self_heal_mode:
         execution_fn = self_heal
     else:
         execution_fn = execute_entrypoint
 
-    improve_fn = improve
+    preprompts_holder = PrepromptsHolder(
+        get_preprompts_path(use_custom_preprompts, Path(project_path))
+    )
 
-    preprompts_path = get_preprompts_path(use_custom_preprompts, Path(project_path))
-    preprompts_holder = PrepromptsHolder(preprompts_path)
     memory = DiskMemory(memory_path(project_path))
+    memory.archive_logs()
+
     execution_env = DiskExecutionEnv()
     agent = CliAgent.with_default_config(
         memory,
@@ -380,33 +442,38 @@ def main(
         preprompts_holder=preprompts_holder,
     )
 
-    store = FileStore(project_path)
+    files = FileStore(project_path)
     if improve_mode:
-        fileselector = FileSelector(project_path)
-        original_files_dict = fileselector.ask_for_files()
-        files_dict = handle_improve_mode(prompt, agent, memory, original_files_dict)
-        if not prompt_yesno("\nDo you want to apply these changes?"):
-            return
+        files_dict_before = FileSelector(project_path).ask_for_files()
+        files_dict = handle_improve_mode(prompt, agent, memory, files_dict_before)
+        if not files_dict or files_dict_before == files_dict:
+            print(
+                f"No changes applied. Could you please upload the debug_log_file.txt in {memory.path} folder in a github issue?"
+            )
+
+        else:
+            print("\nChanges to be made:")
+            compare(files_dict_before, files_dict)
+
+            print()
+            print(colored("Do you want to apply these changes?", "light_green"))
+            if not prompt_yesno():
+                files_dict = files_dict_before
 
     else:
         files_dict = agent.init(prompt)
         # collect user feedback if user consents
         config = (code_gen_fn.__name__, execution_fn.__name__)
-        collect_and_send_human_review(prompt, model, temperature, config, agent.memory)
+        collect_and_send_human_review(prompt, model, temperature, config, memory)
 
-    if is_git_repo(path):
-        # Ask whether user wants to stage uncommitted files before overwriting them
-        modified_files = filter_files_with_uncommitted_changes(path, files_dict)
-        if modified_files:
-            print(
-                "Staging the following uncommitted files before overwriting: ",
-                ", ".join(modified_files),
-            )
-            stage_files(path, modified_files)
+    stage_uncommitted_to_git(path, files_dict, improve_mode)
 
-    store.upload(files_dict)
+    files.push(files_dict)
 
-    print("Total api cost: $ ", ai.token_usage_log.usage_cost())
+    if ai.token_usage_log.is_openai_model():
+        print("Total api cost: $ ", ai.token_usage_log.usage_cost())
+    else:
+        print("Total tokens used: ", ai.token_usage_log.total_tokens())
 
 
 if __name__ == "__main__":
