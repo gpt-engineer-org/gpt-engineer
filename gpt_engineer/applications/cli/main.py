@@ -77,7 +77,7 @@ def load_env_if_needed():
     if os.getenv("OPENAI_API_KEY") is None:
         load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
 
-    openai.api_key = os.getenv("OPENAI_API_KEY", default=None)
+    openai.api_key = os.getenv("OPENAI_API_KEY")
 
     if openai.api_key == "sk-xxx":
         openai.api_base = os.getenv("OPENAI_API_BASE")
