@@ -13,7 +13,7 @@ Or with GPU support (recommended):
 python -m llama_cpp.server --model TheBloke/CodeLlama-13B-GGUF/codellama-13b.Q8_0.gguf --n_gpu_layers 1
 ```
 
-If you have more `GPU` layers available set `--n_gpu_layers` to the higher number. 
+If you have more `GPU` layers available set `--n_gpu_layers` to the higher number.
 
 To find the amount of available  run the above command and look for `llm_load_tensors: offloaded 1/41 layers to GPU` in the output.
 
