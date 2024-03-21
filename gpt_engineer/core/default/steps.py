@@ -313,11 +313,11 @@ def improve_fn(
 def _improve_loop(
     ai: AI, files_dict: FilesDict, memory: BaseMemory, messages: List
 ) -> FilesDict:
-    for _ in range(MAX_EDIT_REFINEMENT_STEPS + 1):
-        messages = ai.next(messages, step_name=curr_fn())
-        files_dict, errors = salvage_correct_hunks(messages, files_dict, memory)
-        if not errors:
-            break
+    messages = ai.next(messages, step_name=curr_fn())
+    files_dict, errors = salvage_correct_hunks(messages, files_dict, memory)
+
+    retries = 0
+    while errors and retries < MAX_EDIT_REFINEMENT_STEPS:
         messages.append(
             HumanMessage(
                 content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details:\n"
@@ -325,7 +325,11 @@ def _improve_loop(
                 + "\n Only rewrite the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
             )
         )
-        return files_dict
+        messages = ai.next(messages, step_name=curr_fn())
+        files_dict, errors = salvage_correct_hunks(messages, files_dict, memory)
+        retries += 1
+
+    return files_dict
 
 
 def salvage_correct_hunks(
