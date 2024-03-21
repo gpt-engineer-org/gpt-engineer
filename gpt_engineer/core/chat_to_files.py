@@ -26,6 +26,8 @@ import re
 
 from typing import Dict, Tuple
 
+from regex import regex
+
 from gpt_engineer.core.diff import ADD, REMOVE, RETAIN, Diff, Hunk
 from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 
@@ -75,6 +77,7 @@ def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
     Returns:
     - FilesDict: The updated files after applying diffs.
     """
+    files = FilesDict(files.copy())
     REMOVE_FLAG = "<REMOVE_LINE>"  # Placeholder to mark lines for removal
     for diff in diffs.values():
         if diff.is_new_file():
@@ -100,16 +103,10 @@ def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
                             line_dict[current_line] += "\n" + line[1]
                         else:
                             line_dict[current_line] = line[1]
-                        print(
-                            f"\nAdded line {line[1]} to {diff.filename_post} at line {current_line} end"
-                        )
                         current_line += 1
                     elif line[0] == REMOVE:
                         # Mark removed lines with REMOVE_FLAG
                         line_dict[current_line] = REMOVE_FLAG
-                        print(
-                            f"\nRemoved line {line[1]} from {diff.filename_post} at line {current_line}"
-                        )
                         current_line += 1
 
             # Remove lines marked for removal
@@ -134,21 +131,24 @@ def parse_diffs(diff_string: str) -> dict:
     - dict: A dictionary of Diff objects keyed by filename.
     """
     # Regex to match individual diff blocks
-    diff_block_pattern = re.compile(
+    diff_block_pattern = regex.compile(
         r"```.*?\n\s*?--- .*?\n\s*?\+\+\+ .*?\n(?:@@ .*? @@\n(?:[-+ ].*?\n)*?)*?```",
         re.DOTALL,
     )
 
     diffs = {}
-    for block in diff_block_pattern.finditer(diff_string):
-        diff_block = block.group()
+    try:
+        for block in diff_block_pattern.finditer(diff_string, timeout=1):
+            diff_block = block.group()
 
-        # Parse individual diff blocks and update the diffs dictionary
-        diffs.update(parse_diff_block(diff_block))
+            # Parse individual diff blocks and update the diffs dictionary
+            diffs.update(parse_diff_block(diff_block))
+    except TimeoutError:
+        print("gpt-engineer timed out while parsing git diff")
 
     if not diffs:
-        raise ValueError(
-            f"The diff {diff_string} is not a valid diff in the unified git diff format"
+        print(
+            "GPT did not provide any proposed changes. Please try to reselect the files for uploading and edit your prompt file."
         )
 
     return diffs

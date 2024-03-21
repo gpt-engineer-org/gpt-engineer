@@ -17,17 +17,19 @@ It operates within the GPT-Engineer environment, relying on core functionalities
 file handling and persistence.
 """
 
+import fnmatch
 import os
 import subprocess
 
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, Generator, List, Union
 
 import toml
 
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import metadata_path
 from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.git import filter_by_gitignore, is_git_repo
 
 
 class FileSelector:
@@ -102,10 +104,14 @@ class FileSelector:
             # selected files contains paths that are relative to the project path
             try:
                 # to open the file we need the path from the cwd
-                with open(Path(self.project_path) / file_path, "r") as content:
+                with open(
+                    Path(self.project_path) / file_path, "r", encoding="utf-8"
+                ) as content:
                     content_dict[str(file_path)] = content.read()
             except FileNotFoundError:
                 print(f"Warning: File not found {file_path}")
+            except UnicodeDecodeError:
+                print(f"Warning: File not UTF-8 encoded {file_path}, skipping")
         return FilesDict(content_dict)
 
     def editor_file_selector(
@@ -282,14 +288,22 @@ class FileSelector:
         print(f"\nYou have selected the following files:\n{input_path}")
 
         project_path = Path(input_path).resolve()
-        all_paths = set(
+        selected_paths = set(
             project_path.joinpath(file).resolve(strict=False) for file in selected_files
         )
 
+        for displayable_path in DisplayablePath.make_tree(project_path):
+            if displayable_path.path in selected_paths:
+                p = displayable_path
+                while p.parent and p.parent.path not in selected_paths:
+                    selected_paths.add(p.parent.path)
+                    p = p.parent
+
         try:
             for displayable_path in DisplayablePath.make_tree(project_path):
-                if displayable_path.path in all_paths:
+                if displayable_path.path in selected_paths:
                     print(displayable_path.displayable())
+
         except FileNotFoundError:
             print("Specified path does not exist: ", project_path)
         except Exception as e:
@@ -324,9 +338,18 @@ class FileSelector:
 
         return existing_files
 
+    def should_filter_file(self, file_path: Path, filters: List[str]) -> bool:
+        """
+        Determines if a file should be ignored based on .gitignore rules.
+        """
+        for f in filters:
+            if fnmatch.fnmatchcase(str(file_path), f):
+                return True
+        return False
+
     def get_current_files(self, project_path: Union[str, Path]) -> List[str]:
         """
-        Generates a list of all files in the project directory.
+        Generates a list of all files in the project directory. Will use .gitignore files if project_path is a git repository.
 
         Parameters
         ----------
@@ -343,13 +366,14 @@ class FileSelector:
             project_path
         ).resolve()  # Ensure path is absolute and resolved
 
-        for path in project_path.glob("**/*"):  # Recursively list all files
+        file_list = project_path.glob("**/*")
+
+        for path in file_list:  # Recursively list all files
             if path.is_file():
                 relpath = path.relative_to(project_path)
-
                 parts = relpath.parts
                 if any(part.startswith(".") for part in parts):
-                    continue  # Skip hidden fileso
+                    continue  # Skip hidden files
                 if any(part in self.IGNORE_FOLDERS for part in parts):
                     continue
                 if relpath.name == "prompt":
@@ -357,25 +381,10 @@ class FileSelector:
 
                 all_files.append(str(relpath))
 
+        if is_git_repo(project_path):
+            all_files = filter_by_gitignore(project_path, all_files)
+
         return all_files
-
-    def is_in_ignoring_extensions(self, path: Path) -> bool:
-        """
-        Checks if a file path should be ignored based on predefined criteria.
-
-        Parameters
-        ----------
-        path : Path
-            The path to the file to be checked.
-
-        Returns
-        -------
-        bool
-            True if the file should not be ignored, False otherwise.
-        """
-        is_hidden = not path.name.startswith(".")
-        is_pycache = "__pycache__" not in path.name
-        return is_hidden and is_pycache
 
 
 class DisplayablePath(object):
@@ -425,7 +434,7 @@ class DisplayablePath(object):
     @classmethod
     def make_tree(
         cls, root: Union[str, Path], parent=None, is_last=False, criteria=None
-    ):
+    ) -> Generator["DisplayablePath", None, None]:
         """
         Creates a tree of DisplayablePath objects from a root directory.
 

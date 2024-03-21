@@ -7,6 +7,7 @@ from typing import List, Optional, Union
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
 from gpt_engineer.core.ai import AI
+from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.core.token_usage import TokenUsageLog
 
 # Type hint for a chat message
@@ -18,10 +19,12 @@ class CachingAI(AI):
         self.temperature = 0.1
         self.azure_endpoint = ""
         self.streaming = False
+        self.vision = False
         try:
             self.model_name = "gpt-4-1106-preview"
             self.llm = self._create_chat_model()
-        except:  # Catch anything
+        except Exception as e:
+            print(f"Failed to create chat model: {e}")
             self.model_name = "cached_response_model"
             self.llm = None
         self.streaming = False
@@ -31,7 +34,7 @@ class CachingAI(AI):
     def next(
         self,
         messages: List[Message],
-        prompt: Optional[str] = None,
+        prompt: Optional[str | Prompt] = None,
         *,
         step_name: str,
     ) -> List[Message]:
@@ -53,9 +56,10 @@ class CachingAI(AI):
         List[Message]
             The updated list of messages in the conversation.
         """
-
-        if prompt:
+        if isinstance(prompt, str):
             messages.append(HumanMessage(content=prompt))
+        if isinstance(prompt, Prompt):
+            messages.append(HumanMessage(content=prompt.to_langchain_content()))
 
         # read cache file if it exists
         if os.path.isfile(self.cache_file):
@@ -65,6 +69,7 @@ class CachingAI(AI):
             cache = dict()
 
         messages_key = self.serialize_messages(messages)
+
         if messages_key not in cache:
             print("calling backoff inference")
             response = self.backoff_inference(messages)

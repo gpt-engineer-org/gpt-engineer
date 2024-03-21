@@ -53,7 +53,7 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 - Locate a folder with code which you want to improve anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions for how you want to improve the code
 - Run `gpte <project_dir> -i` with a relative path to your folder
-  - For example: `gpte projects/my-old-project` from the gpt-engineer directory root with your folder in `projects/`
+  - For example: `gpte projects/my-old-project -i` from the gpt-engineer directory root with your folder in `projects/`
 
 By running gpt-engineer you agree to our [terms](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
@@ -66,11 +66,22 @@ The gptengineer.app team is actively supporting the open source community.
 
 ## Features
 
+### Pre Prompts
 You can specify the "identity" of the AI agent by overriding the `preprompts` folder, with your own version of the `preprompts`, using the `--use-custom-preprompts` argument.
 
 Editing the `preprompts` is how you make the agent remember things between projects.
 
-You can also run with open source models, like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
+### Vision
+
+By default, GPT Engineer expects text input via a `prompt` file. It can also accept imagine inputs for vision capable models. This can be useful for adding UX or architecture diagrams as additional context for GPT Engineer. You can do this by specifiying an image directory with the --image_directory flag and setting a vision capable model in the second cli argument.
+
+E.g. `gpte projects/example-vision gpt-4-vision-preview --prompt_file prompt/text --image_directory prompt/images -i`
+
+### Open source, local and alternative models
+
+By defaul GPT Engineer supports OpenAI Models via the OpenAI API or Azure Open AI API, and Anthropic models.
+
+With a little extra set up you can also run with open source models, like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
 
 ## Mission
 

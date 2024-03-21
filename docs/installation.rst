@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install gpt-engineer, run this command in your terminal:
+To install ``gpt-engineer``, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install gpt_engineer
+    $ python -m pip install gpt-engineer
 
-This is the preferred method to install file-processor, as it will always install the most recent stable release.
+This is the preferred method to install ``gpt-engineer``, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,7 +26,7 @@ you through the process.
 From sources
 ------------
 
-The sources for file-processor can be downloaded from the `Github repo`_.
+The sources for ``gpt-engineer`` can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
@@ -48,7 +48,7 @@ Once you have a copy of the source, you can install it with:
 Troubleshooting
 ---------------
 
-For mac and linux system, there are sometimes slim python installations that do not include the gpt-engineer requirement tkinter, which is a standard library and thus not pip installable.
+For mac and linux system, there are sometimes slim python installations that do not include the ``gpt-engineer`` requirement tkinter, which is a standard library and thus not pip installable.
 
 To install tkinter on mac, you can for example use brew:
 

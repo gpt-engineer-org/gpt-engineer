@@ -31,7 +31,9 @@ improve : function
 """
 
 import inspect
+import io
 import re
+import sys
 
 from pathlib import Path
 from typing import List, MutableMapping, Union
@@ -46,12 +48,15 @@ from gpt_engineer.core.chat_to_files import apply_diffs, chat_to_files_dict, par
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
+    DEBUG_LOG_FILE,
+    DIFF_LOG_FILE,
     ENTRYPOINT_FILE,
     ENTRYPOINT_LOG_FILE,
     IMPROVE_LOG_FILE,
 )
 from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.prompt import Prompt
 
 
 def curr_fn() -> str:
@@ -88,8 +93,32 @@ def setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
     )
 
 
+def setup_sys_prompt_existing_code(
+    preprompts: MutableMapping[Union[str, Path], str]
+) -> str:
+    """
+    Sets up the system prompt for improving existing code.
+
+    Parameters
+    ----------
+    preprompts : MutableMapping[Union[str, Path], str]
+        A mapping of preprompt messages to guide the AI model.
+
+    Returns
+    -------
+    str
+        The system prompt message for the AI model to improve existing code.
+    """
+    return (
+        preprompts["roadmap"]
+        + preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format_diff"])
+        + "\nUseful to know:\n"
+        + preprompts["philosophy"]
+    )
+
+
 def gen_code(
-    ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder
+    ai: AI, prompt: Prompt, memory: BaseMemory, preprompts_holder: PrepromptsHolder
 ) -> FilesDict:
     """
     Generates code from a prompt using AI and returns the generated files.
@@ -111,15 +140,18 @@ def gen_code(
         A dictionary of file names to their respective source code content.
     """
     preprompts = preprompts_holder.get_preprompts()
-    messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
+    messages = ai.start(
+        setup_sys_prompt(preprompts), prompt.to_langchain_content(), step_name=curr_fn()
+    )
     chat = messages[-1].content.strip()
-    memory[CODE_GEN_LOG_FILE] = chat
+    memory.log(CODE_GEN_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
     files_dict = chat_to_files_dict(chat)
     return files_dict
 
 
 def gen_entrypoint(
     ai: AI,
+    prompt: Prompt,
     files_dict: FilesDict,
     memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
@@ -143,10 +175,19 @@ def gen_entrypoint(
     FilesDict
         A dictionary containing the entrypoint file.
     """
+    user_prompt = prompt.entrypoint_prompt
+    if not user_prompt:
+        user_prompt = """
+        Make a unix script that
+        a) installs dependencies
+        b) runs all necessary parts of the codebase (in parallel if necessary)
+        """
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
         system=(preprompts["entrypoint"]),
-        user="Information about the codebase:\n\n" + files_dict.to_chat(),
+        user=user_prompt
+        + "\nInformation about the codebase:\n\n"
+        + files_dict.to_chat(),
         step_name=curr_fn(),
     )
     print()
@@ -156,7 +197,7 @@ def gen_entrypoint(
     entrypoint_code = FilesDict(
         {ENTRYPOINT_FILE: "\n".join(match.group(1) for match in matches)}
     )
-    memory[ENTRYPOINT_LOG_FILE] = chat
+    memory.log(ENTRYPOINT_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
     return entrypoint_code
 
 
@@ -164,7 +205,9 @@ def execute_entrypoint(
     ai: AI,
     execution_env: BaseExecutionEnv,
     files_dict: FilesDict,
+    prompt: Prompt = None,
     preprompts_holder: PrepromptsHolder = None,
+    memory: BaseMemory = None,
 ) -> FilesDict:
     """
     Executes the entrypoint of the codebase.
@@ -224,32 +267,9 @@ def execute_entrypoint(
     return files_dict
 
 
-def setup_sys_prompt_existing_code(
-    preprompts: MutableMapping[Union[str, Path], str]
-) -> str:
-    """
-    Sets up the system prompt for improving existing code.
-
-    Parameters
-    ----------
-    preprompts : MutableMapping[Union[str, Path], str]
-        A mapping of preprompt messages to guide the AI model.
-
-    Returns
-    -------
-    str
-        The system prompt message for the AI model to improve existing code.
-    """
-    return (
-        preprompts["improve"].replace("FILE_FORMAT", preprompts["file_format"])
-        + "\nUseful to know:\n"
-        + preprompts["philosophy"]
-    )
-
-
-def improve(
+def improve_fn(
     ai: AI,
-    prompt: str,
+    prompt: Prompt,
     files_dict: FilesDict,
     memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
@@ -279,52 +299,96 @@ def improve(
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]
-
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
-    messages.append(HumanMessage(content=f"Request: {prompt}"))
+    messages.append(HumanMessage(content=prompt.to_langchain_content()))
+    memory.log(
+        DEBUG_LOG_FILE,
+        "UPLOADED FILES:\n" + files_dict.to_log() + "\nPROMPT:\n" + prompt.text,
+    )
+    return _improve_loop(ai, files_dict, memory, messages)
+
+
+def _improve_loop(
+    ai: AI, files_dict: FilesDict, memory: BaseMemory, messages: List
+) -> FilesDict:
     problems = []
+
     # check edit correctness
     edit_refinements = 0
     while edit_refinements <= MAX_EDIT_REFINEMENT_STEPS:
         messages = ai.next(messages, step_name=curr_fn())
-        files_dict = salvage_correct_hunks(messages, files_dict, memory, problems)
+        files_dict = salvage_correct_hunks(messages, files_dict, problems, memory)
 
-        if len(problems) > 0:
-            messages.append(
-                HumanMessage(
-                    content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details: "
-                    + "\n".join(problems)
-                    + "\n Please ONLY provide the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
-                )
-            )
-            messages = ai.next(messages, step_name=curr_fn())
-            edit_refinements += 1
-            files_dict = salvage_correct_hunks(messages, files_dict, memory, problems)
+        # if len(problems) > 0:
+        #     messages.append(
+        #         HumanMessage(
+        #             content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details: "
+        #             + "\n".join(problems)
+        #             + "\n Only rewrite the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
+        #         )
+        #     )
+        #     messages = ai.next(messages, step_name=curr_fn())
+        #     edit_refinements += 1
+        #     files_dict = salvage_correct_hunks(messages, files_dict, problems)
         return files_dict
 
 
 def salvage_correct_hunks(
     messages: List,
     files_dict: FilesDict,
-    memory: MutableMapping[str | Path, str],
     error_message: List,
+    memory: BaseMemory,
 ) -> FilesDict:
-    chat = messages[-1].content.strip()
+    ai_response = messages[-1].content.strip()
 
-    diffs = parse_diffs(chat)
-
+    diffs = parse_diffs(ai_response)
     # validate and correct diffs
 
-    for file_name, diff in diffs.items():
+    for _, diff in diffs.items():
         # if diff is a new file, validation and correction is unnecessary
-        if diff.is_new_file():
-            files_dict = apply_diffs(diffs, files_dict)
-        else:
+        if not diff.is_new_file():
             problems = diff.validate_and_correct(
                 file_to_lines_dict(files_dict[diff.filename_pre])
             )
             error_message.extend(problems)
     files_dict = apply_diffs(diffs, files_dict)
-    memory[IMPROVE_LOG_FILE] = chat
+    memory.log(IMPROVE_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
+    memory.log(DIFF_LOG_FILE, "\n\n".join(error_message))
+    return files_dict
+
+
+class Tee(object):
+    def __init__(self, *files):
+        self.files = files
+
+    def write(self, obj):
+        for file in self.files:
+            file.write(obj)
+
+    def flush(self):
+        for file in self.files:
+            file.flush()
+
+
+def handle_improve_mode(prompt, agent, memory, files_dict):
+    captured_output = io.StringIO()
+    old_stdout = sys.stdout
+    sys.stdout = Tee(sys.stdout, captured_output)
+
+    try:
+        files_dict = agent.improve(files_dict, prompt)
+    except Exception as e:
+        print(
+            f"Error while improving the project: {e}\nCould you please upload the debug_log_file.txt in {memory.path} folder to github?"
+        )
+    finally:
+        # Reset stdout
+        sys.stdout = old_stdout
+
+        # Get the captured output
+        captured_string = captured_output.getvalue()
+        print(captured_string)
+        memory.log(DEBUG_LOG_FILE, "\nCONSOLE OUTPUT:\n" + captured_string)
+
     return files_dict

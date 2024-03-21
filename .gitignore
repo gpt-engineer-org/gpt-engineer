@@ -31,8 +31,9 @@ venv_test_installation/
 # Python testing
 .pytest_cache/
 .ruff_cache/
-.coverage
 .mypy_cache/
+.coverage
+coverage.*
 
 # macOS specific files
 .DS_Store
@@ -58,6 +59,7 @@ scratchpad
 projects/*
 !projects/example/prompt
 !projects/example-improve
+!projects/example-vision
 
 # docs
 

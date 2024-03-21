@@ -16,8 +16,8 @@ MEMORY_REL_PATH : str
 CODE_GEN_LOG_FILE : str
     The filename for the log file that contains all output from code generation.
 
-IMPROVE_LOG_FILE : str
-    The filename for the log file that contains all output from code improvement.
+DEBUG_LOG_FILE : str
+    The filename for the log file that contains debug information.
 
 ENTRYPOINT_FILE : str
     The filename for the entrypoint script that is executed to run the application.
@@ -44,8 +44,11 @@ META_DATA_REL_PATH = ".gpteng"
 MEMORY_REL_PATH = os.path.join(META_DATA_REL_PATH, "memory")
 CODE_GEN_LOG_FILE = "all_output.txt"
 IMPROVE_LOG_FILE = "improve.txt"
+DIFF_LOG_FILE = "diff_errors.txt"
+DEBUG_LOG_FILE = "debug_log_file.txt"
 ENTRYPOINT_FILE = "run.sh"
 ENTRYPOINT_LOG_FILE = "gen_entrypoint_chat.txt"
+ENTRYPOINT_FILE = "run.sh"
 PREPROMPTS_PATH = Path(__file__).parent.parent.parent / "preprompts"
 
 
