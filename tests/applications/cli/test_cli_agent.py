@@ -10,6 +10,7 @@ from gpt_engineer.core.default.disk_memory import DiskMemory
 # from gpt_engineer.core.default.git_version_manager import GitVersionManager
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, memory_path
 from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen
 from tests.caching_ai import CachingAI
 
@@ -23,7 +24,9 @@ def test_init_standard_config(monkeypatch):
     outfile = "output.txt"
     os.path.join(temp_dir, outfile)
     code = cli_agent.init(
-        f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
+        Prompt(
+            f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
+        )
     )
 
     env = DiskExecutionEnv()
@@ -46,7 +49,9 @@ def test_init_lite_config(monkeypatch):
     outfile = "output.txt"
     os.path.join(temp_dir, outfile)
     code = cli_agent.init(
-        f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
+        Prompt(
+            f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
+        )
     )
 
     env = DiskExecutionEnv()
@@ -67,7 +72,9 @@ def test_init_clarified_gen_config(monkeypatch):
     )
     outfile = "output.txt"
     code = cli_agent.init(
-        f"Make a program that prints 'Hello World!' to a file called '{outfile} either using python or javascript'"
+        Prompt(
+            f"Make a program that prints 'Hello World!' to a file called '{outfile} either using python or javascript'"
+        )
     )
 
     env = DiskExecutionEnv()
@@ -76,27 +83,6 @@ def test_init_clarified_gen_config(monkeypatch):
 
     assert outfile in code
     assert code[outfile].strip() == "Hello World!"
-
-
-# def test_init_self_heal_config(monkeypatch):
-#     monkeypatch.setattr("builtins.input", lambda _: "y")
-#     temp_dir = tempfile.mkdtemp()
-#     memory = DiskMemory(memory_path(temp_dir))
-#     execution_env = DiskExecutionEnv()
-#     cli_agent = CliAgent.with_default_config(
-#         memory, execution_env, ai=CachingAI(), process_code_fn=self_heal
-#     )
-#     outfile = "output.txt"
-#     file_path = os.path.join(temp_dir, outfile)
-#     code = cli_agent.init(
-#         f"Make a program that prints 'Hello World!' to a file called '{outfile}'. Make an intentional mistake in the code causing a runtime error"
-#     )
-#     env = DiskExecutionEnv()
-#     env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
-#     code = env.download()
-#
-#     assert outfile in code
-#     assert code[outfile].strip() == "Hello World!"
 
 
 def test_improve_standard_config(monkeypatch):
@@ -115,7 +101,9 @@ def test_improve_standard_config(monkeypatch):
     cli_agent = CliAgent.with_default_config(memory, execution_env, ai=CachingAI())
     code = cli_agent.improve(
         code,
-        "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",
+        Prompt(
+            "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'"
+        ),
     )
 
     env = DiskExecutionEnv()

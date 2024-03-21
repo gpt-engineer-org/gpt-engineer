@@ -54,11 +54,14 @@ from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
     DEBUG_LOG_FILE,
+    DIFF_LOG_FILE,
     ENTRYPOINT_FILE,
     ENTRYPOINT_LOG_FILE,
+    IMPROVE_LOG_FILE,
 )
 from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.prompt import Prompt
 
 
 def curr_fn() -> str:
@@ -120,7 +123,7 @@ def setup_sys_prompt_existing_code(
 
 
 def gen_code(
-    ai: AI, prompt: str, memory: BaseMemory, preprompts_holder: PrepromptsHolder
+    ai: AI, prompt: Prompt, memory: BaseMemory, preprompts_holder: PrepromptsHolder
 ) -> FilesDict:
     """
     Generates code from a prompt using AI and returns the generated files.
@@ -142,15 +145,18 @@ def gen_code(
         A dictionary of file names to their respective source code content.
     """
     preprompts = preprompts_holder.get_preprompts()
-    messages = ai.start(setup_sys_prompt(preprompts), prompt, step_name=curr_fn())
+    messages = ai.start(
+        setup_sys_prompt(preprompts), prompt.to_langchain_content(), step_name=curr_fn()
+    )
     chat = messages[-1].content.strip()
-    memory[CODE_GEN_LOG_FILE] = chat
+    memory.log(CODE_GEN_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
     files_dict = chat_to_files_dict(chat)
     return files_dict
 
 
 def gen_entrypoint(
     ai: AI,
+    prompt: Prompt,
     files_dict: FilesDict,
     memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
@@ -174,10 +180,19 @@ def gen_entrypoint(
     FilesDict
         A dictionary containing the entrypoint file.
     """
+    user_prompt = prompt.entrypoint_prompt
+    if not user_prompt:
+        user_prompt = """
+        Make a unix script that
+        a) installs dependencies
+        b) runs all necessary parts of the codebase (in parallel if necessary)
+        """
     preprompts = preprompts_holder.get_preprompts()
     messages = ai.start(
         system=(preprompts["entrypoint"]),
-        user="Information about the codebase:\n\n" + files_dict.to_chat(),
+        user=user_prompt
+        + "\nInformation about the codebase:\n\n"
+        + files_dict.to_chat(),
         step_name=curr_fn(),
     )
     print()
@@ -187,7 +202,7 @@ def gen_entrypoint(
     entrypoint_code = FilesDict(
         {ENTRYPOINT_FILE: "\n".join(match.group(1) for match in matches)}
     )
-    memory[ENTRYPOINT_LOG_FILE] = chat
+    memory.log(ENTRYPOINT_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
     return entrypoint_code
 
 
@@ -195,7 +210,9 @@ def execute_entrypoint(
     ai: AI,
     execution_env: BaseExecutionEnv,
     files_dict: FilesDict,
+    prompt: Prompt = None,
     preprompts_holder: PrepromptsHolder = None,
+    memory: BaseMemory = None,
 ) -> FilesDict:
     """
     Executes the entrypoint of the codebase.
@@ -255,9 +272,9 @@ def execute_entrypoint(
     return files_dict
 
 
-def improve(
+def improve_fn(
     ai: AI,
-    prompt: str,
+    prompt: Prompt,
     files_dict: FilesDict,
     memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
@@ -289,9 +306,10 @@ def improve(
     ]
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
-    messages.append(HumanMessage(content=f"Request: {prompt}"))
-    memory[DEBUG_LOG_FILE] = (
-        "UPLOADED FILES:\n" + files_dict.to_chat() + "\nPROMPT:\n" + prompt
+    messages.append(HumanMessage(content=prompt.to_langchain_content()))
+    memory.log(
+        DEBUG_LOG_FILE,
+        "UPLOADED FILES:\n" + files_dict.to_log() + "\nPROMPT:\n" + prompt.text,
     )
     return _improve_loop(ai, files_dict, memory, messages)
 
@@ -305,19 +323,19 @@ def _improve_loop(
     edit_refinements = 0
     while edit_refinements <= MAX_EDIT_REFINEMENT_STEPS:
         messages = ai.next(messages, step_name=curr_fn())
-        files_dict = salvage_correct_hunks(messages, files_dict, problems)
+        files_dict = salvage_correct_hunks(messages, files_dict, problems, memory)
 
-        if len(problems) > 0:
-            messages.append(
-                HumanMessage(
-                    content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details: "
-                    + "\n".join(problems)
-                    + "\n Please FOCUS ON the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
-                )
-            )
-            messages = ai.next(messages, step_name=curr_fn())
-            edit_refinements += 1
-            files_dict = salvage_correct_hunks(messages, files_dict, problems)
+        # if len(problems) > 0:
+        #     messages.append(
+        #         HumanMessage(
+        #             content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details: "
+        #             + "\n".join(problems)
+        #             + "\n Only rewrite the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
+        #         )
+        #     )
+        #     messages = ai.next(messages, step_name=curr_fn())
+        #     edit_refinements += 1
+        #     files_dict = salvage_correct_hunks(messages, files_dict, problems)
         return files_dict
 
 
@@ -325,14 +343,14 @@ def salvage_correct_hunks(
     messages: List,
     files_dict: FilesDict,
     error_message: List,
+    memory: BaseMemory,
 ) -> FilesDict:
-    chat = messages[-1].content.strip()
+    ai_response = messages[-1].content.strip()
 
-    diffs = parse_diffs(chat)
-
+    diffs = parse_diffs(ai_response)
     # validate and correct diffs
 
-    for file_name, diff in diffs.items():
+    for _, diff in diffs.items():
         # if diff is a new file, validation and correction is unnecessary
         if not diff.is_new_file():
             try:
@@ -343,6 +361,8 @@ def salvage_correct_hunks(
                 raise DiffError
             error_message.extend(problems)
     files_dict = apply_diffs(diffs, files_dict)
+    memory.log(IMPROVE_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
+    memory.log(DIFF_LOG_FILE, "\n\n".join(error_message))
     return files_dict
 
 
@@ -367,8 +387,9 @@ def handle_improve_mode(prompt, agent, memory, files_dict):
     try:
         files_dict = agent.improve(files_dict, prompt)
     except Exception as e:
-        print(f"Error while improving the project: {e}")
-        files_dict = None
+        print(
+            f"Error while improving the project: {e}\nCould you please upload the debug_log_file.txt in {memory.path} folder to github?"
+        )
     finally:
         # Reset stdout
         sys.stdout = old_stdout
@@ -376,6 +397,6 @@ def handle_improve_mode(prompt, agent, memory, files_dict):
         # Get the captured output
         captured_string = captured_output.getvalue()
         print(captured_string)
-        memory[DEBUG_LOG_FILE] += "\nCONSOLE OUTPUT:\n" + captured_string
+        memory.log(DEBUG_LOG_FILE, "\nCONSOLE OUTPUT:\n" + captured_string)
 
     return files_dict

@@ -26,7 +26,7 @@ import re
 
 from typing import Dict, Tuple
 
-import regex
+from regex import regex
 
 from gpt_engineer.core.diff import ADD, REMOVE, RETAIN, Diff, Hunk
 from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
@@ -81,6 +81,7 @@ def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
     Returns:
     - FilesDict: The updated files after applying diffs.
     """
+    files = FilesDict(files.copy())
     REMOVE_FLAG = "<REMOVE_LINE>"  # Placeholder to mark lines for removal
     for diff in diffs.values():
         if diff.is_new_file():
@@ -106,16 +107,10 @@ def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
                             line_dict[current_line] += "\n" + line[1]
                         else:
                             line_dict[current_line] = line[1]
-                        print(
-                            f"\nAdded line {line[1]} to {diff.filename_post} at line {current_line} end"
-                        )
                         current_line += 1
                     elif line[0] == REMOVE:
                         # Mark removed lines with REMOVE_FLAG
                         line_dict[current_line] = REMOVE_FLAG
-                        print(
-                            f"\nRemoved line {line[1]} from {diff.filename_post} at line {current_line}"
-                        )
                         current_line += 1
 
             # Remove lines marked for removal
@@ -153,7 +148,7 @@ def parse_diffs(diff_string: str) -> dict:
             # Parse individual diff blocks and update the diffs dictionary
             diffs.update(parse_diff_block(diff_block))
     except TimeoutError:
-        raise DiffError("`diff_block_pattern.finditer` has timed out")
+        print("gpt-engineer timed out while parsing git diff")
 
     if not diffs:
         raise DiffError(

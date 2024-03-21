@@ -30,10 +30,11 @@ python-dotenv = ">=0.21.0"
 langchain = "^0.1"
 langchain_openai = "*"
 toml = ">=0.10.2"
+tomlkit = "^0.12.4"
 pyperclip = "^1.8.2"
 langchain-anthropic = "^0.1.1"
-datasets = "^2.17.1"
 regex = "^2023.12.25"
+pillow = "^10.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.3.1"

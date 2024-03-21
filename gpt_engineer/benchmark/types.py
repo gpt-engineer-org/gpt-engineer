@@ -26,6 +26,7 @@ from typing import Callable, List, Optional, OrderedDict
 
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.prompt import Prompt
 
 
 @dataclass
@@ -56,7 +57,7 @@ class Task:
     name: str
     initial_code: Optional[FilesDict]
     command: Optional[str]
-    prompt: str
+    prompt: Prompt
     assertions: Optional[List[OrderedDict[str, Assertion]]]
 
 

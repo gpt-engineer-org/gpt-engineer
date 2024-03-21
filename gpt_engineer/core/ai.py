@@ -19,7 +19,7 @@ import logging
 import os
 
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 
 import backoff
 import openai
@@ -86,10 +86,11 @@ class AI:
 
     def __init__(
         self,
-        model_name="gpt-4-1106-preview",
+        model_name="gpt-4-0125-preview",
         temperature=0.1,
-        azure_endpoint="",
+        azure_endpoint=None,
         streaming=True,
+        vision=False,
     ):
         """
         Initialize the AI class.
@@ -105,12 +106,13 @@ class AI:
         self.azure_endpoint = azure_endpoint
         self.model_name = model_name
         self.streaming = streaming
+        self.vision = "vision" in model_name
         self.llm = self._create_chat_model()
         self.token_usage_log = TokenUsageLog(model_name)
 
         logger.debug(f"Using model {self.model_name}")
 
-    def start(self, system: str, user: str, step_name: str) -> List[Message]:
+    def start(self, system: str, user: Any, *, step_name: str) -> List[Message]:
         """
         Start the conversation with a system message and a user message.
 
@@ -134,6 +136,67 @@ class AI:
             HumanMessage(content=user),
         ]
         return self.next(messages, step_name=step_name)
+
+    def _extract_content(self, content):
+        """
+        Extracts text content from a message, supporting both string and list types.
+        Parameters
+        ----------
+        content : Union[str, List[dict]]
+            The content of a message, which could be a string or a list.
+        Returns
+        -------
+        str
+            The extracted text content.
+        """
+        if isinstance(content, str):
+            return content
+        elif isinstance(content, list) and content and "text" in content[0]:
+            # Assuming the structure of list content is [{'type': 'text', 'text': 'Some text'}, ...]
+            return content[0]["text"]
+        else:
+            return ""
+
+    def _collapse_text_messages(self, messages: List[Message]):
+        """
+        Combine consecutive messages of the same type into a single message, where if the message content
+        is a list type, the first text element's content is taken. This method keeps `combined_content` as a string.
+
+        This method iterates through the list of messages, combining consecutive messages of the same type
+        by joining their content with a newline character. If the content is a list, it extracts text from the first
+        text element's content. This reduces the number of messages and simplifies the conversation for processing.
+
+        Parameters
+        ----------
+        messages : List[Message]
+            The list of messages to collapse.
+
+        Returns
+        -------
+        List[Message]
+            The list of messages after collapsing consecutive messages of the same type.
+        """
+        collapsed_messages = []
+        if not messages:
+            return collapsed_messages
+
+        previous_message = messages[0]
+        combined_content = self._extract_content(previous_message.content)
+
+        for current_message in messages[1:]:
+            if current_message.type == previous_message.type:
+                combined_content += "\n\n" + self._extract_content(
+                    current_message.content
+                )
+            else:
+                collapsed_messages.append(
+                    previous_message.__class__(content=combined_content)
+                )
+                previous_message = current_message
+                combined_content = self._extract_content(current_message.content)
+
+        collapsed_messages.append(previous_message.__class__(content=combined_content))
+        return collapsed_messages
 
     def next(
         self,
@@ -164,9 +227,13 @@ class AI:
         if prompt:
             messages.append(HumanMessage(content=prompt))
 
-        logger.debug(f"Creating a new chat completion: {messages}")
+        logger.debug(
+            "Creating a new chat completion: %s",
+            "\n".join([m.pretty_repr() for m in messages]),
+        )
 
-        messages = self._collapse_messages(messages)
+        if not self.vision:
+            messages = self._collapse_text_messages(messages)
 
         response = self.backoff_inference(messages)
 
@@ -177,44 +244,6 @@ class AI:
         logger.debug(f"Chat completion finished: {messages}")
 
         return messages
-
-    def _collapse_messages(self, messages: List[Message]):
-        """
-        Combine consecutive messages of the same type into a single message.
-
-        This method iterates through the list of messages, combining consecutive messages of the same type
-        by joining their content with a newline character. This reduces the number of messages and simplifies
-        the conversation for processing.
-
-        Parameters
-        ----------
-        messages : List[Message]
-            The list of messages to collapse.
-
-        Returns
-        -------
-        List[Message]
-            The list of messages after collapsing consecutive messages of the same type.
-        """
-        collapsed_messages = []
-        if not messages:
-            return collapsed_messages
-
-        previous_message = messages[0]
-        combined_content = previous_message.content
-
-        for current_message in messages[1:]:
-            if current_message.type == previous_message.type:
-                combined_content += "\n\n" + current_message.content
-            else:
-                collapsed_messages.append(
-                    previous_message.__class__(content=combined_content)
-                )
-                previous_message = current_message
-                combined_content = current_message.content
-
-        collapsed_messages.append(previous_message.__class__(content=combined_content))
-        return collapsed_messages
 
     @backoff.on_exception(backoff.expo, openai.RateLimitError, max_tries=7, max_time=45)
     def backoff_inference(self, messages):
@@ -317,6 +346,24 @@ class AI:
                 openai_api_type="azure",
                 streaming=self.streaming,
                 callbacks=[StreamingStdOutCallbackHandler()],
+            )
+
+        if self.vision:
+            return ChatOpenAI(
+                model=self.model_name,
+                temperature=self.temperature,
+                streaming=self.streaming,
+                callbacks=[StreamingStdOutCallbackHandler()],
+                max_tokens=4096,  # vision models default to low max token limits
+            )
+
+        if "claude" in self.model_name:
+            return ChatAnthropic(
+                model=self.model_name,
+                temperature=self.temperature,
+                callbacks=[StreamingStdOutCallbackHandler()],
+                streaming=True,
+                max_tokens_to_sample=4096,
             )
 
         if "claude" in self.model_name:

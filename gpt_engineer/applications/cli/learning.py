@@ -16,7 +16,7 @@ check_collection_consent() -> bool
     Checks if the user has previously given consent to store their data and, if not, asks for it.
 ask_collection_consent() -> bool
     Prompts the user for consent to store their data for the purpose of improving GPT Engineer.
-extract_learning(prompt: str, model: str, temperature: float, config: Tuple[str, ...], memory: DiskMemory, review: Review) -> Learning
+extract_learning(prompt: Prompt, model: str, temperature: float, config: Tuple[str, ...], memory: DiskMemory, review: Review) -> Learning
     Extracts feedback and session details to create a Learning instance based on the provided parameters.
 get_session() -> str
     Retrieves a unique identifier for the current user session, creating one if it does not exist.
@@ -40,6 +40,7 @@ from dataclasses_json import dataclass_json
 from termcolor import colored
 
 from gpt_engineer.core.default.disk_memory import DiskMemory
+from gpt_engineer.core.prompt import Prompt
 
 
 @dataclass_json
@@ -97,7 +98,7 @@ class Learning:
         The version of the learning data schema.
     """
 
-    prompt: str
+    prompt: Prompt
     model: str
     temperature: float
     config: str
@@ -116,8 +117,6 @@ TERM_CHOICES = (
     + colored("u", "yellow")
     + "(ncertain): "
 )
-
-VALID_INPUTS = ("y", "n", "u")
 
 
 def human_review_input() -> Optional[Review]:
@@ -141,17 +140,17 @@ def human_review_input() -> Optional[Review]:
     print()
 
     ran = input("Did the generated code run at all? " + TERM_CHOICES)
-    ran = ask_for_valid_input(ran, VALID_INPUTS)
+    ran = ask_for_valid_input(ran)
 
     if ran == "y":
         perfect = input(
             "Did the generated code do everything you wanted? " + TERM_CHOICES
         )
-        perfect = ask_for_valid_input(perfect, VALID_INPUTS)
+        perfect = ask_for_valid_input(perfect)
 
         if perfect != "y":
             useful = input("Did the generated code do anything useful? " + TERM_CHOICES)
-            useful = ask_for_valid_input(useful, VALID_INPUTS)
+            useful = ask_for_valid_input(useful)
         else:
             useful = ""
     else:
@@ -175,8 +174,8 @@ def human_review_input() -> Optional[Review]:
     )
 
 
-def ask_for_valid_input(ran, valid_inputs):
-    while ran not in valid_inputs:
+def ask_for_valid_input(ran):
+    while ran not in ("y", "n", "u"):
         ran = input("Invalid input. Please enter y, n, or u: ")
     return ran
 
@@ -236,7 +235,7 @@ def ask_collection_consent() -> bool:
 
 
 def extract_learning(
-    prompt: str,
+    prompt: Prompt,
     model: str,
     temperature: float,
     config: Tuple[str, ...],
