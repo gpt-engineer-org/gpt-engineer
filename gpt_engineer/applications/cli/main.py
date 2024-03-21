@@ -55,12 +55,7 @@ from gpt_engineer.core.default.steps import (
     improve_fn as improve_fn,
 )
 from gpt_engineer.core.files_dict import FilesDict
-from gpt_engineer.core.git import (
-    init_git_repo,
-    is_git_installed,
-    is_git_repo,
-    stage_uncommitted_to_git,
-)
+from gpt_engineer.core.git import stage_uncommitted_to_git
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
@@ -222,16 +217,21 @@ def compare(f1: FilesDict, f2: FilesDict):
         return "\n".join(colored_lines)
 
     for file in sorted(set(f1) | set(f2)):
-        print(f"Changes to {file}:")
         diff = colored_diff(f1.get(file, ""), f2.get(file, ""))
-        print(diff)
+        if diff:
+            print(f"Changes to {file}:")
+            print(diff)
 
 
 def prompt_yesno() -> bool:
     TERM_CHOICES = colored("y", "green") + "/" + colored("n", "red") + " "
-    while answer := input(TERM_CHOICES).strip().lower() not in ["y", "yes", "n", "no"]:
+    while True:
+        response = input(TERM_CHOICES).strip().lower()
+        if response in ["y", "yes"]:
+            return True
+        if response in ["n", "no"]:
+            break
         print("Please respond with 'y' or 'n'")
-    return answer in ["y", "yes"]
 
 
 @app.command(
@@ -397,13 +397,6 @@ def main(
 
     path = Path(project_path)
     print("Running gpt-engineer in", path.absolute(), "\n")
-
-    prompt = load_prompt(DiskMemory(path), improve_mode, prompt_file, image_directory)
-    # Check if there's a git repo and verify that there aren't any uncommitted changes
-    if is_git_installed():
-        if not is_git_repo(path) and not improve_mode:
-            print("Initializing an empty git repository")
-            init_git_repo(path)
 
     prompt = load_prompt(
         DiskMemory(path),
