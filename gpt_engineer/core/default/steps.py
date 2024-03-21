@@ -44,12 +44,7 @@ from termcolor import colored
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.base_memory import BaseMemory
-from gpt_engineer.core.chat_to_files import (
-    DiffError,
-    apply_diffs,
-    chat_to_files_dict,
-    parse_diffs,
-)
+from gpt_engineer.core.chat_to_files import apply_diffs, chat_to_files_dict, parse_diffs
 from gpt_engineer.core.default.constants import MAX_EDIT_REFINEMENT_STEPS
 from gpt_engineer.core.default.paths import (
     CODE_GEN_LOG_FILE,
@@ -353,12 +348,9 @@ def salvage_correct_hunks(
     for _, diff in diffs.items():
         # if diff is a new file, validation and correction is unnecessary
         if not diff.is_new_file():
-            try:
-                problems = diff.validate_and_correct(
-                    file_to_lines_dict(files_dict[diff.filename_pre])
-                )
-            except KeyError:
-                raise DiffError
+            problems = diff.validate_and_correct(
+                file_to_lines_dict(files_dict[diff.filename_pre])
+            )
             error_message.extend(problems)
     files_dict = apply_diffs(diffs, files_dict)
     memory.log(IMPROVE_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))

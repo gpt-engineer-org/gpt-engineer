@@ -35,10 +35,6 @@ from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
 logger = logging.getLogger(__name__)
 
 
-class DiffError(ValueError):
-    pass
-
-
 def chat_to_files_dict(chat: str) -> FilesDict:
     """
     Converts a chat string containing file paths and code blocks into a FilesDict object.
@@ -151,9 +147,8 @@ def parse_diffs(diff_string: str) -> dict:
         print("gpt-engineer timed out while parsing git diff")
 
     if not diffs:
-        raise DiffError(
-            "GPT did not provide any proposed changes. "
-            "Please try to reselect the files for uploading and edit your prompt file."
+        print(
+            "GPT did not provide any proposed changes. Please try to reselect the files for uploading and edit your prompt file."
         )
 
     return diffs

@@ -18,7 +18,6 @@ from typing import List, Optional
 
 from gpt_engineer.benchmark.types import Assertable, Benchmark, TaskResult
 from gpt_engineer.core.base_agent import BaseAgent
-from gpt_engineer.core.chat_to_files import DiffError
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 
 
@@ -54,7 +53,7 @@ def run(
         t0 = time.time()
         try:
             files_dict = agent.improve(task.initial_code, task.prompt)
-        except DiffError:  # Temporary catch errors related to git diffs
+        except RecursionError:  # Temporary catch errors related to git diffs
             task_results.append(
                 TaskResult(
                     task_name=task.name,
