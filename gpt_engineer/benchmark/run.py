@@ -59,7 +59,7 @@ def run(
                 TaskResult(
                     task_name=task.name,
                     duration=time.time() - t0,
-                    assertion_results=[],
+                    assertion_results={},
                 )
             )
             continue
@@ -86,13 +86,10 @@ def run(
         task_results.append(
             TaskResult(
                 task_name=task.name,
-                assertion_results=[
-                    {
-                        key: assertion(exec_result)
-                        for key, assertion in task.assertions[i].items()
-                    }
-                    for i in range(len(task.assertions))
-                ],
+                assertion_results={
+                    assertion_name: assertion(exec_result)
+                    for assertion_name, assertion in task.assertions.items()
+                },
                 duration=t1 - t0,
             )
         )
@@ -118,11 +115,9 @@ def print_results(results: list[TaskResult]):
     for task_result in results:
         print(f"\n--- Results for {task_result.task_name} ---")
         print(f"{task_result.task_name} ({task_result.duration:.2f}s)")
-        for assertion_results_dict in task_result.assertion_results:
-            for assertion_name, assertion_result in assertion_results_dict.items():
-                checkmark = "✅" if assertion_result else "❌"
-                print(f"  {checkmark} {assertion_name}")
-            print()
+        for assertion_name, assertion_result in task_result.assertion_results.items():
+            checkmark = "✅" if assertion_result else "❌"
+            print(f"  {checkmark} {assertion_name}")
         print()
 
     success_rates = [task_result.success_rate for task_result in results]
@@ -133,15 +128,12 @@ def print_results(results: list[TaskResult]):
     correct_assertions = sum(
         sum(
             assertion_result
-            for assertion_results_dict in task_result.assertion_results
-            for assertion_result in assertion_results_dict.values()
+            for assertion_result in task_result.assertion_results.values()
         )
         for task_result in results
     )
     total_assertions = sum(
-        len(assertion_results_dict)
-        for task_result in results
-        for assertion_results_dict in task_result.assertion_results
+        len(task_result.assertion_results) for task_result in results
     )
     correct_tasks = [
         task_result for task_result in results if task_result.success_rate == 1

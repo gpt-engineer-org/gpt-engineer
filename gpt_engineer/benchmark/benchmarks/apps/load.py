@@ -10,7 +10,6 @@ Functions
 load_apps : function
     Loads the APPS benchmark, which consists of a series coding problems.
 """
-from collections import OrderedDict
 from pathlib import Path
 from subprocess import TimeoutExpired
 from typing import Union
@@ -21,6 +20,7 @@ from gpt_engineer.benchmark.benchmarks.apps.problem import Problem
 from gpt_engineer.benchmark.benchmarks.apps.problems import PROBLEM_IDS
 from gpt_engineer.benchmark.types import Assertable, Benchmark, Task
 from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.prompt import Prompt
 
 DATASET_PATH = Path("gpt_engineer/benchmark/benchmarks/apps/dataset")
 MAX_N_TEST_EXAMPLES = 10
@@ -82,29 +82,26 @@ def load_apps():
     ]
 
     for problem in problems:
+        prompt = Prompt(
+            problem.question
+            + "\nThe program, including its inputs, should be run from the command "
+            "line like 'python main \"input1 input2 etc \"', with all inputs inside "
+            "the quotation marks. The program should not read inputs from stdin."
+        )
+
         tasks.append(
             Task(
                 name=str(problem.id),
                 initial_code=FilesDict({"main.py": problem.starter_code}),
                 command=None,  # Explicitly setting `None` because each assertion specifies its command
-                prompt=problem.question
-                + "\nThe program, including its inputs, should be run from the command "
-                "line like 'python main \"input1 input2 etc \"', with all inputs inside "
-                "the quotation marks. The program should not read inputs from stdin.",
-                assertions=[
-                    OrderedDict(
-                        {
-                            "correct output": AppsAssertion(
-                                expected=problem.outputs[i],
-                                command="python main.py"
-                                + ' "'
-                                + problem.inputs[i]
-                                + '"',
-                            ).evaluate
-                        }
-                    )
+                prompt=prompt,
+                assertions={
+                    f"correct output {i}": AppsAssertion(
+                        expected=problem.outputs[i],
+                        command="python main.py" + ' "' + problem.inputs[i] + '"',
+                    ).evaluate
                     for i in range(min(len(problem.outputs), MAX_N_TEST_EXAMPLES))
-                ],
+                },
             )
         )
 
