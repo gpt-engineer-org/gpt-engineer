@@ -53,4 +53,4 @@ python examples/test_open_llm/test_langchain.py
 
 If you're not using `CodeLLama` make sure to change the `model` parameter in the test script.
 
-That's it 🤓 time to go back [to](/docs/open_models.md) and give `gpte` a try.
+That's it 🤓 time to go back [to](/docs/open_models.md#running-the-example) and give `gpte` a try.
