@@ -19,6 +19,7 @@ from datasets import Dataset, DatasetDict, load_dataset, load_from_disk
 from gpt_engineer.benchmark.benchmarks.apps.problem import Problem
 from gpt_engineer.benchmark.benchmarks.apps.problems import PROBLEM_IDS
 from gpt_engineer.benchmark.types import Assertable, Benchmark, Task
+from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.prompt import Prompt
 
@@ -32,7 +33,10 @@ class AppsAssertion:
         self.command = command
 
     def evaluate(self, assertable: Assertable) -> bool:
-        pro = assertable.env.popen(self.command)
+        # Create new execution environment for every run to avoid side effects
+        env = DiskExecutionEnv()
+        env.upload(assertable.files)
+        pro = env.popen(self.command)
         try:
             stdout, stderr = pro.communicate(timeout=2)
             stdout, stderr = stdout.decode("utf-8"), stderr.decode("utf-8")
