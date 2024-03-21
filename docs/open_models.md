@@ -1,32 +1,43 @@
 Using with open/local models
 ============================
 
+**Use `gpte` first with OpenAI models to get a feel for the `gpte` tool. Then go play with experimental Open LLMs 🐉 support and try not to get 🔥!!**
+
 At the moment the best option for coding is still the use of `gpt-4` models provided by OpenAI. But open models are catching up and are a good free and privacy-oriented alternative if you possess the proper hardware.
 
 You can integrate `gpt-engineer` with open-source models by leveraging an OpenAI-compatible API.
 
-We provide the minimal and cleanest solution below. It's not the only way to use open/local models but the one we recommend and tested.
+We provide the minimal and cleanest solution below. What is described is not the only way to use open/local models but the one we tested and would recommend to most users.
+
+More details on why the solution below is recommended in [this blog post](https://zigabrencic.com/blog/2024-02-21).
 
 Setup
 -----
 
-For inference engine we recommend to the users to use [llama.cpp](https://github.com/ggerganov/llama.cpp) with its `python` bindings `llama-cpp-python`. We choose `llama.cpp` because it supports the largest amount of hardware acceleration backends.
+For inference engine we recommend for the users to use [llama.cpp](https://github.com/ggerganov/llama.cpp) with its `python` bindings `llama-cpp-python`. 
+
+We choose `llama.cpp` because:
+
+- 1.) It supports the largest amount of hardware acceleration backends.
+- 2.) Diverse set of open LLM.
+- 3.) Is written in `python` and directly on top of `llama.cpp` inference engine.
+- 4.) Supports the `openAI` API and `langchain` interface.
 
 To install `llama-cpp-python` follow the official [installation docs](https://llama-cpp-python.readthedocs.io/en/latest/) and for [MacOS with Metal support](https://llama-cpp-python.readthedocs.io/en/latest/install/macos/).
 
-If you want to have benefit from proper hardware acceleration on your machine make sure to set up the proper compile flags:
+If you want to benefit from proper hardware acceleration on your machine make sure to set up the proper compiler flags before installing your package.
 
 - `linux`: `CMAKE_ARGS="-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS"`
 - `macos` with Metal support: `CMAKE_ARGS="-DLLAMA_METAL=on"`
 - `windows`: `$env:CMAKE_ARGS = "-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS"`
 
-Before running:
+Then run:
 
 ```bash
 pip install llama-cpp-python
 ```
 
-For the use of `API` we also need to set up the web server:
+For the use of `API` we also need to set up the web server that `llama-cpp-python` library provides. To install:
 
 ```bash
 pip install 'llama-cpp-python[server]'
@@ -34,46 +45,65 @@ pip install 'llama-cpp-python[server]'
 
 For detailed use consult the [`llama-cpp-python` docs](https://llama-cpp-python.readthedocs.io/en/latest/server/). 
 
-Before we proceed we need to obtain the model weights in the `gguf` format. In case you have weights in other formats check the `llama-cpp-python` docs for conversion to `gguf` format.
+Before we proceed we need to obtain the model weights in the `gguf` format. That should be a single file on your disk.
+
+In case you have weights in other formats check the `llama-cpp-python` docs for conversion to `gguf` format. Model in other formats `ggml`, `.safetensors`, etc. won't work without prior conversion to `gguf` file format!
 
 Which open model to use
 ==================
 
 Your best choice would be:
 
-- [CodeLlama](examples/CodeLlama2.py)
+- CodeLlama 70B
 - Mixtral 8x7B
 
-But to first test the setup go and download weights [CodeLlama-7B-GGUF by the `TheBloke`](https://huggingface.co/TheBloke/CodeLlama-7B-GGUF). Once that works feel free to try out larger models on your hardware and see what happens.
+We are still testing this part, but the larger the model you can run the better. Sure the responses might be slower in terms of (token/s), but code quality will be higher.
 
-On number of parameters
--------------------
+For testing that the open LLM `gpte` setup works we recommend starting with a smaller model. You can download weights of [CodeLlama-7B-GGUF by the `TheBloke`](https://huggingface.co/TheBloke/CodeLlama-7B-GGUF). 
 
-Use the largest model possible that your hardware allows you to run. Sure the responses might be slower but code quality higher.
+Feel free to try out larger models on your hardware and see what happens.
 
 Running the Example
 ==================
 
-To see that your setup works see [test open LLM](examples/test_open_llm/README.md). 
+To see that your setup works check [test open LLM](examples/test_open_llm/README.md). In case below isn't clear enough do the same 😉
 
-If the tests work, run the LLM in separate terminal:
+If above tests work proceed.
+
+For checking that `gpte` works with the `CodeLLama` we recommend for you to create a project with `prompt` file content:
+
+```
+Write a python script that sums up two numbers. Provide only the `sum_two_numbers` function and nothing else.
+
+Provide two tests:
+
+assert(sum_two_numbers(100, 10) == 110)
+assert(sum_two_numbers(10.1, 10) == 20.1)
+```
+
+Now run the LLM in separate terminal:
 
 ```bash
 python -m llama_cpp.server --model $model_path --n_batch 256 --n_gpu_layers 30
 ```
 
-Then run `gpt-engineer` with the following environment variables:
+Then in another terminal window set following environment variables:
 
 ```bash
 export OPENAI_API_BASE="http://localhost:8000/v1"
 export OPENAI_API_KEY="sk-xxx"
-export model_name="llama2"
+export model_name="CodeLLama"
 
+
+And run `gpt-engineer` with the following command:
+
+```bash
 gpte <project_dir> $model_name --lite --temperature 0.1
 ```
 
-On other inference libraries
--------------------
+The `--lite` mode is needed for now since open models for some reason behave worse with too many instructions at the moment. Temperature is set to `0.1` to get consistent best possible results.
+
+*That's it. If sth. doesn't work as expected or you figure out how to improve the open LLM support please let us know.*  
 
 Using Azure models
 ==================
