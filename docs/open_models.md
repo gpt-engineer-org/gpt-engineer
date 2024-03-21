@@ -16,7 +16,7 @@ More details on why the solution below is recommended in [this blog post](https:
 Setup
 -----
 
-For inference engine we recommend for the users to use [llama.cpp](https://github.com/ggerganov/llama.cpp) with its `python` bindings `llama-cpp-python`. 
+For inference engine we recommend for the users to use [llama.cpp](https://github.com/ggerganov/llama.cpp) with its `python` bindings `llama-cpp-python`.
 
 We choose `llama.cpp` because:
 
@@ -47,11 +47,11 @@ For our use case we also need to set up the web server that `llama-cpp-python` l
 pip install 'llama-cpp-python[server]'
 ```
 
-For detailed use consult the [`llama-cpp-python` docs](https://llama-cpp-python.readthedocs.io/en/latest/server/). 
+For detailed use consult the [`llama-cpp-python` docs](https://llama-cpp-python.readthedocs.io/en/latest/server/).
 
 Before we proceed we need to obtain the model weights in the `gguf` format. That should be a single file on your disk.
 
-In case you have weights in other formats check the `llama-cpp-python` docs for conversion to `gguf` format. 
+In case you have weights in other formats check the `llama-cpp-python` docs for conversion to `gguf` format.
 
 Models in other formats `ggml`, `.safetensors`, etc. won't work without prior conversion to `gguf` file format with the solution described below!
 
@@ -65,14 +65,14 @@ Your best choice would be:
 
 We are still testing this part, but the larger the model you can run the better. Sure the responses might be slower in terms of (token/s), but code quality will be higher.
 
-For testing that the open LLM `gpte` setup works we recommend starting with a smaller model. You can download weights of [CodeLlama-13B-GGUF by the `TheBloke`](https://huggingface.co/TheBloke/CodeLlama-13B-GGUF) choose the largest model version you can run (for example `Q6_K`), since quantisation will degrade LLM performance. 
+For testing that the open LLM `gpte` setup works we recommend starting with a smaller model. You can download weights of [CodeLlama-13B-GGUF by the `TheBloke`](https://huggingface.co/TheBloke/CodeLlama-13B-GGUF) choose the largest model version you can run (for example `Q6_K`), since quantisation will degrade LLM performance.
 
 Feel free to try out larger models on your hardware and see what happens.
 
 Running the Example
 ==================
 
-To see that your setup works check [test open LLM setup](examples/test_open_llm/README.md). 
+To see that your setup works check [test open LLM setup](examples/test_open_llm/README.md).
 
 If above tests work proceed 😉
 
@@ -111,7 +111,7 @@ The `--lite` mode is needed for now since open models for some reason behave wor
 
 That's it.
 
-*If sth. doesn't work as expected, or you figure out how to improve the open LLM support please let us know.*  
+*If sth. doesn't work as expected, or you figure out how to improve the open LLM support please let us know.*
 
 Using Azure models
 ==================
