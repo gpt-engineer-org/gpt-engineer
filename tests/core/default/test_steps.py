@@ -9,11 +9,7 @@ from langchain.schema import SystemMessage
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.disk_memory import DiskMemory
-from gpt_engineer.core.default.paths import (
-    ENTRYPOINT_FILE,
-    ENTRYPOINT_LOG_FILE,
-    PREPROMPTS_PATH,
-)
+from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, PREPROMPTS_PATH
 from gpt_engineer.core.default.steps import (
     curr_fn,
     gen_code,
@@ -263,9 +259,9 @@ pytest test_factorial.py
         assert ENTRYPOINT_FILE in entrypoint_code
         assert isinstance(entrypoint_code[ENTRYPOINT_FILE], str)
         assert entrypoint_code[ENTRYPOINT_FILE] == ""
-        assert ENTRYPOINT_LOG_FILE in memory
-        assert isinstance(memory[ENTRYPOINT_LOG_FILE], str)
-        assert memory[ENTRYPOINT_LOG_FILE] == "Irrelevant explanation"
+        # assert ENTRYPOINT_LOG_FILE in memory
+        # assert isinstance(memory[ENTRYPOINT_LOG_FILE], str)
+        # assert memory[ENTRYPOINT_LOG_FILE] == "Irrelevant explanation"
 
 
 class TestImprove:

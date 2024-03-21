@@ -302,8 +302,9 @@ def improve_fn(
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=prompt.to_langchain_content()))
-    memory[DEBUG_LOG_FILE] = (
-        "UPLOADED FILES:\n" + files_dict.to_log() + "\nPROMPT:\n" + prompt.text
+    memory.log(
+        DEBUG_LOG_FILE,
+        "UPLOADED FILES:\n" + files_dict.to_log() + "\nPROMPT:\n" + prompt.text,
     )
     return _improve_loop(ai, files_dict, memory, messages)
 
@@ -388,6 +389,6 @@ def handle_improve_mode(prompt, agent, memory, files_dict):
         # Get the captured output
         captured_string = captured_output.getvalue()
         print(captured_string)
-        memory[DEBUG_LOG_FILE] += "\nCONSOLE OUTPUT:\n" + captured_string
+        memory.log(DEBUG_LOG_FILE, "\nCONSOLE OUTPUT:\n" + captured_string)
 
     return files_dict
