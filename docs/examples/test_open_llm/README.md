@@ -13,7 +13,9 @@ Or with GPU support (recommended):
 python -m llama_cpp.server --model TheBloke/CodeLlama-13B-GGUF/codellama-13b.Q8_0.gguf --n_gpu_layers 1
 ```
 
-If you have more `GPU` layers available set `--n_gpu_layers` to the higher number. To find the amount of avalibale  run the above command and look for `llm_load_tensors: offloaded 1/41 layers to GPU` in the output.
+If you have more `GPU` layers available set `--n_gpu_layers` to the higher number. 
+
+To find the amount of available  run the above command and look for `llm_load_tensors: offloaded 1/41 layers to GPU` in the output.
 
 ## Test API call
 
@@ -38,7 +40,7 @@ Or using `curl`:
 curl --request POST \
      --url http://localhost:8000/v1/chat/completions \
      --header "Content-Type: application/json" \
-     --data '{ "model": "llama", "prompt": "Who are you?", "max_tokens": 60}'
+     --data '{ "model": "CodeLlama", "prompt": "Who are you?", "max_tokens": 60}'
 ```
 
 If this works also make sure that `langchain` interface works since that's how `gpte` interacts with LLMs.
@@ -51,4 +53,4 @@ python examples/test_open_llm/test_langchain.py
 
 If you're not using `CodeLLama` make sure to change the `model` parameter in the test script.
 
-That's it 🤓 time to give `gpte` a try.
+That's it 🤓 time to go back [to](/docs/open_models.md) and give `gpte` a try.
