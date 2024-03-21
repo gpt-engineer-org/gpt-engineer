@@ -20,6 +20,7 @@ DiskMemory
     A file-based key-value store where keys correspond to filenames and values to file contents.
 """
 
+import base64
 import json
 import shutil
 
@@ -79,6 +80,8 @@ class DiskMemory(BaseMemory):
     def __getitem__(self, key: str) -> str:
         """
         Retrieve the content of a file in the database corresponding to the given key.
+        If the file is an image with a .png or .jpeg extension, it returns the content
+        in Base64-encoded string format.
 
         Parameters
         ----------
@@ -88,20 +91,26 @@ class DiskMemory(BaseMemory):
         Returns
         -------
         str
-            The content of the file associated with the key.
+            The content of the file associated with the key, or Base64-encoded string if it's a .png or .jpeg file.
 
         Raises
         ------
         KeyError
             If the file corresponding to the key does not exist in the database.
-
         """
         full_path = self.path / key
 
         if not full_path.is_file():
             raise KeyError(f"File '{key}' could not be found in '{self.path}'")
-        with full_path.open("r", encoding="utf-8") as f:
-            return f.read()
+
+        if full_path.suffix in [".png", ".jpeg", ".jpg"]:
+            with full_path.open("rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
+                mime_type = "image/png" if full_path.suffix == ".png" else "image/jpeg"
+                return f"data:{mime_type};base64,{encoded_string}"
+        else:
+            with full_path.open("r", encoding="utf-8") as f:
+                return f.read()
 
     def get(self, key: str, default: Optional[Any] = None) -> Any:
         """
@@ -117,12 +126,18 @@ class DiskMemory(BaseMemory):
         Returns
         -------
         Any
-            The content of the file if it exists, otherwise the default value.
-
+            The content of the file if it exists, a new DiskMemory instance if the key corresponds to a directory.
         """
+
+        item_path = self.path / key
         try:
-            return self[key]
-        except KeyError:
+            if item_path.is_file():
+                return self[key]
+            elif item_path.is_dir():
+                return DiskMemory(item_path)
+            else:
+                return default
+        except:
             return default
 
     def __setitem__(self, key: Union[str, Path], val: str) -> None:

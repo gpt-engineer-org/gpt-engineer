@@ -21,6 +21,7 @@ from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.core.default.steps import gen_code, gen_entrypoint, improve
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.prompt import Prompt
 
 
 class SimpleAgent(BaseAgent):
@@ -66,10 +67,10 @@ class SimpleAgent(BaseAgent):
             preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )
 
-    def init(self, prompt: str) -> FilesDict:
+    def init(self, prompt: Prompt) -> FilesDict:
         files_dict = gen_code(self.ai, prompt, self.memory, self.preprompts_holder)
         entrypoint = gen_entrypoint(
-            self.ai, files_dict, self.memory, self.preprompts_holder
+            self.ai, prompt, files_dict, self.memory, self.preprompts_holder
         )
         combined_dict = {**files_dict, **entrypoint}
         files_dict = FilesDict(combined_dict)
@@ -78,7 +79,7 @@ class SimpleAgent(BaseAgent):
     def improve(
         self,
         files_dict: FilesDict,
-        prompt: str,
+        prompt: Prompt,
         execution_command: Optional[str] = None,
     ) -> FilesDict:
         files_dict = improve(
