@@ -79,12 +79,8 @@ def load_env_if_needed():
 
     openai.api_key = os.getenv("OPENAI_API_KEY", default=None)
 
-    local_server_url = os.getenv("OPENAI_API_BASE")
-
-
-    if local_server_url:
-        openai.api_base = local_server_url
-        openai.api_key = "sk-xxx"
+    if openai.api_key == "sk-xxx":
+        openai.api_base = os.getenv("OPENAI_API_BASE")
 
     if os.getenv("ANTHROPIC_API_KEY") is None:
         load_dotenv()
