@@ -11,12 +11,16 @@ get_benchmark : function
 """
 
 from gpt_engineer.benchmark.benchmarks.gpteng.load import load_gpteng
+from gpt_engineer.benchmark.benchmarks.gptengineer_app.load import (
+    load as load_gptengineer_app,
+)
 from gpt_engineer.benchmark.benchmarks.gptme.load import load_gptme
 from gpt_engineer.benchmark.types import Benchmark
 
 BENCHMARKS = {
     "gptme": load_gptme,
     "gpteng": load_gpteng,
+    "gptengineer.app": load_gptengineer_app,
 }
 
 
