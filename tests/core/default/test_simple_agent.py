@@ -6,6 +6,7 @@ from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
 from gpt_engineer.core.default.simple_agent import SimpleAgent
 from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.prompt import Prompt
 from tests.caching_ai import CachingAI
 
 
@@ -15,7 +16,9 @@ def test_init():
     lean_agent = SimpleAgent.with_default_config(temp_dir, CachingAI())
     outfile = "output.txt"
     code = lean_agent.init(
-        f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
+        Prompt(
+            f"Make a program that prints 'Hello World!' to a file called '{outfile}'"
+        )
     )
 
     env = DiskExecutionEnv()
@@ -36,9 +39,11 @@ def test_improve():
         }
     )
     lean_agent = SimpleAgent.with_default_config(temp_dir, CachingAI())
-    lean_agent.improve(
+    code = lean_agent.improve(
         code,
-        "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'",
+        Prompt(
+            "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!' "
+        ),
         f"bash {ENTRYPOINT_FILE}",
     )
 

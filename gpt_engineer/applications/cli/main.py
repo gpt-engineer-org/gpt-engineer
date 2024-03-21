@@ -36,6 +36,8 @@ import openai
 import typer
 
 from dotenv import load_dotenv
+from langchain.cache import SQLiteCache
+from langchain.globals import set_llm_cache
 from termcolor import colored
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
@@ -49,11 +51,18 @@ from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.core.default.steps import (
     execute_entrypoint,
     gen_code,
+    handle_improve_mode,
     improve_fn as improve_fn,
 )
 from gpt_engineer.core.files_dict import FilesDict
-from gpt_engineer.core.git import stage_uncommitted_to_git
+from gpt_engineer.core.git import (
+    init_git_repo,
+    is_git_installed,
+    is_git_repo,
+    stage_uncommitted_to_git,
+)
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
 
 app = typer.Typer()  # creates a CLI app
@@ -80,7 +89,25 @@ def load_env_if_needed():
         load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
 
 
-def load_prompt(input_repo: DiskMemory, improve_mode):
+def concatenate_paths(base_path, sub_path):
+    # Compute the relative path from base_path to sub_path
+    relative_path = os.path.relpath(sub_path, base_path)
+
+    # If the relative path is not in the parent directory, use the original sub_path
+    if not relative_path.startswith(".."):
+        return sub_path
+
+    # Otherwise, concatenate base_path and sub_path
+    return os.path.normpath(os.path.join(base_path, sub_path))
+
+
+def load_prompt(
+    input_repo: DiskMemory,
+    improve_mode: bool,
+    prompt_file: str,
+    image_directory: str,
+    entrypoint_prompt_file: str = "",
+) -> Prompt:
     """
     Load or request a prompt from the user based on the mode.
 
@@ -96,26 +123,50 @@ def load_prompt(input_repo: DiskMemory, improve_mode):
     str
         The loaded or inputted prompt.
     """
-    if input_repo.get("prompt"):
-        return input_repo.get("prompt")
 
-    if not improve_mode:
-        input_repo["prompt"] = input(
-            "\nWhat application do you want gpt-engineer to generate?\n"
+    if os.path.isdir(prompt_file):
+        raise ValueError(
+            f"The path to the prompt, {prompt_file}, already exists as a directory. No prompt can be read from it. Please specify a prompt file using --prompt_file"
+        )
+    prompt_str = input_repo.get(prompt_file)
+    if prompt_str:
+        print(colored("Using prompt from file:", "green"), prompt_file)
+        print(prompt_str)
+    else:
+        if not improve_mode:
+            prompt_str = input(
+                "\nWhat application do you want gpt-engineer to generate?\n"
+            )
+        else:
+            prompt_str = input("\nHow do you want to improve the application?\n")
+
+    if entrypoint_prompt_file == "":
+        entrypoint_prompt = ""
+    else:
+        full_entrypoint_prompt_file = concatenate_paths(
+            input_repo.path, entrypoint_prompt_file
+        )
+        if os.path.isfile(full_entrypoint_prompt_file):
+            entrypoint_prompt = input_repo.get(full_entrypoint_prompt_file)
+
+        else:
+            raise ValueError("The provided file at --entrypoint-prompt does not exist")
+
+    if image_directory == "":
+        return Prompt(prompt_str, entrypoint_prompt=entrypoint_prompt)
+
+    full_image_directory = concatenate_paths(input_repo.path, image_directory)
+    if os.path.isdir(full_image_directory):
+        if len(os.listdir(full_image_directory)) == 0:
+            raise ValueError("The provided --image_directory is empty.")
+        image_repo = DiskMemory(full_image_directory)
+        return Prompt(
+            prompt_str,
+            image_repo.get(".").to_dict(),
+            entrypoint_prompt=entrypoint_prompt,
         )
     else:
-        input_repo["prompt"] = input("\nHow do you want to improve the application?\n")
-
-    print("Prompt saved.")
-    print(
-        "If you want to use a different prompt later "
-        + colored(
-            f"you need to remove/edit the file: {input_repo.path}/prompt",
-            "red",
-        )
-    )
-
-    return input_repo.get("prompt")
+        raise ValueError("The provided --image_directory is not a directory.")
 
 
 def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
@@ -183,10 +234,19 @@ def prompt_yesno() -> bool:
     return answer in ["y", "yes"]
 
 
-@app.command()
+@app.command(
+    help="""
+        GPT-engineer lets you:
+
+        \b
+        - Specify a software in natural language
+        - Sit back and watch as an AI writes and executes the code
+        - Ask the AI to implement improvements
+    """
+)
 def main(
     project_path: str = typer.Argument(".", help="path"),
-    model: str = typer.Argument("gpt-4-1106-preview", help="model id string"),
+    model: str = typer.Argument("gpt-4-0125-preview", help="model id string"),
     temperature: float = typer.Option(
         0.1,
         "--temperature",
@@ -209,13 +269,13 @@ def main(
         False,
         "--clarify",
         "-c",
-        help="Clarify mode: have the AI discuss and clarify the specification before implementation.",
+        help="Clarify mode - discuss specification with AI before implementation.",
     ),
     self_heal_mode: bool = typer.Option(
         False,
         "--self-heal",
         "-sh",
-        help="Self-heal mode: enable the AI to attempt to fix errors encountered during execution.",
+        help="Self-heal mode - fix the code by itself when it fails.",
     ),
     azure_endpoint: str = typer.Option(
         "",
@@ -240,6 +300,26 @@ def main(
     ),
     debug: bool = typer.Option(
         False, "--debug", "-d", help="Enable debug mode for debugging."
+    ),
+    prompt_file: str = typer.Option(
+        "prompt",
+        "--prompt_file",
+        help="Relative path to a text file containing a prompt.",
+    ),
+    entrypoint_prompt_file: str = typer.Option(
+        "",
+        "--entrypoint_prompt",
+        help="Relative path to a text file containing a file that specifies requirements for you entrypoint.",
+    ),
+    image_directory: str = typer.Option(
+        "",
+        "--image_directory",
+        help="Relative path to a folder containing images.",
+    ),
+    use_cache: bool = typer.Option(
+        False,
+        "--use_cache",
+        help="Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.",
     ),
 ):
     """
@@ -269,6 +349,14 @@ def main(
         The endpoint for Azure OpenAI services.
     use_custom_preprompts : bool
         Flag indicating whether to use custom preprompts.
+    prompt_file : str
+        Relative path to a text file containing a prompt.
+    entrypoint_prompt_file: str
+        Relative path to a text file containing a file that specifies requirements for you entrypoint.
+    image_directory: str
+        Relative path to a folder containing images.
+    use_cache: bool
+        Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.
     verbose : bool
         Flag indicating whether to enable verbose logging.
 
@@ -289,6 +377,12 @@ def main(
 
     # Set up logging
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
+    if use_cache:
+        set_llm_cache(SQLiteCache(database_path=".langchain.db"))
+    if improve_mode:
+        assert not (
+            clarify_mode or lite_mode
+        ), "Clarify and lite mode are not active for improve mode"
 
     load_env_if_needed()
 
@@ -304,7 +398,24 @@ def main(
     path = Path(project_path)
     print("Running gpt-engineer in", path.absolute(), "\n")
 
-    prompt = load_prompt(DiskMemory(path), improve_mode)
+    prompt = load_prompt(DiskMemory(path), improve_mode, prompt_file, image_directory)
+    # Check if there's a git repo and verify that there aren't any uncommitted changes
+    if is_git_installed():
+        if not is_git_repo(path) and not improve_mode:
+            print("Initializing an empty git repository")
+            init_git_repo(path)
+
+    prompt = load_prompt(
+        DiskMemory(path),
+        improve_mode,
+        prompt_file,
+        image_directory,
+        entrypoint_prompt_file,
+    )
+
+    # todo: if ai.vision is false and not llm_via_clipboard - ask if they would like to use gpt-4-vision-preview instead? If so recreate AI
+    if not ai.vision:
+        prompt.image_urls = None
 
     # configure generation function
     if clarify_mode:
@@ -340,17 +451,22 @@ def main(
 
     files = FileStore(project_path)
     if improve_mode:
-        fileselector = FileSelector(project_path)
-        files_dict_before = fileselector.ask_for_files()
-        files_dict = agent.improve(files_dict_before, prompt)
+        files_dict_before = FileSelector(project_path).ask_for_files()
+        files_dict = handle_improve_mode(prompt, agent, memory, files_dict_before)
+        if not files_dict or files_dict_before == files_dict:
+            print(
+                f"No changes applied. Could you please upload the debug_log_file.txt in {memory.path} folder in a github issue?"
+            )
 
-        print("\nChanges to be made:")
-        compare(files_dict_before, files_dict)
+        else:
+            print("\nChanges to be made:")
+            compare(files_dict_before, files_dict)
 
-        print()
-        print(colored("Do you want to apply these changes?", "light_green"))
-        if prompt_yesno():
-            return
+            print()
+            print(colored("Do you want to apply these changes?", "light_green"))
+            if not prompt_yesno():
+                files_dict = files_dict_before
+
     else:
         files_dict = agent.init(prompt)
         # collect user feedback if user consents

@@ -22,6 +22,7 @@ from gpt_engineer.core.default.steps import (
 )
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.prompt import Prompt
 
 CodeGenType = TypeVar("CodeGenType", bound=Callable[[AI, str, BaseMemory], FilesDict])
 CodeProcessor = TypeVar(
@@ -147,7 +148,7 @@ class CliAgent(BaseAgent):
             preprompts_holder=preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH),
         )
 
-    def init(self, prompt: str) -> FilesDict:
+    def init(self, prompt: Prompt) -> FilesDict:
         """
         Generates a new piece of code using the AI and step bundle based on the provided prompt.
 
@@ -166,7 +167,7 @@ class CliAgent(BaseAgent):
             self.ai, prompt, self.memory, self.preprompts_holder
         )
         entrypoint = gen_entrypoint(
-            self.ai, files_dict, self.memory, self.preprompts_holder
+            self.ai, prompt, files_dict, self.memory, self.preprompts_holder
         )
         combined_dict = {**files_dict, **entrypoint}
         files_dict = FilesDict(combined_dict)
@@ -175,13 +176,15 @@ class CliAgent(BaseAgent):
             self.execution_env,
             files_dict,
             preprompts_holder=self.preprompts_holder,
+            prompt=prompt,
+            memory=self.memory,
         )
         return files_dict
 
     def improve(
         self,
         files_dict: FilesDict,
-        prompt: str,
+        prompt: Prompt,
         execution_command: Optional[str] = None,
     ) -> FilesDict:
         """
@@ -205,19 +208,18 @@ class CliAgent(BaseAgent):
         files_dict = self.improve_fn(
             self.ai, prompt, files_dict, self.memory, self.preprompts_holder
         )
-
-        # No need to run entrypoint for improve right?
-        # if not execution_command and ENTRYPOINT_FILE not in files_dict:
-        #     entrypoint = gen_entrypoint(
-        #         self.ai, files_dict, self.memory, self.preprompts_holder
-        #     )
-        #     combined_dict = {**files_dict, **entrypoint}
-        #     files_dict = FilesDict(combined_dict)
-
+        # entrypoint = gen_entrypoint(
+        #     self.ai, prompt, files_dict, self.memory, self.preprompts_holder
+        # )
+        # combined_dict = {**files_dict, **entrypoint}
+        # files_dict = FilesDict(combined_dict)
         # files_dict = self.process_code_fn(
         #     self.ai,
         #     self.execution_env,
         #     files_dict,
         #     preprompts_holder=self.preprompts_holder,
+        #     prompt=prompt,
+        #     memory=self.memory,
         # )
+
         return files_dict

@@ -6,7 +6,7 @@ GPT-engineer is a community project and lives from your contributions - they are
 - Discussion: raise awareness of a potential improvement. This is often a good starting point before making a detailed feature request.
 - Pull request: implement code and have it reviewed and potentially merged by the maintainers. Implementations of existing feature requests or fixes to bug reports are likely to be merged.
 
-By participating in this project, you agree to abide by the [code of conduct](CODE_OF_CONDUCT.md).
+By participating in this project, you agree to abide by the [code of conduct](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/.github/CODE_OF_CONDUCT.md).
 
 ## Merge Policy for Pull Requests
 Code that is likely to introduce breaking changes, or significantly change the user experience for users and developers, require [board approval](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/GOVERNANCE.md) to be merged. Smaller code changes can be merged directly.
@@ -115,6 +115,6 @@ At the beginning this might seem like a tedious process (having to add the file 
 
 ## Licensing
 
-By contributing to GPT Engineer, you agree that your contributions will be licensed under the [LICENSE](../LICENSE) file of the project.
+By contributing to GPT Engineer, you agree that your contributions will be licensed under the [LICENSE](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/LICENSE) file of the project.
 
 Thank you for your interest in contributing to GPT Engineer! We appreciate your support and look forward to your contributions.
