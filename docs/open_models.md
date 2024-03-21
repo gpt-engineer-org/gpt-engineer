@@ -59,7 +59,7 @@ To see that your setup works see [test open LLM](examples/test_open_llm/README.m
 If the tests work, run the LLM in separate terminal:
 
 ```bash
-python -m llama_cpp.server --model $model_path
+python -m llama_cpp.server --model $model_path --n_batch 256 --n_gpu_layers 30
 ```
 
 Then run `gpt-engineer` with the following environment variables:
@@ -69,7 +69,7 @@ export OPENAI_API_BASE="http://localhost:8000/v1"
 export OPENAI_API_KEY="sk-xxx"
 export model_name="llama2"
 
-gpte <project_dir> $model_name
+gpte <project_dir> $model_name --lite --temperature 0.1
 ```
 
 On other inference libraries
