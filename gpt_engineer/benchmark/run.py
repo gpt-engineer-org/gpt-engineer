@@ -51,17 +51,7 @@ def run(
         print(f"--> Running task: {task.name}\n")
 
         t0 = time.time()
-        try:
-            files_dict = agent.improve(task.initial_code, task.prompt)
-        except RecursionError:  # Temporary catch errors related to git diffs
-            task_results.append(
-                TaskResult(
-                    task_name=task.name,
-                    duration=time.time() - t0,
-                    assertion_results={},
-                )
-            )
-            continue
+        files_dict = agent.improve(task.initial_code, task.prompt)
         t1 = time.time()
 
         env = DiskExecutionEnv()
