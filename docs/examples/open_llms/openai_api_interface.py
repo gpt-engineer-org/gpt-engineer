@@ -1,9 +1,13 @@
 from openai import OpenAI
+import os
 
-client = OpenAI(base_url="http://localhost:8000/v1", api_key="sk-xxx")
+client = OpenAI(
+    base_url=os.getenv("OPENAI_API_BASE"),
+    api_key=os.getenv("OPENAI_API_KEY")
+)
 
 response = client.chat.completions.create(
-    model="CodeLlama",
+    model=os.getenv("MODEL_NAME"),
     messages=[
         {
             "role": "user",

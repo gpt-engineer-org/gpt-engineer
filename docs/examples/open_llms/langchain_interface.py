@@ -1,8 +1,9 @@
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain_openai import ChatOpenAI
+import os
 
 model = ChatOpenAI(
-    model="CodeLlama",
+    model=os.getenv("MODEL_NAME"),
     temperature=0.1,
     callbacks=[StreamingStdOutCallbackHandler()],
     streaming=True,

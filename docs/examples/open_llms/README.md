@@ -24,15 +24,16 @@ Set the environment variables:
 ```bash
 export OPENAI_API_BASE="http://localhost:8000/v1"
 export OPENAI_API_KEY="sk-xxx"
+export MODEL_NAME="CodeLlama"
 ````
 
 Then ping the model via `python` using `OpenAI` API:
 
 ```bash
-python examples/test_open_llm/test_openai_api.py
+python examples/open_llms/openai_api_interface.py
 ```
 
-If you're not using `CodeLLama` make sure to change the `model` parameter in the test script.
+If you're not using `CodeLLama` make sure to change the `MODEL_NAME` parameter.
 
 Or using `curl`:
 
@@ -48,9 +49,8 @@ If this works also make sure that `langchain` interface works since that's how `
 ## Langchain test
 
 ```bash
-python examples/test_open_llm/test_langchain.py
+export MODEL_NAME="CodeLlama"
+python examples/open_llms/langchain_interface.py
 ```
-
-If you're not using `CodeLLama` make sure to change the `model` parameter in the test script.
 
 That's it 🤓 time to go back [to](/docs/open_models.md#running-the-example) and give `gpte` a try.
