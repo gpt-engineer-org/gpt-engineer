@@ -66,3 +66,20 @@ def filter_by_gitignore(path: Path, file_list: List[str]) -> List[str]:
     paths = out.stdout.decode().splitlines()
     # return file_list but filter out the results from git check-ignore
     return [f for f in file_list if f not in paths]
+
+
+def stage_uncommitted_to_git(path, files_dict, improve_mode):
+    # Check if there's a git repo and verify that there aren't any uncommitted changes
+    if is_git_installed() and not improve_mode:
+        if not is_git_repo(path):
+            print("\nInitializing an empty git repository")
+            init_git_repo(path)
+
+    if is_git_repo(path):
+        modified_files = filter_files_with_uncommitted_changes(path, files_dict)
+        if modified_files:
+            print(
+                "Staging the following uncommitted files before overwriting: ",
+                ", ".join(modified_files),
+            )
+            stage_files(path, modified_files)

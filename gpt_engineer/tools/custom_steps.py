@@ -9,7 +9,7 @@ from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.base_memory import BaseMemory
 from gpt_engineer.core.chat_to_files import chat_to_files_dict
 from gpt_engineer.core.default.paths import CODE_GEN_LOG_FILE, ENTRYPOINT_FILE
-from gpt_engineer.core.default.steps import curr_fn, improve, setup_sys_prompt
+from gpt_engineer.core.default.steps import curr_fn, improve_fn, setup_sys_prompt
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.prompt import Prompt
@@ -110,7 +110,9 @@ def self_heal(
             new_prompt = Prompt(
                 f"A program with this specification was requested:\n{prompt}\n, but running it produced the following output:\n{stdout_full}\n and the following errors:\n{stderr_full}. Please change it so that it fulfills the requirements."
             )
-            files_dict = improve(ai, new_prompt, files_dict, memory, preprompts_holder)
+            files_dict = improve_fn(
+                ai, new_prompt, files_dict, memory, preprompts_holder
+            )
         else:
             break
     return files_dict
@@ -187,7 +189,7 @@ def clarified_gen(
     )
     print()
     chat = messages[-1].content.strip()
-    memory[CODE_GEN_LOG_FILE] = chat
+    memory.log(CODE_GEN_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
     files_dict = chat_to_files_dict(chat)
     return files_dict
 
@@ -225,6 +227,6 @@ def lite_gen(
         prompt.to_langchain_content(), preprompts["file_format"], step_name=curr_fn()
     )
     chat = messages[-1].content.strip()
-    memory[CODE_GEN_LOG_FILE] = chat
+    memory.log(CODE_GEN_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
     files_dict = chat_to_files_dict(chat)
     return files_dict

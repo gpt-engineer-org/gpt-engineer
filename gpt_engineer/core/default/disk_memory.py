@@ -24,6 +24,7 @@ import base64
 import json
 import shutil
 
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, Union
 
@@ -283,3 +284,43 @@ class DiskMemory(BaseMemory):
 
         """
         return json.dumps(self.to_dict())
+
+    def log(self, key: Union[str, Path], val: str) -> None:
+        """
+        Append to a file or create and write to it if it doesn't exist.
+
+        Parameters
+        ----------
+        key : str or Path
+            The key (filename) where the content is to be appended.
+        val : str
+            The content to be appended to the file.
+
+        """
+
+        if str(key).startswith("../"):
+            raise ValueError(f"File name {key} attempted to access parent path.")
+
+        if not isinstance(val, str):
+            raise TypeError("val must be str")
+
+        full_path = self.path / "logs" / key
+        full_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Touch if it doesnt exist
+        if not full_path.exists():
+            full_path.touch()
+
+        with open(full_path, "a", encoding="utf-8") as file:
+            file.write(f"\n{datetime.now().isoformat()}\n")
+            file.write(val + "\n")
+
+    def archive_logs(self):
+        """
+        Moves all logs to archive directory based on current timestamp
+        """
+        if "logs" in self:
+            archive_dir = (
+                self.path / f"logs_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
+            )
+            shutil.move(self.path / "logs", archive_dir)

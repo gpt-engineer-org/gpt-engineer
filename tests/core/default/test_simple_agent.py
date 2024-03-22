@@ -39,10 +39,10 @@ def test_improve():
         }
     )
     lean_agent = SimpleAgent.with_default_config(temp_dir, CachingAI())
-    lean_agent.improve(
+    code = lean_agent.improve(
         code,
         Prompt(
-            "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'"
+            "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!' "
         ),
         f"bash {ENTRYPOINT_FILE}",
     )
