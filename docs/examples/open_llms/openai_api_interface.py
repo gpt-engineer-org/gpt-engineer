@@ -1,9 +1,9 @@
-from openai import OpenAI
 import os
 
+from openai import OpenAI
+
 client = OpenAI(
-    base_url=os.getenv("OPENAI_API_BASE"),
-    api_key=os.getenv("OPENAI_API_KEY")
+    base_url=os.getenv("OPENAI_API_BASE"), api_key=os.getenv("OPENAI_API_KEY")
 )
 
 response = client.chat.completions.create(

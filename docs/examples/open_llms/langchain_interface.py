@@ -1,6 +1,7 @@
+import os
+
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain_openai import ChatOpenAI
-import os
 
 model = ChatOpenAI(
     model=os.getenv("MODEL_NAME"),
