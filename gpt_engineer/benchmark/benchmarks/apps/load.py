@@ -56,7 +56,7 @@ def _get_dataset() -> Union[Dataset, DatasetDict]:
     except FileNotFoundError:
         print("Dataset not found locally, downloading...")
 
-    dataset = load_dataset("codeparrot/apps")
+    dataset = load_dataset("codeparrot/apps", trust_remote_code=True)
     dataset.save_to_disk(DATASET_PATH)
 
     return dataset
