@@ -88,3 +88,6 @@ webapp/.next/
 
 #ignore tox files
 .tox
+
+# locally saved datasets
+gpt_engineer/benchmark/benchmarks/apps/dataset

@@ -75,3 +75,15 @@ class TaskResult:
     task_name: str
     assertion_results: dict[str, bool]
     duration: float
+
+    # Returns success rate from 0.00 up to 1.00
+    @property
+    def success_rate(self) -> float:
+        if not self.assertion_results:
+            return 0.0
+
+        succeeded = len(
+            [result for result in self.assertion_results.values() if result is True]
+        )
+
+        return succeeded / len(self.assertion_results)
