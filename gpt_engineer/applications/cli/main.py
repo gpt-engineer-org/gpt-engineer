@@ -283,6 +283,7 @@ def main(
     if improve_mode:
         fileselector = FileSelector(project_path)
         original_files_dict = fileselector.ask_for_files()
+        original_files_dict = store.lint_files_dict(original_files_dict)
         files_dict = handle_improve_mode(prompt, agent, memory, original_files_dict)
         if not prompt_yesno("\nDo you want to apply these changes?"):
             return

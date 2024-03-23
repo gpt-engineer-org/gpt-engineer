@@ -53,7 +53,6 @@ from gpt_engineer.core.default.paths import (
     ENTRYPOINT_LOG_FILE,
 )
 from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
-from gpt_engineer.core.linting import Linter
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
 
@@ -283,11 +282,6 @@ def improve(
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]
-    # create an instance of the Linter class
-    linter = Linter()
-
-    # apply auto-linting to the selected files
-    files_dict = linter.lint_files_dict(files_dict)
 
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))

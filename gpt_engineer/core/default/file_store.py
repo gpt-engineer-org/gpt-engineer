@@ -3,6 +3,8 @@ import tempfile
 from pathlib import Path
 from typing import Union
 
+import autopep8
+
 from gpt_engineer.core.files_dict import FilesDict
 
 
@@ -54,3 +56,47 @@ class FileStore:
                         content = "binary file"
                     files[str(path.relative_to(self.working_dir))] = content
         return FilesDict(files)
+
+    def lint_files_dict(self, files_dict: FilesDict) -> FilesDict:
+        """
+        Lints the given files dictionary. The dictionary keys are file names and the values are the file contents.
+        The function supports linting for Python and JavaScript files.
+
+        Parameters
+        ----------
+        files_dict : dict
+            The dictionary containing file names as keys and file contents as values.
+
+        Returns
+        -------
+        dict
+            The dictionary containing linted file contents.
+        """
+        lint_types = {
+            ".py": lint_python_code,
+            # ".js": lint_javascript_code,
+        }
+        for file_name, file_content in files_dict.items():
+            for file_type, lint_func in lint_types.items():
+                if file_name.endswith(file_type):
+                    files_dict[file_name] = lint_func(file_content)
+                    print(f"Formatted {file_name} with {lint_func.__name__}")
+        return files_dict
+
+
+# Static method to lint Python code
+def lint_python_code(code: str) -> str:
+    """
+    Lints the given Python code using autopep8.
+
+    Parameters
+    ----------
+    code : str
+        The Python code to be linted.
+
+    Returns
+    -------
+    str
+        The linted Python code.
+    """
+    return autopep8.fix_code(code)
