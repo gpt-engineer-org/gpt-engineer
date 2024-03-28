@@ -79,9 +79,6 @@ def load_env_if_needed():
 
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    if openai.api_key == "sk-xxx":
-        openai.api_base = os.getenv("OPENAI_API_BASE")
-
     if os.getenv("ANTHROPIC_API_KEY") is None:
         load_dotenv()
     if os.getenv("ANTHROPIC_API_KEY") is None:
@@ -476,7 +473,7 @@ def main(
 
     if ai.token_usage_log.is_openai_model():
         print("Total api cost: $ ", ai.token_usage_log.usage_cost())
-    elif openai.api_key == "sk-xxx":
+    elif os.getenv("LOCAL_MODEL"):
         print("Total api cost: $ 0.0 since we are using local LLM.")
     else:
         print("Total tokens used: ", ai.token_usage_log.total_tokens())
