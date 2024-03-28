@@ -11,7 +11,7 @@ response = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "Provide me with the code for a simple HTML web site.",
+            "content": "Provide me with only the code for a simple python function that sums two numbers.",
         },
     ],
     temperature=0.7,
