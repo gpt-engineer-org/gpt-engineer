@@ -7,7 +7,6 @@ from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
 from gpt_engineer.core.default.simple_agent import SimpleAgent
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.prompt import Prompt
-from tests.caching_ai import CachingAI
 
 
 def test_init():

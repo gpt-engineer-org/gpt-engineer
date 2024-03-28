@@ -13,9 +13,6 @@ from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, META_DATA_REL_PATH
 from gpt_engineer.core.prompt import Prompt
-from tests.caching_ai import CachingAI
-
-main.AI = CachingAI
 
 
 def simplified_main(path: str, mode: str = ""):

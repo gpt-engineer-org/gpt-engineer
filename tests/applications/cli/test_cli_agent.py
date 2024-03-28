@@ -12,7 +12,22 @@ from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, memory_path
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen
-from tests.caching_ai import CachingAI
+
+from typing import Any, Optional, List
+from langchain.schema import AIMessage
+
+
+class MockAI:
+    def __init__(self, response: List):
+        self.responses = iter(response)
+
+    def start(self, system: str, user: Any, *, step_name: str) -> List[str]:
+        return [next(self.responses)]
+
+    def next(
+        self, messages: List[str], prompt: Optional[str] = None, *, step_name: str
+    ) -> List[str]:
+        return [next(self.responses)]
 
 
 def test_init_standard_config(monkeypatch):
@@ -20,7 +35,15 @@ def test_init_standard_config(monkeypatch):
     temp_dir = tempfile.mkdtemp()
     memory = DiskMemory(memory_path(temp_dir))
     execution_env = DiskExecutionEnv()
-    cli_agent = CliAgent.with_default_config(memory, execution_env, ai=CachingAI())
+    mock_ai = MockAI(
+        [
+            AIMessage(
+                f"hello_world.py\n```\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n```"
+            ),
+            AIMessage(f"```run.sh\npython3 hello_world.py\n```"),
+        ],
+    )
+    cli_agent = CliAgent.with_default_config(memory, execution_env, ai=mock_ai)
     outfile = "output.txt"
     os.path.join(temp_dir, outfile)
     code = cli_agent.init(
@@ -43,8 +66,16 @@ def test_init_lite_config(monkeypatch):
     memory = DiskMemory(memory_path(temp_dir))
     # version_manager = GitVersionManager(temp_dir)
     execution_env = DiskExecutionEnv()
+    mock_ai = MockAI(
+        [
+            AIMessage(
+                f"hello_world.py\n```\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n```"
+            ),
+            AIMessage(f"```run.sh\npython3 hello_world.py\n```"),
+        ],
+    )
     cli_agent = CliAgent.with_default_config(
-        memory, execution_env, ai=CachingAI(), code_gen_fn=lite_gen
+        memory, execution_env, ai=mock_ai, code_gen_fn=lite_gen
     )
     outfile = "output.txt"
     os.path.join(temp_dir, outfile)
@@ -67,8 +98,17 @@ def test_init_clarified_gen_config(monkeypatch):
     temp_dir = tempfile.mkdtemp()
     memory = DiskMemory(memory_path(temp_dir))
     execution_env = DiskExecutionEnv()
+    mock_ai = MockAI(
+        [
+            AIMessage(f"nothing to clarify"),
+            AIMessage(
+                f"hello_world.py\n```\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n```"
+            ),
+            AIMessage(f"```run.sh\npython3 hello_world.py\n```"),
+        ],
+    )
     cli_agent = CliAgent.with_default_config(
-        memory, execution_env, ai=CachingAI(), code_gen_fn=clarified_gen
+        memory, execution_env, ai=mock_ai, code_gen_fn=clarified_gen
     )
     outfile = "output.txt"
     code = cli_agent.init(
@@ -98,7 +138,15 @@ def test_improve_standard_config(monkeypatch):
     memory = DiskMemory(memory_path(temp_dir))
     # version_manager = GitVersionManager(temp_dir)
     execution_env = DiskExecutionEnv()
-    cli_agent = CliAgent.with_default_config(memory, execution_env, ai=CachingAI())
+    mock_ai = MockAI(
+        [
+            AIMessage(
+                f"```diff\n--- main.py\n+++ main.py\n@@ -7,3 +7,3 @@\n     with open(filename, 'w') as file:\n-        file.write('Hello World!')\n+        file.write('!dlroW olleH')\n```"
+            )
+        ]
+    )
+    cli_agent = CliAgent.with_default_config(memory, execution_env, ai=mock_ai)
+
     code = cli_agent.improve(
         code,
         Prompt(
