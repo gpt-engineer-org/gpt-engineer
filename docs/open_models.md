@@ -98,13 +98,14 @@ Then in another terminal window set the following environment variables:
 ```bash
 export OPENAI_API_BASE="http://localhost:8000/v1"
 export OPENAI_API_KEY="sk-xxx"
-export model_name="CodeLLama"
+export MODEL_NAME="CodeLLama"
+export LOCAL_MODEL=true
 ```
 
 And run `gpt-engineer` with the following command:
 
 ```bash
-gpte <project_dir> $model_name --lite --temperature 0.1
+gpte <project_dir> $MODEL_NAME --lite --temperature 0.1
 ```
 
 The `--lite` mode is needed for now since open models for some reason behave worse with too many instructions at the moment. Temperature is set to `0.1` to get consistent best possible results.
