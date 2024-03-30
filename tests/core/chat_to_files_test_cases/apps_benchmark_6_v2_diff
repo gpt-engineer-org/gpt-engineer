@@ -1,0 +1,17 @@
+```diff
+--- main.py
++++ main.py
+@@ -8,7 +8,25 @@
++    # Implementation will be added here
++    max_damage = max(blows, key=lambda x: x[0])
++    max_diff = max(blows, key=lambda x: x[0] - x[1])
++    if max_damage[0] >= x:
++        return 1
++    if max_diff[0] <= max_diff[1] and max_damage[0] < x:
++        return -1
++    effective_damage = max_diff[0] - max_diff[1]
++    remaining_heads = x - max_damage[0]
++    blows_required = 1 + (remaining_heads + effective_damage - 1) // effective_damage
++    return blows_required
+-    pass
+```
