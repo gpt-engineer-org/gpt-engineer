@@ -268,28 +268,7 @@ def test_diff_regex():
     assert len(diffs) == 2
 
 
-# test parse diff
-def test_controller_diff():
-    load_and_test_diff("controller_diff", "controller_code")
-
-
-def test_simple_calculator_diff():
-    load_and_test_diff("simple_calculator_diff", "simple_calculator_code")
-
-
-def test_complex_temperature_converter_diff():
-    load_and_test_diff("temperature_converter_diff", "temperature_converter_code")
-
-
-def test_complex_task_master_diff():
-    load_and_test_diff("task_master_diff", "task_master_code")
-
-
-def test_long_file_diff():
-    load_and_test_diff("wheaties_example_diff", "wheaties_example_code")
-
-
-def load_and_test_diff(
+def parse_chats_with_regex(
     diff_file_name: str, code_file_name: str
 ) -> Tuple[str, str, Dict]:
     # Load the diff
@@ -304,15 +283,36 @@ def load_and_test_diff(
     ) as f:
         code_content = f.read()
 
-    # Parse the diffs and validate & correct them
+    # Parse the diffs
     diffs = parse_diffs(diff_content)
-    # list(diffs.values())[0].validate_and_correct(file_to_lines_dict(code_content))
+
     return diff_content, code_content, diffs
 
 
-# Test diff application
+# test parse diff
+def test_controller_diff():
+    parse_chats_with_regex("controller_diff", "controller_code")
+
+
+def test_simple_calculator_diff():
+    parse_chats_with_regex("simple_calculator_diff", "simple_calculator_code")
+
+
+def test_complex_temperature_converter_diff():
+    parse_chats_with_regex("temperature_converter_diff", "temperature_converter_code")
+
+
+def test_complex_task_master_diff():
+    parse_chats_with_regex("task_master_diff", "task_master_code")
+
+
+def test_long_file_diff():
+    parse_chats_with_regex("wheaties_example_diff", "wheaties_example_code")
+
+
+# Test diff parsing and validation
 def test_validation_and_apply_complex_diff():
-    task_master_diff, task_master_code, diffs = load_and_test_diff(
+    task_master_diff, task_master_code, diffs = parse_chats_with_regex(
         "task_master_diff", "task_master_code"
     )
     files = FilesDict({"taskmaster.py": task_master_code})
@@ -328,7 +328,7 @@ def test_validation_and_apply_complex_diff():
 
 
 def test_validation_and_apply_long_diff():
-    wheaties_diff, wheaties_code, diffs = load_and_test_diff(
+    wheaties_diff, wheaties_code, diffs = parse_chats_with_regex(
         "wheaties_example_diff", "wheaties_example_code"
     )
 
@@ -345,7 +345,7 @@ def test_validation_and_apply_long_diff():
 
 
 def test_validation_and_apply_wrong_diff():
-    example_diff, example_code, diffs = load_and_test_diff(
+    example_diff, example_code, diffs = parse_chats_with_regex(
         "vgvishesh_example_diff", "vgvishesh_example_code"
     )
     files = FilesDict({"src/components/SocialLinks.tsx": example_code})
@@ -361,7 +361,7 @@ def test_validation_and_apply_wrong_diff():
 
 
 def test_validation_and_apply_non_change_diff():
-    example_diff, example_code, diffs = load_and_test_diff(
+    example_diff, example_code, diffs = parse_chats_with_regex(
         "vgvishesh_example_2_diff", "vgvishesh_example_2_code"
     )
     files = FilesDict({"src/App.tsx": example_code})
@@ -377,7 +377,7 @@ def test_validation_and_apply_non_change_diff():
 
 
 def test_validation_and_apply_diff_on_apps_benchmark_6():
-    example_diff, example_code, diffs = load_and_test_diff(
+    example_diff, example_code, diffs = parse_chats_with_regex(
         "apps_benchmark_6_diff", "apps_benchmark_6_code"
     )
     files = FilesDict({"main.py": example_code})
@@ -391,7 +391,7 @@ def test_validation_and_apply_diff_on_apps_benchmark_6():
 
 
 def test_validation_and_apply_diff_on_apps_benchmark_6_v2():
-    example_diff, example_code, diffs = load_and_test_diff(
+    example_diff, example_code, diffs = parse_chats_with_regex(
         "apps_benchmark_6_v2_diff", "apps_benchmark_6_v2_code"
     )
     files = FilesDict({"main.py": example_code})
