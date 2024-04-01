@@ -376,18 +376,18 @@ def test_validation_and_apply_non_change_diff():
     apply_diffs(diffs, files)
 
 
-# def test_validation_and_apply_diff_on_apps_benchmark_6():
-#     example_diff, example_code, diffs = parse_chats_with_regex(
-#         "apps_benchmark_6_diff", "apps_benchmark_6_code"
-#     )
-#     files = FilesDict({"main.py": example_code})
-#     for file_name, diff in diffs.items():
-#         # if diff is a new file, validation and correction is unnecessary
-#         if not diff.is_new_file():
-#             problems = diff.validate_and_correct(file_to_lines_dict(files["main.py"]))
-#             print(problems)
-#
-#     print(apply_diffs(diffs, files))
+def test_validation_and_apply_diff_on_apps_benchmark_6():
+    example_diff, example_code, diffs = parse_chats_with_regex(
+        "apps_benchmark_6_diff", "apps_benchmark_6_code"
+    )
+    files = FilesDict({"main.py": example_code})
+    for file_name, diff in diffs.items():
+        # if diff is a new file, validation and correction is unnecessary
+        if not diff.is_new_file():
+            problems = diff.validate_and_correct(file_to_lines_dict(files["main.py"]))
+            print(problems)
+
+    print(apply_diffs(diffs, files))
 
 
 def test_validation_and_apply_diff_on_apps_benchmark_6_v2():

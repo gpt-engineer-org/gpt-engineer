@@ -148,6 +148,12 @@ class Hunk:
                     # if the start line is not found, this should be a comment from LLM
                     if start_line is None:
                         self.relabel_line(index, ADD)
+                        # check if all the hunks are add lines
+                        if all(self.lines[i][0] == ADD for i in range(len(self.lines))):
+                            problems.append(
+                                f"In {self.hunk_to_string()}:can not find the starting line of the diff"
+                            )
+                            return False
                         continue
                     else:
                         # the line prior to the start line is found now we insert it to the first place as the start line
