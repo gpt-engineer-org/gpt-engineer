@@ -1,7 +1,10 @@
 import os
 import shutil
 import tempfile
-
+from argparse import Namespace
+import dataclasses
+import functools
+import inspect
 from unittest.mock import patch
 
 import pytest
@@ -15,38 +18,84 @@ from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, META_DATA_REL_PATH
 from gpt_engineer.core.prompt import Prompt
 
 
-def simplified_main(path: str, mode: str = ""):
-    model = "gpt-4-1106-preview"
-    lite_mode = False
-    clarify_mode = False
-    improve_mode = False
-    self_heal_mode = False
-    azure_endpoint = ""
-    verbose = False
-    if mode == "lite":
-        lite_mode = True
-    elif mode == "clarify":
-        clarify_mode = True
-    elif mode == "improve":
-        improve_mode = True
-    elif mode == "self-heal":
-        self_heal_mode = True
-    main.main(
-        path,
-        model=model,
-        lite_mode=lite_mode,
-        clarify_mode=clarify_mode,
-        improve_mode=improve_mode,
-        self_heal_mode=self_heal_mode,
-        azure_endpoint=azure_endpoint,
-        use_custom_preprompts=False,
-        prompt_file="prompt",
-        image_directory="",
-        entrypoint_prompt_file="",
-        use_cache=False,
-        verbose=verbose,
-        llm_via_clipboard=False,
-    )
+@functools.wraps(dataclasses.make_dataclass)
+def dcommand(typer_f, **kwargs):
+    required = True
+
+    def field_desc(name, param):
+        nonlocal required
+
+        t = param.annotation or "typing.Any"
+        if param.default.default is not ...:
+            required = False
+            return name, t, dataclasses.field(default=param.default.default)
+
+        if not required:
+            raise ValueError("Required value after optional")
+
+        return name, t
+
+    kwargs.setdefault("cls_name", typer_f.__name__)
+
+    params = inspect.signature(typer_f).parameters
+    kwargs["fields"] = [field_desc(k, v) for k, v in params.items()]
+
+    @functools.wraps(typer_f)
+    def dcommand_decorator(function_or_class):
+        assert callable(function_or_class)
+
+        ka = dict(kwargs)
+        ns = Namespace(**(ka.pop("namespace", None) or {}))
+        if isinstance(function_or_class, type):
+            ka["bases"] = *ka.get("bases", ()), function_or_class
+        else:
+            ns.__call__ = function_or_class
+
+        ka["namespace"] = vars(ns)
+        return dataclasses.make_dataclass(**ka)
+
+    return dcommand_decorator
+
+
+@dcommand(main.main)
+class simplified_main:
+    def __call__(self):
+        attribute_dict = vars(self)
+        main.main(**attribute_dict)
+
+
+# def simplified_main(path: str, mode: str = ""):
+#     model = "gpt-4-1106-preview"
+#     lite_mode = False
+#     clarify_mode = False
+#     improve_mode = False
+#     self_heal_mode = False
+#     azure_endpoint = ""
+#     verbose = False
+#     if mode == "lite":
+#         lite_mode = True
+#     elif mode == "clarify":
+#         clarify_mode = True
+#     elif mode == "improve":
+#         improve_mode = True
+#     elif mode == "self-heal":
+#         self_heal_mode = True
+#     main.main(
+#         path,
+#         model=model,
+#         lite_mode=lite_mode,
+#         clarify_mode=clarify_mode,
+#         improve_mode=improve_mode,
+#         self_heal_mode=self_heal_mode,
+#         azure_endpoint=azure_endpoint,
+#         use_custom_preprompts=False,
+#         prompt_file="prompt",
+#         image_directory="",
+#         entrypoint_prompt_file="",
+#         use_cache=False,
+#         verbose=verbose,
+#         llm_via_clipboard=False,
+#     )
 
 
 def input_generator():
@@ -66,7 +115,8 @@ class TestMain:
         p = tmp_path / "projects/example"
         p.mkdir(parents=True)
         (p / "prompt").write_text(prompt_text)
-        simplified_main(str(p), "")
+        args = simplified_main(str(p))
+        args()
         ex_env = DiskExecutionEnv(path=p)
         ex_env.run(f"bash {ENTRYPOINT_FILE}")
         assert (p / "output.txt").exists()
