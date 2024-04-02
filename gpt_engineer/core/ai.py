@@ -380,7 +380,8 @@ def serialize_messages(messages: List[Message]) -> str:
 class ClipboardAI(AI):
     # Ignore not init superclass
     def __init__(self, **_):  # type: ignore
-        pass
+        self.vision = False
+        self.token_usage_log = TokenUsageLog("clipboard_llm")
 
     @staticmethod
     def serialize_messages(messages: List[Message]) -> str:

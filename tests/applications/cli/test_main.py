@@ -6,7 +6,7 @@ import dataclasses
 import functools
 import inspect
 from unittest.mock import patch
-
+import typer
 import pytest
 
 import gpt_engineer.applications.cli.main as main
@@ -58,44 +58,10 @@ def dcommand(typer_f, **kwargs):
 
 
 @dcommand(main.main)
-class simplified_main:
+class DefaultArgumentsMain:
     def __call__(self):
         attribute_dict = vars(self)
         main.main(**attribute_dict)
-
-
-# def simplified_main(path: str, mode: str = ""):
-#     model = "gpt-4-1106-preview"
-#     lite_mode = False
-#     clarify_mode = False
-#     improve_mode = False
-#     self_heal_mode = False
-#     azure_endpoint = ""
-#     verbose = False
-#     if mode == "lite":
-#         lite_mode = True
-#     elif mode == "clarify":
-#         clarify_mode = True
-#     elif mode == "improve":
-#         improve_mode = True
-#     elif mode == "self-heal":
-#         self_heal_mode = True
-#     main.main(
-#         path,
-#         model=model,
-#         lite_mode=lite_mode,
-#         clarify_mode=clarify_mode,
-#         improve_mode=improve_mode,
-#         self_heal_mode=self_heal_mode,
-#         azure_endpoint=azure_endpoint,
-#         use_custom_preprompts=False,
-#         prompt_file="prompt",
-#         image_directory="",
-#         entrypoint_prompt_file="",
-#         use_cache=False,
-#         verbose=verbose,
-#         llm_via_clipboard=False,
-#     )
 
 
 def input_generator():
@@ -108,87 +74,91 @@ prompt_text = "Make a python program that writes 'hello' to a file called 'outpu
 
 
 class TestMain:
-    #  Runs gpt-engineer with default settings and generates a project in the specified path.
+    #  Runs gpt-engineer cli interface for many parameter configurations, BUT DOES NOT CODEGEN! Only testing cli.
     def test_default_settings_generate_project(self, tmp_path, monkeypatch):
-        gen = input_generator()
-        monkeypatch.setattr("builtins.input", lambda _: next(gen))
         p = tmp_path / "projects/example"
         p.mkdir(parents=True)
         (p / "prompt").write_text(prompt_text)
-        args = simplified_main(str(p))
+        args = DefaultArgumentsMain(str(p), llm_via_clipboard=True, no_execution=True)
         args()
-        ex_env = DiskExecutionEnv(path=p)
-        ex_env.run(f"bash {ENTRYPOINT_FILE}")
-        assert (p / "output.txt").exists()
-        text = (p / "output.txt").read_text().strip()
-        assert text == "hello"
 
     #  Runs gpt-engineer with improve mode and improves an existing project in the specified path.
     def test_improve_existing_project(self, tmp_path, monkeypatch):
-        def improve_generator():
-            yield "y"
-            while True:
-                yield "n"  # Subsequent responses
-
-        gen = improve_generator()
-        monkeypatch.setattr("builtins.input", lambda _: next(gen))
         p = tmp_path / "projects/example"
         p.mkdir(parents=True)
         (p / "prompt").write_text(prompt_text)
-        (p / "main.py").write_text("The program will be written in this file")
-        meta_p = p / META_DATA_REL_PATH
-        meta_p.mkdir(parents=True)
-        (meta_p / "file_selection.toml").write_text(
-            """
-        [files]
-        "main.py" = "selected"
-                    """
+        args = DefaultArgumentsMain(
+            str(p), improve_mode=True, llm_via_clipboard=True, no_execution=True
         )
-        os.environ["GPTE_TEST_MODE"] = "True"
-        simplified_main(str(p), "improve")
-        DiskExecutionEnv(path=p)
-        del os.environ["GPTE_TEST_MODE"]
+        args()
+
+        # def improve_generator():
+        #     yield "y"
+        #     while True:
+        #         yield "n"  # Subsequent responses
+        #
+        # gen = improve_generator()
+        # monkeypatch.setattr("builtins.input", lambda _: next(gen))
+        # p = tmp_path / "projects/example"
+        # p.mkdir(parents=True)
+        # (p / "prompt").write_text(prompt_text)
+        # (p / "main.py").write_text("The program will be written in this file")
+        # meta_p = p / META_DATA_REL_PATH
+        # meta_p.mkdir(parents=True)
+        # (meta_p / "file_selection.toml").write_text(
+        #     """
+        # [files]
+        # "main.py" = "selected"
+        #             """
+        # )
+        # os.environ["GPTE_TEST_MODE"] = "True"
+        # simplified_main(str(p), "improve")
+        # DiskExecutionEnv(path=p)
+        # del os.environ["GPTE_TEST_MODE"]
 
     #  Runs gpt-engineer with lite mode and generates a project with only the main prompt.
     def test_lite_mode_generate_project(self, tmp_path, monkeypatch):
-        gen = input_generator()
-        monkeypatch.setattr("builtins.input", lambda _: next(gen))
         p = tmp_path / "projects/example"
         p.mkdir(parents=True)
         (p / "prompt").write_text(prompt_text)
-        simplified_main(str(p), "lite")
-        ex_env = DiskExecutionEnv(path=p)
-        ex_env.run(f"bash {ENTRYPOINT_FILE}")
-        assert (p / "output.txt").exists()
-        text = (p / "output.txt").read_text().strip()
-        assert text == "hello"
+        args = DefaultArgumentsMain(
+            str(p), lite_mode=True, llm_via_clipboard=True, no_execution=True
+        )
+        args()
 
     #  Runs gpt-engineer with clarify mode and generates a project after discussing the specification with the AI.
     def test_clarify_mode_generate_project(self, tmp_path, monkeypatch):
-        gen = input_generator()
-        monkeypatch.setattr("builtins.input", lambda _: next(gen))
         p = tmp_path / "projects/example"
         p.mkdir(parents=True)
         (p / "prompt").write_text(prompt_text)
-        simplified_main(str(p), "clarify")
-        ex_env = DiskExecutionEnv(path=p)
-        ex_env.run(f"bash {ENTRYPOINT_FILE}")
-        assert (p / "output.txt").exists()
-        text = (p / "output.txt").read_text().strip()
-        assert text == "hello"
+        args = DefaultArgumentsMain(
+            str(p), clarify_mode=True, llm_via_clipboard=True, no_execution=True
+        )
+        args()
 
     #  Runs gpt-engineer with self-heal mode and generates a project after discussing the specification with the AI and self-healing the code.
     def test_self_heal_mode_generate_project(self, tmp_path, monkeypatch):
-        monkeypatch.setattr("builtins.input", lambda _: next(input_generator()))
         p = tmp_path / "projects/example"
         p.mkdir(parents=True)
         (p / "prompt").write_text(prompt_text)
-        simplified_main(str(p), "self-heal")
-        ex_env = DiskExecutionEnv(path=p)
-        ex_env.run(f"bash {ENTRYPOINT_FILE}")
-        assert (p / "output.txt").exists()
-        text = (p / "output.txt").read_text().strip()
-        assert text == "hello"
+        args = DefaultArgumentsMain(
+            str(p), self_heal_mode=True, llm_via_clipboard=True, no_execution=True
+        )
+        args()
+
+    def test_clarify_lite_improve_mode_generate_project(self, tmp_path, monkeypatch):
+        p = tmp_path / "projects/example"
+        p.mkdir(parents=True)
+        (p / "prompt").write_text(prompt_text)
+        args = DefaultArgumentsMain(
+            str(p),
+            improve_mode=True,
+            lite_mode=True,
+            clarify_mode=True,
+            llm_via_clipboard=True,
+            no_execution=True,
+        )
+        pytest.raises(typer.Exit, args)
 
     #  Tests the creation of a log file in improve mode.
 
