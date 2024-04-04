@@ -1,0 +1,8 @@
+fastapi==0.78.0
+uvicorn==0.17.6
+python-dotenv==0.20.0
+sqlalchemy==1.4.27
+aiosmtplib==1.1.6
+pydantic==1.9.0
+email-validator==1.1.3
+jinja2==3.0.3

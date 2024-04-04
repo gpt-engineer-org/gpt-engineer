@@ -1,0 +1,1 @@
+Create a good structure of fastapi project with sqlite db, with endpoint post send-letter, where in body json with letter_template and parameters than in template should be changed and sended via smptp, use .env and make an example 2 html templates with some message for users and parameters fot change
