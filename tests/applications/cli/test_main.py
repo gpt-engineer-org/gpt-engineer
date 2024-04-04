@@ -1,20 +1,20 @@
-import os
-import shutil
-import tempfile
-from argparse import Namespace
 import dataclasses
 import functools
 import inspect
+import os
+import shutil
+import tempfile
+
+from argparse import Namespace
 from unittest.mock import patch
-import typer
+
 import pytest
+import typer
 
 import gpt_engineer.applications.cli.main as main
 
 from gpt_engineer.applications.cli.main import load_prompt
-from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
-from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, META_DATA_REL_PATH
 from gpt_engineer.core.prompt import Prompt
 
 

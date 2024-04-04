@@ -3,6 +3,8 @@ import tempfile
 
 import pytest
 
+from langchain.schema import AIMessage
+
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
@@ -12,9 +14,6 @@ from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, memory_path
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen
-
-from langchain.schema import AIMessage
-
 from tests.mock_ai import MockAI
 
 
@@ -26,9 +25,9 @@ def test_init_standard_config(monkeypatch):
     mock_ai = MockAI(
         [
             AIMessage(
-                f"hello_world.py\n```\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n```"
+                "hello_world.py\n```\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n```"
             ),
-            AIMessage(f"```run.sh\npython3 hello_world.py\n```"),
+            AIMessage("```run.sh\npython3 hello_world.py\n```"),
         ],
     )
     cli_agent = CliAgent.with_default_config(memory, execution_env, ai=mock_ai)
@@ -57,9 +56,9 @@ def test_init_lite_config(monkeypatch):
     mock_ai = MockAI(
         [
             AIMessage(
-                f"hello_world.py\n```\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n```"
+                "hello_world.py\n```\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n```"
             ),
-            AIMessage(f"```run.sh\npython3 hello_world.py\n```"),
+            AIMessage("```run.sh\npython3 hello_world.py\n```"),
         ],
     )
     cli_agent = CliAgent.with_default_config(
@@ -88,11 +87,11 @@ def test_init_clarified_gen_config(monkeypatch):
     execution_env = DiskExecutionEnv()
     mock_ai = MockAI(
         [
-            AIMessage(f"nothing to clarify"),
+            AIMessage("nothing to clarify"),
             AIMessage(
-                f"hello_world.py\n```\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n```"
+                "hello_world.py\n```\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n```"
             ),
-            AIMessage(f"```run.sh\npython3 hello_world.py\n```"),
+            AIMessage("```run.sh\npython3 hello_world.py\n```"),
         ],
     )
     cli_agent = CliAgent.with_default_config(
@@ -129,7 +128,7 @@ def test_improve_standard_config(monkeypatch):
     mock_ai = MockAI(
         [
             AIMessage(
-                f"```diff\n--- main.py\n+++ main.py\n@@ -7,3 +7,3 @@\n     with open(filename, 'w') as file:\n-        file.write('Hello World!')\n+        file.write('!dlroW olleH')\n```"
+                "```diff\n--- main.py\n+++ main.py\n@@ -7,3 +7,3 @@\n     with open(filename, 'w') as file:\n-        file.write('Hello World!')\n+        file.write('!dlroW olleH')\n```"
             )
         ]
     )
