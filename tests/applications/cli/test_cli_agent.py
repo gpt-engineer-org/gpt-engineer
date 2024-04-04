@@ -13,21 +13,9 @@ from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen
 
-from typing import Any, Optional, List
 from langchain.schema import AIMessage
 
-
-class MockAI:
-    def __init__(self, response: List):
-        self.responses = iter(response)
-
-    def start(self, system: str, user: Any, *, step_name: str) -> List[str]:
-        return [next(self.responses)]
-
-    def next(
-        self, messages: List[str], prompt: Optional[str] = None, *, step_name: str
-    ) -> List[str]:
-        return [next(self.responses)]
+from tests.mock_ai import MockAI
 
 
 def test_init_standard_config(monkeypatch):
