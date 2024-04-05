@@ -22,13 +22,12 @@ jobs:
         python-version: ${{ matrix.python-version }}
         cache: 'pip' #Note that pip is for the tox level. Poetry is still used for installing the specific environments (tox.ini)
 
-    - name: Install Tkinter
-      run: sudo apt-get install python3-tk
-
     - name: Install tox
       run: pip install tox
 
     - name: Run tox
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       run: tox
 
     - name: Report coverage
