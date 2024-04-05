@@ -23,7 +23,7 @@ from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.prompt import Prompt
 
-DATASET_PATH = Path("gpt_engineer/benchmark/benchmarks/apps/dataset")
+DATASET_PATH = Path(__file__).parent / "dataset"
 MAX_N_TEST_EXAMPLES = 10
 
 

@@ -28,6 +28,7 @@ import typer
 from langchain.cache import SQLiteCache
 from langchain.globals import set_llm_cache
 
+from gpt_engineer.applications.cli.main import load_env_if_needed
 from gpt_engineer.benchmark.benchmarks.load import get_benchmark
 from gpt_engineer.benchmark.run import print_results, run
 
@@ -87,6 +88,7 @@ def main(
     None
     """
     set_llm_cache(SQLiteCache(database_path=".langchain.db"))
+    load_env_if_needed()
 
     benchmarks = benchmarks.split(",")
     for benchmark_name in benchmarks:
