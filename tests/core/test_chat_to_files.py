@@ -306,7 +306,7 @@ def load_and_test_diff(
 
     # Parse the diffs and validate & correct them
     diffs = parse_diffs(diff_content)
-    # list(diffs.values())[0].validate_and_correct(file_to_lines_dict(code_content))
+    list(diffs.values())[0].validate_and_correct(file_to_lines_dict(code_content))
     return diff_content, code_content, diffs
 
 

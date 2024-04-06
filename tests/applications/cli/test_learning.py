@@ -13,9 +13,10 @@ def test_human_review_input_no_concent_returns_none():
 
 
 def test_human_review_input_consent_code_ran_no_comments():
-    with mock.patch.object(
-        learning, "check_collection_consent", return_value=True
-    ), mock.patch("builtins.input", return_value="y"):
+    with (
+        mock.patch.object(learning, "check_collection_consent", return_value=True),
+        mock.patch("builtins.input", return_value="y"),
+    ):
         result = learning.human_review_input()
 
     assert result.raw == "y, y, "
@@ -25,9 +26,10 @@ def test_human_review_input_consent_code_ran_no_comments():
 
 
 def test_human_review_input_consent_code_ran_not_perfect_but_useful_no_comments():
-    with mock.patch.object(
-        learning, "check_collection_consent", return_value=True
-    ), mock.patch("builtins.input", side_effect=["y", "n", "y", ""]):
+    with (
+        mock.patch.object(learning, "check_collection_consent", return_value=True),
+        mock.patch("builtins.input", side_effect=["y", "n", "y", ""]),
+    ):
         result = learning.human_review_input()
 
     assert result.raw == "y, n, y"
