@@ -2,18 +2,27 @@ import tempfile
 
 import pytest
 
+from langchain.schema import AIMessage
+
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE
 from gpt_engineer.core.default.simple_agent import SimpleAgent
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.prompt import Prompt
-from tests.caching_ai import CachingAI
+from tests.mock_ai import MockAI
 
 
 def test_init():
     temp_dir = tempfile.mkdtemp()
-
-    lean_agent = SimpleAgent.with_default_config(temp_dir, CachingAI())
+    mock_ai = MockAI(
+        [
+            AIMessage(
+                "hello_world.py\n```\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n```"
+            ),
+            AIMessage("```run.sh\npython3 hello_world.py\n```"),
+        ],
+    )
+    lean_agent = SimpleAgent.with_default_config(temp_dir, mock_ai)
     outfile = "output.txt"
     code = lean_agent.init(
         Prompt(
@@ -38,7 +47,14 @@ def test_improve():
             "run.sh": "python3 main.py\n",
         }
     )
-    lean_agent = SimpleAgent.with_default_config(temp_dir, CachingAI())
+    mock_ai = MockAI(
+        [
+            AIMessage(
+                "```diff\n--- main.py\n+++ main.py\n@@ -7,3 +7,3 @@\n     with open(filename, 'w') as file:\n-        file.write('Hello World!')\n+        file.write('!dlroW olleH')\n```"
+            )
+        ]
+    )
+    lean_agent = SimpleAgent.with_default_config(temp_dir, mock_ai)
     code = lean_agent.improve(
         code,
         Prompt(
