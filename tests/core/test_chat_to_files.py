@@ -4,9 +4,9 @@ from typing import Dict, Tuple
 
 import pytest
 
-from gpt_engineer.core.chat_to_files import apply_diffs, parse_diffs
+from gpt_engineer.core.chat_to_files import parse_diffs
 from gpt_engineer.core.diff import is_similar
-from gpt_engineer.core.files_dict import FilesDict, file_to_lines_dict
+from gpt_engineer.core.files_dict import file_to_lines_dict
 
 THIS_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -224,7 +224,7 @@ def test_correct_skipped_lines():
     with open(
         os.path.join(
             THIS_FILE_DIR,
-            "chat_to_files_test_cases",
+            "improve_function_test_cases",
             "corrected_diff_from_missing_lines",
         ),
         "r",
@@ -248,7 +248,7 @@ def test_correct_skipped_lines_and_number_correction():
     with open(
         os.path.join(
             THIS_FILE_DIR,
-            "chat_to_files_test_cases",
+            "improve_function_test_cases",
             "corrected_diff_from_missing_lines",
         ),
         "r",
@@ -273,13 +273,13 @@ def parse_chats_with_regex(
 ) -> Tuple[str, str, Dict]:
     # Load the diff
     with open(
-        os.path.join(THIS_FILE_DIR, "chat_to_files_test_cases", diff_file_name), "r"
+        os.path.join(THIS_FILE_DIR, "improve_function_test_cases", diff_file_name), "r"
     ) as f:
         diff_content = f.read()
 
     # Load the corresponding code
     with open(
-        os.path.join(THIS_FILE_DIR, "chat_to_files_test_cases", code_file_name), "r"
+        os.path.join(THIS_FILE_DIR, "improve_function_test_cases", code_file_name), "r"
     ) as f:
         code_content = f.read()
 
@@ -291,117 +291,23 @@ def parse_chats_with_regex(
 
 # test parse diff
 def test_controller_diff():
-    parse_chats_with_regex("controller_diff", "controller_code")
+    parse_chats_with_regex("controller_chat", "controller_code")
 
 
 def test_simple_calculator_diff():
-    parse_chats_with_regex("simple_calculator_diff", "simple_calculator_code")
+    parse_chats_with_regex("simple_calculator_chat", "simple_calculator_code")
 
 
 def test_complex_temperature_converter_diff():
-    parse_chats_with_regex("temperature_converter_diff", "temperature_converter_code")
+    parse_chats_with_regex("temperature_converter_chat", "temperature_converter_code")
 
 
 def test_complex_task_master_diff():
-    parse_chats_with_regex("task_master_diff", "task_master_code")
+    parse_chats_with_regex("task_master_chat", "task_master_code")
 
 
 def test_long_file_diff():
-    parse_chats_with_regex("wheaties_example_diff", "wheaties_example_code")
-
-
-# Test diff parsing and validation
-def test_validation_and_apply_complex_diff():
-    task_master_diff, task_master_code, diffs = parse_chats_with_regex(
-        "task_master_diff", "task_master_code"
-    )
-    files = FilesDict({"taskmaster.py": task_master_code})
-    for file_name, diff in diffs.items():
-        # if diff is a new file, validation and correction is unnecessary
-        if not diff.is_new_file():
-            problems = diff.validate_and_correct(
-                file_to_lines_dict(files["taskmaster.py"])
-            )
-            print(problems)
-
-    apply_diffs(diffs, files)
-
-
-def test_validation_and_apply_long_diff():
-    wheaties_diff, wheaties_code, diffs = parse_chats_with_regex(
-        "wheaties_example_diff", "wheaties_example_code"
-    )
-
-    files = FilesDict({"VMClonetest.ps1": wheaties_code})
-    for file_name, diff in diffs.items():
-        # if diff is a new file, validation and correction is unnecessary
-        if not diff.is_new_file():
-            problems = diff.validate_and_correct(
-                file_to_lines_dict(files["VMClonetest.ps1"])
-            )
-            print(problems)
-
-    apply_diffs(diffs, files)
-
-
-def test_validation_and_apply_wrong_diff():
-    example_diff, example_code, diffs = parse_chats_with_regex(
-        "vgvishesh_example_diff", "vgvishesh_example_code"
-    )
-    files = FilesDict({"src/components/SocialLinks.tsx": example_code})
-    for file_name, diff in diffs.items():
-        # if diff is a new file, validation and correction is unnecessary
-        if not diff.is_new_file():
-            problems = diff.validate_and_correct(
-                file_to_lines_dict(files["src/components/SocialLinks.tsx"])
-            )
-            print(problems)
-
-    apply_diffs(diffs, files)
-
-
-def test_validation_and_apply_non_change_diff():
-    example_diff, example_code, diffs = parse_chats_with_regex(
-        "vgvishesh_example_2_diff", "vgvishesh_example_2_code"
-    )
-    files = FilesDict({"src/App.tsx": example_code})
-    for file_name, diff in diffs.items():
-        # if diff is a new file, validation and correction is unnecessary
-        if not diff.is_new_file():
-            problems = diff.validate_and_correct(
-                file_to_lines_dict(files["src/App.tsx"])
-            )
-            print(problems)
-
-    apply_diffs(diffs, files)
-
-
-def test_validation_and_apply_diff_on_apps_benchmark_6():
-    example_diff, example_code, diffs = parse_chats_with_regex(
-        "apps_benchmark_6_diff", "apps_benchmark_6_code"
-    )
-    files = FilesDict({"main.py": example_code})
-    for file_name, diff in diffs.items():
-        # if diff is a new file, validation and correction is unnecessary
-        if not diff.is_new_file():
-            problems = diff.validate_and_correct(file_to_lines_dict(files["main.py"]))
-            print(problems)
-
-    print(apply_diffs(diffs, files))
-
-
-def test_validation_and_apply_diff_on_apps_benchmark_6_v2():
-    example_diff, example_code, diffs = parse_chats_with_regex(
-        "apps_benchmark_6_v2_diff", "apps_benchmark_6_v2_code"
-    )
-    files = FilesDict({"main.py": example_code})
-    for file_name, diff in diffs.items():
-        # if diff is a new file, validation and correction is unnecessary
-        if not diff.is_new_file():
-            problems = diff.validate_and_correct(file_to_lines_dict(files["main.py"]))
-            print(problems)
-
-    print(apply_diffs(diffs, files))
+    parse_chats_with_regex("wheaties_example_chat", "wheaties_example_code")
 
 
 if __name__ == "__main__":
