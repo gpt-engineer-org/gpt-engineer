@@ -1,0 +1,61 @@
+Planning:
+
+1. Modify the `handle_input` method within the `Controller` class to change the behavior of the snake when certain keys are pressed.
+2. When the "up" key is pressed, we need to queue two actions: first to move "down" and then to move "right" after one step. This will require storing the next move in the `Controller` class and checking for it on subsequent calls to `handle_input`.
+3. When the "down" key is pressed, the snake should move "up".
+4. When the "left" key is pressed, the snake should move "right".
+5. When the "right" key is pressed, the snake should move "left".
+6. Remove the long, unnecessary comment block.
+7. Since we need to queue actions, we will introduce a new attribute `next_move` to the `Controller` class to store the next move.
+8. Update the `__init__` method to initialize `next_move` as `None`.
+9. Modify the `handle_input` method to check if there is a `next_move` queued before checking the keyboard input. If there is a `next_move`, execute it and clear the `next_move`.
+10. Update the `handle_input` method to set the `next_move` to "right" when the "up" key is pressed, after moving "down".
+11. Update the `handle_input` method to handle the reversed directions for "down", "left", and "right" keys.
+
+Generate patches:
+
+```diff
+--- controller.py
++++ controller.py
+@@ -4,6 +4,7 @@
+ class Controller:
+     def __init__(self, game, view):
+         self.game = game
+         self.view = view
++        self.next_move = None
+
+     def handle_input(self):
++        if self.next_move:
++            self.game.move(self.next_move)
++            self.next_move = None
++        else:
+-        if keyboard.is_pressed("up"):
+-            self.game.move("up")
++            if keyboard.is_pressed("up"):
++                self.game.move("down")
++                self.next_move = "right"
+-        elif keyboard.is_pressed("down"):
++            elif keyboard.is_pressed("down"):
+-            """
+-            long
+-            goring comment
+-
+-
+-
+-
+-
+-
+-
+-
+-            """
+-            self.game.move("down")
++                self.game.move("up")
+-        elif keyboard.is_pressed("left"):
+-            self.game.move("left")
++            elif keyboard.is_pressed("left"):
++                self.game.move("right")
+-        elif keyboard.is_pressed("right"):
+-            self.game.move("right")
++            elif keyboard.is_pressed("right"):
++                self.game.move("left")
+```

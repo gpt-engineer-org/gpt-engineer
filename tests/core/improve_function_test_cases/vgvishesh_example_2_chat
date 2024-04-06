@@ -1,0 +1,50 @@
+To implement a toggle button for switching between dark and light modes, we need to follow these steps:
+
+1. Update the `App.tsx` file to include state management for the theme mode. We will use React's `useState` hook to manage the theme state and `useEffect` hook to apply the theme to the document body class.
+
+2. Add a button in the `App.tsx` file that will toggle the theme state when clicked. This button should be styled and positioned in the top right corner of the screen.
+
+3. Update the `styles.css` file to include styles for the dark mode. We will define a new class, say `.dark-mode`, that will contain the dark mode styles. This class will be applied to the body when the dark mode is active.
+
+4. Update the `styles.css` file to style the toggle button.
+
+Here are the diffs for the changes:
+
+```diff
+--- src/App.tsx
++++ src/App.tsx
+@@ -1,5 +1,9 @@
+ import React from 'react';
++import { useState, useEffect } from 'react';
+ import QRCode from 'qrcode.react';
+ import { profiles } from './components/SocialLinks';
+ import { SocialLinks } from './components/SocialLinks';
++import './styles.css';
+
++const THEME_LIGHT = 'light';
++const THEME_DARK = 'dark';
+
+@@ -6,7 +10,23 @@
+ const App: React.FC = () => {
++  const [theme, setTheme] = useState(THEME_LIGHT);
++
++  useEffect(() => {
++    document.body.className = theme;
++  }, [theme]);
++
++  const toggleTheme = () => {
++    setTheme(theme === THEME_LIGHT ? THEME_DARK : THEME_LIGHT);
++  };
++
+   return (
++    <button className="theme-toggle" onClick={toggleTheme}>
++      {theme === THEME_LIGHT ? 'Dark Mode' : 'Light Mode'}
++    </button>
+     <div className="profile-card-container">
+       <div className="profile-card">
+         <h1 className="profile-title">My Social Profiles QR Code</h1>
+@@ -18,4 +38,4 @@
+ };
+
+ export default App;
+```
