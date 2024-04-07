@@ -1,6 +1,7 @@
 """
 Tests for the revised data collection consent mechanism in the cli/learning module.
 """
+
 from pathlib import Path
 from unittest.mock import patch
 

@@ -1,0 +1,65 @@
+To implement this program, we will follow a structured approach. We will create a Python script that takes command-line arguments for the inputs, parses them, and then processes each query to determine the minimum number of blows required to defeat Zmei Gorynich. The program will consist of a main function that handles input parsing and output formatting, and a separate function that calculates the minimum number of blows for each query.
+
+We will need to:
+1. Parse the command-line arguments to extract the queries.
+2. For each query, calculate the minimum number of blows required.
+3. Print the result for each query.
+
+Let's start by creating the `main.py` file with the necessary imports and the skeleton of our program.
+
+```diff
+--- /dev/null
++++ main.py
+@@ -0,0 +1,36 @@
++import sys
++
++def calculate_min_blows(n, x, blows):
++    """
++    Calculate the minimum number of blows to defeat Zmei Gorynich.
++    :param n: Number of types of blows.
++    :param x: Initial number of heads.
++    :param blows: List of tuples (d_i, h_i) for each blow type.
++    :return: Minimum number of blows or -1 if impossible.
++    """
++    # Implementation will be added here
++    pass
++
++def main():
++    # Parse command-line arguments
++    args = sys.argv[1].split()
++    t = int(args[0])
++    queries = []
++    idx = 1
++    for _ in range(t):
++        n, x = map(int, args[idx:idx+2])
++        idx += 2
++        blows = [tuple(map(int, args[idx:idx+2])) for _ in range(n)]
++        idx += 2*n
++        queries.append((n, x, blows))
++
++    # Process each query
++    for n, x, blows in queries:
++        result = calculate_min_blows(n, x, blows)
++        print(result)
++
++if __name__ == "__main__":
++    main()
+```
+Now, let's implement the logic in calculate_min_blows function to determine the minimum number of blows required to defeat Zmei Gorynich.
+```diff
+--- main.py
++++ main.py
+@@ -8,7 +8,25 @@
++    # Implementation will be added here
++    max_damage = max(blows, key=lambda x: x[0])
++    max_diff = max(blows, key=lambda x: x[0] - x[1])
++    if max_damage[0] >= x:
++        return 1
++    if max_diff[0] <= max_diff[1] and max_damage[0] < x:
++        return -1
++    effective_damage = max_diff[0] - max_diff[1]
++    remaining_heads = x - max_damage[0]
++    blows_required = 1 + (remaining_heads + effective_damage - 1) // effective_damage
++    return blows_required
+-    pass
+```
