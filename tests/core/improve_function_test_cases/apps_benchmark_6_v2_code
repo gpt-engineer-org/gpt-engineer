@@ -1,0 +1,35 @@
+import sys
+
+def calculate_min_blows(n, x, blows):
+    """
+    Calculate the minimum number of blows to defeat Zmei Gorynich.
+    :param n: Number of types of blows.
+    :param x: Initial number of heads.
+    :param blows: List of tuples (d_i, h_i) for each blow type.
+    :return: Minimum number of blows or -1 if impossible.
+    """
+    # Implementation will be added here
+    pass
+
+def main():
+    # Parse command-line arguments
+    args = sys.argv[1].split()
+    t = int(args[0])
+    queries = []
+    idx = 1
+    for _ in range(t):
+        n, x = map(int, args[idx:idx+2])
+        idx += 2
+        blows = [tuple(map(int, args[idx:idx+2])) for _ in range(n)]
+        idx += 2*n
+        queries.append((n, x, blows))
+
+    # Process each query
+    for n, x, blows in queries:
+        result = calculate_min_blows(n, x, blows)
+        print(result)
+
+if __name__ == "__main__":
+    main()"""
+
+print(code)
