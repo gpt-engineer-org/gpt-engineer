@@ -145,10 +145,13 @@ class Hunk:
                         if is_similar(line[1], line_content) and line[1] != "":
                             start_line = line_number - 1
                             break
-                    # if the start line is not found, this should be a comment from LLM
+                    # if the start line is not found, append a problem message
                     if start_line is None:
-                        self.relabel_line(index, ADD)
-                        continue
+                        problems.append(
+                            f"In {self.hunk_to_string()}:can not find the starting line of the diff"
+                        )
+                        return False
+
                     else:
                         # the line prior to the start line is found now we insert it to the first place as the start line
                         self.start_line_pre_edit = start_line
@@ -323,6 +326,8 @@ class Diff:
 
     def is_new_file(self) -> bool:
         """Determines if the diff represents a new file."""
+        if self.filename_pre == "/dev/null":
+            return True
         return any(hunk.is_new_file for hunk in self.hunks)
 
     def diff_to_string(self) -> str:

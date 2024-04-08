@@ -12,6 +12,7 @@ Functions:
     serialize_messages(messages: List[Message]) -> str
         Serialize a list of messages to a JSON string.
 """
+
 from __future__ import annotations
 
 import json
@@ -347,8 +348,15 @@ class AI:
                 streaming=self.streaming,
                 callbacks=[StreamingStdOutCallbackHandler()],
             )
-
-        if self.vision:
+        elif "claude" in self.model_name:
+            return ChatAnthropic(
+                model=self.model_name,
+                temperature=self.temperature,
+                callbacks=[StreamingStdOutCallbackHandler()],
+                streaming=self.streaming,
+                max_tokens_to_sample=4096,
+            )
+        elif self.vision:
             return ChatOpenAI(
                 model=self.model_name,
                 temperature=self.temperature,
@@ -356,30 +364,13 @@ class AI:
                 callbacks=[StreamingStdOutCallbackHandler()],
                 max_tokens=4096,  # vision models default to low max token limits
             )
-
-        if "claude" in self.model_name:
-            return ChatAnthropic(
+        else:
+            return ChatOpenAI(
                 model=self.model_name,
                 temperature=self.temperature,
+                streaming=self.streaming,
                 callbacks=[StreamingStdOutCallbackHandler()],
-                streaming=True,
-                max_tokens_to_sample=4096,
             )
-
-        if "claude" in self.model_name:
-            return ChatAnthropic(
-                model=self.model_name,
-                temperature=self.temperature,
-                callbacks=[StreamingStdOutCallbackHandler()],
-                max_tokens_to_sample=4096,
-            )
-
-        return ChatOpenAI(
-            model=self.model_name,
-            temperature=self.temperature,
-            streaming=self.streaming,
-            callbacks=[StreamingStdOutCallbackHandler()],
-        )
 
 
 def serialize_messages(messages: List[Message]) -> str:
@@ -389,7 +380,8 @@ def serialize_messages(messages: List[Message]) -> str:
 class ClipboardAI(AI):
     # Ignore not init superclass
     def __init__(self, **_):  # type: ignore
-        pass
+        self.vision = False
+        self.token_usage_log = TokenUsageLog("clipboard_llm")
 
     @staticmethod
     def serialize_messages(messages: List[Message]) -> str:
