@@ -306,7 +306,7 @@ Some introductory text.
         # Assert that the code was improved correctly
         expected_code = FilesDict(
             {
-                "main.py": "print('Goodbye, World!')",
+                "main.py": "print('Goodbye, World!')\n",
                 "requirements.txt": "numpy==1.18.1",
                 "README.md": "This is a sample code repository.",
             }
