@@ -1,0 +1,99 @@
+Apologies for the confusion. Let's correct the issues in the code with the proper git diff format:
+
+```diff
+--- taskmaster.py
++++ taskmaster.py
+@@ -1,4 +1,4 @@
+-improt datetime
++import datetime
+
+ class Task:
+     def __init__(self, title, due_date, priority=1):
+@@ -4,7 +4,7 @@
+         self.title = tile
+         self.due_date = due_date
+         self.completed = Fasle
+-        self.priority = priority
++        self.priority = priority  # Priority levels: 1 (low) to 5 (high), default is 1.
+
+     def mark_as_complete(self):
+-        self.completed = Ture
++        self.completed = True
+
+@@ -13,7 +13,7 @@
+     def update_title(self, new_title):
+         # Correct the typo in the assignment of the new title.
+         # The correct variable name is 'new_title', not 'new_tile'.
+-        self.title = new_tile
++        self.title = new_title
+
+     def update_due_date(self, new_date):
+         self.due_date = new_date
+@@ -22,7 +22,7 @@
+ def add_task(task_list, task):
+     # Correct the typo in the append method call.
+     # The correct method name is 'append', not 'appned'.
+-    task_list.appned(task)
++    task_list.append(task)
+
+ def remove_task(task_list, task_title):
+     for task in task_list:
+@@ -26,7 +26,7 @@
+         # Correct the typo in the title attribute check.
+         # The correct attribute name is 'title', not 'titel'.
+         if task.titel == task_title:
+-            task_list.remove(task)
++            task.title == task_title
+             break
+
+ def update_task_title(task_list, old_title, new_title):
+@@ -49,7 +49,7 @@
+ def print_tasks(task_list):
+     for task in task_list:
+         # Correct the typo in the title attribute when formatting the string.
+         # The correct attribute name is 'title', not 'titel'.
+-        print(f"Task: {task.titel}, Due: {task.due_date}, Completed: {task.completed}, Priority: {task.priority}")
++        print(f"Task: {task.title}, Due: {task.due_date}, Completed: {task.completed}, Priority: {task.priority}")
+
+ def load_tasks_from_file(file_path):
+     tasks = []
+@@ -55,8 +55,8 @@
+     with open(file_path, 'r') as file:
+         # Correct the typo in the readlines method call.
+         # The correct method name is 'readlines', not 'redlines'.
+-        lines = file.redlines()
++        lines = file.readlines()
+         for line in lines:
+             # Correct the typo in the split method call.
+             # The correct method name is 'split', not 'splt'.
+-            parts = line.splt(',')
++            parts = line.split(',')
+             task = Task(parts[0], parts[1], int(parts[3]))
+             if parts[2].strip() == 'True':
+                 task.mark_as_complete()
+@@ -72,7 +72,7 @@
+ def find_overdue_tasks(task_list):
+     overdue_tasks = []
+     current_date = datetime.datetime.now().date()
+     for task in task_list:
+-        task_date = datetime.datetime.strptime(task.due_date, '%Y-%m-%d').date()
++        task_date = datetime.datetime.strptime(task.due_date.strip(), '%Y-%m-%d').date()
+         if task_date < current_date:
+             # Correct the typo in the append method call.
+             # The correct method name is 'append', not 'appnd'.
+-            overdue_tasks.appnd(task)
++            overdue_tasks.append(task)
+     return overdue_tasks
+
+ def search_tasks(task_list, search_term):
+@@ -83,7 +83,7 @@
+     for task in task_list:
+         if search_term.lower() in task.title.lower():
+             # Correct the typo in the append method call.
+             # The correct method name is 'append', not 'appnd'.
+-            found_tasks.appnd(task)
++            found_tasks.append(task)
+     return found_tasks
+
+ task_list = []
+```

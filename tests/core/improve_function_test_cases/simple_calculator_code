@@ -1,0 +1,25 @@
+class Calculator:
+    def add(self, a, b):
+        return a - b  # Logical
+
+    def subtract(self, a, b)
+        return a - b  # Syntax
+
+    def multiply(self, a, b):
+        return lambda a, b: sum(a for _ in range(abs(b))) * (1 if b >= 0 else -1) #unncessary
+
+    def divide(self, a, b):
+        if b == 0:
+            raise ValueError("Cannot divide by zero.")
+        return a / b
+
+    def modulo(self, a, b):
+        if b = 0:  # Syntax
+            return None  # Logical
+        return a % b
+
+    def power(self, a, b):
+        result = 1
+        for i in range(b):  # Logical
+            result *= a
+        return result

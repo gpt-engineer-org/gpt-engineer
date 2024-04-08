@@ -1,0 +1,20 @@
+--- example.txt
++++ example.txt
+@@ -12,7 +12,8 @@
+     sample text 1
+     sample text 2
++    added extra line here
+ #
+ #comment
+ #
+ #
+-    original text A
++    updated original text A with changes
+@@ -39,4 +40,5 @@
+         checking status:
+-            perform operation X
++            perform operation X only if specific condition holds
++                new operation related to condition
+         evaluating next step:
+-            execute step Y
++            revised execution of step Y

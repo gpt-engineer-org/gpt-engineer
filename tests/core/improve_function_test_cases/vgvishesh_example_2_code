@@ -1,0 +1,18 @@
+import React from 'react';
+import QRCode from 'qrcode.react';
+import { profiles } from './components/SocialLinks';
+import { SocialLinks } from './components/SocialLinks';
+
+const App: React.FC = () => {
+  return (
+    <div className="profile-card-container">
+      <div className="profile-card">
+        <h1 className="profile-title">My Social Profiles QR Code</h1>
+        <QRCode value={profiles.join("\n")} size={256} />
+        <SocialLinks />
+      </div>
+    </div>
+  );
+};
+
+export default App;
