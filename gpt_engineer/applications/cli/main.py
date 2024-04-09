@@ -76,6 +76,7 @@ def load_env_if_needed():
         load_dotenv()
     if os.getenv("OPENAI_API_KEY") is None:
         load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
+
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
     if os.getenv("ANTHROPIC_API_KEY") is None:
@@ -480,6 +481,8 @@ def main(
 
     if ai.token_usage_log.is_openai_model():
         print("Total api cost: $ ", ai.token_usage_log.usage_cost())
+    elif os.getenv("LOCAL_MODEL"):
+        print("Total api cost: $ 0.0 since we are using local LLM.")
     else:
         print("Total tokens used: ", ai.token_usage_log.total_tokens())
 
