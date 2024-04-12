@@ -38,8 +38,6 @@ import sys
 from pathlib import Path
 from typing import List, MutableMapping, Union
 
-import black
-
 from langchain.schema import HumanMessage, SystemMessage
 from termcolor import colored
 
@@ -269,30 +267,6 @@ def execute_entrypoint(
     return files_dict
 
 
-def black_linting_for_python_files(files_dict: FilesDict) -> FilesDict:
-    """
-    Lints the Python files in the codebase using the `black` tools.
-
-    Parameters
-    ----------
-    files_dict : FilesDict
-        The dictionary of file names to their respective source code content.
-
-    Returns
-    -------
-    FilesDict
-        The dictionary of file names to their respective source code content after linting.
-    """
-    for filename, content in files_dict.items():
-        if filename.endswith(".py"):
-            try:
-                files_dict[filename] = black.format_str(content, mode=black.FileMode())
-                print(f"Linted {filename} with black.")
-            except black.NothingChanged:
-                pass
-    return files_dict
-
-
 def improve_fn(
     ai: AI,
     prompt: Prompt,
@@ -326,8 +300,6 @@ def improve_fn(
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]
 
-    # lint the code
-    files_dict = black_linting_for_python_files(files_dict)
     # Add files as input
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=prompt.to_langchain_content()))

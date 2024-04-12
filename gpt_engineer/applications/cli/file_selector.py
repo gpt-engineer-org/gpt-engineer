@@ -57,7 +57,10 @@ class FileSelector:
         "# gpt-engineer can only read selected files. "
         "Including irrelevant files will degrade performance, "
         "cost additional tokens and potentially overflow token limit.\n\n"
+        "# Linting with BLACK (Python) enhances code suggestions from LLMs. "
+        "To disable linting, uncomment the relevant option in the linting settings.\n\n"
     )
+    LINTING_OPTION_COMMENT = "# Keep commented to enable linting"
 
     def __init__(self, project_path: Union[str, Path]):
         """
@@ -142,7 +145,7 @@ class FileSelector:
         if init:
             tree_dict = {x: "selected" for x in self.get_current_files(root_path)}
 
-            s = toml.dumps({"files": tree_dict})
+            s = toml.dumps({"linting": self.LINTING_OPTION_COMMENT, "files": tree_dict})
 
             # add comments on all lines that match = "selected"
             s = "\n".join(
@@ -274,6 +277,9 @@ class FileSelector:
         """
         selected_files = []
         edited_tree = toml.load(toml_file)  # Load the edited .toml file
+
+        # Check if the linting option is commented out
+        # todo: add linting option to the file selection
 
         # Iterate through the files in the .toml and append selected files to the list
         for file, _ in edited_tree["files"].items():
