@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gpt-engineer"
-version = "0.2.8"
+version = "0.2.9"
 description = "Specify what you want it to build, the AI asks for clarification, and then builds it."
 authors = ["Anton Osika <anton.osika@gmail.com>"]
 license = "MIT"
