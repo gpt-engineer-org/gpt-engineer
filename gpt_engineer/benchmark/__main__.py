@@ -32,6 +32,8 @@ from gpt_engineer.applications.cli.main import load_env_if_needed
 from gpt_engineer.benchmark.benchmarks.load import get_benchmark
 from gpt_engineer.benchmark.run import print_results, run
 
+app = typer.Typer()  # creates a CLI app
+
 
 def get_agent(path):
     """
@@ -52,6 +54,14 @@ def get_agent(path):
     return agent_module.default_config_agent()
 
 
+@app.command(
+    help="""
+        Run any benchmark(s) against the specified agent.
+        
+        \b
+        Currently available benchmarks are: apps and mbpp
+    """
+)
 def main(
     path_to_agent: Annotated[
         str,
