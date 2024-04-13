@@ -57,7 +57,7 @@ def get_agent(path):
 @app.command(
     help="""
         Run any benchmark(s) against the specified agent.
-        
+
         \b
         Currently available benchmarks are: apps and mbpp
     """
