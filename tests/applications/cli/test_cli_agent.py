@@ -25,9 +25,9 @@ def test_init_standard_config(monkeypatch):
     mock_ai = MockAI(
         [
             AIMessage(
-                "hello_world.py\n```\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n```"
+                "hello_world.py\n\`\`\`\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n\`\`\`"
             ),
-            AIMessage("```run.sh\npython3 hello_world.py\n```"),
+            AIMessage("\`\`\`run.sh\npython3 hello_world.py\n\`\`\`"),
         ],
     )
     cli_agent = CliAgent.with_default_config(memory, execution_env, ai=mock_ai)
@@ -56,9 +56,9 @@ def test_init_lite_config(monkeypatch):
     mock_ai = MockAI(
         [
             AIMessage(
-                "hello_world.py\n```\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n```"
+                "hello_world.py\n\`\`\`\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n\`\`\`"
             ),
-            AIMessage("```run.sh\npython3 hello_world.py\n```"),
+            AIMessage("\`\`\`run.sh\npython3 hello_world.py\n\`\`\`"),
         ],
     )
     cli_agent = CliAgent.with_default_config(
@@ -89,9 +89,9 @@ def test_init_clarified_gen_config(monkeypatch):
         [
             AIMessage("nothing to clarify"),
             AIMessage(
-                "hello_world.py\n```\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n```"
+                "hello_world.py\n\`\`\`\nwith open('output.txt', 'w') as file:\n    file.write('Hello World!')\n\`\`\`"
             ),
-            AIMessage("```run.sh\npython3 hello_world.py\n```"),
+            AIMessage("\`\`\`run.sh\npython3 hello_world.py\n\`\`\`"),
         ],
     )
     cli_agent = CliAgent.with_default_config(
@@ -128,7 +128,7 @@ def test_improve_standard_config(monkeypatch):
     mock_ai = MockAI(
         [
             AIMessage(
-                "```diff\n--- main.py\n+++ main.py\n@@ -7,3 +7,3 @@\n     with open(filename, 'w') as file:\n-        file.write('Hello World!')\n+        file.write('!dlroW olleH')\n```"
+                "\`\`\`diff\n--- main.py\n+++ main.py\n@@ -7,3 +7,3 @@\n     with open(filename, 'w') as file:\n-        file.write('Hello World!')\n+        file.write('!dlroW olleH')\n\`\`\`"
             )
         ]
     )
