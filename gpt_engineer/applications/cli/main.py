@@ -247,7 +247,7 @@ def prompt_yesno() -> bool:
 )
 def main(
     project_path: str = typer.Argument(".", help="path"),
-    model: str = typer.Argument("gpt-4-0125-preview", help="model id string"),
+    model: str = typer.Argument("gpt-4-0125-preview" if os.getenv("MODEL_NAME") is None else os.getenv("MODEL_NAME"), help="model id string"),
     temperature: float = typer.Option(
         0.1,
         "--temperature",
