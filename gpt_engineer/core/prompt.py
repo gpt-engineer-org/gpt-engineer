@@ -1,5 +1,6 @@
-from typing import Dict, Optional
 import json
+
+from typing import Dict, Optional
 
 
 class Prompt:
