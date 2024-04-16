@@ -107,7 +107,11 @@ class AI:
         self.azure_endpoint = azure_endpoint
         self.model_name = model_name
         self.streaming = streaming
-        self.vision = ("vision-preview" in model_name) or ("gpt-4-turbo" in model_name and not "preview" in model_name) or ("claude" in model_name)
+        self.vision = (
+            ("vision-preview" in model_name)
+            or ("gpt-4-turbo" in model_name and "preview" not in model_name)
+            or ("claude" in model_name)
+        )
         self.llm = self._create_chat_model()
         self.token_usage_log = TokenUsageLog(model_name)
 
