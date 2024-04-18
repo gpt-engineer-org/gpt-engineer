@@ -284,6 +284,7 @@ class TokenUsageLog:
 
         result = 0
         for log in self.log():
+            if self.model_name == "gpt-3.5":
             result += get_openai_token_cost_for_model(
                 self.model_name, log.total_prompt_tokens, is_completion=False
             )
