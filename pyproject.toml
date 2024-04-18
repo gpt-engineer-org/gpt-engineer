@@ -66,7 +66,7 @@ sphinx_copybutton = ">=0.5.2"
 gpt-engineer = 'gpt_engineer.applications.cli.main:app'
 ge = 'gpt_engineer.applications.cli.main:app'
 gpte = 'gpt_engineer.applications.cli.main:app'
-bench = 'gpt_engineer.benchmark.__main__:main'
+bench = 'gpt_engineer.benchmark.__main__:app'
 gpte_test_application = 'tests.caching_main:app'
 
 [tool.poetry.extras]
