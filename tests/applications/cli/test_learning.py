@@ -3,6 +3,7 @@ from unittest import mock
 from gpt_engineer.applications.cli import learning
 from gpt_engineer.applications.cli.learning import Learning
 from gpt_engineer.core.default.disk_memory import DiskMemory
+from gpt_engineer.core.prompt import Prompt
 
 
 def test_human_review_input_no_concent_returns_none():
@@ -86,7 +87,7 @@ def test_extract_learning():
     memory.to_json.return_value = {"prompt": "prompt"}
 
     result = learning.extract_learning(
-        "prompt",
+        Prompt("prompt"),
         "model_name",
         0.01,
         ("prompt_tokens", "completion_tokens"),
