@@ -79,7 +79,7 @@ class Learning:
     Attributes
     ----------
     prompt : str
-        The initial prompt provided to the GPT Engineer.
+        A JSON string representing the prompt provided to GPT Engineer.
     model : str
         The name of the model used during the session.
     temperature : float
@@ -98,7 +98,7 @@ class Learning:
         The version of the learning data schema.
     """
 
-    prompt: Prompt
+    prompt: str
     model: str
     temperature: float
     config: str
@@ -266,7 +266,7 @@ def extract_learning(
         An instance of Learning containing all the session details and user feedback.
     """
     return Learning(
-        prompt=prompt,
+        prompt=prompt.to_json(),
         model=model,
         temperature=temperature,
         config=json.dumps(config),

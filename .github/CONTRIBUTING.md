@@ -1,8 +1,8 @@
-# Contributing to GPT-engineer
+# Contributing to gpt-engineer
 
-GPT-engineer is a community project and lives from your contributions - they are warmly appreciated. The main contribution avenues are:
-- Bug report: report when something in GPT-engineer doesn't work. Do not report errors in programs written _by_ GPT-engineer.
-- Feature request: provide a detailed sketch about something you want to have implemented in GPT-engineer. There is no guarantee that features will be implemented.
+The gpt-engineer is a community project and lives from your contributions - they are warmly appreciated. The main contribution avenues are:
+- Bug report: report when something in gpt-engineer doesn't work. Do not report errors in programs written _by_ gpt-engineer.
+- Feature request: provide a detailed sketch about something you want to have implemented in gpt-engineer. There is no guarantee that features will be implemented.
 - Discussion: raise awareness of a potential improvement. This is often a good starting point before making a detailed feature request.
 - Pull request: implement code and have it reviewed and potentially merged by the maintainers. Implementations of existing feature requests or fixes to bug reports are likely to be merged.
 
@@ -12,7 +12,7 @@ By participating in this project, you agree to abide by the [code of conduct](ht
 Code that is likely to introduce breaking changes, or significantly change the user experience for users and developers, require [board approval](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/GOVERNANCE.md) to be merged. Smaller code changes can be merged directly.
 As a rule, cosmetic pull requests, for example rephrasing the readme or introducing more compact syntax, that do not yield clear practical improvements are not merged. Such pull requests are generally discouraged, both to save time for the maintainers and to establish a lower bar for becoming a contributor.
 
-## Getting Started with Pull Requests to GPT-engineer
+## Getting Started with Pull Requests to gpt-engineer
 
 To get started with contributing, please follow these steps:
 
@@ -115,6 +115,6 @@ At the beginning this might seem like a tedious process (having to add the file 
 
 ## Licensing
 
-By contributing to GPT Engineer, you agree that your contributions will be licensed under the [LICENSE](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/LICENSE) file of the project.
+By contributing to gpt-engineer, you agree that your contributions will be licensed under the [LICENSE](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/LICENSE) file of the project.
 
-Thank you for your interest in contributing to GPT Engineer! We appreciate your support and look forward to your contributions.
+Thank you for your interest in contributing to gpt-engineer! We appreciate your support and look forward to your contributions.
