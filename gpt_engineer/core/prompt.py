@@ -1,5 +1,3 @@
-import json
-
 from typing import Dict, Optional
 
 
@@ -32,13 +30,3 @@ class Prompt:
                 content.append(image_content)
 
         return content
-
-    def to_dict(self):
-        return {
-            "text": self.text,
-            "image_urls": self.image_urls,
-            "entrypoint_prompt": self.entrypoint_prompt,
-        }
-
-    def to_json(self):
-        return json.dumps(self.to_dict())
