@@ -73,19 +73,20 @@ def load_mbpp(config: MbppConfig) -> Benchmark:
     """
     dataset = _get_dataset()
     tasks = []
-
-    problems = [
-        Problem(
-            source_file=problem["source_file"],
-            task_id=problem["task_id"],
-            prompt=problem["prompt"],
-            code=problem["code"],
-            test_imports=problem["test_imports"],
-            test_list=problem["test_list"],
-        )
-        for problem in dataset["test"]
-        if problem["task_id"] in config["active_indices"]
-    ]
+    problems = []
+    for dataset_type in ["test", "train"]:
+        problems += [
+            Problem(
+                source_file=problem["source_file"],
+                task_id=problem["task_id"],
+                prompt=problem["prompt"],
+                code=problem["code"],
+                test_imports=problem["test_imports"],
+                test_list=problem["test_list"],
+            )
+            for index, problem in enumerate(dataset[dataset_type])
+            if index < config[dataset_type + "_len"]
+        ]
 
     for problem in problems:
         prompt = Prompt(

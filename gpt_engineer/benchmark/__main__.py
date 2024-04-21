@@ -99,6 +99,7 @@ def main(
     set_llm_cache(SQLiteCache(database_path=".langchain.db"))
     load_env_if_needed()
     config = BenchConfig.from_toml(bench_config)
+    print("using config file: " + bench_config)
     benchmarks = list()
     for specific_config_name in vars(config):
         specific_config = getattr(config, specific_config_name)
@@ -108,6 +109,13 @@ def main(
 
     for benchmark_name in benchmarks:
         benchmark = get_benchmark(benchmark_name, config)
+        if len(benchmark.tasks) == 0:
+            print(
+                benchmark_name
+                + " was skipped, since no tasks are specified. Increase the number of tasks in the config file at: "
+                + bench_config
+            )
+            continue
         agent = get_agent(path_to_agent)
 
         results = run(agent, benchmark, verbose=verbose)

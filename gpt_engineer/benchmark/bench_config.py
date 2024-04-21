@@ -56,19 +56,9 @@ class BenchConfig:
             apps.pop(cat + "indices_first", None)
             apps.pop(cat + "indices_len", None)
 
-        mbpp = config_dict["mbpp"]
-        mbpp[ind_list_suffix] = list(
-            range(
-                int(mbpp.get("indices_first", 0)),
-                int(mbpp.get("indices_first", 0)) + int(mbpp.get("indices_len", 5)),
-            )
-        )
-        mbpp.pop("indices_len", None)
-        mbpp.pop("indices_first", None)
-
         return cls(
             apps=apps,
-            mbpp=mbpp,
+            mbpp=config_dict["mbpp"],
             gptme=config_dict["gptme"],
             gpteng=config_dict["gpteng"],
         )
