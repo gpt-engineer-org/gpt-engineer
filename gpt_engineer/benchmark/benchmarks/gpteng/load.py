@@ -19,12 +19,12 @@ load_gpteng : function
 
 from pathlib import Path
 
+from gpt_engineer.benchmark.bench_config import GptengConfig
 from gpt_engineer.benchmark.benchmarks.gpteng.eval_tools import (
     check_evaluation_component,
 )
 from gpt_engineer.benchmark.types import Assertable, Benchmark, Task
 from gpt_engineer.core.chat_to_files import chat_to_files_dict
-from gpt_engineer.benchmark.bench_config import GptengConfig
 from gpt_engineer.core.prompt import Prompt
 
 evaluations = [

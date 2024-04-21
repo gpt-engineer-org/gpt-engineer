@@ -14,7 +14,7 @@ print_results : function
 """
 import time
 
-from typing import List, Optional
+from typing import List
 
 from gpt_engineer.benchmark.types import Assertable, Benchmark, TaskResult
 from gpt_engineer.core.base_agent import BaseAgent

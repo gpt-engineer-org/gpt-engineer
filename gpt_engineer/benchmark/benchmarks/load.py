@@ -9,12 +9,12 @@ Functions
 get_benchmark : function
     Retrieves a Benchmark object by name. Raises ValueError if the benchmark is unknown.
 """
+from gpt_engineer.benchmark.bench_config import BenchConfig
 from gpt_engineer.benchmark.benchmarks.apps.load import load_apps
 from gpt_engineer.benchmark.benchmarks.gpteng.load import load_gpteng
 from gpt_engineer.benchmark.benchmarks.gptme.load import load_gptme
 from gpt_engineer.benchmark.benchmarks.mbpp.load import load_mbpp
 from gpt_engineer.benchmark.types import Benchmark
-from gpt_engineer.benchmark.bench_config import BenchConfig
 
 BENCHMARKS = {
     "gptme": load_gptme,

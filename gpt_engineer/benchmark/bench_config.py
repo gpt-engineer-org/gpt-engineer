@@ -1,7 +1,7 @@
-from dataclasses import asdict, dataclass, field
-from typing import List
-from gpt_engineer.core.project_config import read_config, filter_none
+from dataclasses import dataclass, field
 from pathlib import Path
+
+from gpt_engineer.core.project_config import read_config
 
 
 @dataclass

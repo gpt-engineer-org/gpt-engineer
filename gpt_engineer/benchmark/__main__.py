@@ -30,9 +30,9 @@ from langchain.cache import SQLiteCache
 from langchain.globals import set_llm_cache
 
 from gpt_engineer.applications.cli.main import load_env_if_needed
+from gpt_engineer.benchmark.bench_config import BenchConfig
 from gpt_engineer.benchmark.benchmarks.load import get_benchmark
 from gpt_engineer.benchmark.run import print_results, run
-from gpt_engineer.benchmark.bench_config import BenchConfig
 
 app = typer.Typer()  # creates a CLI app
 
