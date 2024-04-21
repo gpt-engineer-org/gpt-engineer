@@ -96,3 +96,8 @@ section-order = [
 combine-as-imports = true
 split-on-trailing-comma = false
 lines-between-types = 1
+
+[tool.pytest.ini_options]
+markers = [
+    "requires_key: marks tests as requiring access to a valid OPENAI_API_KEY (deselect with '-m \"not requires_key\"')",
+]
