@@ -22,6 +22,7 @@ from gpt_engineer.benchmark.types import Assertable, Benchmark, Task
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.prompt import Prompt
+from gpt_engineer.benchmark.bench_config import BenchConfig
 
 DATASET_PATH = Path(__file__).parent / "dataset"
 MAX_N_TEST_EXAMPLES = 10
@@ -62,7 +63,7 @@ def _get_dataset() -> Union[Dataset, DatasetDict]:
     return dataset
 
 
-def load_mbpp():
+def load_mbpp(config: BenchConfig) -> Benchmark:
     """
     Loads the MBPP benchmark, which consists of a series coding problems.
 

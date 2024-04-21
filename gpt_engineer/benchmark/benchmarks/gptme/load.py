@@ -13,9 +13,10 @@ load_gptme : function
 from gpt_engineer.benchmark.types import Benchmark, Task
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.prompt import Prompt
+from gpt_engineer.benchmark.bench_config import BenchConfig
 
 
-def load_gptme():
+def load_gptme(config: BenchConfig) -> Benchmark:
     """
     Loads the GPT-Me benchmark, which consists of a series of tasks for evaluation.
 

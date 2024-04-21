@@ -20,6 +20,7 @@ __name__ : str
     The standard boilerplate for invoking the main function when the script is executed.
 """
 import importlib
+import os.path
 
 from typing import Annotated, Optional
 
@@ -31,6 +32,7 @@ from langchain.globals import set_llm_cache
 from gpt_engineer.applications.cli.main import load_env_if_needed
 from gpt_engineer.benchmark.benchmarks.load import get_benchmark
 from gpt_engineer.benchmark.run import print_results, run
+from gpt_engineer.benchmark.bench_config import BenchConfig
 
 app = typer.Typer()  # creates a CLI app
 
@@ -72,9 +74,9 @@ def main(
     benchmarks: Annotated[
         str, typer.Argument(help="benchmark name(s) separated by ','")
     ],
-    task_name: Annotated[
+    bench_config: Annotated[
         Optional[str], typer.Argument(help="optional task name in benchmark")
-    ] = None,
+    ] = os.path.join(os.path.dirname(__file__), "default_bench_config.toml"),
     verbose: Annotated[
         bool, typer.Option(help="print results for each task", show_default=False)
     ] = False,
@@ -88,8 +90,8 @@ def main(
         The file path to the Python module that contains a function called 'default_config_agent'.
     benchmarks : str
         A comma-separated string of benchmark names to run.
-    task_name : Optional[str], default=None
-        An optional task name to run within the benchmark.
+    bench_config : Optional[str], default=default_bench_config.toml
+        Configuration file for choosing which benchmark problems to run. See default config for more details.
     verbose : bool, default=False
         A flag to indicate whether to print results for each task.
 
@@ -101,11 +103,12 @@ def main(
     load_env_if_needed()
 
     benchmarks = benchmarks.split(",")
+    config = BenchConfig.from_toml(bench_config)
     for benchmark_name in benchmarks:
-        benchmark = get_benchmark(benchmark_name)
+        benchmark = get_benchmark(benchmark_name, config)
         agent = get_agent(path_to_agent)
 
-        results = run(agent, benchmark, task_name, verbose=verbose)
+        results = run(agent, benchmark, verbose=verbose)
         print(
             f"\n--- Results for agent {path_to_agent}, benchmark: {benchmark_name} ---"
         )

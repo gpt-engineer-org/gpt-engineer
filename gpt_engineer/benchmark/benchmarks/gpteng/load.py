@@ -24,6 +24,7 @@ from gpt_engineer.benchmark.benchmarks.gpteng.eval_tools import (
 )
 from gpt_engineer.benchmark.types import Assertable, Benchmark, Task
 from gpt_engineer.core.chat_to_files import chat_to_files_dict
+from gpt_engineer.benchmark.bench_config import BenchConfig
 
 evaluations = [
     {
@@ -201,7 +202,7 @@ def eval_to_task(case):
     )
 
 
-def load_gpteng():
+def load_gpteng(config: BenchConfig) -> Benchmark:
     """
     Loads the GPT-Eng benchmark, which consists of a series of tasks for evaluation.
 

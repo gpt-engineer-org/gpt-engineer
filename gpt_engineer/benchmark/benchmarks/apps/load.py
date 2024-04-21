@@ -16,12 +16,14 @@ from typing import Union
 
 from datasets import Dataset, DatasetDict, load_dataset, load_from_disk
 
+from gpt_engineer.benchmark.bench_config import BenchConfig
 from gpt_engineer.benchmark.benchmarks.apps.problem import Problem
 from gpt_engineer.benchmark.benchmarks.apps.problems import PROBLEM_IDS
 from gpt_engineer.benchmark.types import Assertable, Benchmark, Task
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.prompt import Prompt
+from gpt_engineer.benchmark.bench_config import BenchConfig
 
 DATASET_PATH = Path(__file__).parent / "dataset"
 MAX_N_TEST_EXAMPLES = 10
@@ -62,7 +64,7 @@ def _get_dataset() -> Union[Dataset, DatasetDict]:
     return dataset
 
 
-def load_apps():
+def load_apps(config: BenchConfig) -> Benchmark:
     """
     Loads the APPS benchmark, which consists of a series coding problems.
 
