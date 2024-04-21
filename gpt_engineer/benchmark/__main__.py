@@ -71,9 +71,6 @@ def main(
             help="python file that contains a function called 'default_config_agent'"
         ),
     ],
-    benchmarks: Annotated[
-        str, typer.Argument(help="benchmark name(s) separated by ','")
-    ],
     bench_config: Annotated[
         Optional[str], typer.Argument(help="optional task name in benchmark")
     ] = os.path.join(os.path.dirname(__file__), "default_bench_config.toml"),
@@ -101,9 +98,14 @@ def main(
     """
     set_llm_cache(SQLiteCache(database_path=".langchain.db"))
     load_env_if_needed()
-
-    benchmarks = benchmarks.split(",")
     config = BenchConfig.from_toml(bench_config)
+    benchmarks = list()
+    for specific_config_name in vars(config):
+        specific_config = getattr(config, specific_config_name)
+        if "active" in specific_config:
+            if specific_config["active"]:
+                benchmarks.append(specific_config_name)
+
     for benchmark_name in benchmarks:
         benchmark = get_benchmark(benchmark_name, config)
         agent = get_agent(path_to_agent)

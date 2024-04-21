@@ -32,6 +32,8 @@ def get_benchmark(name: str, config: BenchConfig) -> Benchmark:
     ----------
     name : str
         The name of the benchmark to retrieve.
+    config : BenchConfig
+        Configuration object for the benchmarks.
 
     Returns
     -------
@@ -45,4 +47,4 @@ def get_benchmark(name: str, config: BenchConfig) -> Benchmark:
     """
     if name not in BENCHMARKS:
         raise ValueError(f"Unknown benchmark {name}.")
-    return BENCHMARKS[name](config)
+    return BENCHMARKS[name](config.__getattribute__(name))

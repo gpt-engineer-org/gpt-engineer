@@ -5,24 +5,34 @@ from pathlib import Path
 
 
 @dataclass
-class _AppsConfig:
+class AppsConfig:
     active: bool | None = True
     test_active_indices: List | None = None
     train_active_indices: List | None = None
 
 
 @dataclass
-class _MbppConfig:
+class MbppConfig:
     active: bool | None = True
     active_indices: List | None = None
+
+
+class GptmeConfig:
+    active: bool | None = True
+
+
+class GptengConfig:
+    active: bool | None = True
 
 
 @dataclass
 class BenchConfig:
     """Configuration for the GPT Engineer CLI and gptengineer.app via `gpt-engineer.toml`."""
 
-    apps: _AppsConfig = field(default_factory=_AppsConfig)
-    mbpp: _MbppConfig = field(default_factory=_MbppConfig)
+    apps: AppsConfig = field(default_factory=AppsConfig)
+    mbpp: MbppConfig = field(default_factory=MbppConfig)
+    gptme: MbppConfig = field(default_factory=GptmeConfig)
+    gpteng: MbppConfig = field(default_factory=GptengConfig)
 
     @classmethod
     def from_toml(cls, config_file: Path | str):
@@ -56,4 +66,9 @@ class BenchConfig:
         mbpp.pop("indices_len", None)
         mbpp.pop("indices_first", None)
 
-        return cls(apps=apps, mbpp=mbpp)
+        return cls(
+            apps=apps,
+            mbpp=mbpp,
+            gptme=config_dict["gptme"],
+            gpteng=config_dict["gpteng"],
+        )

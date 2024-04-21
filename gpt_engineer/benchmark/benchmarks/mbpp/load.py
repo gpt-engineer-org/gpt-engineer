@@ -17,12 +17,11 @@ from typing import Union
 from datasets import Dataset, DatasetDict, load_dataset, load_from_disk
 
 from gpt_engineer.benchmark.benchmarks.mbpp.problem import Problem
-from gpt_engineer.benchmark.benchmarks.mbpp.problems import PROBLEM_IDS
 from gpt_engineer.benchmark.types import Assertable, Benchmark, Task
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.prompt import Prompt
-from gpt_engineer.benchmark.bench_config import BenchConfig
+from gpt_engineer.benchmark.bench_config import MbppConfig
 
 DATASET_PATH = Path(__file__).parent / "dataset"
 MAX_N_TEST_EXAMPLES = 10
@@ -63,7 +62,7 @@ def _get_dataset() -> Union[Dataset, DatasetDict]:
     return dataset
 
 
-def load_mbpp(config: BenchConfig) -> Benchmark:
+def load_mbpp(config: MbppConfig) -> Benchmark:
     """
     Loads the MBPP benchmark, which consists of a series coding problems.
 
@@ -85,7 +84,7 @@ def load_mbpp(config: BenchConfig) -> Benchmark:
             test_list=problem["test_list"],
         )
         for problem in dataset["test"]
-        if problem["task_id"] in PROBLEM_IDS
+        if problem["task_id"] in config["active_indices"]
     ]
 
     for problem in problems:
@@ -110,6 +109,6 @@ def load_mbpp(config: BenchConfig) -> Benchmark:
         )
 
     return Benchmark(
-        name="MBPP",
+        name="mbpp",
         tasks=tasks,
     )
