@@ -85,7 +85,7 @@ def load_mbpp(config: MbppConfig) -> Benchmark:
                 test_list=problem["test_list"],
             )
             for index, problem in enumerate(dataset[dataset_type])
-            if index < config[dataset_type + "_len"]
+            if index < config.__getattribute__(dataset_type + "_len")
         ]
 
     for problem in problems:

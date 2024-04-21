@@ -82,8 +82,9 @@ def load_apps(config: AppsConfig) -> Benchmark:
                 input_output=problem["input_output"],
                 starter_code=problem["starter_code"],
             )
-            for problem in dataset[dataset_type]
-            if problem["problem_id"] in config[dataset_type + "_active_indices"]
+            for index, problem in enumerate(dataset[dataset_type])
+            if (index < config.__getattribute__(dataset_type + "_end_index"))
+            and (index >= config.__getattribute__(dataset_type + "_start_index"))
         ]
 
     for problem in problems:

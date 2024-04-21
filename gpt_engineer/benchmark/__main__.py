@@ -103,8 +103,8 @@ def main(
     benchmarks = list()
     for specific_config_name in vars(config):
         specific_config = getattr(config, specific_config_name)
-        if "active" in specific_config:
-            if specific_config["active"]:
+        if hasattr(specific_config, "active"):
+            if specific_config.active:
                 benchmarks.append(specific_config_name)
 
     for benchmark_name in benchmarks:

@@ -7,20 +7,25 @@ from pathlib import Path
 @dataclass
 class AppsConfig:
     active: bool | None = True
-    test_active_indices: List | None = None
-    train_active_indices: List | None = None
+    test_start_index: int | None = 0
+    test_end_index: int | None = 1
+    train_start_index: int | None = 0
+    train_end_index: int | None = 0
 
 
 @dataclass
 class MbppConfig:
     active: bool | None = True
-    active_indices: List | None = None
+    test_len: int | None = 1
+    train_len: int | None = 0
 
 
+@dataclass
 class GptmeConfig:
     active: bool | None = True
 
 
+@dataclass
 class GptengConfig:
     active: bool | None = True
 
@@ -31,8 +36,8 @@ class BenchConfig:
 
     apps: AppsConfig = field(default_factory=AppsConfig)
     mbpp: MbppConfig = field(default_factory=MbppConfig)
-    gptme: MbppConfig = field(default_factory=GptmeConfig)
-    gpteng: MbppConfig = field(default_factory=GptengConfig)
+    gptme: GptmeConfig = field(default_factory=GptmeConfig)
+    gpteng: GptengConfig = field(default_factory=GptengConfig)
 
     @classmethod
     def from_toml(cls, config_file: Path | str):
@@ -43,22 +48,9 @@ class BenchConfig:
 
     @classmethod
     def from_dict(cls, config_dict: dict):
-        apps = config_dict["apps"]
-        ind_list_suffix = "active_indices"
-        for cat in ["train_", "test_"]:
-            apps[cat + ind_list_suffix] = list(
-                range(
-                    int(apps.get(cat + "indices_first", 0)),
-                    int(apps.get(cat + "indices_first", 0))
-                    + int(apps.get(cat + "indices_len", 0)),
-                )
-            )
-            apps.pop(cat + "indices_first", None)
-            apps.pop(cat + "indices_len", None)
-
         return cls(
-            apps=apps,
-            mbpp=config_dict["mbpp"],
-            gptme=config_dict["gptme"],
-            gpteng=config_dict["gpteng"],
+            apps=AppsConfig(**config_dict.get("apps", {})),
+            mbpp=MbppConfig(**config_dict.get("mbpp", {})),
+            gptme=GptmeConfig(**config_dict.get("gptme", {})),
+            gpteng=GptengConfig(**config_dict.get("gpteng", {})),
         )

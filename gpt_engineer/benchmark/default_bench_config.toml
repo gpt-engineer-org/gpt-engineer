@@ -1,16 +1,16 @@
 # For apps, the maximal range is 0:5000 for both train and test
 [apps]
 active = true
-test_indices_first = 0
-test_indices_len = 1
-train_indices_first = 0
-train_indices_len = 0
+test_start_index = 0
+test_end_index = 2
+train_start_index = 0
+train_end_index = 2
 
 # For mbpp, the maximal range is 0:47
 [mbpp]
 active = true
-test_len = 1
-train_len = 0
+test_len = 2
+train_len = 2
 
 [gpteng]
 active = true
