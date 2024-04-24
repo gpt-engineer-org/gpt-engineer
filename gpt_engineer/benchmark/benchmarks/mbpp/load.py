@@ -57,7 +57,7 @@ def _get_dataset() -> Union[Dataset, DatasetDict]:
         print("Dataset not found locally, downloading...")
 
     dataset = load_dataset("mbpp", "sanitized", trust_remote_code=True)
-    dataset.save_to_disk(DATASET_PATH)
+    dataset.save_to_disk(str(DATASET_PATH))
 
     return dataset
 
