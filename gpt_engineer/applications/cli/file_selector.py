@@ -27,6 +27,7 @@ from typing import Any, Dict, Generator, List, Union
 import toml
 
 from gpt_engineer.core.default.disk_memory import DiskMemory
+from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.default.paths import metadata_path
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.git import filter_by_gitignore, is_git_repo
@@ -53,14 +54,15 @@ class FileSelector:
     IGNORE_FOLDERS = {"site-packages", "node_modules", "venv", "__pycache__"}
     FILE_LIST_NAME = "file_selection.toml"
     COMMENT = (
-        "# Remove '#' to select a file.\n\n"
+        "# Remove '#' to select a file or turn off linting.\n\n"
         "# gpt-engineer can only read selected files. "
         "Including irrelevant files will degrade performance, "
         "cost additional tokens and potentially overflow token limit.\n\n"
         "# Linting with BLACK (Python) enhances code suggestions from LLMs. "
         "To disable linting, uncomment the relevant option in the linting settings.\n\n"
     )
-    LINTING_OPTION_COMMENT = "# Keep commented to enable linting"
+    LINTING_STRING = '[linting]\n# "linting" = "off"\n\n'
+    isLinting = True
 
     def __init__(self, project_path: Union[str, Path]):
         """
@@ -115,6 +117,13 @@ class FileSelector:
                 print(f"Warning: File not found {file_path}")
             except UnicodeDecodeError:
                 print(f"Warning: File not UTF-8 encoded {file_path}, skipping")
+
+        if self.isLinting:
+            file_store = FileStore()
+            files = FilesDict(content_dict)
+            linted_files = file_store.linting(files)
+            return linted_files
+
         return FilesDict(content_dict)
 
     def editor_file_selector(
@@ -145,7 +154,7 @@ class FileSelector:
         if init:
             tree_dict = {x: "selected" for x in self.get_current_files(root_path)}
 
-            s = toml.dumps({"linting": self.LINTING_OPTION_COMMENT, "files": tree_dict})
+            s = toml.dumps({"files": tree_dict})
 
             # add comments on all lines that match = "selected"
             s = "\n".join(
@@ -157,12 +166,23 @@ class FileSelector:
             # Write to the toml file
             with open(toml_file, "w") as f:
                 f.write(self.COMMENT)
+                f.write(self.LINTING_STRING)
                 f.write(s)
 
         else:
             # Load existing files from the .toml configuration
             all_files = self.get_current_files(root_path)
             s = toml.dumps({"files": {x: "selected" for x in all_files}})
+
+            # get linting status from the toml file
+            linting_status = toml.loads(toml_file)
+            if (
+                "linting" in linting_status
+                and linting_status["linting"].get("linting", "").lower() == "off"
+            ):
+                self.isLinting = False
+                self.LINTING_STRING = '[linting]\n"linting" = "off"\n\n'
+                print("\nLinting is disabled")
 
             with open(toml_file, "r") as file:
                 selected_files = toml.load(file)
@@ -181,6 +201,7 @@ class FileSelector:
             # Write the merged list back to the .toml for user review and modification
             with open(toml_file, "w") as file:
                 file.write(self.COMMENT)  # Ensure to write the comment
+                file.write(self.LINTING_STRING)
                 file.write(s)
 
         print(
@@ -278,8 +299,15 @@ class FileSelector:
         selected_files = []
         edited_tree = toml.load(toml_file)  # Load the edited .toml file
 
-        # Check if the linting option is commented out
-        # todo: add linting option to the file selection
+        # check if users have disabled linting or not
+        if (
+            "linting" in edited_tree
+            and edited_tree["linting"].get("linting", "").lower() == "off"
+        ):
+            self.isLinting = False
+            print("\nLinting is disabled")
+        else:
+            self.isLinting = True
 
         # Iterate through the files in the .toml and append selected files to the list
         for file, _ in edited_tree["files"].items():
