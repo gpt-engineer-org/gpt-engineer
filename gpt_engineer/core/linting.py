@@ -8,9 +8,24 @@ class Linting:
         # Dictionary to hold linting methods for different file types
         self.linters = {".py": self.lint_python}
 
+    import black
+
     def lint_python(self, content, config):
-        """Lint Python files using the `black` library."""
-        linted_content = black.format_str(content, mode=black.FileMode(**config))
+        """Lint Python files using the `black` library, handling all exceptions silently and logging them.
+        This function attempts to format the code and returns the formatted code if successful.
+        If any error occurs during formatting, it logs the error and returns the original content.
+        """
+        try:
+            # Try to format the content using black
+            linted_content = black.format_str(content, mode=black.FileMode(**config))
+        except black.NothingChanged:
+            # If nothing changed, log the info and return the original content
+            print("Info: No changes were made during formatting.")
+            linted_content = content
+        except Exception as error:
+            # If any other exception occurs, log the error and return the original content
+            print(f"Error: Could not format due to {error}")
+            linted_content = content
         return linted_content
 
     def lint_files(self, files_dict: FilesDict, config: dict = None) -> FilesDict:
