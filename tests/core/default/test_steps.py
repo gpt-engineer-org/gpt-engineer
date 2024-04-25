@@ -3,7 +3,6 @@ import tempfile
 
 from unittest.mock import MagicMock
 
-import black
 import pytest
 
 from langchain.schema import SystemMessage
@@ -12,7 +11,6 @@ from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import ENTRYPOINT_FILE, PREPROMPTS_PATH
 from gpt_engineer.core.default.steps import (
-    black_linting_for_python_files,
     curr_fn,
     gen_code,
     gen_entrypoint,
@@ -312,24 +310,3 @@ Some introductory text.
             }
         )
         assert improved_code == expected_code
-
-
-class TestBlackLinting:
-    def setup_method(self):
-        self.files_dict = FilesDict(
-            {"test.py": 'print("Hello, World!")', "test.txt": "This is a text file."}
-        )
-
-    def test_black_linting_for_python_files(self):
-        linted_files_dict = black_linting_for_python_files(self.files_dict)
-
-        # Check if the function returns a FilesDict instance
-        assert isinstance(linted_files_dict, FilesDict)
-
-        # Check if the Python file was linted
-        assert linted_files_dict["test.py"] == black.format_str(
-            self.files_dict["test.py"], mode=black.FileMode()
-        )
-
-        # Check if the non-Python file was not linted
-        assert linted_files_dict["test.txt"] == self.files_dict["test.txt"]
