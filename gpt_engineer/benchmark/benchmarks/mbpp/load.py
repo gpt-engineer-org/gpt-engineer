@@ -16,8 +16,8 @@ from typing import Union
 
 from datasets import Dataset, DatasetDict, load_dataset, load_from_disk
 
+from gpt_engineer.benchmark.bench_config import MbppConfig
 from gpt_engineer.benchmark.benchmarks.mbpp.problem import Problem
-from gpt_engineer.benchmark.benchmarks.mbpp.problems import PROBLEM_IDS
 from gpt_engineer.benchmark.types import Assertable, Benchmark, Task
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.files_dict import FilesDict
@@ -57,12 +57,12 @@ def _get_dataset() -> Union[Dataset, DatasetDict]:
         print("Dataset not found locally, downloading...")
 
     dataset = load_dataset("mbpp", "sanitized", trust_remote_code=True)
-    dataset.save_to_disk(DATASET_PATH)
+    dataset.save_to_disk(str(DATASET_PATH))
 
     return dataset
 
 
-def load_mbpp():
+def load_mbpp(config: MbppConfig) -> Benchmark:
     """
     Loads the MBPP benchmark, which consists of a series coding problems.
 
@@ -73,19 +73,20 @@ def load_mbpp():
     """
     dataset = _get_dataset()
     tasks = []
-
-    problems = [
-        Problem(
-            source_file=problem["source_file"],
-            task_id=problem["task_id"],
-            prompt=problem["prompt"],
-            code=problem["code"],
-            test_imports=problem["test_imports"],
-            test_list=problem["test_list"],
-        )
-        for problem in dataset["test"]
-        if problem["task_id"] in PROBLEM_IDS
-    ]
+    problems = []
+    for dataset_type in ["test", "train"]:
+        problems += [
+            Problem(
+                source_file=problem["source_file"],
+                task_id=problem["task_id"],
+                prompt=problem["prompt"],
+                code=problem["code"],
+                test_imports=problem["test_imports"],
+                test_list=problem["test_list"],
+            )
+            for index, problem in enumerate(dataset[dataset_type])
+            if index < config.__getattribute__(dataset_type + "_len")
+        ]
 
     for problem in problems:
         prompt = Prompt(
@@ -109,6 +110,6 @@ def load_mbpp():
         )
 
     return Benchmark(
-        name="MBPP",
+        name="mbpp",
         tasks=tasks,
     )
