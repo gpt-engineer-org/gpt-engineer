@@ -12,6 +12,7 @@ run : function
 print_results : function
     Prints the results of the benchmark tasks to the console.
 """
+import json
 import time
 
 from typing import List
@@ -132,3 +133,16 @@ def print_results(results: list[TaskResult]):
     print(f"Average success rate: {avg_success_rate * 100}% on {len(results)} tasks")
     print("--- Results ---")
     print()
+
+
+def export_json_results(json_path, complete_results):
+    for results in complete_results.values():
+        correct_tasks = [
+            task_result
+            for task_result in results["detailed"]
+            if task_result["solved"] == 1.0
+        ]
+        fraction_correct = len(correct_tasks) / len(results["detailed"])
+        results["fully_solved"] = fraction_correct
+    with open(json_path, "w") as f:
+        json.dump(complete_results, f, indent=4)
