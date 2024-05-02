@@ -1,0 +1,13 @@
+This script checks if it is being run as the main module and then starts the Uvicorn server with the FastAPI app. The server listens on all interfaces (`0.0.0.0`) and port `8000`.
+
+Additionally, we need to update the Dockerfile to ensure that the new script is correctly utilized when the Docker container is run. We will change the CMD directive to use `run.py` instead of directly calling `uvicorn`.
+
+```diff
+--- dockerfile
++++ dockerfile
+@@ -19,3 +19,3 @@
+-# Run app.py when the container launches
+-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
++# Run run.py when the container launches
++CMD ["python", "run.py"]
+```

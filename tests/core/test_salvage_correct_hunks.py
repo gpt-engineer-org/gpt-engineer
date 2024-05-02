@@ -86,6 +86,11 @@ def test_create_two_new_files():
     )
 
 
+def test_theo_case():
+    files = FilesDict({"dockerfile": get_file_content("theo_case_code")})
+    salvage_correct_hunks(message_builder("theo_case_chat"), files, [], memory)
+
+
 def test_clean_up_folder(clean_up_folder):
     # The folder should be deleted after the test is run
     assert True
