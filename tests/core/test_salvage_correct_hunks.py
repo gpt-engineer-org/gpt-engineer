@@ -62,9 +62,7 @@ def test_validation_and_apply_wrong_diff():
 
 def test_validation_and_apply_non_change_diff():
     files = FilesDict({"src/App.tsx": get_file_content("vgvishesh_example_2_code")})
-    salvage_correct_hunks(
-        message_builder("vgvishesh_example_2_chat"), files, [], memory
-    )
+    salvage_correct_hunks(message_builder("vgvishesh_example_2_chat"), files, memory)
 
 
 def test_validation_and_apply_diff_on_apps_benchmark_6():
@@ -79,9 +77,7 @@ def test_validation_and_apply_diff_on_apps_benchmark_6_v2():
 
 def test_create_two_new_files():
     files = FilesDict({"main.py": get_file_content("create_two_new_files_code")})
-    salvage_correct_hunks(
-        message_builder("create_two_new_files_chat"), files, [], memory
-    )
+    salvage_correct_hunks(message_builder("create_two_new_files_chat"), files, memory)
 
 
 def test_clean_up_folder(clean_up_folder):
