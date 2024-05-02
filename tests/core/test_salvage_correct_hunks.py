@@ -45,19 +45,19 @@ def message_builder(chat_path: str) -> List[AIMessage]:
 
 def test_validation_and_apply_complex_diff():
     files = FilesDict({"taskmaster.py": get_file_content("task_master_code")})
-    salvage_correct_hunks(message_builder("task_master_chat"), files, [], memory)
+    salvage_correct_hunks(message_builder("task_master_chat"), files, memory)
 
 
 def test_validation_and_apply_long_diff():
     files = FilesDict({"VMClonetest.ps1": get_file_content("wheaties_example_code")})
-    salvage_correct_hunks(message_builder("wheaties_example_chat"), files, [], memory)
+    salvage_correct_hunks(message_builder("wheaties_example_chat"), files, memory)
 
 
 def test_validation_and_apply_wrong_diff():
     files = FilesDict(
         {"src/components/SocialLinks.tsx": get_file_content("vgvishesh_example_code")}
     )
-    salvage_correct_hunks(message_builder("vgvishesh_example_chat"), files, [], memory)
+    salvage_correct_hunks(message_builder("vgvishesh_example_chat"), files, memory)
 
 
 def test_validation_and_apply_non_change_diff():
@@ -69,14 +69,12 @@ def test_validation_and_apply_non_change_diff():
 
 def test_validation_and_apply_diff_on_apps_benchmark_6():
     files = FilesDict({"main.py": get_file_content("apps_benchmark_6_code")})
-    salvage_correct_hunks(message_builder("apps_benchmark_6_chat"), files, [], memory)
+    salvage_correct_hunks(message_builder("apps_benchmark_6_chat"), files, memory)
 
 
 def test_validation_and_apply_diff_on_apps_benchmark_6_v2():
     files = FilesDict({"main.py": get_file_content("apps_benchmark_6_v2_code")})
-    salvage_correct_hunks(
-        message_builder("apps_benchmark_6_v2_chat"), files, [], memory
-    )
+    salvage_correct_hunks(message_builder("apps_benchmark_6_v2_chat"), files, memory)
 
 
 def test_create_two_new_files():
