@@ -457,7 +457,7 @@ def main(
             files_dict = handle_improve_mode(prompt, agent, memory, files_dict_before)
             if not files_dict or files_dict_before == files_dict:
                 print(
-                    f"No changes applied. Could you please upload the debug_log_file.txt in {memory.path} folder in a github issue?"
+                    f"No changes applied. Could you please upload the debug_log_file.txt in {memory.path}/logs folder in a github issue?"
                 )
 
             else:
