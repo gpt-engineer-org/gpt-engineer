@@ -20,11 +20,11 @@ class Linting:
             linted_content = black.format_str(content, mode=black.FileMode(**config))
         except black.NothingChanged:
             # If nothing changed, log the info and return the original content
-            print("Info: No changes were made during formatting.")
+            print("\nInfo: No changes were made during formatting.\n")
             linted_content = content
         except Exception as error:
             # If any other exception occurs, log the error and return the original content
-            print(f"Error: Could not format due to {error}")
+            print(f"\nError: Could not format due to {error}\n")
             linted_content = content
         return linted_content
 
@@ -57,7 +57,7 @@ class Linting:
                 if linted_content != original_content:
                     print(f"Linted {filename}.")
                 else:
-                    print(f"No changes needed for {filename}.")
+                    print(f"No changes made for {filename}.")
                 files_dict[filename] = linted_content
             else:
                 print(f"No linter registered for {filename}.")

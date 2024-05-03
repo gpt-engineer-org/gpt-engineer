@@ -55,11 +55,11 @@ class FileSelector:
     FILE_LIST_NAME = "file_selection.toml"
     COMMENT = (
         "# Remove '#' to select a file or turn off linting.\n\n"
+        "# Linting with BLACK (Python) enhances code suggestions from LLMs. "
+        "To disable linting, uncomment the relevant option in the linting settings.\n\n"
         "# gpt-engineer can only read selected files. "
         "Including irrelevant files will degrade performance, "
         "cost additional tokens and potentially overflow token limit.\n\n"
-        "# Linting with BLACK (Python) enhances code suggestions from LLMs. "
-        "To disable linting, uncomment the relevant option in the linting settings.\n\n"
     )
     LINTING_STRING = '[linting]\n# "linting" = "off"\n\n'
     isLinting = True
@@ -175,7 +175,8 @@ class FileSelector:
             s = toml.dumps({"files": {x: "selected" for x in all_files}})
 
             # get linting status from the toml file
-            linting_status = toml.loads(toml_file)
+            with open(toml_file, "r") as file:
+                linting_status = toml.load(file)
             if (
                 "linting" in linting_status
                 and linting_status["linting"].get("linting", "").lower() == "off"
