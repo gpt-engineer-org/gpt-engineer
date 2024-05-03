@@ -19,6 +19,7 @@ from gpt_engineer.core.default.steps import (
     setup_sys_prompt_existing_code,
 )
 from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.linting import Linting
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.prompt import Prompt
 
@@ -310,3 +311,23 @@ Some introductory text.
             }
         )
         assert improved_code == expected_code
+
+    def test_lint_python(self):
+        linting = Linting()
+        content = "print('Hello, world! ')"
+        config = {"line_length": 50}
+        linted_content = linting.lint_python(content, config)
+        assert linted_content is not None, "Linted content should not be None"
+
+    def test_lint_files(self):
+        linting = Linting()
+        files_dict = FilesDict({"test.py": "print('Hello, world! ')"})
+        config = {"line_length": 50}
+        linted_files_dict = linting.lint_files(files_dict, config)
+        assert linted_files_dict is not None, "Linted files dict should not be None"
+        assert isinstance(
+            linted_files_dict, FilesDict
+        ), "Output should be an instance of FilesDict"
+        assert (
+            "test.py" in linted_files_dict
+        ), "test.py should be in the linted files dict"
