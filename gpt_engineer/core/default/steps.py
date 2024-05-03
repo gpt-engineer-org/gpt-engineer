@@ -381,7 +381,7 @@ def handle_improve_mode(prompt, agent, memory, files_dict):
         files_dict = agent.improve(files_dict, prompt)
     except Exception as e:
         print(
-            f"Error while improving the project: {e}\nCould you please upload the debug_log_file.txt in {memory.path} folder to github?\nFULL STACK TRACE:\n"
+            f"Error while improving the project: {e}\nCould you please upload the debug_log_file.txt in {memory.path}/logs folder to github?\nFULL STACK TRACE:\n"
         )
         traceback.print_exc(file=sys.stdout)  # Print the full stack trace
     finally:
