@@ -1,11 +1,14 @@
-# GPT-Engineer
+# gpt-engineer
 
-[![Discord Follow](https://dcbadge.vercel.app/api/server/8tcDQ89Ej2?style=flat)](https://discord.gg/8tcDQ89Ej2)
 [![GitHub Repo stars](https://img.shields.io/github/stars/gpt-engineer-org/gpt-engineer?style=social)](https://github.com/gpt-engineer-org/gpt-engineer)
+[![Discord Follow](https://dcbadge.vercel.app/api/server/8tcDQ89Ej2?style=flat)](https://discord.gg/8tcDQ89Ej2)
+[![License](https://img.shields.io/github/license/gpt-engineer-org/gpt-engineer)](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/LICENSE)
+[![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/gpt-engineer-org/gpt-engineer)](https://github.com/gpt-engineer-org/gpt-engineer/issues)
+![GitHub Release](https://img.shields.io/github/v/release/gpt-engineer-org/gpt-engineer)
 [![Twitter Follow](https://img.shields.io/twitter/follow/antonosika?style=social)](https://twitter.com/antonosika)
 
-GPT-engineer lets you:
-- Specify a software in natural language
+gpt-engineer lets you:
+- Specify software in natural language
 - Sit back and watch as an AI writes and executes the code
 - Ask the AI to implement improvements
 
@@ -23,7 +26,7 @@ For **development**:
 - `poetry install`
 - `poetry shell` to activate the virtual environment
 
-We actively support Python 3.10 - 3.12. The last version to support python 3.8 - 3.9 was [0.2.6](https://pypi.org/project/gpt-engineer/0.2.6/).
+We actively support Python 3.10 - 3.12. The last version to support Python 3.8 - 3.9 was [0.2.6](https://pypi.org/project/gpt-engineer/0.2.6/).
 
 ### Setup API Key
 
@@ -36,7 +39,7 @@ Choose **one** of:
 - Custom model:
     - See [docs](https://gpt-engineer.readthedocs.io/en/latest/open_models.html), supports local model, azure, etc.
 
-Check the [Windows README](./WINDOWS_README.md) for windows usage.
+Check the [Windows README](./WINDOWS_README.md) for Windows usage.
 
 **Other ways to run:**
 - Use Docker ([instructions](docker/README.md))
@@ -58,9 +61,9 @@ Check the [Windows README](./WINDOWS_README.md) for windows usage.
 By running gpt-engineer you agree to our [terms](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
 
-## Relation to gptengineer.app
-[gptengineer.app](https://gptengineer.app/) is a commercial project for automatic generation of web-apps.
-It features a UI for non-technical users, connected to a git controlled codebase.
+## Relation to gptengineer.app (GPT Engineer)
+[gptengineer.app](https://gptengineer.app/) is a commercial project for the automatic generation of web apps.
+It features a UI for non-technical users connected to a git-controlled codebase.
 The gptengineer.app team is actively supporting the open source community.
 
 
@@ -73,13 +76,13 @@ Editing the `preprompts` is how you make the agent remember things between proje
 
 ### Vision
 
-By default, GPT Engineer expects text input via a `prompt` file. It can also accept imagine inputs for vision capable models. This can be useful for adding UX or architecture diagrams as additional context for GPT Engineer. You can do this by specifiying an image directory with the --image_directory flag and setting a vision capable model in the second cli argument.
+By default, gpt-engineer expects text input via a `prompt` file. It can also accept imagine inputs for vision-capable models. This can be useful for adding UX or architecture diagrams as additional context for GPT Engineer. You can do this by specifying an image directory with the—-image_directory flag and setting a vision-capable model in the second cli argument.
 
 E.g. `gpte projects/example-vision gpt-4-vision-preview --prompt_file prompt/text --image_directory prompt/images -i`
 
 ### Open source, local and alternative models
 
-By defaul GPT Engineer supports OpenAI Models via the OpenAI API or Azure Open AI API, and Anthropic models.
+By default, gpt-engineer supports OpenAI Models via the OpenAI API or Azure Open AI API, and Anthropic models.
 
 With a little extra set up you can also run with open source models, like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
 
@@ -93,7 +96,7 @@ If you want to see our broader ambitions, check out the [roadmap](https://github
 [discord](https://discord.gg/8tcDQ89Ej2)
 to get input on how you can [contribute](.github/CONTRIBUTING.md) to it.
 
-gpt-engineer is [governed](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/GOVERNANCE.md) by a board of long term contributors. If you contribute routinely and have an interest in shaping the future of gpt-engineer, you will be considered for the board.
+gpt-engineer is [governed](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/GOVERNANCE.md) by a board of long-term contributors. If you contribute routinely and have an interest in shaping the future of gpt-engineer, you will be considered for the board.
 
 ## Example
 

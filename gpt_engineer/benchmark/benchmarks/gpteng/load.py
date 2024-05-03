@@ -19,11 +19,13 @@ load_gpteng : function
 
 from pathlib import Path
 
+from gpt_engineer.benchmark.bench_config import GptengConfig
 from gpt_engineer.benchmark.benchmarks.gpteng.eval_tools import (
     check_evaluation_component,
 )
 from gpt_engineer.benchmark.types import Assertable, Benchmark, Task
 from gpt_engineer.core.chat_to_files import chat_to_files_dict
+from gpt_engineer.core.prompt import Prompt
 
 evaluations = [
     {
@@ -192,7 +194,7 @@ def eval_to_task(case):
     return Task(
         name=case["name"],
         initial_code=chat_to_files_dict(Path(case["code_blob"]).read_text()),
-        prompt=prompt,
+        prompt=Prompt(prompt),
         command=None,
         assertions={
             f"{e['type']}_{i}": expect_to_assertion(e)
@@ -201,7 +203,7 @@ def eval_to_task(case):
     )
 
 
-def load_gpteng():
+def load_gpteng(config: GptengConfig) -> Benchmark:
     """
     Loads the GPT-Eng benchmark, which consists of a series of tasks for evaluation.
 
