@@ -313,34 +313,31 @@ def improve_fn(
 def _improve_loop(
     ai: AI, files_dict: FilesDict, memory: BaseMemory, messages: List
 ) -> FilesDict:
-    problems = []
+    messages = ai.next(messages, step_name=curr_fn())
+    files_dict, errors = salvage_correct_hunks(messages, files_dict, memory)
 
-    # check edit correctness
-    edit_refinements = 0
-    while edit_refinements <= MAX_EDIT_REFINEMENT_STEPS:
+    retries = 0
+    while errors and retries < MAX_EDIT_REFINEMENT_STEPS:
+        messages.append(
+            HumanMessage(
+                content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details:\n"
+                + "\n".join(errors)
+                + "\n Only rewrite the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
+            )
+        )
         messages = ai.next(messages, step_name=curr_fn())
-        files_dict = salvage_correct_hunks(messages, files_dict, problems, memory)
+        files_dict, errors = salvage_correct_hunks(messages, files_dict, memory)
+        retries += 1
 
-        # if len(problems) > 0:
-        #     messages.append(
-        #         HumanMessage(
-        #             content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details: "
-        #             + "\n".join(problems)
-        #             + "\n Only rewrite the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
-        #         )
-        #     )
-        #     messages = ai.next(messages, step_name=curr_fn())
-        #     edit_refinements += 1
-        #     files_dict = salvage_correct_hunks(messages, files_dict, problems)
-        return files_dict
+    return files_dict
 
 
 def salvage_correct_hunks(
     messages: List,
     files_dict: FilesDict,
-    error_message: List,
     memory: BaseMemory,
-) -> FilesDict:
+) -> tuple[FilesDict, List[str]]:
+    error_messages = []
     ai_response = messages[-1].content.strip()
 
     diffs = parse_diffs(ai_response)
@@ -352,11 +349,11 @@ def salvage_correct_hunks(
             problems = diff.validate_and_correct(
                 file_to_lines_dict(files_dict[diff.filename_pre])
             )
-            error_message.extend(problems)
+            error_messages.extend(problems)
     files_dict = apply_diffs(diffs, files_dict)
     memory.log(IMPROVE_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
-    memory.log(DIFF_LOG_FILE, "\n\n".join(error_message))
-    return files_dict
+    memory.log(DIFF_LOG_FILE, "\n\n".join(error_messages))
+    return files_dict, error_messages
 
 
 class Tee(object):
