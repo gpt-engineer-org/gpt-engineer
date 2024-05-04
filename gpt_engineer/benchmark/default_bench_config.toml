@@ -12,8 +12,5 @@ active = true
 test_len = 2
 train_len = 2
 
-[gpteng]
-active = true
-
 [gptme]
 active = true

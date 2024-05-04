@@ -26,18 +26,12 @@ class GptmeConfig:
 
 
 @dataclass
-class GptengConfig:
-    active: bool | None = True
-
-
-@dataclass
 class BenchConfig:
     """Configuration for the GPT Engineer CLI and gptengineer.app via `gpt-engineer.toml`."""
 
     apps: AppsConfig = field(default_factory=AppsConfig)
     mbpp: MbppConfig = field(default_factory=MbppConfig)
     gptme: GptmeConfig = field(default_factory=GptmeConfig)
-    gpteng: GptengConfig = field(default_factory=GptengConfig)
 
     @classmethod
     def from_toml(cls, config_file: Path | str):
@@ -52,5 +46,4 @@ class BenchConfig:
             apps=AppsConfig(**config_dict.get("apps", {})),
             mbpp=MbppConfig(**config_dict.get("mbpp", {})),
             gptme=GptmeConfig(**config_dict.get("gptme", {})),
-            gpteng=GptengConfig(**config_dict.get("gpteng", {})),
         )
