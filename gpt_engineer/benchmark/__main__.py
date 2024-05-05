@@ -132,7 +132,7 @@ def main(
             "detailed": [result.to_dict() for result in results]
         }
     if json_output is not None:
-        export_json_results(json_output, benchmark_results)
+        export_json_results(json_output, benchmark_results, config.to_dict())
 
 
 if __name__ == "__main__":
