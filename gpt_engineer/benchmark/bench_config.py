@@ -11,6 +11,7 @@ class AppsConfig:
     test_end_index: int | None = 1
     train_start_index: int | None = 0
     train_end_index: int | None = 0
+    examples_per_problem: int | None = 10
 
 
 @dataclass
