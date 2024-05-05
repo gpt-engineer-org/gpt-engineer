@@ -135,7 +135,7 @@ def print_results(results: list[TaskResult]):
     print()
 
 
-def export_json_results(json_path, complete_results):
+def export_json_results(json_path, complete_results, config):
     for results in complete_results.values():
         correct_tasks = [
             task_result
@@ -144,5 +144,6 @@ def export_json_results(json_path, complete_results):
         ]
         fraction_correct = len(correct_tasks) / len(results["detailed"])
         results["fully_solved"] = fraction_correct
+    complete_results["config"] = config
     with open(json_path, "w") as f:
         json.dump(complete_results, f, indent=4)

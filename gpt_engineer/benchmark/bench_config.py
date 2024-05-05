@@ -47,3 +47,10 @@ class BenchConfig:
             mbpp=MbppConfig(**config_dict.get("mbpp", {})),
             gptme=GptmeConfig(**config_dict.get("gptme", {})),
         )
+
+    def to_dict(self):
+        dict_config = {
+            benchmark_name: {key: val for key, val in spec_config.__dict__.items()}
+            for benchmark_name, spec_config in self.__dict__.items()
+        }
+        return dict_config
