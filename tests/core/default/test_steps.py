@@ -14,6 +14,7 @@ from gpt_engineer.core.default.steps import (
     curr_fn,
     gen_code,
     gen_entrypoint,
+    handle_improve_mode,
     improve_fn,
     setup_sys_prompt,
     setup_sys_prompt_existing_code,
@@ -310,3 +311,26 @@ Some introductory text.
             }
         )
         assert improved_code == expected_code
+
+    def test_handle_improve_mode_multilayer_error_trace(self):
+        # Mock the AI class
+        class MockAI:
+            def improve(self, files_dict, prompt):
+                try:
+                    raise Exception("This is a nested test exception")
+                except Exception as e:
+                    raise Exception("This is a test exception") from e
+
+        agent = MockAI()
+        memory = DiskMemory(tempfile.mkdtemp())
+        files_dict = FilesDict({"main.py": "print('Hello, World!')"})
+        prompt = (
+            "Change the program to print 'Goodbye, World!' instead of 'Hello, World!'"
+        )
+
+        try:
+            handle_improve_mode(prompt, agent, memory, files_dict)
+        except Exception as e:
+            assert str(e) == "This is a test exception"
+            assert isinstance(e.__cause__, Exception)
+            assert str(e.__cause__) == "This is a nested test exception"

@@ -9,6 +9,7 @@ Functions
 get_benchmark : function
     Retrieves a Benchmark object by name. Raises ValueError if the benchmark is unknown.
 """
+from gpt_engineer.benchmark.bench_config import BenchConfig
 from gpt_engineer.benchmark.benchmarks.apps.load import load_apps
 from gpt_engineer.benchmark.benchmarks.gpteng.load import load_gpteng
 from gpt_engineer.benchmark.benchmarks.gptme.load import load_gptme
@@ -23,7 +24,7 @@ BENCHMARKS = {
 }
 
 
-def get_benchmark(name: str) -> Benchmark:
+def get_benchmark(name: str, config: BenchConfig) -> Benchmark:
     """
     Retrieves a Benchmark object by name. Raises ValueError if the benchmark is unknown.
 
@@ -31,6 +32,8 @@ def get_benchmark(name: str) -> Benchmark:
     ----------
     name : str
         The name of the benchmark to retrieve.
+    config : BenchConfig
+        Configuration object for the benchmarks.
 
     Returns
     -------
@@ -44,4 +47,4 @@ def get_benchmark(name: str) -> Benchmark:
     """
     if name not in BENCHMARKS:
         raise ValueError(f"Unknown benchmark {name}.")
-    return BENCHMARKS[name]()
+    return BENCHMARKS[name](config.__getattribute__(name))
