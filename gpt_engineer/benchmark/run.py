@@ -14,7 +14,7 @@ print_results : function
 """
 import time
 
-from typing import List, Optional
+from typing import List
 
 from gpt_engineer.benchmark.types import Assertable, Benchmark, TaskResult
 from gpt_engineer.core.base_agent import BaseAgent
@@ -24,7 +24,6 @@ from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 def run(
     agent: BaseAgent,
     benchmark: Benchmark,
-    task_name: Optional[str] = None,
     verbose=False,
 ) -> List[TaskResult]:
     """
@@ -36,8 +35,6 @@ def run(
         The agent to use for running the benchmark tasks.
     benchmark : Benchmark
         The benchmark containing the tasks to run.
-    task_name : Optional[str], default=None
-        An optional name of a specific task to run within the benchmark.
     verbose : bool, default=False
         A flag to indicate whether to print verbose output during the benchmark.
 
