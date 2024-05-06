@@ -5,6 +5,10 @@ import os
 from prompt_toolkit import prompt
 from prompt_toolkit.validation import Validator, ValidationError
 
+from gpt_engineer.core.ai import AI
+
+from generation_tools import generate_branch_name
+
 app = typer.Typer()
 
 class FeatureValidator(Validator):
@@ -21,9 +25,15 @@ def load_feature_description(feature_file_path):
         with open(feature_file_path, 'r', encoding='utf-8') as file:
             feature_description = file.read().strip()
     else:
-        print(f"No feature file found at {feature_file_path}. Please enter the feature description:")
-        feature_description = prompt("Feature: ", validator=FeatureValidator())
-        # todo: create feature text file containing the users feature 
+        print(f"No file found at {feature_file_path}. Please describe the feature or change to work on:")
+        feature_description = prompt(
+            "",
+            multiline=True,
+            validator=FeatureValidator(),
+            bottom_toolbar="Press Ctrl+O to finish"
+        )
+        with open(feature_file_path, 'w', encoding='utf-8') as file:
+            file.write(feature_description)
          
 
     return feature_description
@@ -60,17 +70,26 @@ def main(
 
     # todo: check that git repo exists. If not - ask the user to create a git repository with a suitable git ignore which will be used to reduce ai usage
     # todo: check that git repo is clean. If not - ask the user to stash or commit changes.
+
+    ai = AI(
+        model_name=model,
+        temperature=temperature,
+        azure_endpoint=azure_endpoint,
+    )
       
     feature_description = load_feature_description(os.path.join(project_path, 'feature'))
 
-    branch_name= 'feature/new' #todo: use ai to generate branch name suggestion
+    branch_name = generate_branch_name(ai, feature_description)
 
-    print("Great, sounds like a useful feature.")
+    print("\nFeature file created.\n ")
+
     branch_name = prompt('Please confirm or edit the feature branch name: ', default=branch_name)
-    print(f'Creating feature branch: {branch_name}')
-    #todo: use gitpython to create new branch. 
 
-    # todo: continue with the rest of the task creation flow. Every time a task is added move it to 
+    # todo: use gitpython to create new branch. 
+
+    print(f'\nFeature branch created.\n')
+
+    # todo: continue with the rest of the task creation flow. Every time a task is added move it to a task file
 
 
 
