@@ -88,7 +88,11 @@ def test_create_two_new_files():
 
 def test_theo_case():
     files = FilesDict({"dockerfile": get_file_content("theo_case_code")})
-    salvage_correct_hunks(message_builder("theo_case_chat"), files, [], memory)
+    updated_files = salvage_correct_hunks(
+        message_builder("theo_case_chat"), files, [], memory
+    )
+    print(updated_files["dockerfile"])
+    print(updated_files["run.py"])
 
 
 def test_clean_up_folder(clean_up_folder):
