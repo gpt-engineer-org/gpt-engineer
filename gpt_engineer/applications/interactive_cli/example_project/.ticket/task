@@ -1,0 +1,5 @@
+Create a local sql lite database for development. 
+
+Initialize it with a feedback table. 
+
+The table can store a comment and a rating out of 5
