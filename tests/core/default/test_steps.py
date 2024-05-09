@@ -14,12 +14,12 @@ from gpt_engineer.core.default.steps import (
     curr_fn,
     gen_code,
     gen_entrypoint,
-    handle_improve_mode,
     improve_fn,
     setup_sys_prompt,
     setup_sys_prompt_existing_code,
 )
 from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.linting import Linting
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.prompt import Prompt
 
@@ -312,25 +312,22 @@ Some introductory text.
         )
         assert improved_code == expected_code
 
-    def test_handle_improve_mode_multilayer_error_trace(self):
-        # Mock the AI class
-        class MockAI:
-            def improve(self, files_dict, prompt):
-                try:
-                    raise Exception("This is a nested test exception")
-                except Exception as e:
-                    raise Exception("This is a test exception") from e
+    def test_lint_python(self):
+        linting = Linting()
+        content = "print('Hello, world! ')"
+        config = {"line_length": 50}
+        linted_content = linting.lint_python(content, config)
+        assert linted_content is not None, "Linted content should not be None"
 
-        agent = MockAI()
-        memory = DiskMemory(tempfile.mkdtemp())
-        files_dict = FilesDict({"main.py": "print('Hello, World!')"})
-        prompt = (
-            "Change the program to print 'Goodbye, World!' instead of 'Hello, World!'"
-        )
-
-        try:
-            handle_improve_mode(prompt, agent, memory, files_dict)
-        except Exception as e:
-            assert str(e) == "This is a test exception"
-            assert isinstance(e.__cause__, Exception)
-            assert str(e.__cause__) == "This is a nested test exception"
+    def test_lint_files(self):
+        linting = Linting()
+        files_dict = FilesDict({"test.py": "print('Hello, world! ')"})
+        config = {"line_length": 50}
+        linted_files_dict = linting.lint_files(files_dict, config)
+        assert linted_files_dict is not None, "Linted files dict should not be None"
+        assert isinstance(
+            linted_files_dict, FilesDict
+        ), "Output should be an instance of FilesDict"
+        assert (
+            "test.py" in linted_files_dict
+        ), "test.py should be in the linted files dict"
