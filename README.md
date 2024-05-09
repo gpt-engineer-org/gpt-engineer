@@ -39,10 +39,10 @@ Choose **one** of:
 - Custom model:
     - See [docs](https://gpt-engineer.readthedocs.io/en/latest/open_models.html), supports local model, azure, etc.
 
-Check the [Windows README](./WINDOWS_README.md) for Windows usage.
+Check the [Windows README](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/WINDOWS_README.md) for Windows usage.
 
 **Other ways to run:**
-- Use Docker ([instructions](docker/README.md))
+- Use Docker ([instructions](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/docker/README.md))
 - Do everything in your browser:
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/gpt-engineer-org/gpt-engineer/codespaces)
 
@@ -94,7 +94,7 @@ If you are interested in contributing to this, we are interested in having you.
 
 If you want to see our broader ambitions, check out the [roadmap](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/ROADMAP.md), and join
 [discord](https://discord.gg/8tcDQ89Ej2)
-to get input on how you can [contribute](.github/CONTRIBUTING.md) to it.
+to get input on how you can [contribute](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/.github/CONTRIBUTING.md) to it.
 
 gpt-engineer is [governed](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/GOVERNANCE.md) by a board of long-term contributors. If you contribute routinely and have an interest in shaping the future of gpt-engineer, you will be considered for the board.
 
