@@ -1,23 +1,14 @@
-# Stage 1: Builder stage
-FROM python:3.11-alpine AS builder
+FROM python:3.11-slim
 
-RUN apk update && apk add --no-cache tk tcl curl
+RUN apt-get update
+RUN apt-get install -y sudo tk tcl gcc curl
+RUN apt-get install -y git
 
 WORKDIR /app
 
 COPY . .
+COPY docker/entrypoint.sh ./entrypoint.sh
 
-RUN pip install --no-cache-dir -e .
+RUN sudo pip install -e .
 
-# Stage 2: Final stage
-FROM python:3.11-alpine
-
-WORKDIR /app
-
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
-COPY --from=builder /app .
-
-COPY docker/entrypoint.sh .
-
-ENTRYPOINT ["sh", "/app/entrypoint.sh"]
+ENTRYPOINT ["bash", "/app/entrypoint.sh"]
