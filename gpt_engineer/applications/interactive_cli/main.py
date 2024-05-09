@@ -8,7 +8,7 @@ from prompt_toolkit.validation import Validator, ValidationError
 from gpt_engineer.core.ai import AI
 
 from generation_tools import generate_branch_name, generate_suggested_tasks
-from git_context import GitContext
+from repository import Repository
 
 app = typer.Typer()
 
@@ -43,6 +43,8 @@ def initialize_new_feature(ai, ticket):
     
     print(f'\nFeature branch created.\n')
 
+    
+
 
 def get_context_string(ticket, git_context, code):
     input = f""" 
@@ -67,7 +69,7 @@ def get_context_string(ticket, git_context, code):
 def choose_next_task(ai, ticket, context):
     print(f"There are {len(ticket.progress.done)} tasks completed so far. What shall we do next?")
 
-    suggested_tasks  = generate_suggested_tasks
+    suggested_tasks  = generate_suggested_tasks()
 
 
 
@@ -114,12 +116,14 @@ def main(
         azure_endpoint=azure_endpoint,
     )
 
+    repository = Repository(project_path)
+
     ticket = Ticket.load_or_create_at_directory(project_path)
 
     if new:
         initialize_new_feature(ai, ticket)
 
-    git_context = GitContext.load_from_directory(project_path)
+    git_context = repository.get_git_context()
 
     print(git_context.staged_changes)
     print(git_context.unstaged_changes)
