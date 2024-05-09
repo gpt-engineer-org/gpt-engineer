@@ -1,13 +1,14 @@
 import typer
 from dotenv import load_dotenv
+from ticket import Ticket
 
-import os
 from prompt_toolkit import prompt
 from prompt_toolkit.validation import Validator, ValidationError
 
 from gpt_engineer.core.ai import AI
 
-from generation_tools import generate_branch_name
+from generation_tools import generate_branch_name, generate_suggested_tasks
+from git_context import GitContext
 
 app = typer.Typer()
 
@@ -17,31 +18,67 @@ class FeatureValidator(Validator):
         if not text:
             raise ValidationError(message="Feature description cannot be empty", cursor_position=len(text))
 
-def load_feature_description(feature_file_path):
-    """
-    Load the feature description from a file or prompt the user if the file doesn't exist.
-    """
-    if os.path.exists(feature_file_path):
-        with open(feature_file_path, 'r', encoding='utf-8') as file:
-            feature_description = file.read().strip()
-    else:
-        print(f"No file found at {feature_file_path}. Please describe the feature or change to work on:")
-        feature_description = prompt(
-            "",
+
+def initialize_new_feature(ai, ticket): 
+    
+    ticket.clear_ticket()
+
+    feature_description = prompt(
+            "Write feature description: ",
             multiline=True,
             validator=FeatureValidator(),
             bottom_toolbar="Press Ctrl+O to finish"
         )
-        with open(feature_file_path, 'w', encoding='utf-8') as file:
-            file.write(feature_description)
-         
+    
+    ticket.feature = feature_description
+    ticket.save_feature()
+    
+    # print("\n Ticket files created at .ticket \n ")
 
-    return feature_description
+    branch_name = generate_branch_name(ai, feature_description)
+
+    branch_name = prompt('\nConfirm branch name: ', default=branch_name)
+
+    # todo: use gitpython to create new branch. 
+    
+    print(f'\nFeature branch created.\n')
+
+
+def get_context_string(ticket, git_context, code):
+    input = f""" 
+## Feature
+{ticket.feature}
+
+## Completed Tasks 
+{ticket.progress.done}
+
+## Git Context
+### Commits 
+{git_context.commits}
+
+### Staged Changes
+{git_context.staged_changes}
+
+## Current Codebase
+{code}
+"""
+    
+
+def choose_next_task(ai, ticket, context):
+    print(f"There are {len(ticket.progress.done)} tasks completed so far. What shall we do next?")
+
+    suggested_tasks  = generate_suggested_tasks
+
+
+
 
 @app.command()
 def main(
     project_path: str = typer.Argument(".", help="path"),
     model: str = typer.Argument("gpt-4-turbo", help="model id string"),
+    new: bool = typer.Option(
+        False, "--new", "-n", help="Initialize new feature."
+    ),
     temperature: float = typer.Option(
         0.1,
         "--temperature",
@@ -60,7 +97,7 @@ def main(
     ),
     debug: bool = typer.Option(
         False, "--debug", "-d", help="Enable debug mode for debugging."
-    ),
+    )
 ):
     """
     Run GPTE Interactive Improve 
@@ -76,18 +113,19 @@ def main(
         temperature=temperature,
         azure_endpoint=azure_endpoint,
     )
-      
-    feature_description = load_feature_description(os.path.join(project_path, 'feature'))
 
-    branch_name = generate_branch_name(ai, feature_description)
+    ticket = Ticket.load_or_create_at_directory(project_path)
 
-    print("\nFeature file created.\n ")
+    if new:
+        initialize_new_feature(ai, ticket)
 
-    branch_name = prompt('Please confirm or edit the feature branch name: ', default=branch_name)
+    git_context = GitContext.load_from_directory(project_path)
 
-    # todo: use gitpython to create new branch. 
-
-    print(f'\nFeature branch created.\n')
+    print(git_context.staged_changes)
+    print(git_context.unstaged_changes)
+    for commit in git_context.commits:
+        print(commit)
+        print()
 
     # todo: continue with the rest of the task creation flow. Every time a task is added move it to a task file
 

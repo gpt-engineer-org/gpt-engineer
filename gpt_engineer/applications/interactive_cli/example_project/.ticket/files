@@ -1,0 +1,20 @@
+project/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/
+│   │   │       └── example/
+│   │   │           └── MyApp.java
+│   │   └── resources/
+│   │       └── config.properties
+│   └── test/
+│       ├── java/
+│       │   └── com/
+│       │       └── example/
+│       │           └── MyAppTest.java
+│       └── resources/
+│           └── testdata.txt
+├── lib/
+│   └── external-library.jar
+└── README.md
+
