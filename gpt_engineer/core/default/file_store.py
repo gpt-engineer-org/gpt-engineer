@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Union
 
 from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.linting import Linting
 
 
 class FileStore:
@@ -42,6 +43,11 @@ class FileStore:
             with open(path, "w") as f:
                 f.write(content)
         return self
+
+    def linting(self, files: FilesDict) -> FilesDict:
+        # lint the code
+        linting = Linting()
+        return linting.lint_files(files)
 
     def pull(self) -> FilesDict:
         files = {}
