@@ -32,7 +32,7 @@ from langchain.globals import set_llm_cache
 from gpt_engineer.applications.cli.main import load_env_if_needed
 from gpt_engineer.benchmark.bench_config import BenchConfig
 from gpt_engineer.benchmark.benchmarks.load import get_benchmark
-from gpt_engineer.benchmark.run import export_json_results, print_results, run
+from gpt_engineer.benchmark.run import export_yaml_results, print_results, run
 
 app = typer.Typer()  # creates a CLI app
 
@@ -74,7 +74,7 @@ def main(
     bench_config: Annotated[
         str, typer.Argument(help="optional task name in benchmark")
     ] = os.path.join(os.path.dirname(__file__), "default_bench_config.toml"),
-    json_output: Annotated[
+    yaml_output: Annotated[
         Optional[str],
         typer.Option(help="print results for each task", show_default=False),
     ] = None,
@@ -91,8 +91,8 @@ def main(
         The file path to the Python module that contains a function called 'default_config_agent'.
     bench_config : str, default=default_bench_config.toml
         Configuration file for choosing which benchmark problems to run. See default config for more details.
-    json_output: Optional[str], default=None
-        Pass a path to a json file to have results written to file.
+    yaml_output: Optional[str], default=None
+        Pass a path to a yaml file to have results written to file.
     verbose : bool, default=False
         A flag to indicate whether to print results for each task.
     Returns
@@ -131,8 +131,8 @@ def main(
         benchmark_results[benchmark_name] = {
             "detailed": [result.to_dict() for result in results]
         }
-    if json_output is not None:
-        export_json_results(json_output, benchmark_results, config.to_dict())
+    if yaml_output is not None:
+        export_yaml_results(yaml_output, benchmark_results, config.to_dict())
 
 
 if __name__ == "__main__":

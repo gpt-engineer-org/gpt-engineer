@@ -12,7 +12,7 @@ run : function
 print_results : function
     Prints the results of the benchmark tasks to the console.
 """
-import json
+import yaml
 import time
 
 from typing import List
@@ -135,7 +135,7 @@ def print_results(results: list[TaskResult]):
     print()
 
 
-def export_json_results(json_path, complete_results, config):
+def export_yaml_results(yaml_path, complete_results, config):
     for results in complete_results.values():
         correct_tasks = [
             task_result
@@ -145,5 +145,5 @@ def export_json_results(json_path, complete_results, config):
         fraction_correct = len(correct_tasks) / len(results["detailed"])
         results["fully_solved"] = fraction_correct
     complete_results["config"] = config
-    with open(json_path, "w") as f:
-        json.dump(complete_results, f, indent=4)
+    with open(yaml_path, "w") as f:
+        yaml.dump(complete_results, f, indent=4)
