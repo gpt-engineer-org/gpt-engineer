@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from pathlib import Path
-
+from tomlkit.items import Integer
 from gpt_engineer.core.project_config import read_config
 
 
@@ -49,9 +49,19 @@ class BenchConfig:
             gptme=GptmeConfig(**config_dict.get("gptme", {})),
         )
 
+    @staticmethod
+    def recursive_resolve(data_dict):
+        for key, value in data_dict.items():
+            if isinstance(value, Integer):
+                data_dict[key] = int(value)
+            elif isinstance(value, dict):
+                BenchConfig.recursive_resolve(value)
+
     def to_dict(self):
         dict_config = {
             benchmark_name: {key: val for key, val in spec_config.__dict__.items()}
             for benchmark_name, spec_config in self.__dict__.items()
         }
+        BenchConfig.recursive_resolve(dict_config)
+
         return dict_config
