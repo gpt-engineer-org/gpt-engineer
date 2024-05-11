@@ -453,7 +453,12 @@ def main(
     files = FileStore(project_path)
     if not no_execution:
         if improve_mode:
-            files_dict_before = FileSelector(project_path).ask_for_files()
+            files_dict_before, is_linting = FileSelector(project_path).ask_for_files()
+
+            # lint the code
+            if is_linting:
+                files_dict_before = files.linting(files_dict_before)
+
             files_dict = handle_improve_mode(prompt, agent, memory, files_dict_before)
             if not files_dict or files_dict_before == files_dict:
                 print(
