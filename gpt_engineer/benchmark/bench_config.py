@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from pathlib import Path
+
 from tomlkit.items import Integer
+
 from gpt_engineer.core.project_config import read_config
 
 
