@@ -12,7 +12,7 @@ class FileSelection:
     """
     def __init__(self, project_path: str, repository):
         self.repository = repository
-        self.yaml_path = os.path.join(project_path, '.ticket', 'files.yml')
+        self.yaml_path = os.path.join(project_path, '.feature', 'files.yml')
         self._initialize()
 
     def _create_nested_structure_from_file_paths(self, files_paths):
@@ -184,6 +184,52 @@ class FileSelection:
         selected_files, excluded_files = self._get_from_yaml()
 
         return selected_files
+    
+
+    def get_pretty_from_yaml(self):
+        """
+        Retrieves selected file paths from the YAML file and prints them in an ASCII-style tree structure.
+        """
+        # Get selected files from YAML
+        selected_files = self.get_from_yaml()
+        
+        # Helper function to insert a path into the tree dictionary
+        def insert_path(tree, path_parts):
+            # Recursively build nested dictionary from path parts
+            if not path_parts:
+                return
+            if path_parts[0] not in tree:
+                tree[path_parts[0]] = {}
+            insert_path(tree[path_parts[0]], path_parts[1:])
+
+        # Create a nested dictionary from the list of file paths
+        file_tree = {}
+        for filepath in selected_files:
+            parts = filepath.split('/')
+            insert_path(file_tree, parts)
+
+        # Helper function to format the tree into a string with ASCII graphics
+        def format_tree(tree, prefix=''):
+            lines = []
+            # Sorted to keep alphabetical order
+            items = sorted(tree.items())
+            for i, (key, sub_tree) in enumerate(items):
+                if i == len(items) - 1:  # Last item uses └──
+                    lines.append(prefix + '└── ' + key)
+                    extension = '    '
+                else:
+                    lines.append(prefix + '├── ' + key)
+                    extension = '│   '
+                if sub_tree:
+                    lines.extend(format_tree(sub_tree, prefix=prefix + extension))
+            return lines
+
+        # Generate formatted tree lines
+        tree_lines = format_tree(file_tree)
+
+        # Join lines and return as a string
+        return '\n'.join(tree_lines)
+
 
 
     def open_yaml_in_editor(self):

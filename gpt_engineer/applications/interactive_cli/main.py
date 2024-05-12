@@ -1,6 +1,5 @@
 import typer
 from dotenv import load_dotenv
-from ticket import Ticket
 
 from prompt_toolkit import prompt
 from prompt_toolkit.validation import Validator, ValidationError

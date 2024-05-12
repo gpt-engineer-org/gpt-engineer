@@ -13,11 +13,13 @@ class Feature(DiskMemory):
     and progress (history of incremental work completed)
     """
     def __init__(self, project_path: Union[str, Path]):
-        super().__init__(project_path / ".feature") 
+        super().__init__(Path(project_path) / ".feature") 
 
+
+    def clear_feature(self) -> None:
         self.set_description("")
         self.set_task("")
-        super()["progress.json"] = {"done": []}
+        super().__setitem__("progress.json", json.dumps({"done": []}))
 
     def get_description(self) -> str:
         """
@@ -28,7 +30,7 @@ class Feature(DiskMemory):
         str
             The content of the feature file.
         """
-        return super()["description"]
+        return super().__getitem__("description")
     
     def set_description(self, feature_description: str):
         """
@@ -39,7 +41,7 @@ class Feature(DiskMemory):
         feature_description : str
             The new feature_description to write to the feature file.
         """
-        super()["description"] = feature_description
+        super().__setitem__("description", feature_description)
 
     def get_progress(self) -> dict:
         """
@@ -50,7 +52,7 @@ class Feature(DiskMemory):
         str
             The content of the feature file.
         """
-        return json.load(super()["progress.json"])
+        return json.loads(super().__getitem__("progress.json"))
 
     def update_progress(self, task: str):
         """
@@ -63,7 +65,7 @@ class Feature(DiskMemory):
         """
         progress= self.get_progress()
         new_progress = progress['done'].append(task)
-        super()["progress.json"] = json.dumps(new_progress, indent=4)
+        super().__setitem__("progress.json", json.dumps(new_progress, indent=4))
     
     def set_task(self, task: str):
         """
@@ -74,7 +76,7 @@ class Feature(DiskMemory):
         task : str
             The new task to write to the feature file.
         """
-        super()["task"] = task
+        super().__setitem__("task",task)
 
     def get_task(self) -> str:
         """
@@ -85,7 +87,7 @@ class Feature(DiskMemory):
         str
             The content of the feature file.
         """
-        return super()["task"]
+        return super().__getitem__("task")
 
 
     def complete_task(self):
