@@ -12,10 +12,11 @@ run : function
 print_results : function
     Prints the results of the benchmark tasks to the console.
 """
-import yaml
 import time
 
 from typing import List
+
+import yaml
 
 from gpt_engineer.benchmark.types import Assertable, Benchmark, TaskResult
 from gpt_engineer.core.base_agent import BaseAgent
