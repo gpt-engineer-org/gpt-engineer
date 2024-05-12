@@ -37,7 +37,7 @@ import sys
 import traceback
 
 from pathlib import Path
-from typing import List, MutableMapping, Union
+from typing import List, MutableMapping, Union, Optional
 
 from langchain.schema import HumanMessage, SystemMessage
 from termcolor import colored
@@ -274,6 +274,7 @@ def improve_fn(
     files_dict: FilesDict,
     memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
+    additional_context: Optional[str] = None,
 ) -> FilesDict:
     """
     Improves the code based on user input and returns the updated files.
@@ -290,6 +291,8 @@ def improve_fn(
         The memory interface where the code and related data are stored.
     preprompts_holder : PrepromptsHolder
         The holder for preprompt messages that guide the AI model.
+    additional_context :str
+        Optional additional context to provide to the AI as part of the request
 
     Returns
     -------
@@ -300,7 +303,10 @@ def improve_fn(
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]
-    # Add files as input
+    
+    if additional_context:
+        messages.append(HumanMessage(content=additional_context))
+
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=prompt.to_langchain_content()))
     memory.log(
