@@ -92,3 +92,7 @@ webapp/.next/
 # locally saved datasets
 gpt_engineer/benchmark/benchmarks/apps/dataset
 gpt_engineer/benchmark/benchmarks/mbpp/dataset
+
+gpt_engineer/benchmark/minimal_bench_config.toml
+
+test.json
