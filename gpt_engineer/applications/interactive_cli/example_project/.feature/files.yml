@@ -1,0 +1,7 @@
+# Complete list of files shared with the AI
+# Please comment out any files not needed as context for this change 
+# This saves money and avoids overwhelming the AI
+- .gitignore
+#- 'README.md'
+- index.html
+- styles.css

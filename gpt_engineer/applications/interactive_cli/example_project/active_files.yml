@@ -1,0 +1,10 @@
+# Please comment out files you want to exclude from the AI context (this saves money and can avoid overwhelming the AI)
+- .ticket/:
+  - feature
+  - files.yml
+  - progress.json
+  - task
+- .gitignore
+- README.md
+- index.html
+- styles.css

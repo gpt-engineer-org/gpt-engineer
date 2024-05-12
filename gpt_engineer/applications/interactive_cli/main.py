@@ -6,72 +6,51 @@ from prompt_toolkit import prompt
 from prompt_toolkit.validation import Validator, ValidationError
 
 from gpt_engineer.core.ai import AI
+from gpt_engineer.core.prompt import Prompt
 
-from generation_tools import generate_branch_name, generate_suggested_tasks
-from repository import Repository
+from generation_tools import  generate_suggested_tasks
+from repository import Repository, GitContext
+from file_selection import FileSelection
+from files import Files
+from agent import FeatureAgent
+from feature import Feature
 
 app = typer.Typer()
 
-class FeatureValidator(Validator):
-    def validate(self, document):
-        text = document.text
-        if not text:
-            raise ValidationError(message="Feature description cannot be empty", cursor_position=len(text))
 
+def get_contenxt_string(feature:Feature ,git_context:GitContext):
+        return f"""I am working on a feature but breaking it up into small incremental tasks. Your job is to complete the incremental task provided to you - only that task and nothign more. 
+        
+The purpose of this message is to give you wider context around the feature you are working on and what incremental tasks have already been completed so far.
 
-def initialize_new_feature(ai, ticket): 
-    
-    ticket.clear_ticket()
+## Feature - this is the description fo the current feature we are working on.
+{feature.get_description()}
 
-    feature_description = prompt(
-            "Write feature description: ",
-            multiline=True,
-            validator=FeatureValidator(),
-            bottom_toolbar="Press Ctrl+O to finish"
-        )
-    
-    ticket.feature = feature_description
-    ticket.save_feature()
-    
-    # print("\n Ticket files created at .ticket \n ")
+## Completed Tasks - these are the lists of tasks you have completed so far on the feature branch.
+{feature.get_progress()["done"]}
 
-    branch_name = generate_branch_name(ai, feature_description)
+## Git Context - these are the code changes made so far while implementing this feature. This may include work completed by you on previous tasks as well as changes made independently by me.
+### Branch Changes - this is the cumulative diff of all the commits so far on the feature branch. 
+{git_context.branch_changes}
 
-    branch_name = prompt('\nConfirm branch name: ', default=branch_name)
-
-    # todo: use gitpython to create new branch. 
-    
-    print(f'\nFeature branch created.\n')
-
-    
-
-
-def get_context_string(ticket, git_context, code):
-    input = f""" 
-## Feature
-{ticket.feature}
-
-## Completed Tasks 
-{ticket.progress.done}
-
-## Git Context
-### Commits 
-{git_context.commits}
-
-### Staged Changes
+### Staged Changes - this is the diff of the current staged changes. 
 {git_context.staged_changes}
+"""
 
-## Current Codebase
-{code}
+def get_full_context_string(ticket, git_context, files: Files):
+    return f"""{get_contenxt_string(ticket, git_context)}
+
+## Current Codebase - this is the as is view of the current code base including any unstaged changes. 
+{files.to_chat()}
 """
     
 
-def choose_next_task(ai, ticket, context):
+def choose_next_task(ai, ticket, git_context: GitContext, files: Files):
     print(f"There are {len(ticket.progress.done)} tasks completed so far. What shall we do next?")
 
-    suggested_tasks  = generate_suggested_tasks()
+    context_string = get_full_context_string(ticket, git_context, files)
 
-
+    suggested_tasks_xml  = generate_suggested_tasks()
 
 
 @app.command()
@@ -118,22 +97,15 @@ def main(
 
     repository = Repository(project_path)
 
-    ticket = Ticket.load_or_create_at_directory(project_path)
+    feature = Feature(project_path)
+
+    agent = FeatureAgent(project_path, feature, repository, ai)
 
     if new:
-        initialize_new_feature(ai, ticket)
+        agent.init()
+    else:
+        agent.resume()
 
-    git_context = repository.get_git_context()
-
-    print(git_context.staged_changes)
-    print(git_context.unstaged_changes)
-    for commit in git_context.commits:
-        print(commit)
-        print()
-
-    # todo: continue with the rest of the task creation flow. Every time a task is added move it to a task file
-
-
-
+    
 if __name__ == "__main__":
     app()

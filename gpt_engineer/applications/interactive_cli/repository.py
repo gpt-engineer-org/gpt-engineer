@@ -23,9 +23,10 @@ class GitContext:
     Represents the Git context of an in progress feature.
     """
     commits: List[Commit]
+    branch_changes: str
     staged_changes: str
     unstaged_changes: str
-
+    tracked_files: List[str]
 
 
 class Repository:
@@ -48,6 +49,34 @@ class Repository:
         except GitCommandError as e:
             print(f"Error listing tracked files: {e}")
             return []
+        
+    def get_feature_branch_diff(self):
+        """
+        Get a consolidated diff for the entire feature branch from its divergence point.
+        
+        Returns:
+        - str: The diff representing all changes from the feature branch since its divergence.
+        """
+        current_branch = self.repo.active_branch
+
+        # Get the tracking branch (e.g., 'origin/master')
+        tracking_branch = current_branch.tracking_branch()
+        if tracking_branch is None:
+            print("No tracking branch set, using 'master' as default base branch.")
+            tracking_branch = self.repo.heads.master  # Fallback to 'master'
+
+        try:
+            # Find the merge base between the current branch and the tracking branch or master
+            merge_base = self.repo.merge_base(tracking_branch, current_branch)
+            if merge_base:
+                merge_base = merge_base[0]  # GitPython might return a list of merge bases
+
+            # Generate the diff from the merge base to the latest commit of the feature branch
+            feature_diff = self.repo.git.diff(f"{merge_base}..{current_branch}", unified=0)
+            return feature_diff
+        except GitCommandError as e:
+            print(f"Error generating diff: {e}")
+            return ""
 
 
     def get_git_context(self):
@@ -65,4 +94,8 @@ class Repository:
             for commit in commits
         ]
 
-        return GitContext(commit_objects, staged_changes, unstaged_changes)
+        branch_changes = self.get_feature_branch_diff()
+
+        tracked_files = self.get_tracked_files()
+
+        return GitContext(commit_objects, branch_changes, staged_changes, unstaged_changes, tracked_files)
