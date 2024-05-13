@@ -327,6 +327,11 @@ def main(
         "--no_execution",
         help="Run setup but to not call LLM or write any code. For testing purposes.",
     ),
+    sysinfo: bool = typer.Option(
+        False,
+        "--sysinfo",
+        help="Output system information using native commands or those from GPTE-installed packages without exposing sensitive data.",
+    ),
 ):
     """
     The main entry point for the CLI tool that generates or improves a project.
@@ -367,6 +372,8 @@ def main(
         Flag indicating whether to enable verbose logging.
     no_execution: bool
         Run setup but to not call LLM or write any code. For testing purposes.
+    sysinfo: bool
+        Flag indicating whether to output system information.
 
     Returns
     -------

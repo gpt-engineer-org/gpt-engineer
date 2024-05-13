@@ -4,6 +4,8 @@ using an AI model. It includes functionalities to initialize code generation, im
 and process the code through various steps defined in the step bundle.
 """
 
+import platform
+import subprocess
 from typing import Callable, Optional, TypeVar
 
 # from gpt_engineer.core.default.git_version_manager import GitVersionManager
@@ -223,3 +225,42 @@ class CliAgent(BaseAgent):
         # )
 
         return files_dict
+
+    def get_system_info(self) -> str:
+        """
+        Gathers system information using native commands or those from GPTE-installed packages without exposing sensitive data.
+
+        Returns
+        -------
+        str
+            A string containing the gathered system information.
+        """
+        system_info_commands = {
+            "Linux": [
+                "uname -a",
+                "lsb_release -a",
+                "cat /proc/version",
+                "pip freeze",
+                "python --version",
+                "which python"
+            ],
+            "Windows": [
+                "systeminfo",
+                "pip freeze",
+                "python --version",
+                "where python"
+            ]
+        }
+
+        os_type = platform.system()
+        commands = system_info_commands.get(os_type, [])
+        system_info = ""
+
+        for command in commands:
+            try:
+                result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+                system_info += f"\n{command}:\n{result.stdout}"
+            except subprocess.CalledProcessError as e:
+                system_info += f"\nError executing {command}: {e}"
+
+        return system_info
