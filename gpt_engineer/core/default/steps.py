@@ -393,7 +393,6 @@ def handle_improve_mode(prompt, agent, memory, files_dict):
 
         # Get the captured output
         captured_string = captured_output.getvalue()
-        print(captured_string)
         memory.log(DEBUG_LOG_FILE, "\nCONSOLE OUTPUT:\n" + captured_string)
 
     return files_dict
