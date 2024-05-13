@@ -98,6 +98,26 @@ to get input on how you can [contribute](.github/CONTRIBUTING.md) to it.
 
 gpt-engineer is [governed](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/GOVERNANCE.md) by a board of long-term contributors. If you contribute routinely and have an interest in shaping the future of gpt-engineer, you will be considered for the board.
 
+## System Information
+
+To output system information using the GPTE CLI, you can use the `--sysinfo` argument. This feature uses native commands or those from GPTE-installed packages to gather system information without exposing sensitive data. Here are examples of how to use this command:
+
+### Linux
+
+```bash
+gpte --sysinfo
+```
+
+This will execute commands like `uname -a`, `lsb_release -a`, `cat /proc/version`, `pip freeze`, `python --version`, and `which python` to gather system information.
+
+### Windows
+
+```bash
+gpte --sysinfo
+```
+
+On Windows, it will execute the `systeminfo` command along with `pip freeze`, `python --version`, and `where python` to collect system information.
+
 ## Example
 
 

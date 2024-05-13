@@ -29,6 +29,8 @@ import difflib
 import logging
 import os
 import sys
+import subprocess
+import platform
 
 from pathlib import Path
 
@@ -234,6 +236,39 @@ def prompt_yesno() -> bool:
             break
         print("Please respond with 'y' or 'n'")
 
+def sysinfo() -> None:
+    """
+    Gathers and prints system information using native commands or those from GPTE-installed packages without exposing sensitive data.
+    """
+    system_info_commands = {
+        "Linux": [
+            "uname -a",
+            "lsb_release -a",
+            "cat /proc/version",
+            "pip freeze",
+            "python --version",
+            "which python"
+        ],
+        "Windows": [
+            "systeminfo",
+            "pip freeze",
+            "python --version",
+            "where python"
+        ]
+    }
+
+    os_type = platform.system()
+    commands = system_info_commands.get(os_type, [])
+    system_info = ""
+
+    for command in commands:
+        try:
+            result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+            system_info += f"\n{command}:\n{result.stdout}"
+        except subprocess.CalledProcessError as e:
+            system_info += f"\nError executing {command}: {e}"
+
+    print(system_info)
 
 @app.command(
     help="""
@@ -327,6 +362,11 @@ def main(
         "--no_execution",
         help="Run setup but to not call LLM or write any code. For testing purposes.",
     ),
+    sysinfo: bool = typer.Option(
+        False,
+        "--sysinfo",
+        help="Output system information using native commands or those from GPTE-installed packages without exposing sensitive data.",
+    ),
 ):
     """
     The main entry point for the CLI tool that generates or improves a project.
@@ -367,6 +407,8 @@ def main(
         Flag indicating whether to enable verbose logging.
     no_execution: bool
         Run setup but to not call LLM or write any code. For testing purposes.
+    sysinfo: bool
+        Flag indicating whether to output system information.
 
     Returns
     -------
@@ -485,6 +527,9 @@ def main(
         print("Total api cost: $ 0.0 since we are using local LLM.")
     else:
         print("Total tokens used: ", ai.token_usage_log.total_tokens())
+
+    if sysinfo:
+        sysinfo()
 
 
 if __name__ == "__main__":
