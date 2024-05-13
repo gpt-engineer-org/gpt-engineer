@@ -37,7 +37,7 @@ import sys
 import traceback
 
 from pathlib import Path
-from typing import List, MutableMapping, Union, Optional
+from typing import List, MutableMapping, Optional, Union
 
 from langchain.schema import HumanMessage, SystemMessage
 from termcolor import colored
@@ -303,7 +303,7 @@ def improve_fn(
     messages = [
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]
-    
+
     if additional_context:
         messages.append(HumanMessage(content=additional_context))
 

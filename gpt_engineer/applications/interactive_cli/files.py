@@ -1,5 +1,7 @@
-from gpt_engineer.core.files_dict import FilesDict
 from pathlib import Path
+
+from gpt_engineer.core.files_dict import FilesDict
+
 
 class Files(FilesDict):
     def __init__(self, project_path: str, selected_files: list):
@@ -16,7 +18,9 @@ class Files(FilesDict):
         content_dict = {}
         for file_path in selected_files:
             try:
-                with open(Path(project_path) / file_path, "r", encoding="utf-8") as content:
+                with open(
+                    Path(project_path) / file_path, "r", encoding="utf-8"
+                ) as content:
                     content_dict[str(file_path)] = content.read()
             except FileNotFoundError:
                 print(f"Warning: File not found {file_path}")

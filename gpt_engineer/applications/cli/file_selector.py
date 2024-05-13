@@ -19,8 +19,8 @@ file handling and persistence.
 
 import fnmatch
 import os
+import platform
 import subprocess
-import platform 
 
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Union
@@ -212,12 +212,12 @@ class FileSelector:
                 pass
 
         # Platform-specific methods to open the file
-        if platform.system() == 'Windows':
+        if platform.system() == "Windows":
             os.startfile(file_path)
-        elif platform.system() == 'Darwin':
-            subprocess.run(['open', file_path])
+        elif platform.system() == "Darwin":
+            subprocess.run(["open", file_path])
         else:  # Linux and other Unix-like systems
-            subprocess.run(['xdg-open', file_path])
+            subprocess.run(["xdg-open", file_path])
 
     def is_utf8(self, file_path: Union[str, Path]) -> bool:
         """

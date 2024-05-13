@@ -6,7 +6,7 @@ body {
     background: #f4f4f4;
     color: #333;
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
 }
 
 header {
