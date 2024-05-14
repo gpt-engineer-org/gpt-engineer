@@ -455,7 +455,7 @@ def main(
         if improve_mode:
             files_dict_before = FileSelector(project_path).ask_for_files()
 
-            improve_lambda = lambda: agent.improve(prompt, files_dict_before)
+            improve_lambda = lambda: agent.improve(files_dict_before, prompt)
             files_dict = handle_improve_mode(improve_lambda, memory)
 
             if not files_dict or files_dict_before == files_dict:
