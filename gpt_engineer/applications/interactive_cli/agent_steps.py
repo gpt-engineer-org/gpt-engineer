@@ -30,18 +30,11 @@ class FeatureValidator(Validator):
 def initialize_new_feature(ai: AI, feature: Feature):
     feature.clear_feature()
 
-    feature_description = cli_input(
-        "Write feature description: ",
-        multiline=True,
-        validator=FeatureValidator(),
-        bottom_toolbar="Press Ctrl+O to finish",
-    )
-
-    feature.set_description(feature_description)
+    update_feature_description(feature)
 
     # print("\n Ticket files created at .ticket \n ")
 
-    branch_name = generate_branch_name(ai, feature_description)
+    branch_name = generate_branch_name(ai, feature.get_description())
 
     branch_name = cli_input("\nConfirm branch name: ", default=branch_name)
 
@@ -53,7 +46,9 @@ def initialize_new_feature(ai: AI, feature: Feature):
 def update_user_file_selection(file_selection: FileSelection):
     file_selection.update_yaml_from_tracked_files()
     file_selection.open_yaml_in_editor()
-    input("Please edit the YAML file and then press Enter to continue...")
+    input(
+        "Please edit the file selection for this feature and then press Enter to continue..."
+    )
 
 
 def update_feature_description(feature: Feature):
@@ -62,8 +57,8 @@ def update_feature_description(feature: Feature):
 
 
 def update_task_description(feature: Feature):
-    feature.open_feature_in_editor()
-    input("Please edit the feature file and then press Enter to continue...")
+    feature.open_task_in_editor()
+    input("Please edit the task file and then press Enter to continue...")
 
 
 def check_for_unstaged_changes(

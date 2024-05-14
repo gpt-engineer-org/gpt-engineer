@@ -27,8 +27,15 @@ class Feature(DiskMemory):
         super().__init__(self.feature_path)
 
     def clear_feature(self) -> None:
-        self.set_description("")
-        self.set_task("")
+        self.set_description(
+            """Please replace with your own feature description. Markdown is supported.
+
+Hint: 
+Improve your prompts by including technical references to any APIs, libraries, components etc that the pre trained model may not know about in detail already."""
+        )
+        self.set_task(
+            "Please replace with a task description - directing the AI on the first task to implement on this feature"
+        )
         super().__setitem__(self.progress_filename, json.dumps({"done": []}))
 
     def get_description(self) -> str:

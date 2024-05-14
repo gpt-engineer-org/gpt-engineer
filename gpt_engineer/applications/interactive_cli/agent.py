@@ -1,7 +1,6 @@
 from feature import Feature
 from file_selection import FileSelection
 from repository import Repository
-from files import Files
 from agent_steps import (
     initialize_new_feature,
     update_user_file_selection,
@@ -9,8 +8,8 @@ from agent_steps import (
     confirm_feature_context_and_task_with_user,
     run_improve_function,
     adjust_feature_task_or_files,
+    update_task_description,
 )
-from generation_tools import build_context_string
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.base_agent import BaseAgent
@@ -40,6 +39,8 @@ class FeatureAgent(BaseAgent):
         initialize_new_feature(self.ai, self.feature)
 
         update_user_file_selection(self.file_selection)
+
+        update_task_description(self.feature)
 
         self.resume()
 
