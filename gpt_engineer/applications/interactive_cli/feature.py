@@ -20,7 +20,7 @@ class Feature(DiskMemory):
     def __init__(self, project_path: Union[str, Path]):
 
         self.feature_path = Path(project_path) / ".feature"
-        self.feature_filename = "description.md"
+        self.feature_filename = "feature.md"
         self.progress_filename = "progress.json"
         self.task_filename = "task.md"
 

@@ -103,22 +103,25 @@ def confirm_feature_context_and_task_with_user(
     return False
 
 
-def check_if_task_is_complete():
+def complete_task():
+    pass
 
     # feature.complete task
-    # then 
+    # then
 
 
 def adjust_feature_task_or_files():
-    # todo : create a function which uses the test4.py example code approach to offer a selection of options to the user 
+    pass
+    # todo : create a function which uses the test4.py example code approach to offer a selection of options to the user
 
-    # c - complete the task and start a new one 
+    # c - complete the task and start a new one
 
-    # f - "edit feature" using update_feature_description step 
+    # f - "edit feature" using update_feature_description step
     # s - "edit file selection" using update_user_file_selection step
     # t - "edit task" using update_task_description step
 
-    # 
+    #
+
 
 def compare_files(f1: Files, f2: Files):
     def colored_diff(s1, s2):
