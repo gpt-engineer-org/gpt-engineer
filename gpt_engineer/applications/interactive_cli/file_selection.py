@@ -177,12 +177,8 @@ class FileSelection:
 
         selected_files, excluded_files = self._get_from_yaml()
 
-        print(set(selected_files + excluded_files))
-        print(set(tracked_files))
-
         # If there are no changes, do nothing
         if set(tracked_files) == set(selected_files + excluded_files):
-            print("yep")
             return
 
         new_selected_files = list(set(tracked_files) - set(excluded_files))
