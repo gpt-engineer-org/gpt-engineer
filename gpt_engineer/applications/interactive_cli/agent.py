@@ -8,6 +8,7 @@ from agent_steps import (
     check_for_unstaged_changes,
     confirm_feature_context_and_task_with_user,
     run_improve_function,
+    adjust_feature_task_or_files,
 )
 from generation_tools import build_context_string
 
@@ -44,9 +45,16 @@ class FeatureAgent(BaseAgent):
 
     def resume(self):
 
-        check_for_unstaged_changes(self.repository)
+        implement = False
 
-        confirm_feature_context_and_task_with_user(self.feature, self.file_selection)
+        while not implement:
+            implement = confirm_feature_context_and_task_with_user(
+                self.feature, self.file_selection
+            )
+
+            adjust_feature_task_or_files()
+
+        check_for_unstaged_changes(self.repository)
 
         run_improve_function(
             self.project_path,

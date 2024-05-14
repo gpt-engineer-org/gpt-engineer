@@ -5,7 +5,6 @@ from files import Files
 from generation_tools import generate_branch_name, build_context_string
 from termcolor import colored
 
-
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.core.default.steps import improve_fn, handle_improve_mode
@@ -13,7 +12,6 @@ from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.prompt import Prompt
-
 
 from prompt_toolkit import prompt as cli_input
 from prompt_toolkit.validation import ValidationError, Validator
@@ -58,6 +56,16 @@ def update_user_file_selection(file_selection: FileSelection):
     input("Please edit the YAML file and then press Enter to continue...")
 
 
+def update_feature_description(feature: Feature):
+    feature.open_feature_in_editor()
+    input("Please edit the feature file and then press Enter to continue...")
+
+
+def update_task_description(feature: Feature):
+    feature.open_feature_in_editor()
+    input("Please edit the feature file and then press Enter to continue...")
+
+
 def check_for_unstaged_changes(
     repository: Repository,
 ):
@@ -86,14 +94,31 @@ def confirm_feature_context_and_task_with_user(
     print(f"Task: {task}\n\n")
 
     #  do you want to attempt this task?
-    if cli_input("Do you want to attempt this task? y/n: ").lower() not in [
+    if cli_input("Do you want to implement this task? y/n: ").lower() in [
         "y",
         "yes",
     ]:
-        print("Ok, not proceeding. Perhaps you should update the feature and retry")
-        return
-        # TODO: if no: do you want to edit feature? edit task? complete? or cancel?
+        return True
 
+    return False
+
+
+def check_if_task_is_complete():
+
+    # feature.complete task
+    # then 
+
+
+def adjust_feature_task_or_files():
+    # todo : create a function which uses the test4.py example code approach to offer a selection of options to the user 
+
+    # c - complete the task and start a new one 
+
+    # f - "edit feature" using update_feature_description step 
+    # s - "edit file selection" using update_user_file_selection step
+    # t - "edit task" using update_task_description step
+
+    # 
 
 def compare_files(f1: Files, f2: Files):
     def colored_diff(s1, s2):
