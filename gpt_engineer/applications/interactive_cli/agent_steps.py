@@ -2,15 +2,22 @@ from feature import Feature
 from file_selection import FileSelection
 from repository import Repository
 from files import Files
-from generation_tools import generate_branch_name
+from generation_tools import generate_branch_name, build_context_string
+from termcolor import colored
 
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.prompt import Prompt
-from gpt_engineer.core.default.steps import improve_fn
+from gpt_engineer.core.default.steps import improve_fn, handle_improve_mode
+from gpt_engineer.core.default.disk_memory import DiskMemory
+from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
+from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.prompt import Prompt
+
 
 from prompt_toolkit import prompt as cli_input
 from prompt_toolkit.validation import ValidationError, Validator
+import difflib
 
 
 class FeatureValidator(Validator):
@@ -64,7 +71,9 @@ def check_for_unstaged_changes(
             return
 
 
-def confirm_task_and_context_with_user(feature: Feature, file_selection: FileSelection):
+def confirm_feature_context_and_task_with_user(
+    feature: Feature, file_selection: FileSelection
+):
     file_selection.update_yaml_from_tracked_files()
 
     feature_description = feature.get_description()
@@ -86,29 +95,80 @@ def confirm_task_and_context_with_user(feature: Feature, file_selection: FileSel
         # TODO: if no: do you want to edit feature? edit task? complete? or cancel?
 
 
-def run_improve_function(ai: AI, feature: Feature, files: Files):
+def compare_files(f1: Files, f2: Files):
+    def colored_diff(s1, s2):
+        lines1 = s1.splitlines()
+        lines2 = s2.splitlines()
+
+        diff = difflib.unified_diff(lines1, lines2, lineterm="")
+
+        RED = "\033[38;5;202m"
+        GREEN = "\033[92m"
+        RESET = "\033[0m"
+
+        colored_lines = []
+        for line in diff:
+            if line.startswith("+"):
+                colored_lines.append(GREEN + line + RESET)
+            elif line.startswith("-"):
+                colored_lines.append(RED + line + RESET)
+            else:
+                colored_lines.append(line)
+
+        return "\n".join(colored_lines)
+
+    for file in sorted(set(f1) | set(f2)):
+        diff = colored_diff(f1.get(file, ""), f2.get(file, ""))
+        if diff:
+            print(f"Changes to {file}:")
+            print(diff)
+
+
+def prompt_yesno() -> bool:
+    TERM_CHOICES = colored("y", "green") + "/" + colored("n", "red") + " "
+    while True:
+        response = input(TERM_CHOICES).strip().lower()
+        if response in ["y", "yes"]:
+            return True
+        if response in ["n", "no"]:
+            break
+        print("Please respond with 'y' or 'n'")
+
+
+def run_improve_function(
+    project_path,
+    feature: Feature,
+    repository: Repository,
+    ai: AI,
+    file_selection: FileSelection,
+):
+
+    memory = DiskMemory(memory_path(project_path))
+    preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
+
+    context_string = build_context_string(feature, repository.get_git_context())
 
     prompt = Prompt(feature.get_task(), prefix="Task: ")
 
-    #  WIP!
+    files = Files(project_path, file_selection.get_from_yaml())
 
+    improve_lambda = lambda: improve_fn(
+        ai, prompt, files, memory, preprompts_holder, context_string
+    )
 
-# improve_fn(
-#     self.ai, prompt, files, self.memory, self.preprompts_holder, context_string
-# )
+    updated_files_dictionary = handle_improve_mode(improve_lambda, memory)
+    if not updated_files_dictionary or files == updated_files_dictionary:
+        print(
+            f"No changes applied. Could you please upload the debug_log_file.txt in {memory.path} folder in a github issue?"
+        )
 
-#     files_dict_before = FileSelector(project_path).ask_for_files()
-#     files_dict = handle_improve_mode(prompt, agent, memory, files_dict_before)
-#     if not files_dict or files_dict_before == files_dict:
-#         print(
-#             f"No changes applied. Could you please upload the debug_log_file.txt in {memory.path} folder in a github issue?"
-#         )
+    else:
+        print("\nChanges to be made:")
+        compare_files(files, updated_files_dictionary)
 
-#     else:
-#         print("\nChanges to be made:")
-#         compare(files_dict_before, files_dict)
+        print()
+        print(colored("Do you want to apply these changes?", "light_green"))
+        if not prompt_yesno():
+            return
 
-#         print()
-#         print(colored("Do you want to apply these changes?", "light_green"))
-#         if not prompt_yesno():
-#             files_dict = files_dict_before
+    files.write_to_disk(updated_files_dictionary)

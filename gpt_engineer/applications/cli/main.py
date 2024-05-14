@@ -454,7 +454,10 @@ def main(
     if not no_execution:
         if improve_mode:
             files_dict_before = FileSelector(project_path).ask_for_files()
-            files_dict = handle_improve_mode(prompt, agent, memory, files_dict_before)
+
+            improve_lambda = lambda: agent.improve(prompt, files_dict_before)
+            files_dict = handle_improve_mode(improve_lambda, memory)
+
             if not files_dict or files_dict_before == files_dict:
                 print(
                     f"No changes applied. Could you please upload the debug_log_file.txt in {memory.path} folder in a github issue?"

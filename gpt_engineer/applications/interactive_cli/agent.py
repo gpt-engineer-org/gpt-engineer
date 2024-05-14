@@ -6,16 +6,13 @@ from agent_steps import (
     initialize_new_feature,
     update_user_file_selection,
     check_for_unstaged_changes,
-    confirm_task_and_context_with_user,
+    confirm_feature_context_and_task_with_user,
+    run_improve_function,
 )
 from generation_tools import build_context_string
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.base_agent import BaseAgent
-from gpt_engineer.core.default.disk_memory import DiskMemory
-from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
-from gpt_engineer.core.preprompts_holder import PrepromptsHolder
-from gpt_engineer.core.prompt import Prompt
 
 
 class FeatureAgent(BaseAgent):
@@ -36,12 +33,10 @@ class FeatureAgent(BaseAgent):
         self.ai = ai or AI()
 
         self.file_selection = FileSelection(project_path, repository)
-        self.memory = DiskMemory(memory_path(project_path))
-        self.preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
 
     def init(self):
 
-        initialize_new_feature(self.feature)
+        initialize_new_feature(self.ai, self.feature)
 
         update_user_file_selection(self.file_selection)
 
@@ -51,13 +46,15 @@ class FeatureAgent(BaseAgent):
 
         check_for_unstaged_changes(self.repository)
 
-        confirm_task_and_context_with_user(self.feature, self.file_selection)
+        confirm_feature_context_and_task_with_user(self.feature, self.file_selection)
 
-        context_string = build_context_string(
-            self.feature, self.repository.get_git_context()
+        run_improve_function(
+            self.project_path,
+            self.feature,
+            self.repository,
+            self.ai,
+            self.file_selection,
         )
-
-        files = Files(self.project_path, self.file_selection.get_from_yaml())
 
     def improve(self):
         self.resume()

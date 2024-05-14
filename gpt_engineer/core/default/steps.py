@@ -375,13 +375,13 @@ class Tee(object):
             file.flush()
 
 
-def handle_improve_mode(prompt, agent, memory, files_dict):
+def handle_improve_mode(improve_lambda, memory):
     captured_output = io.StringIO()
     old_stdout = sys.stdout
     sys.stdout = Tee(sys.stdout, captured_output)
 
     try:
-        files_dict = agent.improve(files_dict, prompt)
+        files_dict = improve_lambda()
     except Exception as e:
         print(
             f"Error while improving the project: {e}\nCould you please upload the debug_log_file.txt in {memory.path} folder to github?\nFULL STACK TRACE:\n"

@@ -15,6 +15,9 @@ class Files(FilesDict):
         selected_files : list
             List of file paths relative to the project path.
         """
+
+        self.project_path = project_path
+        # Convert the list of selected files and their relative directory into a dictionary of relative file paths
         content_dict = {}
         for file_path in selected_files:
             try:
@@ -27,3 +30,11 @@ class Files(FilesDict):
             except UnicodeDecodeError:
                 print(f"Warning: File not UTF-8 encoded {file_path}, skipping")
         super().__init__(content_dict)
+
+    def write_to_disk(self, files: FilesDict):
+        for name, content in files.items():
+            path = Path(self.project_path) / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with open(path, "w") as f:
+                f.write(content)
+        return self
