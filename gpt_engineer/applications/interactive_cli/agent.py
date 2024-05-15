@@ -36,7 +36,7 @@ class FeatureAgent(BaseAgent):
 
     def init(self):
 
-        initialize_new_feature(self.ai, self.feature)
+        initialize_new_feature(self.ai, self.feature, self.repository)
 
         update_user_file_selection(self.file_selection)
 

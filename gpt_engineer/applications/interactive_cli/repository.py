@@ -115,3 +115,26 @@ class Repository:
             unstaged_changes,
             tracked_files,
         )
+
+    def create_branch(self, branch_name):
+        """
+        Create a new branch in the repository.
+
+        Parameters
+        ----------
+        branch_name : str
+            The name of the new branch.
+        """
+        self.repo.git.checkout("-b", branch_name)
+
+    def stage_all_changes(self):
+        """
+        Stage all changes in the repository.
+        """
+        self.repo.git.add("--all")
+
+    def undo_unstaged_changes(self):
+        """
+        Undo all unstaged changes in the repository.
+        """
+        self.repo.git.checkout("--", ".")
