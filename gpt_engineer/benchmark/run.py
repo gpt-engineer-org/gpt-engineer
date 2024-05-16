@@ -16,6 +16,8 @@ import time
 
 from typing import List
 
+import yaml
+
 from gpt_engineer.benchmark.types import Assertable, Benchmark, TaskResult
 from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
@@ -132,3 +134,17 @@ def print_results(results: list[TaskResult]):
     print(f"Average success rate: {avg_success_rate * 100}% on {len(results)} tasks")
     print("--- Results ---")
     print()
+
+
+def export_yaml_results(yaml_path, complete_results, config):
+    for results in complete_results.values():
+        correct_tasks = [
+            task_result
+            for task_result in results["detailed"]
+            if task_result["solved"] == 1.0
+        ]
+        fraction_correct = len(correct_tasks) / len(results["detailed"])
+        results["fully_solved"] = fraction_correct
+    complete_results["config"] = config
+    with open(yaml_path, "w") as f:
+        yaml.dump(complete_results, f, indent=4)

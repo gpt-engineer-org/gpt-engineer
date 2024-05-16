@@ -5,7 +5,6 @@ import pytest
 from gpt_engineer.benchmark.bench_config import (
     AppsConfig,
     BenchConfig,
-    GptengConfig,
     GptmeConfig,
     MbppConfig,
 )
@@ -18,7 +17,6 @@ class TestBenchConfig:
         assert isinstance(config.apps, AppsConfig)
         assert isinstance(config.mbpp, MbppConfig)
         assert isinstance(config.gptme, GptmeConfig)
-        assert isinstance(config.gpteng, GptengConfig)
         assert config.apps.active is True
         assert config.apps.test_start_index == 0
         assert config.apps.test_end_index == 1
@@ -28,7 +26,6 @@ class TestBenchConfig:
         assert config.mbpp.test_len == 1
         assert config.mbpp.train_len == 0
         assert config.gptme.active is True
-        assert config.gpteng.active is True
 
     #  Creating a BenchConfig object with specific values should return an instance of BenchConfig with the specified attributes set to the specified values.
     def test_specific_values(self):
@@ -42,12 +39,10 @@ class TestBenchConfig:
             ),
             mbpp=MbppConfig(active=False, test_len=5, train_len=6),
             gptme=GptmeConfig(active=False),
-            gpteng=GptengConfig(active=False),
         )
         assert isinstance(config.apps, AppsConfig)
         assert isinstance(config.mbpp, MbppConfig)
         assert isinstance(config.gptme, GptmeConfig)
-        assert isinstance(config.gpteng, GptengConfig)
         assert config.apps.active is False
         assert config.apps.test_start_index == 1
         assert config.apps.test_end_index == 2
@@ -57,7 +52,6 @@ class TestBenchConfig:
         assert config.mbpp.test_len == 5
         assert config.mbpp.train_len == 6
         assert config.gptme.active is False
-        assert config.gpteng.active is False
 
     #  Calling the from_dict method with a valid dictionary should return an instance of BenchConfig with attributes set according to the values in the dictionary.
     def test_from_dict_valid_dict(self):
@@ -71,13 +65,11 @@ class TestBenchConfig:
             },
             "mbpp": {"active": False, "test_len": 5, "train_len": 6},
             "gptme": {"active": False},
-            "gpteng": {"active": False},
         }
         config = BenchConfig.from_dict(config_dict)
         assert isinstance(config.apps, AppsConfig)
         assert isinstance(config.mbpp, MbppConfig)
         assert isinstance(config.gptme, GptmeConfig)
-        assert isinstance(config.gpteng, GptengConfig)
         assert config.apps.active is False
         assert config.apps.test_start_index == 1
         assert config.apps.test_end_index == 2
@@ -87,7 +79,6 @@ class TestBenchConfig:
         assert config.mbpp.test_len == 5
         assert config.mbpp.train_len == 6
         assert config.gptme.active is False
-        assert config.gpteng.active is False
 
     #  Calling the from_toml method with an invalid path to a TOML file should raise an appropriate exception.
     def test_from_toml_invalid_path(self):
