@@ -60,7 +60,9 @@ from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
 
-app = typer.Typer()  # creates a CLI app
+app = typer.Typer(
+    context_settings={"help_option_names": ["-h", "--help"]}
+)  # creates a CLI app
 
 
 def load_env_if_needed():
