@@ -282,12 +282,16 @@ class TokenUsageLog:
         if not self.is_openai_model():
             return None
 
-        result = 0
-        for log in self.log():
-            result += get_openai_token_cost_for_model(
-                self.model_name, log.total_prompt_tokens, is_completion=False
-            )
-            result += get_openai_token_cost_for_model(
-                self.model_name, log.total_completion_tokens, is_completion=True
-            )
-        return result
+        try:
+            result = 0
+            for log in self.log():
+                result += get_openai_token_cost_for_model(
+                    self.model_name, log.total_prompt_tokens, is_completion=False
+                )
+                result += get_openai_token_cost_for_model(
+                    self.model_name, log.total_completion_tokens, is_completion=True
+                )
+            return result
+        except Exception as e:
+            print(f"Error calculating usage cost: {e}")
+            return None
