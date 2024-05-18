@@ -7,8 +7,9 @@ RUN apt-get install -y git
 WORKDIR /app
 
 COPY . .
+
 COPY docker/entrypoint.sh ./entrypoint.sh
 
-RUN sudo pip install -e .
+RUN pip install --no-cache-dir -e .
 
 ENTRYPOINT ["bash", "/app/entrypoint.sh"]
