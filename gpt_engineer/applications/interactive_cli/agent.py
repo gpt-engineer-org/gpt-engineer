@@ -1,8 +1,8 @@
-from feature import Feature
-from file_selection import FileSelection
-from repository import Repository
-from settings import Settings
-from agent_steps import (
+from gpt_engineer.applications.interactive_cli.feature import Feature
+from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
+from gpt_engineer.applications.interactive_cli.repository import Repository
+from gpt_engineer.applications.interactive_cli.domain import Settings
+from gpt_engineer.applications.interactive_cli.agent_steps import (
     initialize_new_feature,
     update_user_file_selection,
     check_for_unstaged_changes,
@@ -33,7 +33,7 @@ class FeatureAgent(BaseAgent):
         self.repository = repository
         self.ai = ai or AI()
 
-        self.file_selection = FileSelection(project_path, repository)
+        self.file_selector = FileSelector(project_path, repository)
 
     def init(self, settings: Settings):
 
@@ -41,7 +41,7 @@ class FeatureAgent(BaseAgent):
             self.ai, self.feature, self.repository, settings.no_branch
         )
 
-        update_user_file_selection(self.file_selection)
+        update_user_file_selection(self.file_selector)
 
         update_task_description(self.feature)
 
@@ -53,7 +53,7 @@ class FeatureAgent(BaseAgent):
 
         while not implement:
             implement = confirm_feature_context_and_task_with_user(
-                self.feature, self.file_selection
+                self.feature, self.file_selector
             )
 
             adjust_feature_task_or_files()
@@ -65,7 +65,7 @@ class FeatureAgent(BaseAgent):
             self.feature,
             self.repository,
             self.ai,
-            self.file_selection,
+            self.file_selector,
         )
 
     def improve(self):

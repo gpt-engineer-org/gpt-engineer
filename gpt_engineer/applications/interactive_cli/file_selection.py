@@ -1,85 +1,191 @@
 import os
 import platform
 import subprocess
-
-from typing import List, Tuple
-from collections import defaultdict
-
 import yaml
 
+from gpt_engineer.applications.interactive_cli.repository import Repository
+from gpt_engineer.core.ai import AI
+from gpt_engineer.applications.interactive_cli.generation_tools import (
+    fuzzy_parse_file_selection,
+)
+from gpt_engineer.applications.interactive_cli.domain import FileSelection
 
-class FileSelection:
+
+def paths_to_tree(paths):
+    tree = {}
+    files_marker = "(./)"
+
+    for path in paths:
+        parts = path.split("/")
+        current_level = tree
+
+        for part in parts[:-1]:
+            if part not in current_level:
+                current_level[part] = {}
+            current_level = current_level[part]
+
+        if isinstance(current_level, dict):
+            if files_marker not in current_level:
+                current_level[files_marker] = []
+            current_level[files_marker].append(parts[-1])
+
+    # Clean and sort the tree to match the required format
+    def clean_tree(node):
+        if not isinstance(node, dict):
+            return node
+        sorted_keys = sorted(node.keys(), key=lambda x: (x == files_marker, x))
+        cleaned_node = {key: clean_tree(node[key]) for key in sorted_keys}
+        if sorted_keys == [files_marker]:
+            return cleaned_node[files_marker]
+        return cleaned_node
+
+    cleaned_tree = clean_tree(tree)
+    return cleaned_tree
+
+
+def tree_to_paths(tree):
+
+    files_marker = "(./)"
+
+    def traverse_tree(tree, base_path=""):
+        paths = []
+        if tree:
+            for key, value in tree.items():
+                if key == files_marker:
+                    if value:
+                        for file in value:
+                            paths.append(os.path.join(base_path, file))
+                elif isinstance(value, list):
+                    for file in value:
+                        paths.append(os.path.join(base_path, key, file))
+                else:
+                    subfolder_path = os.path.join(base_path, key)
+                    paths.extend(traverse_tree(value, subfolder_path))
+        return paths
+
+    return traverse_tree(tree)
+
+
+def commented_yaml_to_file_selection(commented_content) -> FileSelection:
+    commented_content_lines = commented_content.split("\n")
+    uncommented_content_1 = "\n".join(
+        line.replace("# ", "").replace("#", "") for line in commented_content_lines
+    )
+    uncommented_content_2 = "\n".join(
+        line.replace("#", "") for line in commented_content_lines
+    )
+
+    included_files = tree_to_paths(yaml.safe_load(commented_content))
+    try:
+        all_files = tree_to_paths(yaml.safe_load(uncommented_content_1))
+    except:
+        try:
+            all_files = tree_to_paths(yaml.safe_load(uncommented_content_2))
+        except:
+            raise ValueError(
+                "Could not convert the commented yaml to a file selection. Please check the format."
+            )
+
+    included_files_not_in_all_files = set(included_files) - set(all_files)
+
+    if len(included_files_not_in_all_files) > 0:
+        raise ValueError("Yaml file selection has not been read correctly.")
+
+    excluded_files = list(set(all_files) - set(included_files))
+    return FileSelection(included_files, excluded_files)
+
+
+def file_selection_to_commented_yaml(selection: FileSelection) -> str:
+    # Dont worry about commenting lines if they are no excluded files
+    if not selection.excluded_files:
+        tree = paths_to_tree(selection.included_files)
+
+        return yaml.dump(tree, sort_keys=False)
+
+    all_files = list(selection.included_files) + list(selection.excluded_files)
+
+    current_tree = paths_to_tree(all_files)
+
+    # Add a # in front of files which are excluded. This is a marker for us to go back and properly comment them out
+    def mark_excluded_files(structure, prefix=""):
+        if isinstance(structure, dict):
+            for key, value in structure.items():
+                if key == "(./)":
+                    structure[key] = mark_excluded_files(value, prefix)
+                else:
+                    new_prefix = os.path.join(prefix, key)
+                    structure[key] = mark_excluded_files(value, new_prefix)
+        elif isinstance(structure, list):
+            for i, item in enumerate(structure):
+                full_path = os.path.join(prefix, item)
+
+                if full_path in selection.excluded_files:
+                    structure[i] = f"#{item}"
+
+        return structure
+
+    mark_excluded_files(current_tree)
+
+    content = yaml.dump(current_tree, sort_keys=False)
+
+    # Find all files marked for commenting - add comment and remove the mark.
+    def comment_marked_files(yaml_content):
+        lines = yaml_content.split("\n")
+
+        updated_lines = []
+        for line in lines:
+            if "#" in line:
+                line = "#" + line.replace("#", "").replace("'", "")
+            updated_lines.append(line)
+
+        return "\n".join(updated_lines)
+
+    commented_yaml = comment_marked_files(content)
+
+    return commented_yaml
+
+
+class FileSelector:
     """
     Manages the active files in a project directory and creates a YAML file listing them.
     """
 
-    def __init__(self, project_path: str, repository):
+    def __init__(self, project_path: str, repository: Repository):
+        self.ai = AI("gpt-4o", temperature=0)
         self.repository = repository
         self.yaml_path = os.path.join(project_path, ".feature", "files.yml")
         self._initialize()
 
-    def _paths_to_tree(self, paths):
-        def nested_dict():
-            return defaultdict(nested_dict)
-
-        tree = nested_dict()
-
-        files_marker = "(./)"
-
-        for path in paths:
-            parts = path.split(os.sep)
-            file = parts.pop()
-            d = tree
-            for part in parts:
-                d = d[part]
-            if files_marker not in d:
-                d[files_marker] = []
-            d[files_marker].append(file)
-
-        def default_to_regular(d):
-            if isinstance(d, defaultdict):
-                d = {k: default_to_regular(v) for k, v in d.items()}
-            return d
-
-        def ordered_dict(data):
-            if isinstance(data, dict):
-                keys = sorted(data.keys(), key=lambda x: (x == files_marker, x))
-                return {k: ordered_dict(data[k]) for k in keys}
-            return data
-
-        ordered_tree = ordered_dict(default_to_regular(tree))
-
-        return ordered_tree
-        # return yaml.dump(tree, sort_keys=False)
-
-    def _tree_to_paths(self, tree):
-
-        files_marker = "(./)"
-
-        def traverse_tree(tree, base_path=""):
-            paths = []
-            if tree:
-                for key, value in tree.items():
-                    if key == files_marker:
-                        if value:
-                            for file in value:
-                                paths.append(os.path.join(base_path, file))
-                    else:
-                        subfolder_path = os.path.join(base_path, key)
-                        paths.extend(traverse_tree(value, subfolder_path))
-            return paths
-
-        # tree = yaml.safe_load(yaml_content)
-        return traverse_tree(tree)
-
     def _write_yaml_with_header(self, yaml_content):
+        def add_indentation(content):
+            lines = content.split("\n")
+            new_lines = []
+            last_key = None
+
+            for line in lines:
+                stripped_line = line.strip()
+                if stripped_line.endswith(":"):
+                    last_key = stripped_line
+                if stripped_line.startswith("- ") and (last_key != "(./):"):
+                    new_lines.append("  " + line)  # Add extra indentation
+                else:
+                    new_lines.append(line)
+            return "\n".join(new_lines)
+
+        indented_content = add_indentation(yaml_content)
         with open(self.yaml_path, "w") as file:
             file.write(
                 f"""# Complete list of files shared with the AI
 # Please comment out any files not needed as context for this change
 # This saves money and avoids overwhelming the AI
-{yaml_content}"""
+{indented_content}"""
             )
+
+    def _read_yaml_with_headers(self):
+        with open(self.yaml_path, "r") as file:
+            original_content_lines = file.readlines()[3:]
+
+        return "".join(original_content_lines)
 
     def _initialize(self):
         """
@@ -91,75 +197,15 @@ class FileSelection:
 
         print("YAML file is missing or empty, generating YAML...")
 
-        tree = self._paths_to_tree(self.repository.get_tracked_files())
+        tree = paths_to_tree(self.repository.get_tracked_files())
 
-        self._write_yaml_with_header(yaml.dump(tree, sort_keys=False))
+        self._write_yaml_with_header(yaml.dump(tree, sort_keys=False, indent=2))
 
-    def _get_from_yaml(self) -> Tuple[List[str], List[str]]:
-        with open(self.yaml_path, "r") as file:
-            original_content_lines = file.readlines()[
-                3:
-            ]  # Skip the 3 instruction lines
+    def set_to_yaml(self, file_selection):
 
-        # Create a version of the content with all lines uncommented
-        commented_content = "".join(original_content_lines)
-        uncommented_content = "".join(
-            line.replace("# ", "").replace("#", "") for line in original_content_lines
-        )
+        commented_yaml = file_selection_to_commented_yaml(file_selection)
 
-        print(uncommented_content)
-
-        included_files = self._tree_to_paths(yaml.safe_load(commented_content))
-        all_files = self._tree_to_paths(yaml.safe_load(uncommented_content))
-
-        # Determine excluded files by finding the difference
-        excluded_files = list(set(all_files) - set(included_files))
-
-        return (included_files, excluded_files)
-
-    def _set_to_yaml(self, selected_files, excluded_files):
-        # Dont worry about commenting lines if they are no excluded files
-        if not excluded_files:
-            tree = self._paths_to_tree(selected_files)
-
-            self._write_yaml_with_header(yaml.dump(tree, sort_keys=False))
-
-            return
-
-        all_files = list(selected_files) + list(excluded_files)
-
-        current_tree = self._paths_to_tree(all_files)
-
-        # Add a # in front of files which are excluded. This is a marker for us to go back and properly comment them out
-        def mark_excluded_files(structure, prefix=""):
-            for i, item in enumerate(structure):
-                if isinstance(item, dict):
-                    for key, value in item.items():
-                        mark_excluded_files(value, prefix + key)
-                else:
-                    full_path = prefix + item
-                    if full_path in excluded_files:
-                        structure[i] = f"#{item}"
-
-        mark_excluded_files(current_tree)
-
-        # Find all files marked for commenting - add comment and remove the mark.
-        def comment_marked_files(yaml_content):
-            lines = yaml_content.split("\n")
-
-            updated_lines = []
-            for line in lines:
-                if "#" in line:
-                    line = "#" + line.replace("#", "")
-                updated_lines.append(line)
-
-            return "\n".join(updated_lines)
-
-        content = yaml.dump(tree, sort_keys=False)
-
-        updated_content = comment_marked_files(content)
-
-        self._write_yaml_with_header(updated_content)
+        self._write_yaml_with_header(commented_yaml)
 
         return
 
@@ -170,28 +216,42 @@ class FileSelection:
 
         tracked_files = self.repository.get_tracked_files()
 
-        selected_files, excluded_files = self._get_from_yaml()
+        file_selection = self.get_from_yaml()
 
-        print(excluded_files)
+        print(file_selection.excluded_files)
 
         # If there are no changes, do nothing
-        if set(tracked_files) == set(selected_files + excluded_files):
+        if set(tracked_files) == set(
+            file_selection.included_files + file_selection.excluded_files
+        ):
             return
 
-        new_selected_files = list(set(tracked_files) - set(excluded_files))
+        new_included_files = list(
+            set(tracked_files) - set(file_selection.excluded_files)
+        )
 
-        self._set_to_yaml(new_selected_files, excluded_files)
+        self._set_to_yaml(new_included_files, file_selection.excluded_files)
 
-    def get_from_yaml(self):
+    def get_from_yaml(self) -> FileSelection:
         """
-        Get selected file paths from yaml
+        Get selected file paths and excluded file paths from yaml
         """
 
-        selected_files, excluded_files = self._get_from_yaml()
+        yaml_content = self._read_yaml_with_headers()
 
-        return selected_files
+        try:
+            file_selection = commented_yaml_to_file_selection(yaml_content)
+        except:
+            print(
+                "Could not read the file selection from the YAML file. Attempting to fix with AI"
+            )
+            print(yaml_content)
+            file_selection = fuzzy_parse_file_selection(self.ai, yaml_content)
+            self.set_to_yaml(file_selection)
 
-    def get_pretty_from_yaml(self):
+        return file_selection
+
+    def get_pretty_selected_from_yaml(self) -> str:
         """
         Retrieves selected file paths from the YAML file and prints them in an ASCII-style tree structure.
         """

@@ -1,9 +1,11 @@
-from feature import Feature
-from file_selection import FileSelection
-from repository import Repository
-from files import Files
-from generation_tools import generate_branch_name, build_context_string
-from termcolor import colored
+from gpt_engineer.applications.interactive_cli.feature import Feature
+from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
+from gpt_engineer.applications.interactive_cli.repository import Repository
+from gpt_engineer.applications.interactive_cli.files import Files
+from gpt_engineer.applications.interactive_cli.generation_tools import (
+    generate_branch_name,
+    build_context_string,
+)
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.prompt import Prompt
@@ -44,9 +46,9 @@ def initialize_new_feature(
         print("\nFeature branch created.\n")
 
 
-def update_user_file_selection(file_selection: FileSelection):
-    file_selection.update_yaml_from_tracked_files()
-    file_selection.open_yaml_in_editor()
+def update_user_file_selection(file_selector: FileSelector):
+    file_selector.update_yaml_from_tracked_files()
+    file_selector.open_yaml_in_editor()
     input(
         "Please edit the file selection for this feature and then press Enter to continue..."
     )
@@ -76,10 +78,10 @@ def check_for_unstaged_changes(
 
 
 def confirm_feature_context_and_task_with_user(
-    feature: Feature, file_selection: FileSelection
+    feature: Feature, file_selector: FileSelector
 ):
-    file_selection.update_yaml_from_tracked_files()
-    file_string = file_selection.get_pretty_from_yaml()
+    file_selector.update_yaml_from_tracked_files()
+    file_string = file_selector.get_pretty_selected_from_yaml()
 
     feature_description = feature.get_description()
     task = feature.get_task()
@@ -124,7 +126,7 @@ def run_task_loop(
     feature: Feature,
     repository: Repository,
     ai: AI,
-    file_selection: FileSelection,
+    file_selector: FileSelector,
 ):
 
     memory = DiskMemory(memory_path(project_path))
@@ -134,7 +136,7 @@ def run_task_loop(
 
     prompt = Prompt(feature.get_task(), prefix="Task: ")
 
-    files = Files(project_path, file_selection.get_from_yaml())
+    files = Files(project_path, file_selector.get_from_yaml())
 
     improve_lambda = lambda: improve_fn(
         ai, prompt, files, memory, preprompts_holder, context_string
@@ -146,7 +148,7 @@ def run_task_loop(
 
     files.write_to_disk(updated_files_dictionary)
 
-    review_changes(project_path, feature, repository, ai, file_selection)
+    review_changes(project_path, feature, repository, ai, file_selector)
 
 
 def review_changes(
@@ -154,7 +156,7 @@ def review_changes(
     feature: Feature,
     repository: Repository,
     ai: AI,
-    file_selection: FileSelection,
+    file_selector: FileSelector,
 ):
 
     completer = WordCompleter(["r", "c", "u"], ignore_case=True)
@@ -174,19 +176,19 @@ u: Undo changes and exit
     if result == "r":
         print("Deleting changes and rerunning generation...")
         repository.undo_unstaged_changes()
-        run_task_loop(project_path, feature, repository, ai, file_selection)
+        run_task_loop(project_path, feature, repository, ai, file_selector)
 
     if result == "c":
         print("Completing task... ")
         repository.stage_all_changes()
         feature.complete_task()
-        file_selection.update_yaml_from_tracked_files()
+        file_selector.update_yaml_from_tracked_files()
         if cli_input("Do you want to start a new task? y/n: ").lower() in [
             "y",
             "yes",
         ]:
             update_task_description(feature)
-            run_task_loop(project_path, feature, repository, ai, file_selection)
+            run_task_loop(project_path, feature, repository, ai, file_selector)
         return
 
     if result == "u":

@@ -1,10 +1,10 @@
 import typer
-
-from agent import FeatureAgent
 from dotenv import load_dotenv
-from feature import Feature
-from repository import Repository
-from settings import Settings
+
+from gpt_engineer.applications.interactive_cli.agent import FeatureAgent
+from gpt_engineer.applications.interactive_cli.feature import Feature
+from gpt_engineer.applications.interactive_cli.repository import Repository
+from gpt_engineer.applications.interactive_cli.domain import Settings
 
 from gpt_engineer.core.ai import AI
 

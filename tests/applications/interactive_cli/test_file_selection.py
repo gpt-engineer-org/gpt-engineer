@@ -1,118 +1,203 @@
-import os
-import shutil
-import tempfile
-import unittest
+import yaml
+import pytest
+from dotenv import load_dotenv
 
-from gpt_engineer.applications.interactive_cli.file_selection import FileSelection
+from gpt_engineer.core.ai import AI
+
+from gpt_engineer.applications.interactive_cli.file_selection import (
+    FileSelection,
+    paths_to_tree,
+    tree_to_paths,
+    paths_to_tree,
+    file_selection_to_commented_yaml,
+    commented_yaml_to_file_selection,
+)
+
+from gpt_engineer.applications.interactive_cli.generation_tools import (
+    fuzzy_parse_file_selection,
+)
 
 
-class MockRepository:
-    def __init__(self, files):
-        self.files = files
+def test_tree_conversion():
+    original_paths = [
+        ".github/ISSUE_TEMPLATE/bug-report.md",
+        ".github/ISSUE_TEMPLATE/documentation-clarification.md",
+        ".github/ISSUE_TEMPLATE/feature-request.md",
+        ".github/PULL_REQUEST_TEMPLATE/PULL_REQUEST_TEMPLATE.md",
+        ".github/workflows/automation.yml",
+        ".github/workflows/ci.yaml",
+        ".github/workflows/pre-commit.yaml",
+        ".github/workflows/release.yaml",
+        ".github/CODEOWNERS",
+        ".github/CODE_OF_CONDUCT.md",
+        ".github/CONTRIBUTING.md",
+        ".github/FUNDING.yml",
+        "docker/Dockerfile",
+        "docker/README.md",
+        "docker/entrypoint.sh",
+        "docs/examples/open_llms/README.md",
+        "docs/examples/open_llms/langchain_interface.py",
+    ]
 
-    def get_tracked_files(self):
-        return self.files
+    tree = paths_to_tree(original_paths)
+    reconstructed_paths = tree_to_paths(tree)
+
+    assert sorted(original_paths) == sorted(
+        reconstructed_paths
+    ), "The file paths do not match after conversion!"
 
 
-class TestFileSelection(unittest.TestCase):
+def test_tree_conversion_yaml():
+    original_paths = [
+        ".github/ISSUE_TEMPLATE/bug-report.md",
+        ".github/ISSUE_TEMPLATE/documentation-clarification.md",
+        ".github/ISSUE_TEMPLATE/feature-request.md",
+        ".github/PULL_REQUEST_TEMPLATE/PULL_REQUEST_TEMPLATE.md",
+        ".github/workflows/automation.yml",
+        ".github/workflows/ci.yaml",
+        ".github/workflows/pre-commit.yaml",
+        ".github/workflows/release.yaml",
+        ".github/CODEOWNERS",
+        ".github/CODE_OF_CONDUCT.md",
+        ".github/CONTRIBUTING.md",
+        ".github/FUNDING.yml",
+        "docker/Dockerfile",
+        "docker/README.md",
+        "docker/entrypoint.sh",
+        "docs/examples/open_llms/README.md",
+        "docs/examples/open_llms/langchain_interface.py",
+    ]
 
-    def setUp(self):
-        # Create a temporary directory for the test
-        self.test_dir = tempfile.mkdtemp()
-        self.project_path = self.test_dir
-        os.makedirs(os.path.join(self.project_path, ".feature"), exist_ok=True)
+    tree = paths_to_tree(original_paths)
+    yaml_tree = yaml.dump(tree)
+    read_tree = yaml.safe_load(yaml_tree)
+    reconstructed_paths = tree_to_paths(read_tree)
 
-        # Initial file structure for the mock repository
-        self.initial_files = [
-            "folder1/file1",
-            "folder1/file2",
-            "folder1/folder2/file3",
-            "folder1/folder2/file4",
-            "file5",
-            "file6",
-        ]
-        self.repository = MockRepository(self.initial_files)
+    assert sorted(original_paths) == sorted(
+        reconstructed_paths
+    ), "The file paths do not match after conversion!"
 
-        # Initialize the FileSelection object
-        self.file_selection = FileSelection(self.project_path, self.repository)
 
-    def tearDown(self):
-        # Remove the temporary directory after the test
-        shutil.rmtree(self.test_dir)
+def test_file_selection_to_yaml():
+    included_files = [
+        "docker/Dockerfile",
+        "docker/README.md",
+        "docker/entrypoint.sh",
+    ]
 
-    def test_lifecycle(self):
-        # Step 1: Create YAML file from the mock repository
-        self.file_selection._initialize()
-        expected_yaml_initial = """# Complete list of files shared with the AI
-# Please comment out any files not needed as context for this change
-# This saves money and avoids overwhelming the AI
-- folder1/:
-  - folder2/:
-    - file3
-    - file4
-  - file1
-  - file2
-- file5
-- file6
+    excluded_files = [
+        ".github/ISSUE_TEMPLATE/bug-report.md",
+        ".github/ISSUE_TEMPLATE/documentation-clarification.md",
+        ".github/ISSUE_TEMPLATE/feature-request.md",
+        ".github/PULL_REQUEST_TEMPLATE/PULL_REQUEST_TEMPLATE.md",
+        ".github/workflows/automation.yml",
+        ".github/workflows/ci.yaml",
+        ".github/workflows/pre-commit.yaml",
+        ".github/workflows/release.yaml",
+        ".github/CODEOWNERS",
+        ".github/CODE_OF_CONDUCT.md",
+        ".github/CONTRIBUTING.md",
+        ".github/FUNDING.yml",
+        "docs/examples/open_llms/README.md",
+        "docs/examples/open_llms/langchain_interface.py",
+    ]
+
+    commented_yaml = file_selection_to_commented_yaml(
+        FileSelection(included_files, excluded_files)
+    )
+
+    assert (
+        commented_yaml
+        == """.github:
+  ISSUE_TEMPLATE:
+#  - bug-report.md
+#  - documentation-clarification.md
+#  - feature-request.md
+  PULL_REQUEST_TEMPLATE:
+#  - PULL_REQUEST_TEMPLATE.md
+  workflows:
+#  - automation.yml
+#  - ci.yaml
+#  - pre-commit.yaml
+#  - release.yaml
+  (./):
+#  - CODEOWNERS
+#  - CODE_OF_CONDUCT.md
+#  - CONTRIBUTING.md
+#  - FUNDING.yml
+docker:
+- Dockerfile
+- README.md
+- entrypoint.sh
+docs:
+  examples:
+    open_llms:
+#    - README.md
+#    - langchain_interface.py
 """
-        with open(self.file_selection.yaml_path, "r") as file:
-            initial_yaml_content = file.read()
-
-        self.assertEqual(initial_yaml_content, expected_yaml_initial)
-
-        # Step 2: Update the YAML file directly (simulating user comments)
-        edited_yaml_content = """# Complete list of files shared with the AI
-# Please comment out any files not needed as context for this change
-# This saves money and avoids overwhelming the AI
-- folder1/:
-  - folder2/:
-    # - file3
-    # - file4
-  # - file1
-  - file2
-# - file5
-- file6
-"""
-        with open(self.file_selection.yaml_path, "w") as file:
-            file.write(edited_yaml_content)
-
-        # Step 3: Update tracked files in the repository and update the YAML file
-        new_files = [
-            "folder1/file1",
-            "folder1/file2",
-            "folder1/folder2/file3",
-            "folder1/folder2/file4",
-            "file5",
-            "file6",
-            "newfile7",
-        ]
-        self.repository.files = new_files
-        self.file_selection.update_yaml_from_tracked_files()
-
-        expected_yaml_updated = """# Complete list of files shared with the AI
-# Please comment out any files not needed as context for this change
-# This saves money and avoids overwhelming the AI
-- folder1/:
-  - folder2/:
-    # - file3
-    # - file4
-  # - file1
-  - file2
-# - file5
-- file6
-- newfile7
-"""
-        with open(self.file_selection.yaml_path, "r") as file:
-            updated_yaml_content = file.read()
-
-        self.assertEqual(updated_yaml_content, expected_yaml_updated)
-
-        # Step 4: Get files from YAML and verify
-        selected_files = self.file_selection.get_from_yaml()
-        expected_selected_files = ["folder1/file2", "file6", "newfile7"]
-
-        self.assertEqual(selected_files, expected_selected_files)
+    )
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_yaml_to_file_selection():
+    included_files = [
+        "docker/Dockerfile",
+        "docker/README.md",
+        "docker/entrypoint.sh",
+    ]
+
+    excluded_files = [
+        ".github/ISSUE_TEMPLATE/bug-report.md",
+        ".github/ISSUE_TEMPLATE/documentation-clarification.md",
+        ".github/ISSUE_TEMPLATE/feature-request.md",
+        ".github/PULL_REQUEST_TEMPLATE/PULL_REQUEST_TEMPLATE.md",
+        ".github/workflows/automation.yml",
+        ".github/workflows/ci.yaml",
+        ".github/workflows/pre-commit.yaml",
+        ".github/workflows/release.yaml",
+        ".github/CODEOWNERS",
+        ".github/CODE_OF_CONDUCT.md",
+        ".github/CONTRIBUTING.md",
+        ".github/FUNDING.yml",
+        "docs/examples/open_llms/README.md",
+        "docs/examples/open_llms/langchain_interface.py",
+    ]
+
+    commented_yaml = file_selection_to_commented_yaml(
+        FileSelection(included_files, excluded_files)
+    )
+
+    file_selection = commented_yaml_to_file_selection(commented_yaml)
+
+    assert sorted(file_selection.included_files) == sorted(included_files)
+    assert sorted(file_selection.excluded_files) == sorted(excluded_files)
+
+
+@pytest.mark.skip(reason="Skipping as test requires AI")
+def test_yaml_to_file_selection_fuzzy():
+
+    load_dotenv()
+
+    commented_yaml = """# gpt_engineer:
+#   applications:
+#     cli:
+      - __init__.py
+      - cli_agent.py
+#       - collect.py
+      - file_selector.py
+      - learning.py
+      - main.py"""
+
+    file_selction = fuzzy_parse_file_selection(AI(), commented_yaml)
+
+    assert file_selction == FileSelection(
+        [
+            "gpt_engineer/applications/cli/__init__.py",
+            "gpt_engineer/applications/cli/cli_agent.py",
+            "gpt_engineer/applications/cli/file_selector.py",
+            "gpt_engineer/applications/cli/learning.py",
+            "gpt_engineer/applications/cli/main.py",
+        ],
+        [
+            "gpt_engineer/applications/cli/collect.py",
+        ],
+    )
