@@ -24,7 +24,6 @@ from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.prompt import Prompt
 
 DATASET_PATH = Path(__file__).parent / "dataset"
-MAX_N_TEST_EXAMPLES = 10
 
 
 class AppsAssertion:
@@ -106,7 +105,9 @@ def load_apps(config: AppsConfig) -> Benchmark:
                         expected=problem.outputs[i],
                         command="python main.py" + ' "' + problem.inputs[i] + '"',
                     ).evaluate
-                    for i in range(min(len(problem.outputs), MAX_N_TEST_EXAMPLES))
+                    for i in range(
+                        min(len(problem.outputs), config.examples_per_problem)
+                    )
                 },
             )
         )

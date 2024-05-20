@@ -114,6 +114,28 @@ That's it.
 
 *If sth. doesn't work as expected, or you figure out how to improve the open LLM support please let us know.*
 
+Using Open Router models
+==================
+
+In case you don't posses the hardware to run local LLM's yourself you can use the hosting on [Open Router](https://openrouter.ai) and pay as you go for the tokens.
+
+To set it up you need to Sign In and load purchase 💰 the LLM credits. Pricing per token is different for (each model](https://openrouter.ai/models), but mostly cheaper then Open AI.
+
+Then create the API key.
+
+To for example use [Meta: Llama 3 8B Instruct (extended)](https://openrouter.ai/models/meta-llama/llama-3-8b-instruct:extended) with `gpte` we need to set:
+
+```bash
+export OPENAI_API_BASE="https://openrouter.ai/api/v1"
+export OPENAI_API_KEY="sk-key-from-open-router"
+export MODEL_NAME="meta-llama/llama-3-8b-instruct:extended"
+export LOCAL_MODEL=true
+```
+
+```bash
+gpte <project_dir> $MODEL_NAME --lite --temperature 0.1
+```
+
 Using Azure models
 ==================
 

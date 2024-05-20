@@ -1,0 +1,79 @@
+To add an entrypoint for running the API through the command line, we will create a new Python script that can be executed directly. This script will set up and run the FastAPI application using Uvicorn, which is an ASGI server. This approach allows you to run the server from the command line without directly using the `uvicorn` command.
+
+We will create a new file named `run.py` in the root directory. This file will import the FastAPI application from `main.py` and will use Uvicorn to run it.
+
+Here's the implementation:
+
+```diff
+--- /dev/null
++++ run.py
+@@ -0,0 +1,10 @@
++import uvicorn
++from main import app
++
++# This script can be used to run the FastAPI application from the command line.
++if __name__ == "__main__":
++    uvicorn.run(app, host="0.0.0.0", port=8000)
+```
+
+This script checks if it is being run as the main module and then starts the Uvicorn server with the FastAPI app. The server listens on all interfaces (`0.0.0.0`) and port `8000`.
+
+Additionally, we need to update the Dockerfile to ensure that the new script is correctly utilized when the Docker container is run. We will change the CMD directive to use `run.py` instead of directly calling `uvicorn`.
+
+```diff
+--- dockerfile
++++ dockerfile
+@@ -19,3 +19,3 @@
+-# Run app.py when the container launches
+-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
++# Run run.py when the container launches
++CMD ["python", "run.py"]
+```
+
+This change in the Dockerfile ensures that when the Docker container is started, it uses the new `run.py` script to launch the application. This script sets up the Uvicorn server with the specified host and port settings.
+
+With these changes, you can now run the API both directly from the command line by executing `python run.py` and through Docker using the updated Dockerfile configuration. This setup provides flexibility for different deployment scenarios.Invalid hunk: @@ -19,3 +19,3 @@
+-# Run app.py when the container launches
+-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
++# Run run.py when the container launches
++CMD ["python", "run.py"]
+
+To add an entrypoint for running the API through the command line, we will create a new Python script that can be executed directly. This script will set up and run the FastAPI application using Uvicorn, which is an ASGI server. This approach allows you to run the server from the command line without directly using the `uvicorn` command.
+
+We will create a new file named `run.py` in the root directory. This file will import the FastAPI application from `main.py` and will use Uvicorn to run it.
+
+Here's the implementation:
+
+```diff
+--- /dev/null
++++ run.py
+@@ -0,0 +1,10 @@
++import uvicorn
++from main import app
++
++# This script can be used to run the FastAPI application from the command line.
++if __name__ == "__main__":
++    uvicorn.run(app, host="0.0.0.0", port=8000)
+```
+
+This script checks if it is being run as the main module and then starts the Uvicorn server with the FastAPI app. The server listens on all interfaces (`0.0.0.0`) and port `8000`.
+
+Additionally, we need to update the Dockerfile to ensure that the new script is correctly utilized when the Docker container is run. We will change the CMD directive to use `run.py` instead of directly calling `uvicorn`.
+
+```diff
+--- dockerfile
++++ dockerfile
+@@ -19,3 +19,3 @@
+-# Run app.py when the container launches
+-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
++# Run run.py when the container launches
++CMD ["python", "run.py"]
+```
+
+This change in the Dockerfile ensures that when the Docker container is started, it uses the new `run.py` script to launch the application. This script sets up the Uvicorn server with the specified host and port settings.
+
+With these changes, you can now run the API both directly from the command line by executing `python run.py` and through Docker using the updated Dockerfile configuration. This setup provides flexibility for different deployment scenarios.Invalid hunk: @@ -19,3 +19,3 @@
+-# Run app.py when the container launches
+-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
++# Run run.py when the container launches
++CMD ["python", "run.py"]

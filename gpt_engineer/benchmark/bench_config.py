@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from tomlkit.items import Integer
+
 from gpt_engineer.core.project_config import read_config
 
 
@@ -11,6 +13,7 @@ class AppsConfig:
     test_end_index: int | None = 1
     train_start_index: int | None = 0
     train_end_index: int | None = 0
+    examples_per_problem: int | None = 10
 
 
 @dataclass
@@ -26,18 +29,12 @@ class GptmeConfig:
 
 
 @dataclass
-class GptengConfig:
-    active: bool | None = True
-
-
-@dataclass
 class BenchConfig:
     """Configuration for the GPT Engineer CLI and gptengineer.app via `gpt-engineer.toml`."""
 
     apps: AppsConfig = field(default_factory=AppsConfig)
     mbpp: MbppConfig = field(default_factory=MbppConfig)
     gptme: GptmeConfig = field(default_factory=GptmeConfig)
-    gpteng: GptengConfig = field(default_factory=GptengConfig)
 
     @classmethod
     def from_toml(cls, config_file: Path | str):
@@ -52,5 +49,21 @@ class BenchConfig:
             apps=AppsConfig(**config_dict.get("apps", {})),
             mbpp=MbppConfig(**config_dict.get("mbpp", {})),
             gptme=GptmeConfig(**config_dict.get("gptme", {})),
-            gpteng=GptengConfig(**config_dict.get("gpteng", {})),
         )
+
+    @staticmethod
+    def recursive_resolve(data_dict):
+        for key, value in data_dict.items():
+            if isinstance(value, Integer):
+                data_dict[key] = int(value)
+            elif isinstance(value, dict):
+                BenchConfig.recursive_resolve(value)
+
+    def to_dict(self):
+        dict_config = {
+            benchmark_name: {key: val for key, val in spec_config.__dict__.items()}
+            for benchmark_name, spec_config in self.__dict__.items()
+        }
+        BenchConfig.recursive_resolve(dict_config)
+
+        return dict_config

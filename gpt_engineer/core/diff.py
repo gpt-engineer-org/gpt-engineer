@@ -354,7 +354,8 @@ class Diff:
                 }
             is_valid = hunk.validate_and_correct(cut_lines_dict, problems)
             if not is_valid and len(problems) > 0:
-                print(f"Invalid hunk: {hunk.hunk_to_string()}")
+                for idx, val in enumerate(problems):
+                    print(f"\nInvalid Hunk NO.{idx}---\n{val}\n---")
                 self.hunks.remove(hunk)
             # now correct the numbers, assuming the start line pre-edit has been fixed
             hunk.hunk_len_pre_edit = (

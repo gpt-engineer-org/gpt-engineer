@@ -87,3 +87,8 @@ class TaskResult:
         )
 
         return succeeded / len(self.assertion_results)
+
+    def to_dict(self) -> dict:
+        out_dict = {key: value for key, value in self.__dict__.items()}
+        out_dict["solved"] = self.success_rate
+        return out_dict
