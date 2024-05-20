@@ -28,7 +28,9 @@ class FeatureValidator(Validator):
             )
 
 
-def initialize_new_feature(ai: AI, feature: Feature, repository: Repository):
+def initialize_new_feature(
+    ai: AI, feature: Feature, repository: Repository, no_branch: bool
+):
     feature.clear_feature()
 
     update_feature_description(feature)
@@ -37,9 +39,9 @@ def initialize_new_feature(ai: AI, feature: Feature, repository: Repository):
 
     branch_name = cli_input("\nConfirm branch name: ", default=branch_name)
 
-    repository.create_branch(branch_name)
-
-    print("\nFeature branch created.\n")
+    if not no_branch:
+        repository.create_branch(branch_name)
+        print("\nFeature branch created.\n")
 
 
 def update_user_file_selection(file_selection: FileSelection):
@@ -77,14 +79,14 @@ def confirm_feature_context_and_task_with_user(
     feature: Feature, file_selection: FileSelection
 ):
     file_selection.update_yaml_from_tracked_files()
+    file_string = file_selection.get_pretty_from_yaml()
 
     feature_description = feature.get_description()
-    file_string = file_selection.get_pretty_from_yaml()
     task = feature.get_task()
 
     # list feature, files and task
     print(f"Feature: {feature_description}\n\n")
-    print(f"Files: {file_string}\n\n")
+    print(f"Files: \n\nrepo\n{file_string}\n\n")
     print(f"Task: {task}\n\n")
 
     #  do you want to attempt this task?
@@ -117,7 +119,7 @@ def adjust_feature_task_or_files():
     #
 
 
-def run_improve_function(
+def run_task_loop(
     project_path,
     feature: Feature,
     repository: Repository,
@@ -172,18 +174,19 @@ u: Undo changes and exit
     if result == "r":
         print("Deleting changes and rerunning generation...")
         repository.undo_unstaged_changes()
-        run_improve_function(project_path, feature, repository, ai, file_selection)
+        run_task_loop(project_path, feature, repository, ai, file_selection)
 
     if result == "c":
-        print("You have chosen to retry the generation.")
+        print("Completing task... ")
         repository.stage_all_changes()
         feature.complete_task()
+        file_selection.update_yaml_from_tracked_files()
         if cli_input("Do you want to start a new task? y/n: ").lower() in [
             "y",
             "yes",
         ]:
             update_task_description(feature)
-            run_improve_function(project_path, feature, repository, ai, file_selection)
+            run_task_loop(project_path, feature, repository, ai, file_selection)
         return
 
     if result == "u":

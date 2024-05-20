@@ -4,6 +4,7 @@ from agent import FeatureAgent
 from dotenv import load_dotenv
 from feature import Feature
 from repository import Repository
+from settings import Settings
 
 from gpt_engineer.core.ai import AI
 
@@ -15,6 +16,12 @@ def main(
     project_path: str = typer.Argument(".", help="path"),
     model: str = typer.Argument("gpt-4-turbo", help="model id string"),
     new: bool = typer.Option(False, "--new", "-n", help="Initialize new feature."),
+    no_branch: bool = typer.Option(
+        False,
+        "--no-branch",
+        "-nb",
+        help="Do not create a new feature branch for this work.",
+    ),
     temperature: float = typer.Option(
         0.1,
         "--temperature",
@@ -56,10 +63,12 @@ def main(
 
     agent = FeatureAgent(project_path, feature, repository, ai)
 
+    settings = Settings(no_branch)
+
     if new:
-        agent.init()
+        agent.init(settings)
     else:
-        agent.resume()
+        agent.resume(settings)
 
 
 if __name__ == "__main__":

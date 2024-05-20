@@ -3,6 +3,7 @@ import platform
 import subprocess
 
 from typing import List, Tuple
+from collections import defaultdict
 
 import yaml
 
@@ -17,40 +18,61 @@ class FileSelection:
         self.yaml_path = os.path.join(project_path, ".feature", "files.yml")
         self._initialize()
 
-    def _create_nested_structure_from_file_paths(self, files_paths):
-        files_paths.sort()
-        file_structure = []
-        for filepath in files_paths:
-            parts = filepath.split("/")
-            # Filter out the '.ticket' directory from paths
-            if ".ticket" in parts or ".feature" in parts:
-                continue
-            node = file_structure
-            for i, part in enumerate(parts[:-1]):
-                # Append '/' to part if it's a directory
-                directory = part if part.endswith("/") else part + "/"
-                found = False
-                for item in node:
-                    if isinstance(item, dict) and directory in item:
-                        node = item[directory]
-                        found = True
-                        break
-                if not found:
-                    new_node = []
-                    # Insert directory at the correct position (before any file)
-                    index = next(
-                        (idx for idx, item in enumerate(node) if isinstance(item, str)),
-                        len(node),
-                    )
-                    node.insert(index, {directory: new_node})
-                    node = new_node
-            # Add the file to the last node, ensuring directories are listed first
-            if not parts[-1].endswith("/"):
-                node.append(parts[-1])
+    def _paths_to_tree(self, paths):
+        def nested_dict():
+            return defaultdict(nested_dict)
 
-        return file_structure
+        tree = nested_dict()
 
-    def _write_yaml_with_comments(self, yaml_content):
+        files_marker = "(./)"
+
+        for path in paths:
+            parts = path.split(os.sep)
+            file = parts.pop()
+            d = tree
+            for part in parts:
+                d = d[part]
+            if files_marker not in d:
+                d[files_marker] = []
+            d[files_marker].append(file)
+
+        def default_to_regular(d):
+            if isinstance(d, defaultdict):
+                d = {k: default_to_regular(v) for k, v in d.items()}
+            return d
+
+        def ordered_dict(data):
+            if isinstance(data, dict):
+                keys = sorted(data.keys(), key=lambda x: (x == files_marker, x))
+                return {k: ordered_dict(data[k]) for k in keys}
+            return data
+
+        ordered_tree = ordered_dict(default_to_regular(tree))
+
+        return ordered_tree
+        # return yaml.dump(tree, sort_keys=False)
+
+    def _tree_to_paths(self, tree):
+
+        files_marker = "(./)"
+
+        def traverse_tree(tree, base_path=""):
+            paths = []
+            if tree:
+                for key, value in tree.items():
+                    if key == files_marker:
+                        if value:
+                            for file in value:
+                                paths.append(os.path.join(base_path, file))
+                    else:
+                        subfolder_path = os.path.join(base_path, key)
+                        paths.extend(traverse_tree(value, subfolder_path))
+            return paths
+
+        # tree = yaml.safe_load(yaml_content)
+        return traverse_tree(tree)
+
+    def _write_yaml_with_header(self, yaml_content):
         with open(self.yaml_path, "w") as file:
             file.write(
                 f"""# Complete list of files shared with the AI
@@ -69,69 +91,44 @@ class FileSelection:
 
         print("YAML file is missing or empty, generating YAML...")
 
-        file_structure = self._create_nested_structure_from_file_paths(
-            self.repository.get_tracked_files()
-        )
+        tree = self._paths_to_tree(self.repository.get_tracked_files())
 
-        self._write_yaml_with_comments(
-            yaml.safe_dump(
-                file_structure, default_flow_style=False, sort_keys=False, indent=2
-            )
-        )
+        self._write_yaml_with_header(yaml.dump(tree, sort_keys=False))
 
     def _get_from_yaml(self) -> Tuple[List[str], List[str]]:
         with open(self.yaml_path, "r") as file:
-            original_content = file.readlines()[3:]  # Skip the 3 instruction lines
+            original_content_lines = file.readlines()[
+                3:
+            ]  # Skip the 3 instruction lines
 
         # Create a version of the content with all lines uncommented
-        uncommented_content = "".join(line.lstrip("# ") for line in original_content)
+        commented_content = "".join(original_content_lines)
+        uncommented_content = "".join(
+            line.replace("# ", "").replace("#", "") for line in original_content_lines
+        )
 
-        # Load the original and uncommented content as YAML
-        original_structure = yaml.safe_load("".join(original_content))
-        uncommented_structure = yaml.safe_load(uncommented_content)
+        print(uncommented_content)
 
-        def recurse_items(items, path=""):
-            paths = []
-            if isinstance(items, dict):
-                for key, value in items.items():
-                    new_path = os.path.join(path, key)
-                    paths.extend(recurse_items(value, new_path))
-            elif isinstance(items, list):
-                for item in items:
-                    if isinstance(item, dict):
-                        paths.extend(recurse_items(item, path))
-                    else:
-                        paths.append(os.path.join(path, item))
-            else:
-                paths.append(path)
-            return paths
-
-        original_paths = recurse_items(original_structure)
-        uncommented_paths = recurse_items(uncommented_structure)
+        included_files = self._tree_to_paths(yaml.safe_load(commented_content))
+        all_files = self._tree_to_paths(yaml.safe_load(uncommented_content))
 
         # Determine excluded files by finding the difference
-        excluded_files = list(set(uncommented_paths) - set(original_paths))
+        excluded_files = list(set(all_files) - set(included_files))
 
-        return (original_paths, excluded_files)
+        return (included_files, excluded_files)
 
     def _set_to_yaml(self, selected_files, excluded_files):
         # Dont worry about commenting lines if they are no excluded files
         if not excluded_files:
-            file_structure = self._create_nested_structure_from_file_paths(
-                selected_files
-            )
+            tree = self._paths_to_tree(selected_files)
 
-            self._write_yaml_with_comments(
-                yaml.safe_dump(
-                    file_structure, default_flow_style=False, sort_keys=False, indent=2
-                )
-            )
+            self._write_yaml_with_header(yaml.dump(tree, sort_keys=False))
 
             return
 
         all_files = list(selected_files) + list(excluded_files)
 
-        current_structure = self._create_nested_structure_from_file_paths(all_files)
+        current_tree = self._paths_to_tree(all_files)
 
         # Add a # in front of files which are excluded. This is a marker for us to go back and properly comment them out
         def mark_excluded_files(structure, prefix=""):
@@ -144,7 +141,7 @@ class FileSelection:
                     if full_path in excluded_files:
                         structure[i] = f"#{item}"
 
-        mark_excluded_files(current_structure)
+        mark_excluded_files(current_tree)
 
         # Find all files marked for commenting - add comment and remove the mark.
         def comment_marked_files(yaml_content):
@@ -153,18 +150,16 @@ class FileSelection:
             updated_lines = []
             for line in lines:
                 if "#" in line:
-                    line = "#" + line.replace("#", "").strip()
+                    line = "#" + line.replace("#", "")
                 updated_lines.append(line)
 
             return "\n".join(updated_lines)
 
-        content = yaml.safe_dump(
-            current_structure, default_flow_style=False, sort_keys=False, indent=2
-        )
+        content = yaml.dump(tree, sort_keys=False)
 
         updated_content = comment_marked_files(content)
 
-        self._write_yaml_with_comments(updated_content)
+        self._write_yaml_with_header(updated_content)
 
         return
 
@@ -176,6 +171,8 @@ class FileSelection:
         tracked_files = self.repository.get_tracked_files()
 
         selected_files, excluded_files = self._get_from_yaml()
+
+        print(excluded_files)
 
         # If there are no changes, do nothing
         if set(tracked_files) == set(selected_files + excluded_files):
@@ -219,8 +216,11 @@ class FileSelection:
         # Helper function to format the tree into a string with ASCII graphics
         def format_tree(tree, prefix=""):
             lines = []
-            # Sorted to keep alphabetical order
-            items = sorted(tree.items())
+            # Separate directories and files
+            directories = {k: v for k, v in tree.items() if v}
+            files = {k: v for k, v in tree.items() if not v}
+            # Sort items to keep alphabetical order, directories first
+            items = sorted(directories.items()) + sorted(files.items())
             for i, (key, sub_tree) in enumerate(items):
                 if i == len(items) - 1:  # Last item uses └──
                     lines.append(prefix + "└── " + key)

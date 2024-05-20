@@ -1,12 +1,13 @@
 from feature import Feature
 from file_selection import FileSelection
 from repository import Repository
+from settings import Settings
 from agent_steps import (
     initialize_new_feature,
     update_user_file_selection,
     check_for_unstaged_changes,
     confirm_feature_context_and_task_with_user,
-    run_improve_function,
+    run_task_loop,
     adjust_feature_task_or_files,
     update_task_description,
 )
@@ -34,17 +35,19 @@ class FeatureAgent(BaseAgent):
 
         self.file_selection = FileSelection(project_path, repository)
 
-    def init(self):
+    def init(self, settings: Settings):
 
-        initialize_new_feature(self.ai, self.feature, self.repository)
+        initialize_new_feature(
+            self.ai, self.feature, self.repository, settings.no_branch
+        )
 
         update_user_file_selection(self.file_selection)
 
         update_task_description(self.feature)
 
-        self.resume()
+        self.resume(settings)
 
-    def resume(self):
+    def resume(self, settings: Settings):
 
         implement = False
 
@@ -57,7 +60,7 @@ class FeatureAgent(BaseAgent):
 
         check_for_unstaged_changes(self.repository)
 
-        run_improve_function(
+        run_task_loop(
             self.project_path,
             self.feature,
             self.repository,

@@ -128,3 +128,67 @@ Respond in XML and nothing else.
     xml = messages[-1].content.strip()
 
     return parse_task_xml_to_class(xml).tasks
+
+
+def fuzzy_parse_yaml_files(ai: AI, yaml_string: str) -> str:
+    system_prompt = """
+You are a fuzzy yaml parser, who correctly parses yaml even if it is not strictly valid. 
+
+A user has been given a yaml representation of a file structure, represented in block collections like so: 
+
+- folder1/:
+  - folder2/:
+    - file3
+    - file4
+  - file1
+  - file2
+- file5
+- file6
+
+They have been asked to comment out any files that they wish to be excluded. 
+
+An example of the yaml file after commenting might be something like this: 
+
+- folder1/:
+  - folder2/:
+    # - file1
+    # - file2
+  - folder3/:
+    - file3
+  # - file4
+  - file5
+# - file6
+- file7
+
+Although this isnt strictly correct yaml, their intentions are clear. 
+
+Your job is to return the list of included files, and the list of excluded files as json. 
+
+The json you should return will be like this: 
+
+{
+    "included_files": [
+        "folder1/file5",
+        "folder1/folder3/file3",
+        "file7"
+    ],
+    "excluded_files": [ 
+        "folder1/folder2/file1",
+        "folder1/folder2/file2",
+        "folder1/folder3/file4",
+        "folder1/file5",
+    ]
+}
+
+Files can only be included or excluded, not both. If you are confused about the state of a file make your best guess - and if you really arent sure then mark it as included.
+"""
+
+    # ai.llm.callbacks.clear() # silent
+
+    messages = ai.start(system_prompt, yaml_string, step_name="fuzzy-parse-yaml")
+
+    # ai.llm.callbacks.append(StreamingStdOutCallbackHandler())
+
+    xml = messages[-1].content.strip()
+
+    return parse_task_xml_to_class(xml).tasks
