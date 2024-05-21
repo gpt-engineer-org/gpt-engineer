@@ -6,9 +6,8 @@ from gpt_engineer.applications.interactive_cli.agent_steps import (
     initialize_new_feature,
     update_user_file_selection,
     check_for_unstaged_changes,
-    confirm_feature_context_and_task_with_user,
     run_task_loop,
-    adjust_feature_task_or_files,
+    run_adjust_loop,
     update_task_description,
 )
 
@@ -49,14 +48,7 @@ class FeatureAgent(BaseAgent):
 
     def resume(self, settings: Settings):
 
-        implement = False
-
-        while not implement:
-            implement = confirm_feature_context_and_task_with_user(
-                self.feature, self.file_selector
-            )
-
-            adjust_feature_task_or_files()
+        run_adjust_loop(self.feature, self.file_selector)
 
         check_for_unstaged_changes(self.repository)
 

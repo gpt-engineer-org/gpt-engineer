@@ -85,6 +85,17 @@ class Repository:
             print(f"Error generating diff: {e}")
             return ""
 
+    def get_unstaged_changes(self):
+        """
+        Get the unstaged changes in the repository.
+
+        Returns
+        -------
+        str
+            The unstaged changes in the repository.
+        """
+        return self.repo.git.diff()
+
     def get_git_context(self):
         staged_changes = self.repo.git.diff("--cached")
         unstaged_changes = self.repo.git.diff()
