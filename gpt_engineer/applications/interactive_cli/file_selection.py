@@ -135,7 +135,7 @@ def file_selection_to_commented_yaml(selection: FileSelection) -> str:
         updated_lines = []
         for line in lines:
             if "#" in line:
-                line = "#" + line.replace("#", "").replace("'", "")
+                line = line.replace("- '#", "#- ").replace("'", "")
             updated_lines.append(line)
 
         return "\n".join(updated_lines)
@@ -154,19 +154,30 @@ class FileSelector:
         self.ai = AI("gpt-4o", temperature=0)
         self.repository = repository
         self.yaml_path = os.path.join(project_path, ".feature", "files.yml")
-        self._initialize()
+
+        if os.path.exists(self.yaml_path):
+            return
+
+        print("YAML file is missing or empty, generating YAML...")
+
+        file_selection = FileSelection([], self.repository.get_tracked_files())
+
+        self.set_to_yaml(file_selection)
 
     def _write_yaml_with_header(self, yaml_content):
+
         def add_indentation(content):
             lines = content.split("\n")
             new_lines = []
             last_key = None
 
             for line in lines:
-                stripped_line = line.strip()
+                stripped_line = line.replace("#", "").strip()
                 if stripped_line.endswith(":"):
                     last_key = stripped_line
                 if stripped_line.startswith("- ") and (last_key != "(./):"):
+                    # add 2 spaces at the begining of line or after any #
+
                     new_lines.append("  " + line)  # Add extra indentation
                 else:
                     new_lines.append(line)
@@ -175,9 +186,9 @@ class FileSelector:
         indented_content = add_indentation(yaml_content)
         with open(self.yaml_path, "w") as file:
             file.write(
-                f"""# Complete list of files shared with the AI
-# Please comment out any files not needed as context for this change
-# This saves money and avoids overwhelming the AI
+                f"""# Uncomment any files you would like to use for this feature
+# Note that (./) is a special key which represents files at the root of the parent directory
+
 {indented_content}"""
             )
 
@@ -186,20 +197,6 @@ class FileSelector:
             original_content_lines = file.readlines()[3:]
 
         return "".join(original_content_lines)
-
-    def _initialize(self):
-        """
-        Generates a YAML file from the tracked files if one doesnt exist
-        """
-
-        if os.path.exists(self.yaml_path):
-            return
-
-        print("YAML file is missing or empty, generating YAML...")
-
-        tree = paths_to_tree(self.repository.get_tracked_files())
-
-        self._write_yaml_with_header(yaml.dump(tree, sort_keys=False, indent=2))
 
     def set_to_yaml(self, file_selection):
 
@@ -218,8 +215,6 @@ class FileSelector:
 
         file_selection = self.get_from_yaml()
 
-        print(file_selection.excluded_files)
-
         # If there are no changes, do nothing
         if set(tracked_files) == set(
             file_selection.included_files + file_selection.excluded_files
@@ -230,7 +225,9 @@ class FileSelector:
             set(tracked_files) - set(file_selection.excluded_files)
         )
 
-        self._set_to_yaml(new_included_files, file_selection.excluded_files)
+        self.set_to_yaml(
+            FileSelection(new_included_files, file_selection.excluded_files)
+        )
 
     def get_from_yaml(self) -> FileSelection:
         """
@@ -256,7 +253,7 @@ class FileSelector:
         Retrieves selected file paths from the YAML file and prints them in an ASCII-style tree structure.
         """
         # Get selected files from YAML
-        selected_files = self.get_from_yaml()
+        file_selection = self.get_from_yaml()
 
         # Helper function to insert a path into the tree dictionary
         def insert_path(tree, path_parts):
@@ -267,9 +264,8 @@ class FileSelector:
                 tree[path_parts[0]] = {}
             insert_path(tree[path_parts[0]], path_parts[1:])
 
-        # Create a nested dictionary from the list of file paths
         file_tree = {}
-        for filepath in selected_files:
+        for filepath in file_selection.included_files:
             parts = filepath.split("/")
             insert_path(file_tree, parts)
 

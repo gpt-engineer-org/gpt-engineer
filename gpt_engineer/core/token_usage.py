@@ -71,11 +71,11 @@ class Tokenizer:
 
     def __init__(self, model_name):
         self.model_name = model_name
-        self._tiktoken_tokenizer = (
-            tiktoken.encoding_for_model(model_name)
-            if "gpt-4" in model_name or "gpt-3.5" in model_name
-            else tiktoken.get_encoding("cl100k_base")
-        )
+
+        try:
+            self._tiktoken_tokenizer = tiktoken.encoding_for_model(model_name)
+        except:
+            self._tiktoken_tokenizer = tiktoken.get_encoding("cl100k_base")
 
     def num_tokens(self, txt: str) -> int:
         """

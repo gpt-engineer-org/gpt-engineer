@@ -136,7 +136,9 @@ def run_task_loop(
 
     prompt = Prompt(feature.get_task(), prefix="Task: ")
 
-    files = Files(project_path, file_selector.get_from_yaml())
+    selected_files = file_selector.get_from_yaml().included_files
+
+    files = Files(project_path, selected_files)
 
     improve_lambda = lambda: improve_fn(
         ai, prompt, files, memory, preprompts_holder, context_string

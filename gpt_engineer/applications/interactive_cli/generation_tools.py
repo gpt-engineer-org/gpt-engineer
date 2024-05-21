@@ -138,7 +138,6 @@ You are a fuzzy yaml parser, who correctly parses yaml even if it is not strictl
 
 A user has been given a yaml representation of a file structure, represented like so:
 
-```
 .github:
   ISSUE_TEMPLATE:
     - bug-report.md
@@ -156,13 +155,11 @@ A user has been given a yaml representation of a file structure, represented lik
   - CODE_OF_CONDUCT.md
   - CONTRIBUTING.md
   - FUNDING.yml
-```
 
 Folders are represented as keys in a dictionary, files are items in a list. Any files listed under the (./) key can be assumed to be files of the folder above that.
 
 The given example maps to these file paths:
 
-```
 ".github/ISSUE_TEMPLATE/bug-report.md",
 ".github/ISSUE_TEMPLATE/documentation-clarification.md",
 ".github/ISSUE_TEMPLATE/feature-request.md",
@@ -175,11 +172,10 @@ The given example maps to these file paths:
 ".github/CODE_OF_CONDUCT.md",
 ".github/CONTRIBUTING.md",
 ".github/FUNDING.yml",
-```
 
 An example of the yaml file after commenting might be something like this:
 
-```
+
 .github:
   # ISSUE_TEMPLATE:
   #   - bug-report.md
@@ -197,11 +193,10 @@ An example of the yaml file after commenting might be something like this:
   - CODE_OF_CONDUCT.md
   - CONTRIBUTING.md
   # - FUNDING.yml
-```
+
 
 This would convert into:
 
-```
 {
     "included_files": [
         ".github/workflows/automation.yml",
@@ -220,7 +215,7 @@ This would convert into:
         ".github/FUNDING.yml"
     ]
 }
-```
+
 
 Although the commmented content wasnt strictly correct yaml, their intentions were clear. They wanted to retain the files in the workflow folder aswell as the code of conduct and contributing guides
 
@@ -230,7 +225,6 @@ Excluded files are always commented out with a # like in the above example.
 
 The json you should return will be like this:
 
-```
 {
     "included_files": [
         "folder1/file5",
@@ -244,7 +238,6 @@ The json you should return will be like this:
         "folder1/file5",
     ]
 }
-```
 
 Files can only be included or excluded, not both. If you are confused about the state of a file make your best guess - and if you really arent sure then mark it as included.
 
@@ -469,6 +462,9 @@ Remember any line that is commented is an excluded file. Any line that is NOT co
     # ai.llm.callbacks.append(StreamingStdOutCallbackHandler())
 
     json_string = messages[-1].content.strip()
+
+    # strip anything before first { and after last }
+    json_string = json_string[json_string.find("{") : json_string.rfind("}") + 1]
 
     data = json.loads(json_string)
 
