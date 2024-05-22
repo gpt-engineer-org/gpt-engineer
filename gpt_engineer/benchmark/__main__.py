@@ -22,12 +22,13 @@ __name__ : str
 import importlib
 import os.path
 import sys
+
 from typing import Annotated, Optional
 
 import typer
 
-from langchain_community.cache import SQLiteCache
 from langchain.globals import set_llm_cache
+from langchain_community.cache import SQLiteCache
 
 from gpt_engineer.applications.cli.main import load_env_if_needed
 from gpt_engineer.benchmark.bench_config import BenchConfig

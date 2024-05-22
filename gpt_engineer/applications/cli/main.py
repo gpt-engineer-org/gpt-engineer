@@ -36,8 +36,8 @@ import openai
 import typer
 
 from dotenv import load_dotenv
-from langchain_community.cache import SQLiteCache
 from langchain.globals import set_llm_cache
+from langchain_community.cache import SQLiteCache
 from termcolor import colored
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
