@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Union
 
 from gpt_engineer.core.default.disk_memory import DiskMemory
+from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
+from gpt_engineer.applications.interactive_cli.repository import Repository
 
 
 class Feature(DiskMemory):
@@ -17,12 +19,17 @@ class Feature(DiskMemory):
     and progress (history of incremental work completed)
     """
 
-    def __init__(self, project_path: Union[str, Path]):
+    def __init__(self, project_path: Union[str, Path], repository: Repository):
 
-        self.feature_path = Path(project_path) / ".feature"
-        self.feature_filename = "feature.md"
-        self.progress_filename = "progress.json"
-        self.task_filename = "task.md"
+        self._feature_path = Path(project_path) / ".feature"
+        self._feature_filename = "feature.md"
+        self._progress_filename = "progress.json"
+        self._task_filename = "task.md"
+        self._files_filename = "files.yml"
+
+        self.file_selector = FileSelector(
+            Path(project_path) / ".feature" / self._files_filename, repository
+        )
 
         super().__init__(self.feature_path)
 

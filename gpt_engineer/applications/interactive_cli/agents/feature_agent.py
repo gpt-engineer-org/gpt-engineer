@@ -1,8 +1,7 @@
 from gpt_engineer.applications.interactive_cli.feature import Feature
-from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
 from gpt_engineer.applications.interactive_cli.repository import Repository
 from gpt_engineer.applications.interactive_cli.domain import Settings
-from gpt_engineer.applications.interactive_cli.agent_steps import (
+from gpt_engineer.applications.interactive_cli.agents.agent_steps import (
     initialize_new_feature,
     update_user_file_selection,
     check_for_unstaged_changes,
@@ -22,17 +21,13 @@ class FeatureAgent(BaseAgent):
 
     def __init__(
         self,
-        project_path: str,
         feature: Feature,
         repository: Repository,
         ai: AI = None,
     ):
-        self.project_path = project_path
         self.feature = feature
         self.repository = repository
         self.ai = ai or AI()
-
-        self.file_selector = FileSelector(project_path, repository)
 
     def init(self, settings: Settings):
 

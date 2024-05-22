@@ -1,7 +1,7 @@
 import typer
 from dotenv import load_dotenv
 
-from gpt_engineer.applications.interactive_cli.agent import FeatureAgent
+from gpt_engineer.applications.interactive_cli.agents.feature_agent import FeatureAgent
 from gpt_engineer.applications.interactive_cli.feature import Feature
 from gpt_engineer.applications.interactive_cli.repository import Repository
 from gpt_engineer.applications.interactive_cli.domain import Settings
@@ -11,22 +11,14 @@ from gpt_engineer.core.ai import AI
 app = typer.Typer()
 
 
-@app.command()
-def main(
-    project_path: str = typer.Argument(".", help="path"),
-    model: str = typer.Argument("gpt-4-turbo", help="model id string"),
-    new: bool = typer.Option(False, "--new", "-n", help="Initialize new feature."),
-    no_branch: bool = typer.Option(
-        False,
-        "--no-branch",
-        "-nb",
-        help="Do not create a new feature branch for this work.",
-    ),
+def common_options(
+    project_path: str = typer.Option(".", "--path", "-p", help="Path to the project."),
+    model: str = typer.Option("gpt-4o", "--model", "-m", help="Model ID string."),
     temperature: float = typer.Option(
         0.1,
         "--temperature",
         "-t",
-        help="Controls randomness: lower values for more focused, deterministic outputs",
+        help="Controls randomness: lower values for more focused, deterministic outputs.",
     ),
     azure_endpoint: str = typer.Option(
         "",
@@ -42,26 +34,76 @@ def main(
         False, "--debug", "-d", help="Enable debug mode for debugging."
     ),
 ):
-    """
-    Run GPTE Interactive Improve
-    """
+    return {
+        "project_path": project_path,
+        "model": model,
+        "no_branch": no_branch,
+        "temperature": temperature,
+        "azure_endpoint": azure_endpoint,
+        "verbose": verbose,
+        "debug": debug,
+    }
 
+
+@app.command()
+def task(
+    new: bool = typer.Option(False, "--new", "-n", help="Initialize a new task."),
+    **options,
+):
+    """
+    Handle tasks in the project.
+    """
     load_dotenv()
-
-    # todo: check that git repo exists. If not - ask the user to create a git repository with a suitable git ignore which will be used to reduce ai usage
-    # todo: check that git repo is clean. If not - ask the user to stash or commit changes.
+    options = common_options(**options)
 
     ai = AI(
-        model_name=model,
-        temperature=temperature,
-        azure_endpoint=azure_endpoint,
+        model_name=options["model"],
+        temperature=options["temperature"],
+        azure_endpoint=options["azure_endpoint"],
     )
 
-    repository = Repository(project_path)
+    repository = Repository(options["project_path"])
 
-    feature = Feature(project_path)
+    feature = Feature(options["project_path"])
 
-    agent = FeatureAgent(project_path, feature, repository, ai)
+    agent = FeatureAgent(options["project_path"], feature, repository, ai)
+
+    settings = Settings(options["no_branch"])
+
+    if new:
+        agent.init(settings)
+    else:
+        agent.resume(settings)
+
+
+@app.command()
+def feature(
+    new: bool = typer.Option(False, "--new", "-n", help="Initialize a new feature."),
+    no_branch: bool = typer.Option(
+        False,
+        "--no-branch",
+        "-nb",
+        help="Do not create a new feature branch for this work.",
+    ),
+    **options,
+):
+    """
+    Handle features in the project.
+    """
+    load_dotenv()
+    options = common_options(**options)
+
+    ai = AI(
+        model_name=options["model"],
+        temperature=options["temperature"],
+        azure_endpoint=options["azure_endpoint"],
+    )
+
+    repository = Repository(options["project_path"])
+
+    feature = Feature(options["project_path"], repository)
+
+    agent = FeatureAgent(feature, repository, ai)
 
     settings = Settings(no_branch)
 
@@ -69,6 +111,28 @@ def main(
         agent.init(settings)
     else:
         agent.resume(settings)
+
+
+@app.command()
+def chat(**options):
+    """
+    Initiate a chat about the current repository.
+    """
+    load_dotenv()
+    options = common_options(**options)
+
+    ai = AI(
+        model_name=options["model"],
+        temperature=options["temperature"],
+        azure_endpoint=options["azure_endpoint"],
+    )
+
+    repository = Repository(options["project_path"])
+
+    # Add the logic for initiating a chat here
+    typer.echo(
+        f"Initiating a chat about the repo at {options['project_path']} using model {options['model']}."
+    )
 
 
 if __name__ == "__main__":

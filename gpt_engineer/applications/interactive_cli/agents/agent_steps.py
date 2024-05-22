@@ -37,11 +37,13 @@ def initialize_new_feature(
 
     update_feature_description(feature)
 
-    branch_name = generate_branch_name(ai, feature.get_description())
-
-    branch_name = cli_input("\nConfirm branch name: ", default=branch_name)
-
     if not no_branch:
+        print("Creating feature branch... (this can be disabled with -nb setting)")
+
+        branch_name = generate_branch_name(ai, feature.get_description())
+
+        branch_name = cli_input("\nConfirm branch name: ", default=branch_name)
+
         repository.create_branch(branch_name)
         print("\nFeature branch created.\n")
 
@@ -178,7 +180,6 @@ def review_changes(
     feature: Feature,
     repository: Repository,
     ai: AI,
-    file_selector: FileSelector,
 ):
 
     completer = WordCompleter(["r", "c", "u"], ignore_case=True)
@@ -196,9 +197,9 @@ x: Exit
     ).lower()
 
     if result == "r":
-        rerun_task(repository, project_path, feature, ai, file_selector)
+        run_task(repository, project_path, feature, ai)
     if result == "c":
-        complete_task(repository, project_path, feature, ai, file_selector)
+        complete_task(repository, project_path, feature, ai)
     if result == "x":
         print("exiting...")
         return
