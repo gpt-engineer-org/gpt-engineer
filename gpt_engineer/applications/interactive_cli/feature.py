@@ -93,8 +93,14 @@ Improve your prompts by including technical references to any APIs, libraries, c
             The new feature_description to write to the feature file.
         """
         progress = self.get_progress()
-        new_progress = progress["done"].append(task)
-        super().__setitem__(self._progress_filename, json.dumps(new_progress, indent=4))
+
+        print(progress["done"])
+
+        progress["done"].append(task)
+
+        json_string = json.dumps(progress, indent=4)
+
+        super().__setitem__(self._progress_filename, json_string)
 
     def set_task(self, task: str):
         """

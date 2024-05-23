@@ -79,9 +79,8 @@ def check_for_unstaged_changes(
             return
 
 
-def confirm_feature_context_and_task_with_user(
-    feature: Feature, file_selector: FileSelector
-):
+def confirm_feature_context_and_task_with_user(feature: Feature):
+    file_selector = feature.file_selector
     file_selector.update_yaml_from_tracked_files()
     file_string = file_selector.get_pretty_selected_from_yaml()
 
@@ -118,7 +117,6 @@ def run_task_loop(
     feature: Feature,
     repository: Repository,
     ai: AI,
-    file_selector: FileSelector,
 ):
 
     memory = DiskMemory(memory_path(project_path))
@@ -134,7 +132,7 @@ The purpose of this message is to give you wider context around the feature you 
 
     prompt = Prompt(feature.get_task(), prefix="Task: ")
 
-    selected_files = file_selector.get_from_yaml().included_files
+    selected_files = feature.file_selector.get_from_yaml().included_files
 
     files = Files(project_path, selected_files)
 
@@ -149,15 +147,15 @@ The purpose of this message is to give you wider context around the feature you 
 
     files.write_to_disk(updated_files_dictionary)
 
-    review_changes(project_path, feature, repository, ai, file_selector)
+    review_changes(project_path, feature, repository, ai)
 
 
-def run_adjust_loop(feature, file_selector):
-    implement = confirm_feature_context_and_task_with_user(feature, file_selector)
+def run_adjust_loop(feature):
+    implement = confirm_feature_context_and_task_with_user(feature)
 
     while not implement:
         adjust_feature_task_or_files()
-        implement = confirm_feature_context_and_task_with_user(feature, file_selector)
+        implement = confirm_feature_context_and_task_with_user(feature)
 
 
 def run_task(repository, project_path, feature, ai, file_selector):
@@ -166,19 +164,19 @@ def run_task(repository, project_path, feature, ai, file_selector):
     run_task_loop(project_path, feature, repository, ai, file_selector)
 
 
-def complete_task(repository, project_path, feature, ai, file_selector):
+def complete_task(repository, project_path, feature, ai):
     print("Completing task... ")
     repository.stage_all_changes()
     feature.complete_task()
-    file_selector.update_yaml_from_tracked_files()
+    feature.file_selector.update_yaml_from_tracked_files()
     print("Continuing with next task...")
     update_task_description(feature)
 
-    run_adjust_loop(feature, file_selector)
+    run_adjust_loop(feature)
 
     check_for_unstaged_changes(repository)
 
-    run_task_loop(project_path, feature, repository, ai, file_selector)
+    run_task_loop(project_path, feature, repository, ai)
 
 
 def review_changes(

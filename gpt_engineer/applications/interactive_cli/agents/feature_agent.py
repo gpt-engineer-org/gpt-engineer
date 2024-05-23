@@ -45,17 +45,11 @@ class FeatureAgent(BaseAgent):
 
     def resume(self, settings: Settings):
 
-        run_adjust_loop(self.feature, self.file_selector)
+        run_adjust_loop(self.feature)
 
         check_for_unstaged_changes(self.repository)
 
-        run_task_loop(
-            self.project_path,
-            self.feature,
-            self.repository,
-            self.ai,
-            self.feature.file_selector,
-        )
+        run_task_loop(self.project_path, self.feature, self.repository, self.ai)
 
     def improve(self):
         self.resume()
