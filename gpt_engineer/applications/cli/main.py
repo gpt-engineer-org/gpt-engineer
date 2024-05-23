@@ -36,8 +36,8 @@ import openai
 import typer
 
 from dotenv import load_dotenv
-from langchain.cache import SQLiteCache
 from langchain.globals import set_llm_cache
+from langchain_community.cache import SQLiteCache
 from termcolor import colored
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
@@ -60,7 +60,9 @@ from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
 
-app = typer.Typer()  # creates a CLI app
+app = typer.Typer(
+    context_settings={"help_option_names": ["-h", "--help"]}
+)  # creates a CLI app
 
 
 def load_env_if_needed():
@@ -247,7 +249,7 @@ def prompt_yesno() -> bool:
 )
 def main(
     project_path: str = typer.Argument(".", help="path"),
-    model: str = typer.Argument("gpt-4o", help="model id string"),
+    model: str = typer.Option("gpt-4o", "--model", "-m", help="model id string"),
     temperature: float = typer.Option(
         0.1,
         "--temperature",
