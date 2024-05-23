@@ -21,13 +21,15 @@ class FeatureAgent(BaseAgent):
 
     def __init__(
         self,
+        ai: AI,
+        project_path: str,
         feature: Feature,
         repository: Repository,
-        ai: AI = None,
     ):
+        self.ai = ai
+        self.project_path = project_path
         self.feature = feature
         self.repository = repository
-        self.ai = ai or AI()
 
     def init(self, settings: Settings):
 
@@ -35,7 +37,7 @@ class FeatureAgent(BaseAgent):
             self.ai, self.feature, self.repository, settings.no_branch
         )
 
-        update_user_file_selection(self.file_selector)
+        update_user_file_selection(self.feature.file_selector)
 
         update_task_description(self.feature)
 
@@ -52,7 +54,7 @@ class FeatureAgent(BaseAgent):
             self.feature,
             self.repository,
             self.ai,
-            self.file_selector,
+            self.feature.file_selector,
         )
 
     def improve(self):

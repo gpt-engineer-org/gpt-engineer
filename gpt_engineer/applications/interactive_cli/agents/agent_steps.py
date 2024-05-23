@@ -126,6 +126,12 @@ def run_task_loop(
 
     context_string = build_context_string(feature, repository.get_git_context())
 
+    feature_agent_context = f"""I am working on a feature but breaking it up into small incremental tasks. Your job is to complete the incremental task provided to you - only that task and nothing more.
+
+The purpose of this message is to give you wider context around the feature you are working on and what incremental tasks have already been completed so far.
+
+{context_string}"""
+
     prompt = Prompt(feature.get_task(), prefix="Task: ")
 
     selected_files = file_selector.get_from_yaml().included_files
@@ -133,7 +139,7 @@ def run_task_loop(
     files = Files(project_path, selected_files)
 
     improve_lambda = lambda: improve_fn(
-        ai, prompt, files, memory, preprompts_holder, context_string
+        ai, prompt, files, memory, preprompts_holder, feature_agent_context
     )
 
     print("\n---- begining code generation ----\n")

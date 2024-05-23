@@ -31,7 +31,7 @@ class Feature(DiskMemory):
             Path(project_path) / ".feature" / self._files_filename, repository
         )
 
-        super().__init__(self.feature_path)
+        super().__init__(self._feature_path)
 
     def clear_feature(self) -> None:
         self.set_description(
@@ -43,7 +43,7 @@ Improve your prompts by including technical references to any APIs, libraries, c
         self.set_task(
             "Please replace with a task description - directing the AI on the first task to implement on this feature"
         )
-        super().__setitem__(self.progress_filename, json.dumps({"done": []}))
+        super().__setitem__(self._progress_filename, json.dumps({"done": []}))
 
     def get_description(self) -> str:
         """
@@ -54,7 +54,7 @@ Improve your prompts by including technical references to any APIs, libraries, c
         str
             The content of the feature file.
         """
-        return super().__getitem__(self.feature_filename)
+        return super().__getitem__(self._feature_filename)
 
     def set_description(self, feature_description: str):
         """
@@ -65,7 +65,7 @@ Improve your prompts by including technical references to any APIs, libraries, c
         feature_description : str
             The new feature_description to write to the feature file.
         """
-        super().__setitem__(self.feature_filename, feature_description)
+        super().__setitem__(self._feature_filename, feature_description)
 
     def get_progress(self) -> dict:
         """
@@ -76,7 +76,12 @@ Improve your prompts by including technical references to any APIs, libraries, c
         str
             The content of the feature file.
         """
-        return json.loads(super().__getitem__(self.progress_filename))
+
+        json_string = super().__getitem__(self._progress_filename)
+        if json_string:
+            return json.loads(json_string)
+
+        return None
 
     def update_progress(self, task: str):
         """
@@ -89,7 +94,7 @@ Improve your prompts by including technical references to any APIs, libraries, c
         """
         progress = self.get_progress()
         new_progress = progress["done"].append(task)
-        super().__setitem__(self.progress_filename, json.dumps(new_progress, indent=4))
+        super().__setitem__(self._progress_filename, json.dumps(new_progress, indent=4))
 
     def set_task(self, task: str):
         """
@@ -100,7 +105,7 @@ Improve your prompts by including technical references to any APIs, libraries, c
         task : str
             The new task to write to the feature file.
         """
-        super().__setitem__(self.task_filename, task)
+        super().__setitem__(self._task_filename, task)
 
     def get_task(self) -> str:
         """
@@ -111,7 +116,7 @@ Improve your prompts by including technical references to any APIs, libraries, c
         str
             The content of the feature file.
         """
-        return super().__getitem__(self.task_filename)
+        return super().__getitem__(self._task_filename)
 
     def complete_task(self):
         """
@@ -124,7 +129,7 @@ Improve your prompts by including technical references to any APIs, libraries, c
             self.set_task("")
 
     def _file_path(self, filename):
-        return self.feature_path / filename
+        return self._feature_path / filename
 
     def _open_file_in_editor(self, path):
         """
@@ -144,10 +149,10 @@ Improve your prompts by including technical references to any APIs, libraries, c
         """
         Opens the feature file in the default system editor.
         """
-        self._open_file_in_editor(self._file_path(self.feature_filename))
+        self._open_file_in_editor(self._file_path(self._feature_filename))
 
     def open_task_in_editor(self):
         """
         Opens the task file in the default system editor.
         """
-        self._open_file_in_editor(self._file_path(self.task_filename))
+        self._open_file_in_editor(self._file_path(self._task_filename))
