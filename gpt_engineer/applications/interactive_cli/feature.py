@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Union
 
 from gpt_engineer.core.default.disk_memory import DiskMemory
+from gpt_engineer.core.default.paths import memory_path
 from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
 from gpt_engineer.applications.interactive_cli.repository import Repository
 
@@ -21,15 +22,14 @@ class Feature(DiskMemory):
 
     def __init__(self, project_path: Union[str, Path], repository: Repository):
 
-        self._feature_path = Path(project_path) / ".feature"
+        self._feature_path = Path(memory_path(project_path)) / "feature"
+        self.path = self._feature_path
         self._feature_filename = "feature.md"
         self._progress_filename = "progress.json"
         self._task_filename = "task.md"
-        self._files_filename = "files.yml"
 
-        self.file_selector = FileSelector(
-            Path(project_path) / ".feature" / self._files_filename, repository
-        )
+        if not os.path.exists(self._feature_path):
+            os.makedirs(self._feature_path)
 
         super().__init__(self._feature_path)
 

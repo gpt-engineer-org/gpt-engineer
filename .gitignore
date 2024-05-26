@@ -97,6 +97,7 @@ prompt
 
 
 .feature
+.task
 
 gpt_engineer/benchmark/minimal_bench_config.toml
 

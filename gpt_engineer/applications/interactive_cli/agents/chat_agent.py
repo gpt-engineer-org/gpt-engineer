@@ -3,6 +3,7 @@ from gpt_engineer.core.ai import AI, HumanMessage, SystemMessage
 from gpt_engineer.applications.interactive_cli.feature import Feature
 from gpt_engineer.applications.interactive_cli.repository import Repository
 from gpt_engineer.applications.interactive_cli.files import Files
+from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
 from gpt_engineer.applications.interactive_cli.agents.agent_steps import (
     update_user_file_selection,
 )
@@ -19,17 +20,19 @@ class ChatAgent:
         project_path: str,
         feature: Feature,
         repository: Repository,
+        file_selector: FileSelector,
     ):
         self.ai = ai
         self.project_path = project_path
         self.feature = feature
         self.repository = repository
+        self.file_selector = file_selector
 
     def start(self):
 
-        update_user_file_selection(self.feature.file_selector)
+        update_user_file_selection(self.file_selector)
 
-        selected_files = self.feature.file_selector.get_from_yaml().included_files
+        selected_files = self.file_selector.get_from_yaml().included_files
 
         files = Files(self.project_path, selected_files)
 

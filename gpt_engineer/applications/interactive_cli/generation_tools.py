@@ -55,24 +55,28 @@ def parse_task_xml_to_class(xml_data):
     return response
 
 
-def build_context_string(feature, git_context):
+def build_git_context_string(git_context):
+    return f"""## Git Context - these are the code changes made so far while implementing this feature. This may include work completed by you on previous tasks as well as changes made independently by me.
+### Branch Changes - this is the cumulative diff of all the commits so far on the feature branch.
+{git_context.branch_changes}
+
+### Staged Changes - this is the diff of the current staged changes.
+{git_context.staged_changes}"""
+
+
+def build_feature_context_string(feature, git_context):
     return f"""## Feature - this is the description fo the current feature we are working on.
 {feature.get_description()}
 
 ## Completed Tasks - these are the lists of tasks you have completed so far on the feature branch.
 {feature.get_progress()["done"]}
 
-## Git Context - these are the code changes made so far while implementing this feature. This may include work completed by you on previous tasks as well as changes made independently by me.
-### Branch Changes - this is the cumulative diff of all the commits so far on the feature branch.
-{git_context.branch_changes}
-
-### Staged Changes - this is the diff of the current staged changes.
-{git_context.staged_changes}
+{build_git_context_string(git_context)}
 """
 
 
 def build_files_context_string(feature, git_context, files):
-    return f"""{build_context_string(feature, git_context)}
+    return f"""{build_feature_context_string(feature, git_context)}
 
 ## Current Codebase - this is the as is view of the current code base including any unstaged changes.
 {files.to_chat()}

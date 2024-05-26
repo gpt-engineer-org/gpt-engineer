@@ -1,26 +1,21 @@
 import typer
 from dotenv import load_dotenv
+from pathlib import Path
+from gpt_engineer.core.default.paths import memory_path
 
+from gpt_engineer.applications.interactive_cli.agents.task_agent import TaskAgent
 from gpt_engineer.applications.interactive_cli.agents.feature_agent import FeatureAgent
 from gpt_engineer.applications.interactive_cli.agents.chat_agent import ChatAgent
 from gpt_engineer.applications.interactive_cli.feature import Feature
+from gpt_engineer.applications.interactive_cli.task import Task
 from gpt_engineer.applications.interactive_cli.repository import Repository
 from gpt_engineer.applications.interactive_cli.domain import Settings
+from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
+
 
 from gpt_engineer.core.ai import AI
 
 app = typer.Typer()
-
-
-# @app.command()
-# def task(
-#     new: bool = typer.Option(False, "--new", "-n", help="Initialize a new task."),
-#     **options,
-# ):
-#     """
-#     Handle tasks in the project.
-#     """
-#     # TO BE IMPLEMENTED
 
 
 @app.command()
@@ -68,7 +63,9 @@ def feature(
 
     feature = Feature(project_path, repository)
 
-    agent = FeatureAgent(ai, project_path, feature, repository)
+    file_selector = FileSelector(project_path, repository)
+
+    agent = FeatureAgent(ai, project_path, feature, repository, file_selector)
 
     settings = Settings(no_branch)
 
@@ -90,7 +87,7 @@ def chat(
     ),
 ):
     """
-    Initiate a chat about the current repository.
+    Initiate a chat about the current repository and feature context
     """
     ai = AI(
         model_name=model,
@@ -100,10 +97,49 @@ def chat(
     repository = Repository(project_path)
 
     feature = Feature(project_path, repository)
-    chat_agent = ChatAgent(ai, project_path, feature, repository)
+
+    file_selector = FileSelector(project_path, repository)
+
+    chat_agent = ChatAgent(ai, project_path, feature, repository, file_selector)
 
     chat_agent.start()
 
 
 if __name__ == "__main__":
     app()
+
+
+@app.command()
+def task(
+    project_path: str = typer.Option(".", "--path", "-p", help="Path to the project."),
+    model: str = typer.Option("gpt-4o", "--model", "-m", help="Model ID string."),
+    temperature: float = typer.Option(
+        0.1,
+        "--temperature",
+        "-t",
+        help="Controls randomness: lower values for more focused, deterministic outputs.",
+    ),
+):
+    """
+    Implement a simple one off task without feature context
+    """
+    load_dotenv()
+
+    ai = AI(
+        model_name=model,
+        temperature=temperature,
+    )
+
+    repository = Repository(project_path)
+
+    task = Task(project_path, repository)
+
+    file_selector = FileSelector(project_path, repository)
+
+    task_agent = TaskAgent(ai, project_path, task, repository, file_selector)
+
+    task_agent.run()
+
+    # review
+
+    # task.delete()

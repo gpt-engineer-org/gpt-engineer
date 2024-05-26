@@ -2,9 +2,13 @@ import os
 import platform
 import subprocess
 import yaml
+from pathlib import Path
+
+
+from gpt_engineer.core.default.paths import memory_path
+from gpt_engineer.core.ai import AI
 
 from gpt_engineer.applications.interactive_cli.repository import Repository
-from gpt_engineer.core.ai import AI
 from gpt_engineer.applications.interactive_cli.generation_tools import (
     fuzzy_parse_file_selection,
 )
@@ -150,10 +154,10 @@ class FileSelector:
     Manages the active files in a project directory and creates a YAML file listing them.
     """
 
-    def __init__(self, yaml_path: str, repository: Repository):
+    def __init__(self, project_path: str, repository: Repository):
         self.ai = AI("gpt-4o", temperature=0)
         self.repository = repository
-        self.yaml_path = yaml_path
+        self.yaml_path = Path(memory_path(project_path)) / "files.yml"
 
         if os.path.exists(self.yaml_path):
             return

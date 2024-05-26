@@ -1,6 +1,7 @@
 from gpt_engineer.applications.interactive_cli.feature import Feature
 from gpt_engineer.applications.interactive_cli.repository import Repository
 from gpt_engineer.applications.interactive_cli.domain import Settings
+from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
 from gpt_engineer.applications.interactive_cli.agents.agent_steps import (
     initialize_new_feature,
     update_user_file_selection,
@@ -25,11 +26,13 @@ class FeatureAgent(BaseAgent):
         project_path: str,
         feature: Feature,
         repository: Repository,
+        file_selector: FileSelector,
     ):
         self.ai = ai
         self.project_path = project_path
         self.feature = feature
         self.repository = repository
+        self.file_selector = file_selector
 
     def init(self, settings: Settings):
 
@@ -37,7 +40,7 @@ class FeatureAgent(BaseAgent):
             self.ai, self.feature, self.repository, settings.no_branch
         )
 
-        update_user_file_selection(self.feature.file_selector)
+        update_user_file_selection(self.file_selector)
 
         update_task_description(self.feature)
 
@@ -45,11 +48,17 @@ class FeatureAgent(BaseAgent):
 
     def resume(self, settings: Settings):
 
-        run_adjust_loop(self.feature)
+        run_adjust_loop(self.feature, self.file_selector)
 
         check_for_unstaged_changes(self.repository)
 
-        run_task_loop(self.project_path, self.feature, self.repository, self.ai)
+        run_task_loop(
+            self.project_path,
+            self.feature,
+            self.repository,
+            self.ai,
+            self.file_selector,
+        )
 
     def improve(self):
         self.resume()
