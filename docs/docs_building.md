@@ -4,7 +4,7 @@ Building Docs with Sphinx
 This example shows a basic Sphinx docs project with Read the Docs. This project is using `sphinx` with `readthedocs`
 project template.
 
-Some useful links are given below to lear and contribute in the project.
+Some useful links are given below to learn and contribute to the project.
 
 📚 [docs/](https://www.sphinx-doc.org/en/master/usage/quickstart.html)<br>
 A basic Sphinx project lives in `docs/`, it was generated using Sphinx defaults. All the `*.rst` & `*.md` make up sections in the documentation. Both `.rst` and `.md` formats are supported in this project
@@ -52,7 +52,7 @@ Below is the rundown of documentation structure for `pandasai`, you need to know
 3. `docs/api_reference.rst` contains the API documentation created using `docstring`.  Run the `create_api_rst.py` to update the API reference file.
 4. Project is using standard Google Docstring Style.
 5. Rebuild the documentation locally to see that it works.
-6. Documentation are hosted on [Read the Docs tutorial](https://docs.readthedocs.io/en/stable/tutorial/)
+6. Documentation is hosted on [Read the Docs tutorial](https://docs.readthedocs.io/en/stable/tutorial/)
 
 
 Read the Docs tutorial
