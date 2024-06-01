@@ -117,13 +117,13 @@ That's it.
 Using Open Router models
 ==================
 
-In case you don't posses the hardware to run local LLM's yourself you can use the hosting on [Open Router](https://openrouter.ai) and pay as you go for the tokens.
+In case you don't possess the hardware to run local LLM's yourself you can use the hosting on [Open Router](https://openrouter.ai) and pay as you go for the tokens.
 
-To set it up you need to Sign In and load purchase 💰 the LLM credits. Pricing per token is different for (each model](https://openrouter.ai/models), but mostly cheaper then Open AI.
+To set it up you need to Sign In and load purchase 💰 the LLM credits. Pricing per token is different for (each model](https://openrouter.ai/models), but mostly cheaper than Open AI.
 
 Then create the API key.
 
-To for example use [Meta: Llama 3 8B Instruct (extended)](https://openrouter.ai/models/meta-llama/llama-3-8b-instruct:extended) with `gpte` we need to set:
+For example use [Meta: Llama 3 8B Instruct (extended)](https://openrouter.ai/models/meta-llama/llama-3-8b-instruct:extended) with `gpte` we need to set:
 
 ```bash
 export OPENAI_API_BASE="https://openrouter.ai/api/v1"
