@@ -11,7 +11,7 @@ To install LangChain run:
 
     $ python -m pip install gpt-engineer
 
-For more details, see our [Installation guide](/instllation.html).
+For more details, see our [Installation guide](/installation.html).
 
 Setup API Key
 =============
