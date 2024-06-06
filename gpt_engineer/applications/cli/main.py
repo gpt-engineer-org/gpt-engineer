@@ -29,6 +29,9 @@ import difflib
 import logging
 import os
 import sys
+import platform
+import subprocess
+import json
 
 from pathlib import Path
 
@@ -237,6 +240,25 @@ def prompt_yesno() -> bool:
         print("Please respond with 'y' or 'n'")
 
 
+def get_system_info():
+    system_info = {
+        "os": platform.system(),
+        "os_version": platform.version(),
+        "architecture": platform.machine(),
+        "python_version": sys.version,
+        "packages": get_installed_packages()
+    }
+    return system_info
+
+def get_installed_packages():
+    try:
+        result = subprocess.run([sys.executable, "-m", "pip", "list", "--format=json"], capture_output=True, text=True)
+        packages = json.loads(result.stdout)
+        return {pkg["name"]: pkg["version"] for pkg in packages}
+    except Exception as e:
+        return str(e)
+
+
 @app.command(
     help="""
         GPT-engineer lets you:
@@ -329,6 +351,11 @@ def main(
         "--no_execution",
         help="Run setup but to not call LLM or write any code. For testing purposes.",
     ),
+    sysinfo: bool = typer.Option(
+        False,
+        "--sysinfo",
+        help="Output system information for debugging",
+    ),
 ):
     """
     The main entry point for the CLI tool that generates or improves a project.
@@ -369,6 +396,8 @@ def main(
         Flag indicating whether to enable verbose logging.
     no_execution: bool
         Run setup but to not call LLM or write any code. For testing purposes.
+    sysinfo: bool
+        Flag indicating whether to output system information for debugging.
 
     Returns
     -------
@@ -379,6 +408,12 @@ def main(
         import pdb
 
         sys.excepthook = lambda *_: pdb.pm()
+
+    if sysinfo:
+        sys_info = get_system_info()
+        for key, value in sys_info.items():
+            print(f"{key}: {value}")
+        raise typer.Exit()
 
     # Validate arguments
     if improve_mode and (clarify_mode or lite_mode):
