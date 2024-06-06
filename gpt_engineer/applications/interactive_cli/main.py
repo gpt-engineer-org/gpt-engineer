@@ -132,7 +132,7 @@ def task(
 
     repository = Repository(project_path)
 
-    task = Task(project_path, repository)
+    task = Task(project_path)
 
     file_selector = FileSelector(project_path, repository)
 

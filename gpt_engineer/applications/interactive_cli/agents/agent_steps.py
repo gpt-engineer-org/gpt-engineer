@@ -5,6 +5,7 @@ from gpt_engineer.applications.interactive_cli.files import Files
 from gpt_engineer.applications.interactive_cli.generation_tools import (
     generate_branch_name,
     build_feature_context_string,
+    generate_suggested_tasks,
 )
 
 from gpt_engineer.core.ai import AI
@@ -17,7 +18,10 @@ from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from prompt_toolkit import prompt as cli_input
 from prompt_toolkit.validation import ValidationError, Validator
 from prompt_toolkit import PromptSession as InputSession
+from prompt_toolkit.formatted_text import FormattedText
 from prompt_toolkit.completion import WordCompleter
+
+from yaspin import yaspin
 
 
 # This is a random comment to prove the assistant works
@@ -62,9 +66,50 @@ def update_feature_description(feature: Feature):
 
 
 def update_task_description(feature: Feature):
-
     feature.open_task_in_editor()
     input("Please edit the task file and then press Enter to continue...")
+
+
+def initiate_new_task(ai, feature, git_context, file_selector):
+
+    files = file_selector.get_included_as_file_repository()
+
+    try:
+        with yaspin(text="Generating suggested tasks...") as spinner:
+            response = generate_suggested_tasks(ai, feature, git_context, files)
+            spinner.ok("✔")  # Success message
+    except Exception as e:
+        raise RuntimeError("Error generating task suggestions.") from e
+
+    tasks = response.tasks
+
+    max_tasks = min(len(tasks), 3)
+    options = [str(i + 1) for i in range(max_tasks)] + ["c"]
+    completer = WordCompleter(options, ignore_case=True)
+
+    task_list_message = "\n".join([f"{i + 1}: {tasks[i]}" for i in range(max_tasks)])
+
+    def get_prompt():
+        return [
+            ("class:text", response.planning_thoughts),
+            (
+                "class:text",
+                "\n\nWould you like to work on one of these suggested tasks or choose your own?\n",
+            ),
+            ("class:text", task_list_message),
+            ("class:text", "\nc: Custom task\n"),
+        ]
+
+    session = InputSession()
+    result = session.prompt(FormattedText(get_prompt()), completer=completer).lower()
+
+    if result in options[:-1]:
+        selected_task = tasks[int(result) - 1]
+        print(f"Selected task: {selected_task}")
+        feature.set_task(selected_task)
+
+    if result == "c":
+        update_task_description(feature)
 
 
 def check_for_unstaged_changes(
@@ -135,9 +180,7 @@ The purpose of this message is to give you wider context around the feature you 
 
     prompt = Prompt(feature.get_task(), prefix="Task: ")
 
-    selected_files = file_selector.get_from_yaml().included_files
-
-    files = Files(project_path, selected_files)
+    files = file_selector.get_included_as_file_repository()
 
     improve_lambda = lambda: improve_fn(
         ai, prompt, files, memory, preprompts_holder, feature_agent_context
@@ -172,10 +215,10 @@ def complete_task(repository, project_path, feature, ai, file_selector):
     repository.stage_all_changes()
     feature.complete_task()
     file_selector.update_yaml_from_tracked_files()
-    print("Continuing with next task...")
-    update_task_description(feature)
+    git_context = repository.get_git_context()
 
-    run_adjust_loop(feature, file_selector)
+    print("Continuing with next task...")
+    initiate_new_task(ai, feature, git_context, file_selector)
 
     check_for_unstaged_changes(repository)
 

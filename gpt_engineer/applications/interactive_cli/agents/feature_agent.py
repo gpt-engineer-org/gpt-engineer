@@ -8,8 +8,9 @@ from gpt_engineer.applications.interactive_cli.agents.agent_steps import (
     check_for_unstaged_changes,
     run_task_loop,
     run_adjust_loop,
-    update_task_description,
+    initiate_new_task,
 )
+from prompt_toolkit import prompt as cli_input
 
 from gpt_engineer.core.ai import AI
 from gpt_engineer.core.base_agent import BaseAgent
@@ -42,11 +43,29 @@ class FeatureAgent(BaseAgent):
 
         update_user_file_selection(self.file_selector)
 
-        update_task_description(self.feature)
+        initiate_new_task(self.ai, self.feature, None, self.file_selector)
 
         self.resume(settings)
 
     def resume(self, settings: Settings):
+        if self.feature.has_task():
+            if cli_input(
+                "Complete current task and initiate new task? y/n: "
+            ).lower() in [
+                "n",
+                "no",
+            ]:
+                check_for_unstaged_changes(self.repository)
+
+                run_task_loop(
+                    self.project_path,
+                    self.feature,
+                    self.repository,
+                    self.ai,
+                    self.file_selector,
+                )
+
+        initiate_new_task(self.ai, self.feature, None, self.file_selector)
 
         run_adjust_loop(self.feature, self.file_selector)
 

@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Union
 
 from gpt_engineer.core.default.disk_memory import DiskMemory
+from gpt_engineer.core.default.paths import memory_path
 from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
 from gpt_engineer.applications.interactive_cli.repository import Repository
 
@@ -16,9 +17,9 @@ class Task(DiskMemory):
     Represents a task that will be done one off without the wider context of a feature
     """
 
-    def __init__(self, project_path: Union[str, Path], repository: Repository):
+    def __init__(self, project_path: Union[str, Path]):
 
-        self._task_path = Path(project_path) / ".task"
+        self._task_path = Path(memory_path(project_path)) / "task"
         self.path = self._task_path
         self._task_filename = "task.md"
         self._files_filename = "files.yml"

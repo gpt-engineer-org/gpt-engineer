@@ -65,14 +65,20 @@ def build_git_context_string(git_context):
 
 
 def build_feature_context_string(feature, git_context):
-    return f"""## Feature - this is the description fo the current feature we are working on.
+    feature_string = f"""## Feature - this is the description fo the current feature we are working on.
 {feature.get_description()}
 
 ## Completed Tasks - these are the lists of tasks you have completed so far on the feature branch.
 {feature.get_progress()["done"]}
+"""
+
+    if git_context:
+        return f"""{feature_string}
 
 {build_git_context_string(git_context)}
 """
+
+    return feature_string
 
 
 def build_files_context_string(feature, git_context, files):
@@ -86,11 +92,15 @@ def build_files_context_string(feature, git_context, files):
 def generate_suggested_tasks(ai: AI, feature, git_context, files) -> str:
     system_prompt = """
 You are a software engineer work planning tool. Given a feature description, a list of tasks already completed, and sections of the code
-repository we are working on, suggest a list of tasks to be done in order to move towards the end goal of completing the feature.
+repository we are working on, suggest a list of implementation tasks to be done in order to move towards the end goal of completing the feature.
 
-First start by outputting your planning thoughts: an overview of what we are trying to achieve, what we have achieved so far, and what is left to be done.
+An implementation task consists of actually writing some code - and doesnt include review or research tasks, or any other activity other tha writing code.
 
-Then output the list of tasks to be done. Please try to keep the tasks small, actionable and independantly commitable.
+First start by outputting your planning thoughts: an overview of what we are trying to achieve, what we have achieved so far, and what implementation tasks are left to be done.
+
+Then output the list of between 0 and 3 implementation tasks to be done which get us closer to our goal. Please try to keep the tasks small, actionable and independantly commitable.
+
+We only need to move towards our goal with these tasks, we dont have to complete the feature in these 3 steps.
 
 The output format will be XML as follows:
 
@@ -99,10 +109,13 @@ The output format will be XML as follows:
 <![CDATA[Include your thoughts here.]]>
 </PlanningThoughts>
 <Tasks>
-<Task>
+<Task numer="1">
 <![CDATA[Include a task description here]]>
 </Task>
-<Task>
+<Task number="2">
+<![CDATA[Include another task description here.]]>
+</Task>
+<Task number="3">
 <![CDATA[Include another task description here.]]>
 </Task>
 </Tasks>
@@ -112,19 +125,21 @@ The output format will be XML as follows:
 </Response>
 
 Respond in XML and nothing else.
+
+You may send as as little as 0 tasks and as many as 3. If you believe the feature is complete, send 0 tasks.
 """
 
     input = build_files_context_string(feature, git_context, files)
 
-    # ai.llm.callbacks.clear() # silent
+    ai.llm.callbacks.clear()  # silent
 
     messages = ai.start(system_prompt, input, step_name="suggest-tasks")
 
-    # ai.llm.callbacks.append(StreamingStdOutCallbackHandler())
+    ai.llm.callbacks.append(StreamingStdOutCallbackHandler())
 
     xml = messages[-1].content.strip()
 
-    return parse_task_xml_to_class(xml).tasks
+    return parse_task_xml_to_class(xml)
 
 
 def fuzzy_parse_file_selection(ai: AI, yaml_string: str) -> FileSelection:

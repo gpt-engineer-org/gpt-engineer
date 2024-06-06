@@ -28,21 +28,21 @@ class Feature(DiskMemory):
         self._progress_filename = "progress.json"
         self._task_filename = "task.md"
 
+        self._feature_placeholder = """Please replace with your own feature description. Markdown is supported.
+
+Hint: 
+Improve your prompts by including technical references to any APIs, libraries, components etc that the pre trained model may not know about in detail already."""
+
+        self._task_placeholder = "Please replace with a task description - directing the AI on the first task to implement on this feature"
+
         if not os.path.exists(self._feature_path):
             os.makedirs(self._feature_path)
 
         super().__init__(self._feature_path)
 
     def clear_feature(self) -> None:
-        self.set_description(
-            """Please replace with your own feature description. Markdown is supported.
-
-Hint: 
-Improve your prompts by including technical references to any APIs, libraries, components etc that the pre trained model may not know about in detail already."""
-        )
-        self.set_task(
-            "Please replace with a task description - directing the AI on the first task to implement on this feature"
-        )
+        self.set_description(self._feature_placeholder)
+        self.set_task(self._task_placeholder)
         super().__setitem__(self._progress_filename, json.dumps({"done": []}))
 
     def get_description(self) -> str:
@@ -123,6 +123,23 @@ Improve your prompts by including technical references to any APIs, libraries, c
             The content of the feature file.
         """
         return super().__getitem__(self._task_filename)
+
+    def has_task(self) -> bool:
+        """
+        Retrieve the content of the feature file in the database.
+
+        Returns
+        -------
+        str
+            The content of the feature file.
+        """
+
+        task = self.get_task()
+
+        if task and not task == self._task_placeholder:
+            return True
+
+        return False
 
     def complete_task(self):
         """

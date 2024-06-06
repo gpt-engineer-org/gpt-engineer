@@ -9,6 +9,7 @@ from gpt_engineer.core.default.paths import memory_path
 from gpt_engineer.core.ai import AI
 
 from gpt_engineer.applications.interactive_cli.repository import Repository
+from gpt_engineer.applications.interactive_cli.files import Files
 from gpt_engineer.applications.interactive_cli.generation_tools import (
     fuzzy_parse_file_selection,
 )
@@ -155,6 +156,7 @@ class FileSelector:
     """
 
     def __init__(self, project_path: str, repository: Repository):
+        self.project_path = project_path
         self.ai = AI("gpt-4o", temperature=0)
         self.repository = repository
         self.yaml_path = Path(memory_path(project_path)) / "files.yml"
@@ -311,3 +313,8 @@ class FileSelector:
             subprocess.run(["open", self.yaml_path])
         else:  # Linux and other Unix-like systems
             subprocess.run(["xdg-open", self.yaml_path])
+
+    def get_included_as_file_repository(self):
+        file_selection = self.get_from_yaml()
+
+        return Files(self.project_path, file_selection.included_files)
