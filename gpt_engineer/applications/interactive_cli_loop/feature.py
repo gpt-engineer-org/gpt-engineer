@@ -67,18 +67,6 @@ Improve your prompts by including technical references to any APIs, libraries, c
         """
         super().__setitem__(self._feature_filename, feature_description)
 
-    def has_description(self) -> bool:
-        """
-        Does the feature have a description?
-        """
-
-        task = self.get_task()
-
-        if task and not task == self._task_placeholder:
-            return True
-
-        return False
-
     def get_progress(self) -> dict:
         """
         Retrieve the progress object.
@@ -138,7 +126,12 @@ Improve your prompts by including technical references to any APIs, libraries, c
 
     def has_task(self) -> bool:
         """
-        Does the feature have an active task?
+        Retrieve the content of the feature file in the database.
+
+        Returns
+        -------
+        str
+            The content of the feature file.
         """
 
         task = self.get_task()

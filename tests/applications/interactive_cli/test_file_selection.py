@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 from gpt_engineer.core.ai import AI
 
-from gpt_engineer.applications.interactive_cli.file_selection import (
+from gpt_engineer.applications.interactive_cli_loop.file_selection import (
     FileSelection,
     paths_to_tree,
     tree_to_paths,
@@ -13,7 +13,7 @@ from gpt_engineer.applications.interactive_cli.file_selection import (
     commented_yaml_to_file_selection,
 )
 
-from gpt_engineer.applications.interactive_cli.generation_tools import (
+from gpt_engineer.applications.interactive_cli_loop.generation_tools import (
     fuzzy_parse_file_selection,
 )
 
