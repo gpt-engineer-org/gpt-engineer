@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # -*- coding: utf-8 -*-
 
 project_dir="/project"

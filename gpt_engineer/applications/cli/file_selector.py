@@ -27,7 +27,6 @@ from typing import Any, Dict, Generator, List, Union
 import toml
 
 from gpt_engineer.core.default.disk_memory import DiskMemory
-from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.default.paths import metadata_path
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.git import filter_by_gitignore, is_git_repo
@@ -62,7 +61,7 @@ class FileSelector:
         "cost additional tokens and potentially overflow token limit.\n\n"
     )
     LINTING_STRING = '[linting]\n# "linting" = "off"\n\n'
-    isLinting = True
+    is_linting = True
 
     def __init__(self, project_path: Union[str, Path]):
         """
@@ -77,7 +76,7 @@ class FileSelector:
         self.metadata_db = DiskMemory(metadata_path(self.project_path))
         self.toml_path = self.metadata_db.path / self.FILE_LIST_NAME
 
-    def ask_for_files(self) -> FilesDict:
+    def ask_for_files(self) -> tuple[FilesDict, bool]:
         """
         Prompts the user to select files for context improvement.
 
@@ -118,13 +117,7 @@ class FileSelector:
             except UnicodeDecodeError:
                 print(f"Warning: File not UTF-8 encoded {file_path}, skipping")
 
-        if self.isLinting:
-            file_store = FileStore()
-            files = FilesDict(content_dict)
-            linted_files = file_store.linting(files)
-            return linted_files
-
-        return FilesDict(content_dict)
+        return FilesDict(content_dict), self.is_linting
 
     def editor_file_selector(
         self, input_path: Union[str, Path], init: bool = True
@@ -181,7 +174,7 @@ class FileSelector:
                 "linting" in linting_status
                 and linting_status["linting"].get("linting", "").lower() == "off"
             ):
-                self.isLinting = False
+                self.is_linting = False
                 self.LINTING_STRING = '[linting]\n"linting" = "off"\n\n'
                 print("\nLinting is disabled")
 
@@ -305,10 +298,10 @@ class FileSelector:
             "linting" in edited_tree
             and edited_tree["linting"].get("linting", "").lower() == "off"
         ):
-            self.isLinting = False
+            self.is_linting = False
             print("\nLinting is disabled")
         else:
-            self.isLinting = True
+            self.is_linting = True
 
         # Iterate through the files in the .toml and append selected files to the list
         for file, _ in edited_tree["files"].items():
