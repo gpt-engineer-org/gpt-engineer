@@ -26,12 +26,12 @@ Notes
 """
 
 import difflib
+import json
 import logging
 import os
-import sys
 import platform
 import subprocess
-import json
+import sys
 
 from pathlib import Path
 
@@ -246,13 +246,18 @@ def get_system_info():
         "os_version": platform.version(),
         "architecture": platform.machine(),
         "python_version": sys.version,
-        "packages": get_installed_packages()
+        "packages": get_installed_packages(),
     }
     return system_info
 
+
 def get_installed_packages():
     try:
-        result = subprocess.run([sys.executable, "-m", "pip", "list", "--format=json"], capture_output=True, text=True)
+        result = subprocess.run(
+            [sys.executable, "-m", "pip", "list", "--format=json"],
+            capture_output=True,
+            text=True,
+        )
         packages = json.loads(result.stdout)
         return {pkg["name"]: pkg["version"] for pkg in packages}
     except Exception as e:
