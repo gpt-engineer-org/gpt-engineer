@@ -59,13 +59,11 @@ Check the [Windows README](./WINDOWS_README.md) for Windows usage.
   - For example: `gpte projects/my-old-project -i` from the gpt-engineer directory root with your folder in `projects/`
 
 ### Benchmark custom agents
-- gpt-engineer installs the binary 'bench', which gives you a simple interface for benchmarking your own agent implementations against popular public datasets. 
+- gpt-engineer installs the binary 'bench', which gives you a simple interface for benchmarking your own agent implementations against popular public datasets.
 - The easiest way to get started with benchmarking is by checking out the [template](https://github.com/gpt-engineer-org/gpte-bench-template) repo, which contains detailed instructions and an agent template.
 - Currently supported benchmark:
   - [APPS](https://github.com/hendrycks/apps)
   - [MBPP](https://github.com/google-research/google-research/tree/master/mbpp)
-
-By running gpt-engineer you agree to our [terms](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
 By running gpt-engineer you agree to our [terms](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
