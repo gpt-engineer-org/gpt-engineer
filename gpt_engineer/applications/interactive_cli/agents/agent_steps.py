@@ -1,8 +1,10 @@
-from gpt_engineer.applications.interactive_cli_loop.feature import Feature
-from gpt_engineer.applications.interactive_cli_loop.file_selection import FileSelector
-from gpt_engineer.applications.interactive_cli_loop.repository import Repository
-from gpt_engineer.applications.interactive_cli_loop.files import Files
-from gpt_engineer.applications.interactive_cli_loop.generation_tools import (
+from gpt_engineer.applications.interactive_cli.feature import Feature
+from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
+from gpt_engineer.applications.interactive_cli.repository import (
+    Repository,
+    GitContext,
+)
+from gpt_engineer.applications.interactive_cli.generation_tools import (
     generate_branch_name,
     build_feature_context_string,
     generate_suggested_tasks,
@@ -15,11 +17,15 @@ from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 
-from prompt_toolkit import prompt as cli_input
+from prompt_toolkit import (
+    prompt as cli_input,
+    PromptSession as InputSession,
+    HTML,
+    print_formatted_text,
+)
 from prompt_toolkit.validation import ValidationError, Validator
-from prompt_toolkit import PromptSession as InputSession
-from prompt_toolkit.formatted_text import FormattedText
 from prompt_toolkit.completion import WordCompleter
+
 
 from yaspin import yaspin
 
@@ -34,14 +40,88 @@ class FeatureValidator(Validator):
             )
 
 
-def initialize_new_feature(
-    ai: AI, feature: Feature, repository: Repository, no_branch: bool
-):
+def print_feature_state(feature, file_selector):
+
+    if not feature.has_description():
+        output = "No active feature."
+    else:
+        feature_description = feature.get_description()
+        file_string = file_selector.get_pretty_selected_from_yaml()
+        completed_tasks_string = "None"
+        active_task_string = "None"
+
+        completed_tasks = feature.get_progress()["done"]
+
+        if completed_tasks and len(completed_tasks) > 0:
+            completed_tasks_string = "\n".join(
+                [f"• {task}" for task in completed_tasks]
+            )
+
+        if feature.has_task():
+            active_task_string = feature.get_task()
+
+        output = f"""
+---
+
+<b>Active Feature</b>
+
+<i>{feature_description}</i>
+
+<b>File Selection</b>
+
+<i>{file_string}</i>
+
+<b>Completed Tasks</b>
+
+<i>{completed_tasks_string}</i>
+
+<b>Active Task</b>
+
+<i>{active_task_string}</i>
+
+---
+"""
+
+    print_formatted_text(HTML(output))
+
+
+def select_create_branch():
+    completer = WordCompleter(["1", "2", "x"], ignore_case=True)
+    session = InputSession()
+
+    # Using prompt to get user input
+    result = session.prompt(
+        """Would you like to 
+
+1 - Initialize new feature (on new branch)
+2 - Initialize new feature (on current branch)
+
+x - Exit
+
+""",
+        completer=completer,
+    ).lower()
+
+    print()
+
+    if result == "1":
+        return True
+    if result == "2":
+        return False
+    if result == "x":
+        print("Exiting...")
+        return
+
+
+def initialize_new_feature(ai: AI, feature: Feature, repository: Repository):
+
+    create__branch = select_create_branch()
+
     feature.clear_feature()
 
     update_feature_description(feature)
 
-    if not no_branch:
+    if create__branch:
         print("Creating feature branch... (this can be disabled with -nb setting)")
 
         branch_name = generate_branch_name(ai, feature.get_description())
@@ -62,15 +142,84 @@ def update_user_file_selection(file_selector: FileSelector):
 
 def update_feature_description(feature: Feature):
     feature.open_feature_in_editor()
-    input("Please edit the feature file and then press Enter to continue...")
+    input("\nPlease edit the feature file and then press Enter to continue...")
 
 
 def update_task_description(feature: Feature):
     feature.open_task_in_editor()
-    input("Please edit the task file and then press Enter to continue...")
+    input("\nPlease edit the task file and then press Enter to continue...")
+
+
+def update_feature(feature: Feature, file_selector: FileSelector):
+    completer = WordCompleter(["1", "2", "3", "x"], ignore_case=True)
+    session = InputSession()
+
+    result = session.prompt(
+        HTML(
+            """
+<b>Would you like to:</b>
+
+<green>1 - Edit Feature Description</green>
+<green>2 - Edit File Selection</green>
+<green>3 - Finish/Deactivate Feature</green>
+
+<green>x - Exit</green>
+
+"""
+        ),
+        completer=completer,
+    ).lower()
+
+    print()
+
+    if result == "1":
+        update_feature_description(feature)
+    if result == "2":
+        update_user_file_selection(file_selector)
+    if result == "3":
+        print("Sorry! Not implemented yet.")
+    if result == "x":
+        print("Exiting...")
+        return
 
 
 def initiate_new_task(ai, feature, git_context, file_selector):
+    """
+    Runs a flow which ends in the user saving a new task in the task.md file
+    """
+
+    completer = WordCompleter(["1", "2", "3", "x"], ignore_case=True)
+    session = InputSession()
+
+    result = session.prompt(
+        HTML(
+            """
+<blue>No active task...</blue>
+
+<b>Would you like to:</b>
+
+<green>1 - Suggest New Tasks (Recommended)</green>
+<green>2 - New Custom Task</green>
+
+<green>x - Exit</green>
+
+"""
+        ),
+        completer=completer,
+    ).lower()
+
+    print()
+
+    if result == "1":
+        suggest_new_tasks(ai, feature, git_context, file_selector)
+    elif result == "2":
+        update_task_description(feature)
+    elif result == "x":
+        print("Exiting...")
+        return
+
+
+def suggest_new_tasks(ai, feature, git_context, file_selector):
 
     files = file_selector.get_included_as_file_repository()
 
@@ -87,29 +236,89 @@ def initiate_new_task(ai, feature, git_context, file_selector):
     options = [str(i + 1) for i in range(max_tasks)] + ["c"]
     completer = WordCompleter(options, ignore_case=True)
 
-    task_list_message = "\n".join([f"{i + 1}: {tasks[i]}" for i in range(max_tasks)])
+    task_list_message = "\n".join(
+        [f"<green>{i + 1}: {tasks[i]}</green>" for i in range(max_tasks)]
+    )
 
     def get_prompt():
-        return [
-            ("class:text", response.planning_thoughts),
-            (
-                "class:text",
-                "\n\nWould you like to work on one of these suggested tasks or choose your own?\n",
-            ),
-            ("class:text", task_list_message),
-            ("class:text", "\nc: Custom task\n"),
-        ]
+        return f"""
+<b>AI Reasoning</b>
+<i>{response.planning_thoughts}</i>
+
+<b>Which task would you like to you like to work on?</b>
+
+{task_list_message}
+
+<green>c: Custom task</green>
+
+<green>x: Exit</green>
+
+"""
 
     session = InputSession()
-    result = session.prompt(FormattedText(get_prompt()), completer=completer).lower()
+    result = session.prompt(HTML(get_prompt()), completer=completer).lower()
+
+    print()
 
     if result in options[:-1]:
         selected_task = tasks[int(result) - 1]
-        print(f"Selected task: {selected_task}")
         feature.set_task(selected_task)
 
     if result == "c":
         update_task_description(feature)
+
+    task = feature.get_task()
+
+    print_formatted_text(
+        HTML(
+            f"""---
+
+<b>Active Task</b>
+                                  
+<i>{task}</i>
+
+---
+"""
+        )
+    )
+
+
+def check_existing_task(feature, file_selector):
+    completer = WordCompleter(["1", "2", "3", "x"], ignore_case=True)
+    session = InputSession()
+
+    result = session.prompt(
+        HTML(
+            """<blue>You have an existing task present</blue> 
+
+<b>Would you like to:</b>
+
+<green>1 - Implement task</green>
+<green>2 - Mark task as complete</green>
+<green>3 - Discard task and continue</green>
+
+<green>x - Exit</green>
+
+"""
+        ),
+        completer=completer,
+    ).lower()
+
+    print()
+
+    if result == "1":
+        return True
+    if result == "2":
+        complete_task(feature, file_selector)
+        return False
+    if result == "3":
+        feature.set_task("")
+        return True
+    if result == "x":
+        print("Exiting...")
+        return False
+
+    return False
 
 
 def check_for_unstaged_changes(
@@ -117,12 +326,42 @@ def check_for_unstaged_changes(
 ):
     unstaged_changes = repository.get_unstaged_changes()
 
-    if unstaged_changes:
-        if input(
-            "Unstaged changes present are you sure you want to proceed? y/n: "
-        ).lower() not in ["", "y", "yes"]:
-            print("Ok, not proceeding.")
-            return
+    if not unstaged_changes:
+        return True
+
+    completer = WordCompleter(["1", "2", "3", "x"], ignore_case=True)
+    session = InputSession()
+
+    result = session.prompt(
+        HTML(
+            """<blue>Unstaged changes present...</blue>
+
+<b>Would you like to:</b>
+
+<green>1 - Stage changes and continue</green>
+<green>2 - Undo changes and continue</green>
+<green>3 - Continue with unstaged changes</green>
+
+<green>x - Exit</green>
+
+"""
+        ),
+        completer=completer,
+    ).lower()
+
+    print()
+
+    if result == "1":
+        repository.stage_all_changes()
+    if result == "2":
+        repository.undo_unstaged_changes()
+    if result == "3":
+        return True
+    if result == "x":
+        print("Exiting...")
+        return False
+
+    return True
 
 
 def confirm_feature_context_and_task_with_user(
@@ -159,10 +398,10 @@ def adjust_prompt_files():
     input("Please edit the prompt files and then press Enter to continue...")
 
 
-def run_task_loop(
+def generate_code_for_task(
     project_path,
     feature: Feature,
-    repository: Repository,
+    git_context: GitContext,
     ai: AI,
     file_selector: FileSelector,
 ):
@@ -170,7 +409,7 @@ def run_task_loop(
     memory = DiskMemory(memory_path(project_path))
     preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
 
-    context_string = build_feature_context_string(feature, repository.get_git_context())
+    context_string = build_feature_context_string(feature, git_context)
 
     feature_agent_context = f"""I am working on a feature but breaking it up into small incremental tasks. Your job is to complete the incremental task provided to you - only that task and nothing more.
 
@@ -186,14 +425,11 @@ The purpose of this message is to give you wider context around the feature you 
         ai, prompt, files, memory, preprompts_holder, feature_agent_context
     )
 
-    print("\n---- begining code generation ----\n")
-    # Creates loop
+    print_formatted_text("\n---- Beginning code generation ----\n")
     updated_files_dictionary = handle_improve_mode(improve_lambda, memory)
-    print("\n---- ending code generation ----\n")
+    print("\n---- Ending code generation ----\n")
 
     files.write_to_disk(updated_files_dictionary)
-
-    review_changes(project_path, feature, repository, ai, file_selector)
 
 
 def run_adjust_loop(feature, file_selector):
@@ -204,25 +440,10 @@ def run_adjust_loop(feature, file_selector):
         implement = confirm_feature_context_and_task_with_user(feature, file_selector)
 
 
-def run_task(repository, project_path, feature, ai, file_selector):
-    print("Rerunning generation...")
-    check_for_unstaged_changes(repository)
-    run_task_loop(project_path, feature, repository, ai, file_selector)
-
-
-def complete_task(repository, project_path, feature, ai, file_selector):
-    print("Completing task... ")
-    repository.stage_all_changes()
+def complete_task(feature, file_selector):
     feature.complete_task()
     file_selector.update_yaml_from_tracked_files()
-    git_context = repository.get_git_context()
-
-    print("Continuing with next task...")
-    initiate_new_task(ai, feature, git_context, file_selector)
-
-    check_for_unstaged_changes(repository)
-
-    run_task_loop(project_path, feature, repository, ai, file_selector)
+    print_formatted_text(HTML("<blue>Task Completed</blue>\n"))
 
 
 def review_changes(
@@ -233,24 +454,50 @@ def review_changes(
     file_selector: FileSelector,
 ):
 
-    completer = WordCompleter(["r", "c", "u"], ignore_case=True)
+    completer = WordCompleter(["1", "2", "3", "4", "5", "x"], ignore_case=True)
     session = InputSession()
 
-    # Using prompt to get user input
     result = session.prompt(
-        """Please review the unstaged changes generated by GPT Engineer.. 
+        HTML(
+            """<blue>Code generation for task complete </blue>
 
-r: Retry the task (incorporating changes to prompt files)
-c: Complete task and stage changes 
-x: Exit
-""",
+<green><b>Important:</b> Please review and edit the unstaged changes with your IDE of choice...</green>
+
+<b>Would you like to:</b>
+
+<green>1 - Complete task and stage changes (Recommended)</green>
+<green>2 - Complete task and don't stage changes</green>
+
+<green>3 - Undo changes and Retry task</green>
+<green>4 - Leave changes and Retry task</green>
+
+<green>5 - Discard task and continue</green>
+
+<green>x - Exit</green>
+
+"""
+        ),
         completer=completer,
     ).lower()
 
-    if result == "r":
-        run_task(repository, project_path, feature, ai, file_selector)
-    if result == "c":
-        complete_task(repository, project_path, feature, ai, file_selector)
+    print()
+
+    if result == "1":
+        repository.stage_all_changes()
+        complete_task(feature, file_selector)
+    if result == "2":
+        complete_task(feature, file_selector)
+    if result == "3":
+        print("Rerunning generation...")
+        repository.undo_unstaged_changes()
+        generate_code_for_task(repository, project_path, feature, ai, file_selector)
+    if result == "4":
+        print("Rerunning generation...")
+        repository.undo_unstaged_changes()
+        generate_code_for_task(repository, project_path, feature, ai, file_selector)
+    if result == "5":
+        feature.clear_task()
+
     if result == "x":
         print("exiting...")
         return

@@ -1,18 +1,16 @@
 import typer
 from dotenv import load_dotenv
-from pathlib import Path
-from gpt_engineer.core.default.paths import memory_path
 
-from gpt_engineer.applications.interactive_cli_loop.agents.task_agent import TaskAgent
-from gpt_engineer.applications.interactive_cli_loop.agents.feature_agent import (
+
+from gpt_engineer.applications.interactive_cli.agents.feature_agent import (
     FeatureAgent,
 )
-from gpt_engineer.applications.interactive_cli_loop.agents.chat_agent import ChatAgent
-from gpt_engineer.applications.interactive_cli_loop.feature import Feature
-from gpt_engineer.applications.interactive_cli_loop.task import Task
-from gpt_engineer.applications.interactive_cli_loop.repository import Repository
-from gpt_engineer.applications.interactive_cli_loop.domain import Settings
-from gpt_engineer.applications.interactive_cli_loop.file_selection import FileSelector
+from gpt_engineer.applications.interactive_cli.agents.chat_agent import ChatAgent
+from gpt_engineer.applications.interactive_cli.feature import Feature
+from gpt_engineer.applications.interactive_cli.task import Task
+from gpt_engineer.applications.interactive_cli.repository import Repository
+from gpt_engineer.applications.interactive_cli.domain import Settings
+from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
 
 
 from gpt_engineer.core.ai import AI
@@ -31,24 +29,11 @@ def feature(
         "-t",
         help="Controls randomness: lower values for more focused, deterministic outputs.",
     ),
-    azure_endpoint: str = typer.Option(
-        "",
-        "--azure",
-        "-a",
-        help="""Endpoint for your Azure OpenAI Service (https://xx.openai.azure.com).
-                In that case, the given model is the deployment name chosen in the Azure AI Studio.""",
-    ),
     verbose: bool = typer.Option(
         False, "--verbose", "-v", help="Enable verbose logging for debugging."
     ),
     debug: bool = typer.Option(
         False, "--debug", "-d", help="Enable debug mode for debugging."
-    ),
-    no_branch: bool = typer.Option(
-        False,
-        "--no-branch",
-        "-nb",
-        help="Do not create a new feature branch for this work.",
     ),
 ):
     """
@@ -69,12 +54,10 @@ def feature(
 
     agent = FeatureAgent(ai, project_path, feature, repository, file_selector)
 
-    settings = Settings(no_branch)
-
     if new:
-        agent.init(settings)
+        agent.initialize_feature()
     else:
-        agent.resume(settings)
+        agent.update_feature()
 
 
 @app.command()
@@ -134,14 +117,10 @@ def task(
 
     repository = Repository(project_path)
 
-    task = Task(project_path)
+    feature = Feature(project_path, repository)
 
     file_selector = FileSelector(project_path, repository)
 
-    task_agent = TaskAgent(ai, project_path, task, repository, file_selector)
+    agent = FeatureAgent(ai, project_path, feature, repository, file_selector)
 
-    task_agent.run()
-
-    # review
-
-    # task.delete()
+    agent.run_task()

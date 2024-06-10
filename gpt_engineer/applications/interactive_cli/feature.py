@@ -42,8 +42,11 @@ Improve your prompts by including technical references to any APIs, libraries, c
 
     def clear_feature(self) -> None:
         self.set_description(self._feature_placeholder)
-        self.set_task(self._task_placeholder)
+        self.clear_task()
         super().__setitem__(self._progress_filename, json.dumps({"done": []}))
+
+    def clear_task(self) -> None:
+        self.set_task(self._task_placeholder)
 
     def get_description(self) -> str:
         """
@@ -72,9 +75,9 @@ Improve your prompts by including technical references to any APIs, libraries, c
         Does the feature have a description?
         """
 
-        task = self.get_task()
+        description = self.get_description()
 
-        if task and not task == self._task_placeholder:
+        if description and not description == self._feature_placeholder:
             return True
 
         return False
@@ -105,8 +108,6 @@ Improve your prompts by including technical references to any APIs, libraries, c
             The new feature_description to write to the feature file.
         """
         progress = self.get_progress()
-
-        print(progress["done"])
 
         progress["done"].append(task)
 

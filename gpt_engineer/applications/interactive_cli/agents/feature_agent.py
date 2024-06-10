@@ -1,22 +1,25 @@
-from gpt_engineer.applications.interactive_cli_loop.feature import Feature
-from gpt_engineer.applications.interactive_cli_loop.repository import Repository
-from gpt_engineer.applications.interactive_cli_loop.domain import Settings
-from gpt_engineer.applications.interactive_cli_loop.file_selection import FileSelector
-from gpt_engineer.applications.interactive_cli_loop.agents.agent_steps import (
+from gpt_engineer.applications.interactive_cli.feature import Feature
+from gpt_engineer.applications.interactive_cli.repository import Repository
+from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
+from gpt_engineer.applications.interactive_cli.agents.agent_steps import (
     initialize_new_feature,
     update_user_file_selection,
-    check_for_unstaged_changes,
-    run_task_loop,
-    run_adjust_loop,
+    print_feature_state,
+    update_feature,
     initiate_new_task,
+    generate_code_for_task,
+    review_changes,
+    check_existing_task,
+    check_for_unstaged_changes,
 )
-from prompt_toolkit import prompt as cli_input
 
+# Bottom comment for testing!
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.base_agent import BaseAgent
+
+from yaspin import yaspin
 
 
-class FeatureAgent(BaseAgent):
+class FeatureAgent:
     """
     A cli agent which implements a feature as a set of incremental tasks
     """
@@ -35,49 +38,68 @@ class FeatureAgent(BaseAgent):
         self.repository = repository
         self.file_selector = file_selector
 
-    def init(self, settings: Settings):
-
-        initialize_new_feature(
-            self.ai, self.feature, self.repository, settings.no_branch
-        )
+    def initialize_feature(self):
+        initialize_new_feature(self.ai, self.feature, self.repository)
 
         update_user_file_selection(self.file_selector)
 
-        initiate_new_task(self.ai, self.feature, None, self.file_selector)
+        print("\nFeature Initialized. Run gptf task to begin working on it.")
 
-        self.resume(settings)
+    def update_feature(self):
 
-    def resume(self, settings: Settings):
+        print_feature_state(self.feature, self.file_selector)
+
+        if not self.feature.has_description():
+            self.initialize_feature()
+        else:
+            update_feature(self.feature, self.repository)
+
+    def run_task(self):
+        print_feature_state(self.feature, self.file_selector)
+
+        if not self.feature.has_description():
+            print(
+                """Run gptf to initialize new feature.
+
+or
+
+Run gptf --no-feature to implement task without a feature"""
+            )
+            return
+
         if self.feature.has_task():
-            if cli_input(
-                "Complete current task and initiate new task? y/n: "
-            ).lower() in [
-                "n",
-                "no",
-            ]:
-                check_for_unstaged_changes(self.repository)
+            cont = check_existing_task(self.feature, self.file_selector)
 
-                run_task_loop(
-                    self.project_path,
-                    self.feature,
-                    self.repository,
-                    self.ai,
-                    self.file_selector,
+            if not cont:
+                return
+
+        while True:
+            with yaspin(text="Gathering git context...") as spinner:
+                git_context = self.repository.get_git_context()
+                spinner.ok("✔")
+
+            if not self.feature.has_task():
+                initiate_new_task(
+                    self.ai, self.feature, git_context, self.file_selector
                 )
 
-        initiate_new_task(self.ai, self.feature, None, self.file_selector)
+            cont = check_for_unstaged_changes(self.repository)
 
-        run_adjust_loop(self.feature, self.file_selector)
+            if not cont:
+                return
 
-        check_for_unstaged_changes(self.repository)
+            generate_code_for_task(
+                self.project_path,
+                self.feature,
+                git_context,
+                self.ai,
+                self.file_selector,
+            )
 
-        run_task_loop(
-            self.project_path,
-            self.feature,
-            self.repository,
-            self.ai,
-            self.file_selector,
-        )
-
-    def improve(self):
-        self.resume()
+            review_changes(
+                self.project_path,
+                self.feature,
+                self.repository,
+                self.ai,
+                self.file_selector,
+            )

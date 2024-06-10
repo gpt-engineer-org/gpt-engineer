@@ -109,7 +109,7 @@ The output format will be XML as follows:
 <![CDATA[Include your thoughts here.]]>
 </PlanningThoughts>
 <Tasks>
-<Task numer="1">
+<Task number="1">
 <![CDATA[Include a task description here]]>
 </Task>
 <Task number="2">
@@ -137,9 +137,18 @@ You may send as as little as 0 tasks and as many as 3. If you believe the featur
 
     ai.llm.callbacks.append(StreamingStdOutCallbackHandler())
 
-    xml = messages[-1].content.strip()
+    raw_response = messages[-1].content.strip()
 
-    return parse_task_xml_to_class(xml)
+    xml_start = raw_response.find("<")
+    xml_end = raw_response.rfind(">") + 1
+    xml = raw_response[xml_start:xml_end]
+
+    try:
+        resp = parse_task_xml_to_class(xml)
+    except:
+        print(raw_response)
+
+    return resp
 
 
 def fuzzy_parse_file_selection(ai: AI, yaml_string: str) -> FileSelection:
