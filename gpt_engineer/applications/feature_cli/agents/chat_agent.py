@@ -6,6 +6,8 @@ from gpt_engineer.applications.feature_cli.files import Files
 from gpt_engineer.applications.feature_cli.file_selection import FileSelector
 from gpt_engineer.applications.feature_cli.agents.agent_steps import (
     update_user_file_selection,
+    confirm_chat_feature,
+    get_git_context,
 )
 from gpt_engineer.applications.feature_cli.generation_tools import (
     build_files_context_string,
@@ -36,9 +38,16 @@ class ChatAgent:
 
         files = Files(self.project_path, selected_files)
 
-        context_string = build_files_context_string(
-            self.feature, self.repository.get_git_context(), files
-        )
+        context_string = f"Files from code repository:\n\n{files.to_chat()}"
+
+        if self.feature.has_description():
+            with_feature = confirm_chat_feature()
+
+            if with_feature:
+                git_context = get_git_context(self.repository)
+                context_string = build_files_context_string(
+                    self.feature, git_context, files
+                )
 
         system = f"""You are the chat function of an AI software engineering tool called gpt engineer.
         

@@ -219,6 +219,12 @@ def initiate_new_task(ai, feature, git_context, file_selector):
         return
 
 
+def get_git_context(repository):
+    with yaspin(text="Gathering git context...") as spinner:
+        git_context = repository.get_git_context()
+        spinner.ok("✔")
+
+
 def suggest_new_tasks(ai, feature, git_context, file_selector):
 
     files = file_selector.get_included_as_file_repository()
@@ -497,6 +503,39 @@ def review_changes(
         generate_code_for_task(repository, project_path, feature, ai, file_selector)
     if result == "5":
         feature.clear_task()
+
+    if result == "x":
+        print("exiting...")
+        return
+
+
+def confirm_chat_feature():
+
+    completer = WordCompleter(["1", "2", "3", "4", "5", "x"], ignore_case=True)
+    session = InputSession()
+
+    result = session.prompt(
+        HTML(
+            """<blue>Active Feature Detected</blue>
+
+<b>Would you like to:</b>
+
+<green>1 - Chat with feaure context and code</green>
+<green>2 - Chat with code only</green>
+
+<green>x - Exit</green>
+
+"""
+        ),
+        completer=completer,
+    ).lower()
+
+    print()
+
+    if result == "1":
+        return True
+    if result == "2":
+        return False
 
     if result == "x":
         print("exiting...")

@@ -11,6 +11,7 @@ from gpt_engineer.applications.feature_cli.agents.agent_steps import (
     review_changes,
     check_existing_task,
     check_for_unstaged_changes,
+    get_git_context,
 )
 
 # Bottom comment for testing!
@@ -63,7 +64,7 @@ class FeatureAgent:
 
 or
 
-Run gptf --no-feature to implement task without a feature"""
+Run gptf task --no-feature to implement task without a feature"""
             )
             return
 
@@ -74,9 +75,7 @@ Run gptf --no-feature to implement task without a feature"""
                 return
 
         while True:
-            with yaspin(text="Gathering git context...") as spinner:
-                git_context = self.repository.get_git_context()
-                spinner.ok("✔")
+            git_context = get_git_context(self.repository)
 
             if not self.feature.has_task():
                 initiate_new_task(

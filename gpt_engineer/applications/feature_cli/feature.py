@@ -57,7 +57,10 @@ Improve your prompts by including technical references to any APIs, libraries, c
         str
             The content of the feature file.
         """
-        return super().__getitem__(self._feature_filename)
+        if super().__contains__(self._feature_filename):
+            return super().__getitem__(self._feature_filename)
+
+        return None
 
     def set_description(self, feature_description: str):
         """
@@ -92,9 +95,10 @@ Improve your prompts by including technical references to any APIs, libraries, c
             The content of the feature file.
         """
 
-        json_string = super().__getitem__(self._progress_filename)
-        if json_string:
-            return json.loads(json_string)
+        if super().__contains__(self._progress_filename):
+            json_string = super().__getitem__(self._progress_filename)
+            if json_string:
+                return json.loads(json_string)
 
         return None
 
@@ -135,7 +139,10 @@ Improve your prompts by including technical references to any APIs, libraries, c
         str
             The content of the feature file.
         """
-        return super().__getitem__(self._task_filename)
+        if super().__contains__(self._task_filename):
+            return super().__getitem__(self._task_filename)
+
+        return None
 
     def has_task(self) -> bool:
         """
