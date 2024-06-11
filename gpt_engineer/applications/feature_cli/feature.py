@@ -7,8 +7,8 @@ from typing import Union
 
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import memory_path
-from gpt_engineer.applications.interactive_cli_loop.file_selection import FileSelector
-from gpt_engineer.applications.interactive_cli_loop.repository import Repository
+from gpt_engineer.applications.feature_cli.file_selection import FileSelector
+from gpt_engineer.applications.feature_cli.repository import Repository
 
 
 class Feature(DiskMemory):
@@ -22,7 +22,7 @@ class Feature(DiskMemory):
 
     def __init__(self, project_path: Union[str, Path], repository: Repository):
 
-        self._feature_path = Path(memory_path(project_path)) / "feature"
+        self._feature_path = Path(project_path) / ".feature"
         self.path = self._feature_path
         self._feature_filename = "feature.md"
         self._progress_filename = "progress.json"

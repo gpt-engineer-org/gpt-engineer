@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import json
 
-from gpt_engineer.applications.interactive_cli_loop.domain import FileSelection
+from gpt_engineer.applications.feature_cli.domain import FileSelection
 from gpt_engineer.core.ai import AI
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler

@@ -44,11 +44,26 @@ class Repository:
 
     def get_tracked_files(self) -> List[str]:
         """
-        List all files that are currently tracked by Git in the repository.
+        List all files that are currently tracked by Git in the repository,
+        ignoring submodules.
         """
         try:
+            # Get all tracked files
             tracked_files = self.repo.git.ls_files().split("\n")
-            return tracked_files
+
+            # Get the list of submodule paths
+            submodule_paths = self.repo.git.submodule(
+                "foreach", "--quiet", "echo $sm_path"
+            ).split("\n")
+
+            # Filter out submodule paths from tracked files
+            filtered_files = [
+                file
+                for file in tracked_files
+                if not any(file.startswith(submodule) for submodule in submodule_paths)
+            ]
+
+            return filtered_files
         except GitCommandError as e:
             print(f"Error listing tracked files: {e}")
             return []

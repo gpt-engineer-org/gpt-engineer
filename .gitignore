@@ -95,10 +95,6 @@ gpt_engineer/benchmark/benchmarks/mbpp/dataset
 
 prompt
 
-
-.feature
-.task
-
 gpt_engineer/benchmark/minimal_bench_config.toml
 
 test.json

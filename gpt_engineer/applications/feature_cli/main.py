@@ -7,7 +7,6 @@ from gpt_engineer.applications.feature_cli.agents.feature_agent import (
 )
 from gpt_engineer.applications.feature_cli.agents.chat_agent import ChatAgent
 from gpt_engineer.applications.feature_cli.feature import Feature
-from gpt_engineer.applications.feature_cli.task import Task
 from gpt_engineer.applications.feature_cli.repository import Repository
 from gpt_engineer.applications.feature_cli.domain import Settings
 from gpt_engineer.applications.feature_cli.file_selection import FileSelector

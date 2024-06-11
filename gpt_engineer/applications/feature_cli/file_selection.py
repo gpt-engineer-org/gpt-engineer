@@ -8,12 +8,12 @@ from pathlib import Path
 from gpt_engineer.core.default.paths import memory_path
 from gpt_engineer.core.ai import AI
 
-from gpt_engineer.applications.interactive_cli_loop.repository import Repository
-from gpt_engineer.applications.interactive_cli_loop.files import Files
-from gpt_engineer.applications.interactive_cli_loop.generation_tools import (
+from gpt_engineer.applications.feature_cli.repository import Repository
+from gpt_engineer.applications.feature_cli.files import Files
+from gpt_engineer.applications.feature_cli.generation_tools import (
     fuzzy_parse_file_selection,
 )
-from gpt_engineer.applications.interactive_cli_loop.domain import FileSelection
+from gpt_engineer.applications.feature_cli.domain import FileSelection
 
 
 def paths_to_tree(paths):
@@ -159,7 +159,7 @@ class FileSelector:
         self.project_path = project_path
         self.ai = AI("gpt-4o", temperature=0)
         self.repository = repository
-        self.yaml_path = Path(memory_path(project_path)) / "files.yml"
+        self.yaml_path = Path(project_path) / ".feature" / "files.yml"
 
         if os.path.exists(self.yaml_path):
             return
