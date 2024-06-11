@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gpt-engineer"
-version = "0.3.0"
+version = "0.3.1"
 description = "Specify what you want it to build, the AI asks for clarification, and then builds it."
 authors = ["Anton Osika <anton.osika@gmail.com>"]
 license = "MIT"
@@ -38,6 +38,7 @@ pillow = "^10.2.0"
 datasets = "^2.17.1"
 black = "23.3.0"
 gitpython = "^3.0.0"
+langchain-community = "^0.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.3.1"
@@ -73,7 +74,21 @@ gpte_test_application = 'tests.caching_main:app'
 
 [tool.poetry.extras]
 test = ["pytest", "pytest-cov"]
-doc = ["autodoc_pydantic", "myst_parser", "nbsphinx", "sphinx", "sphinx-autobuild", "sphinx_book_theme", "sphinx_rtd_theme", "sphinx-typlog-theme", "myst-nb", "linkchecker", "sphinx-copybutton", "markdown-include", "sphinx_copybutton"]
+doc = [
+  "autodoc_pydantic",
+  "myst_parser",
+  "nbsphinx",
+  "sphinx",
+  "sphinx-autobuild",
+  "sphinx_book_theme",
+  "sphinx_rtd_theme",
+  "sphinx-typlog-theme",
+  "myst-nb",
+  "linkchecker",
+  "sphinx-copybutton",
+  "markdown-include",
+  "sphinx_copybutton",
+]
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
@@ -89,11 +104,11 @@ target-version = ["py310"]
 known-first-party = []
 known-third-party = []
 section-order = [
-    "future",
-    "standard-library",
-    "third-party",
-    "first-party",
-    "local-folder",
+  "future",
+  "standard-library",
+  "third-party",
+  "first-party",
+  "local-folder",
 ]
 combine-as-imports = true
 split-on-trailing-comma = false
@@ -101,5 +116,5 @@ lines-between-types = 1
 
 [tool.pytest.ini_options]
 markers = [
-    "requires_key: marks tests as requiring access to a valid OPENAI_API_KEY (deselect with '-m \"not requires_key\"')",
+  "requires_key: marks tests as requiring access to a valid OPENAI_API_KEY (deselect with '-m \"not requires_key\"')",
 ]
