@@ -2,15 +2,15 @@ import typer
 from dotenv import load_dotenv
 
 
-from gpt_engineer.applications.interactive_cli.agents.feature_agent import (
+from gpt_engineer.applications.feature_cli.agents.feature_agent import (
     FeatureAgent,
 )
-from gpt_engineer.applications.interactive_cli.agents.chat_agent import ChatAgent
-from gpt_engineer.applications.interactive_cli.feature import Feature
-from gpt_engineer.applications.interactive_cli.task import Task
-from gpt_engineer.applications.interactive_cli.repository import Repository
-from gpt_engineer.applications.interactive_cli.domain import Settings
-from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
+from gpt_engineer.applications.feature_cli.agents.chat_agent import ChatAgent
+from gpt_engineer.applications.feature_cli.feature import Feature
+from gpt_engineer.applications.feature_cli.task import Task
+from gpt_engineer.applications.feature_cli.repository import Repository
+from gpt_engineer.applications.feature_cli.domain import Settings
+from gpt_engineer.applications.feature_cli.file_selection import FileSelector
 
 
 from gpt_engineer.core.ai import AI

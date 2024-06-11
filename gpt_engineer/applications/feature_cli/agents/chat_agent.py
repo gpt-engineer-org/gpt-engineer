@@ -1,13 +1,13 @@
 from gpt_engineer.core.ai import AI, HumanMessage, SystemMessage
 
-from gpt_engineer.applications.interactive_cli.feature import Feature
-from gpt_engineer.applications.interactive_cli.repository import Repository
-from gpt_engineer.applications.interactive_cli.files import Files
-from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
-from gpt_engineer.applications.interactive_cli.agents.agent_steps import (
+from gpt_engineer.applications.feature_cli.feature import Feature
+from gpt_engineer.applications.feature_cli.repository import Repository
+from gpt_engineer.applications.feature_cli.files import Files
+from gpt_engineer.applications.feature_cli.file_selection import FileSelector
+from gpt_engineer.applications.feature_cli.agents.agent_steps import (
     update_user_file_selection,
 )
-from gpt_engineer.applications.interactive_cli.generation_tools import (
+from gpt_engineer.applications.feature_cli.generation_tools import (
     build_files_context_string,
 )
 

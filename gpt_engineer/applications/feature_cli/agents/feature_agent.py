@@ -1,7 +1,7 @@
-from gpt_engineer.applications.interactive_cli.feature import Feature
-from gpt_engineer.applications.interactive_cli.repository import Repository
-from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
-from gpt_engineer.applications.interactive_cli.agents.agent_steps import (
+from gpt_engineer.applications.feature_cli.feature import Feature
+from gpt_engineer.applications.feature_cli.repository import Repository
+from gpt_engineer.applications.feature_cli.file_selection import FileSelector
+from gpt_engineer.applications.feature_cli.agents.agent_steps import (
     initialize_new_feature,
     update_user_file_selection,
     print_feature_state,

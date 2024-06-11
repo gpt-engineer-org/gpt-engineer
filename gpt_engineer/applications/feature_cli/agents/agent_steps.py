@@ -1,10 +1,10 @@
-from gpt_engineer.applications.interactive_cli.feature import Feature
-from gpt_engineer.applications.interactive_cli.file_selection import FileSelector
-from gpt_engineer.applications.interactive_cli.repository import (
+from gpt_engineer.applications.feature_cli.feature import Feature
+from gpt_engineer.applications.feature_cli.file_selection import FileSelector
+from gpt_engineer.applications.feature_cli.repository import (
     Repository,
     GitContext,
 )
-from gpt_engineer.applications.interactive_cli.generation_tools import (
+from gpt_engineer.applications.feature_cli.generation_tools import (
     generate_branch_name,
     build_feature_context_string,
     generate_suggested_tasks,
