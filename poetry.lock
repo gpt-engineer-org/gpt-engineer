@@ -148,19 +148,20 @@ files = [
 
 [[package]]
 name = "anthropic"
-version = "0.25.6"
+version = "0.26.1"
 description = "The official Python library for the anthropic API"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "anthropic-0.25.6-py3-none-any.whl", hash = "sha256:c4736402953c99b643ac452306ff0d33bdd2368a793d5c61fdcecd3331a0a103"},
-    {file = "anthropic-0.25.6.tar.gz", hash = "sha256:4c93ed9bd8fd5774992314b66de7e90fdefb39fbf6fd641d31d7e6046145122b"},
+    {file = "anthropic-0.26.1-py3-none-any.whl", hash = "sha256:2812b9b250b551ed8a1f0a7e6ae3f005654098994f45ebca5b5808bd154c9628"},
+    {file = "anthropic-0.26.1.tar.gz", hash = "sha256:26680ff781a6f678a30a1dccd0743631e602b23a47719439ffdef5335fa167d8"},
 ]
 
 [package.dependencies]
 anyio = ">=3.5.0,<5"
 distro = ">=1.7.0,<2"
 httpx = ">=0.23.0,<1"
+jiter = ">=0.1.0,<1"
 pydantic = ">=1.9.0,<3"
 sniffio = "*"
 tokenizers = ">=0.13.0"
@@ -1417,6 +1418,76 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "jiter"
+version = "0.4.0"
+description = "Fast iterable JSON parser."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "jiter-0.4.0-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:4aa6226d82a4a4505078c0bd5947bad65399635fc5cd4b226512e41753624edf"},
+    {file = "jiter-0.4.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:947111ac906740a948e7b63799481acd3d5ef666ccb178d146e25718640b7408"},
+    {file = "jiter-0.4.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:69572ffb4e84ae289a7422b9af4ea123cae2ce0772228859b37d4b26b4bc92ea"},
+    {file = "jiter-0.4.0-cp310-cp310-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:ba6046cbb5d1baa5a781b846f7e5438596a332f249a857d63f86ef5d1d9563b0"},
+    {file = "jiter-0.4.0-cp310-cp310-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:d4f346e54602782e66d07df0d1c7389384fd93680052ed6170da2c6dc758409e"},
+    {file = "jiter-0.4.0-cp310-cp310-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:49110ce693f07e97d61089d894cea05a0b9894d5ccc6ac6fc583028726c8c8af"},
+    {file = "jiter-0.4.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2e358df6fd129f3a4e087539f086355ad0107e5da16dbc8bc857d94222eaeed5"},
+    {file = "jiter-0.4.0-cp310-cp310-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:7eb852ca39a48f3c049def56f0d1771b32e948e4f429a782d14ef4cc64cfd26e"},
+    {file = "jiter-0.4.0-cp310-cp310-musllinux_1_1_aarch64.whl", hash = "sha256:44dc045decb2545bffe2da04ea4c36d9438d3f3d49fc47ed423ea75c352b712e"},
+    {file = "jiter-0.4.0-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:413adb15372ac63db04373240f40925788e4282c997eeafc2040530049a0a599"},
+    {file = "jiter-0.4.0-cp310-none-win32.whl", hash = "sha256:0b48ea71673a97b897e4b94bbc871e62495a5a85f836c9f90712a4c70aa3ef7e"},
+    {file = "jiter-0.4.0-cp310-none-win_amd64.whl", hash = "sha256:6a1c84b44afafaf0ba6223679cf17af664b889da14da31d8af3595fd977d96fa"},
+    {file = "jiter-0.4.0-cp311-cp311-macosx_10_12_x86_64.whl", hash = "sha256:b2cc498345fa37ca23fbc20271a553aa46e6eb00924600f49b7dc4b2aa8952ee"},
+    {file = "jiter-0.4.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:69f7221ac09ab421abf04f89942026868297c568133998fb181bcf435760cbf3"},
+    {file = "jiter-0.4.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ef7d01c52f3e5a56ae73af36bd13797dd1a56711eb522748e5e84d15425b3f10"},
+    {file = "jiter-0.4.0-cp311-cp311-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:39be97d5ce0c4d0dae28c23c03a0af0501a725589427e99763f99c42e18aa402"},
+    {file = "jiter-0.4.0-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:eac2ed1ec1e577b92b7ea2d4e6de8aec0c1164defd8af8affdc8ec0f0ec2904a"},
+    {file = "jiter-0.4.0-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:6258837d184c92c9cb91c983c310ad7269d41afb49d34f00ca9246e073943a03"},
+    {file = "jiter-0.4.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:123c2a77b066bf17a4d021e238e8351058cfa56b90ac04f2522d120dc64ea055"},
+    {file = "jiter-0.4.0-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:2df939f792c7a40e55f36700417db551b9f6b84d348990fa0f2c608adeb1f11b"},
+    {file = "jiter-0.4.0-cp311-cp311-musllinux_1_1_aarch64.whl", hash = "sha256:cb1b09b16d40cf9ba1d11ba11e5b96ad29286a6a1c4ad5e6a2aef5e352a89f5d"},
+    {file = "jiter-0.4.0-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:0efb4208889ebdbf933bf08dbcbc16e64ffd34c8e2b28044ee142789a9dc3a67"},
+    {file = "jiter-0.4.0-cp311-none-win32.whl", hash = "sha256:20545ac1b68e7e5b066a1e8347840c9cebdd02ace65faae2e655fc02ec5c915c"},
+    {file = "jiter-0.4.0-cp311-none-win_amd64.whl", hash = "sha256:6b300f9887c8e4431cd03a974ea3e4f9958885636003c3864220a9b2d2f8462b"},
+    {file = "jiter-0.4.0-cp312-cp312-macosx_10_12_x86_64.whl", hash = "sha256:923432a0563bbae404ff25bb010e348514a69bfab979f2f8119b23b625dbf6d9"},
+    {file = "jiter-0.4.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:ab8bb0ec8b97cec4422dc8b37b525442d969244488c805b834609ab0ccd788e2"},
+    {file = "jiter-0.4.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:b857adb127b9c533907226791eafa79c5038c3eb5a477984994bf7c4715ba518"},
+    {file = "jiter-0.4.0-cp312-cp312-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:2609cc0d1d8d470e921ff9a604afeb4c701bbe13e00bd9834d5aa6e7ea732a9b"},
+    {file = "jiter-0.4.0-cp312-cp312-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:d39e99f8b7df46a119b6f84321f6ba01f16fa46abfa765d44c05c486d8e66829"},
+    {file = "jiter-0.4.0-cp312-cp312-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:56de8b518ebfe76a70f856741f6de248ce396c50a87acef827b6e8388e3a502d"},
+    {file = "jiter-0.4.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:488b7e777be47f67ce1a1f8f8eb907f9bbd81af5c03784a9bab09d025c250233"},
+    {file = "jiter-0.4.0-cp312-cp312-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:7ea35e0ecbb5dadd457855eb980dcc548c14cf5341bcd22a43814cb56f2bcc79"},
+    {file = "jiter-0.4.0-cp312-cp312-musllinux_1_1_aarch64.whl", hash = "sha256:e1a9e9ee69c80b63951c93226b68d0e955953f64fe758bad2afe7ef7f9016af9"},
+    {file = "jiter-0.4.0-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:78e2f3cc2a32a21d43ccc5afcf66f5d17e827ccc4e6d21c0b353bdad2c7dcc9c"},
+    {file = "jiter-0.4.0-cp312-none-win32.whl", hash = "sha256:eeaa7a2b47a99f4ebbb4142bb58b95617e09f24c87570f6a57d2770687c9ddbe"},
+    {file = "jiter-0.4.0-cp312-none-win_amd64.whl", hash = "sha256:8d4a78b385b93ff59a67215d26000fcb4789a388fca3730d1b60fab17fc81e3c"},
+    {file = "jiter-0.4.0-cp38-cp38-macosx_10_12_x86_64.whl", hash = "sha256:ebf20a3fac1089ce26963bf04140da0f803d55332ec69d59c5a87cf1a87d29c4"},
+    {file = "jiter-0.4.0-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:d62244ffc6a168187452277adeefb7b2c30170689c6bf543a51e98e8c17ddab7"},
+    {file = "jiter-0.4.0-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:40b2cde77446a41cec595739fd168be87edff2428eaf7c3438231224dd0ab7a5"},
+    {file = "jiter-0.4.0-cp38-cp38-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:e51fc0a22021ec8905b9b00a2f7d25756f2ff7a653e35a790a2067ae126b51f6"},
+    {file = "jiter-0.4.0-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:a56e6f980b89d7cfe5c43811dcf52d6f37b319428a4540511235dafda9ea7808"},
+    {file = "jiter-0.4.0-cp38-cp38-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:f0fec16adab8d3d3d6d74e3711a1f380836ebeab2a20e3f88cfe2ec5094d8b84"},
+    {file = "jiter-0.4.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:19e3de515801c954e8f1dc1f575282a4a86df9e782d4993ea1ed2be9a8dedaa0"},
+    {file = "jiter-0.4.0-cp38-cp38-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:17e0ad8abf0bb04d81810eaeaab35d2c99b5da11fcd1058e0a389607ff6503b0"},
+    {file = "jiter-0.4.0-cp38-cp38-musllinux_1_1_aarch64.whl", hash = "sha256:8dc0132b728f3b3e90ff0d1874504cd49c78f3553bf3745168a7fc0b4cf674e1"},
+    {file = "jiter-0.4.0-cp38-cp38-musllinux_1_1_x86_64.whl", hash = "sha256:81a883104aa96e494d3d28eaf7070780d03ecee8ccfdfaf7e4899710340c47f1"},
+    {file = "jiter-0.4.0-cp38-none-win32.whl", hash = "sha256:a044c53ab1aaa4af624ac9574181b5bad8e260aea7e03104738156511433deba"},
+    {file = "jiter-0.4.0-cp38-none-win_amd64.whl", hash = "sha256:d920035c869053e3d9a0b3ff94384d16a8ef5fde3dea55f97bd29916f6e27554"},
+    {file = "jiter-0.4.0-cp39-cp39-macosx_10_12_x86_64.whl", hash = "sha256:091e978f4e586a2f1c69bf940d45f4e6a23455877172a0ab7d6de04a3b119299"},
+    {file = "jiter-0.4.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:79134b2d601309bcbe3304a262d7d228ad61d53c80883231c637773000a6d683"},
+    {file = "jiter-0.4.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c471473e0b05058b5d729ff04271b6d45a575ac8bd9948563268c734b380ac7e"},
+    {file = "jiter-0.4.0-cp39-cp39-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:bb84b8930da8b32b0b1fdff9817e2c4b47e8981b5647ad11c4975403416e4112"},
+    {file = "jiter-0.4.0-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:7f2805e28941751ebfe0948596a64cde4cfb9b84bea5282affd020063e659c96"},
+    {file = "jiter-0.4.0-cp39-cp39-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:42ef59f9e513bf081a8b5c5578933ea9c3a63e559e6e3501a3e72edcd456ff5e"},
+    {file = "jiter-0.4.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3ae12e3906f9e565120ab569de261b738e3a1ec50c40e30c67499e4f893e9a8c"},
+    {file = "jiter-0.4.0-cp39-cp39-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:264dc1324f45a793bc89af4f653225229eb17bca9ec7107dce6c8fb4fe68d20f"},
+    {file = "jiter-0.4.0-cp39-cp39-musllinux_1_1_aarch64.whl", hash = "sha256:9a1c172ec47d846e25881dfbd52438ddb690da4ea04d185e477abd3db6c32f8a"},
+    {file = "jiter-0.4.0-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:ccde31d0bc114aedad0dbd71b7f63ba0f0eecd7ec9ae1926a0ca01c1eb2854e7"},
+    {file = "jiter-0.4.0-cp39-none-win32.whl", hash = "sha256:13139b05792fbc13a0f9a5b4c89823ea0874141decae1b8f693f12bb1d28e061"},
+    {file = "jiter-0.4.0-cp39-none-win_amd64.whl", hash = "sha256:3a729b2631c6d5551a41069697415fee9659c3eadc9ab87369376ba51930cd00"},
+    {file = "jiter-0.4.0.tar.gz", hash = "sha256:68203e02e0419bc3eca717c580c2d8f615aeee1150e2a1fb68d6600a7e52a37c"},
+]
+
+[[package]]
 name = "jsonpatch"
 version = "1.33"
 description = "Apply JSON-Patches (RFC 6902)"
@@ -1558,23 +1629,20 @@ files = [
 
 [[package]]
 name = "langchain"
-version = "0.1.17"
+version = "0.2.1"
 description = "Building applications with LLMs through composability"
 optional = false
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langchain-0.1.17-py3-none-any.whl", hash = "sha256:f6c5b5fdb529545e6cafbb4ba099031508e621ba1ed7985cf078a597ade3458b"},
-    {file = "langchain-0.1.17.tar.gz", hash = "sha256:709b80afa00ae634dfc7042f3e4c20309267b21ffeacc7d7494d58bcae1862f7"},
+    {file = "langchain-0.2.1-py3-none-any.whl", hash = "sha256:3e13bf97c5717bce2c281f5117e8778823e8ccf62d949e73d3869448962b1c97"},
+    {file = "langchain-0.2.1.tar.gz", hash = "sha256:5758a315e1ac92eb26dafec5ad0fafa03cafa686aba197d5bb0b1dd28cc03ebe"},
 ]
 
 [package.dependencies]
 aiohttp = ">=3.8.3,<4.0.0"
 async-timeout = {version = ">=4.0.0,<5.0.0", markers = "python_version < \"3.11\""}
-dataclasses-json = ">=0.5.7,<0.7"
-jsonpatch = ">=1.33,<2.0"
-langchain-community = ">=0.0.36,<0.1"
-langchain-core = ">=0.1.48,<0.2.0"
-langchain-text-splitters = ">=0.0.1,<0.1"
+langchain-core = ">=0.2.0,<0.3.0"
+langchain-text-splitters = ">=0.2.0,<0.3.0"
 langsmith = ">=0.1.17,<0.2.0"
 numpy = ">=1,<2"
 pydantic = ">=1,<3"
@@ -1590,44 +1658,45 @@ cli = ["typer (>=0.9.0,<0.10.0)"]
 cohere = ["cohere (>=4,<6)"]
 docarray = ["docarray[hnswlib] (>=0.32.0,<0.33.0)"]
 embeddings = ["sentence-transformers (>=2,<3)"]
-extended-testing = ["aiosqlite (>=0.19.0,<0.20.0)", "aleph-alpha-client (>=2.15.0,<3.0.0)", "anthropic (>=0.3.11,<0.4.0)", "arxiv (>=1.4,<2.0)", "assemblyai (>=0.17.0,<0.18.0)", "atlassian-python-api (>=3.36.0,<4.0.0)", "beautifulsoup4 (>=4,<5)", "bibtexparser (>=1.4.0,<2.0.0)", "cassio (>=0.1.0,<0.2.0)", "chardet (>=5.1.0,<6.0.0)", "cohere (>=4,<6)", "couchbase (>=4.1.9,<5.0.0)", "dashvector (>=1.0.1,<2.0.0)", "databricks-vectorsearch (>=0.21,<0.22)", "datasets (>=2.15.0,<3.0.0)", "dgml-utils (>=0.3.0,<0.4.0)", "esprima (>=4.0.1,<5.0.0)", "faiss-cpu (>=1,<2)", "feedparser (>=6.0.10,<7.0.0)", "fireworks-ai (>=0.9.0,<0.10.0)", "geopandas (>=0.13.1,<0.14.0)", "gitpython (>=3.1.32,<4.0.0)", "google-cloud-documentai (>=2.20.1,<3.0.0)", "gql (>=3.4.1,<4.0.0)", "hologres-vector (>=0.0.6,<0.0.7)", "html2text (>=2020.1.16,<2021.0.0)", "javelin-sdk (>=0.1.8,<0.2.0)", "jinja2 (>=3,<4)", "jq (>=1.4.1,<2.0.0)", "jsonschema (>1)", "langchain-openai (>=0.0.2,<0.1)", "lxml (>=4.9.3,<6.0)", "markdownify (>=0.11.6,<0.12.0)", "motor (>=3.3.1,<4.0.0)", "msal (>=1.25.0,<2.0.0)", "mwparserfromhell (>=0.6.4,<0.7.0)", "mwxml (>=0.3.3,<0.4.0)", "newspaper3k (>=0.2.8,<0.3.0)", "numexpr (>=2.8.6,<3.0.0)", "openai (<2)", "openapi-pydantic (>=0.3.2,<0.4.0)", "pandas (>=2.0.1,<3.0.0)", "pdfminer-six (>=20221105,<20221106)", "pgvector (>=0.1.6,<0.2.0)", "praw (>=7.7.1,<8.0.0)", "psychicapi (>=0.8.0,<0.9.0)", "py-trello (>=0.19.0,<0.20.0)", "pymupdf (>=1.22.3,<2.0.0)", "pypdf (>=3.4.0,<4.0.0)", "pypdfium2 (>=4.10.0,<5.0.0)", "pyspark (>=3.4.0,<4.0.0)", "rank-bm25 (>=0.2.2,<0.3.0)", "rapidfuzz (>=3.1.1,<4.0.0)", "rapidocr-onnxruntime (>=1.3.2,<2.0.0)", "rdflib (==7.0.0)", "requests-toolbelt (>=1.0.0,<2.0.0)", "rspace_client (>=2.5.0,<3.0.0)", "scikit-learn (>=1.2.2,<2.0.0)", "sqlite-vss (>=0.1.2,<0.2.0)", "streamlit (>=1.18.0,<2.0.0)", "sympy (>=1.12,<2.0)", "telethon (>=1.28.5,<2.0.0)", "timescale-vector (>=0.0.1,<0.0.2)", "tqdm (>=4.48.0)", "upstash-redis (>=0.15.0,<0.16.0)", "xata (>=1.0.0a7,<2.0.0)", "xmltodict (>=0.13.0,<0.14.0)"]
+extended-testing = ["aiosqlite (>=0.19.0,<0.20.0)", "aleph-alpha-client (>=2.15.0,<3.0.0)", "anthropic (>=0.3.11,<0.4.0)", "arxiv (>=1.4,<2.0)", "assemblyai (>=0.17.0,<0.18.0)", "atlassian-python-api (>=3.36.0,<4.0.0)", "beautifulsoup4 (>=4,<5)", "bibtexparser (>=1.4.0,<2.0.0)", "cassio (>=0.1.0,<0.2.0)", "chardet (>=5.1.0,<6.0.0)", "cohere (>=4,<6)", "couchbase (>=4.1.9,<5.0.0)", "dashvector (>=1.0.1,<2.0.0)", "databricks-vectorsearch (>=0.21,<0.22)", "datasets (>=2.15.0,<3.0.0)", "dgml-utils (>=0.3.0,<0.4.0)", "esprima (>=4.0.1,<5.0.0)", "faiss-cpu (>=1,<2)", "feedparser (>=6.0.10,<7.0.0)", "fireworks-ai (>=0.9.0,<0.10.0)", "geopandas (>=0.13.1,<0.14.0)", "gitpython (>=3.1.32,<4.0.0)", "google-cloud-documentai (>=2.20.1,<3.0.0)", "gql (>=3.4.1,<4.0.0)", "hologres-vector (>=0.0.6,<0.0.7)", "html2text (>=2020.1.16,<2021.0.0)", "javelin-sdk (>=0.1.8,<0.2.0)", "jinja2 (>=3,<4)", "jq (>=1.4.1,<2.0.0)", "jsonschema (>1)", "langchain-openai (>=0.1,<0.2)", "lxml (>=4.9.3,<6.0)", "markdownify (>=0.11.6,<0.12.0)", "motor (>=3.3.1,<4.0.0)", "msal (>=1.25.0,<2.0.0)", "mwparserfromhell (>=0.6.4,<0.7.0)", "mwxml (>=0.3.3,<0.4.0)", "newspaper3k (>=0.2.8,<0.3.0)", "numexpr (>=2.8.6,<3.0.0)", "openai (<2)", "openapi-pydantic (>=0.3.2,<0.4.0)", "pandas (>=2.0.1,<3.0.0)", "pdfminer-six (>=20221105,<20221106)", "pgvector (>=0.1.6,<0.2.0)", "praw (>=7.7.1,<8.0.0)", "psychicapi (>=0.8.0,<0.9.0)", "py-trello (>=0.19.0,<0.20.0)", "pymupdf (>=1.22.3,<2.0.0)", "pypdf (>=3.4.0,<4.0.0)", "pypdfium2 (>=4.10.0,<5.0.0)", "pyspark (>=3.4.0,<4.0.0)", "rank-bm25 (>=0.2.2,<0.3.0)", "rapidfuzz (>=3.1.1,<4.0.0)", "rapidocr-onnxruntime (>=1.3.2,<2.0.0)", "rdflib (==7.0.0)", "requests-toolbelt (>=1.0.0,<2.0.0)", "rspace_client (>=2.5.0,<3.0.0)", "scikit-learn (>=1.2.2,<2.0.0)", "sqlite-vss (>=0.1.2,<0.2.0)", "streamlit (>=1.18.0,<2.0.0)", "sympy (>=1.12,<2.0)", "telethon (>=1.28.5,<2.0.0)", "timescale-vector (>=0.0.1,<0.0.2)", "tqdm (>=4.48.0)", "upstash-redis (>=0.15.0,<0.16.0)", "xata (>=1.0.0a7,<2.0.0)", "xmltodict (>=0.13.0,<0.14.0)"]
 javascript = ["esprima (>=4.0.1,<5.0.0)"]
 llms = ["clarifai (>=9.1.0)", "cohere (>=4,<6)", "huggingface_hub (>=0,<1)", "manifest-ml (>=0.0.1,<0.0.2)", "nlpcloud (>=1,<2)", "openai (<2)", "openlm (>=0.0.5,<0.0.6)", "torch (>=1,<3)", "transformers (>=4,<5)"]
-openai = ["openai (<2)", "tiktoken (>=0.3.2,<0.6.0)"]
+openai = ["openai (<2)", "tiktoken (>=0.7,<1.0)"]
 qdrant = ["qdrant-client (>=1.3.1,<2.0.0)"]
 text-helpers = ["chardet (>=5.1.0,<6.0.0)"]
 
 [[package]]
 name = "langchain-anthropic"
-version = "0.1.11"
+version = "0.1.13"
 description = "An integration package connecting AnthropicMessages and LangChain"
 optional = false
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langchain_anthropic-0.1.11-py3-none-any.whl", hash = "sha256:21a9b72e14292f5f97d8a21ae1b3d799ff4d541fadc327deb7df62f1c96513a1"},
-    {file = "langchain_anthropic-0.1.11.tar.gz", hash = "sha256:b00e01cb22dbfd6a111f2c713f0a056770ae6fb677c9271998d0e360e25c3d12"},
+    {file = "langchain_anthropic-0.1.13-py3-none-any.whl", hash = "sha256:121f6f480da7685c239573d98322adb94fe486d40651ac341637f65da36881de"},
+    {file = "langchain_anthropic-0.1.13.tar.gz", hash = "sha256:32e7ac51e1874c47e1a20493e75f5bfc88b0ffeaf5f1aed6091547e1ae44bb85"},
 ]
 
 [package.dependencies]
-anthropic = ">=0.23.0,<1"
+anthropic = ">=0.26.0,<1"
 defusedxml = ">=0.7.1,<0.8.0"
-langchain-core = ">=0.1.43,<0.2.0"
+langchain-core = ">=0.1.43,<0.3"
 
 [[package]]
 name = "langchain-community"
-version = "0.0.36"
+version = "0.2.1"
 description = "Community contributed LangChain integrations."
 optional = false
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langchain_community-0.0.36-py3-none-any.whl", hash = "sha256:439ae85e01d852ba8388923d8e2a71121efdc2eea3dc1ce27d28741189f1ea75"},
-    {file = "langchain_community-0.0.36.tar.gz", hash = "sha256:97be9d00cf119c961e03ed226e04e670f51b5d42f5b05ffc3518598fa6d20c74"},
+    {file = "langchain_community-0.2.1-py3-none-any.whl", hash = "sha256:b834e2c5ded6903b839fcaf566eee90a0ffae53405a0f7748202725e701d39cd"},
+    {file = "langchain_community-0.2.1.tar.gz", hash = "sha256:079942e8f15da975769ccaae19042b7bba5481c42020bbbd7d8cad73a9393261"},
 ]
 
 [package.dependencies]
 aiohttp = ">=3.8.3,<4.0.0"
 dataclasses-json = ">=0.5.7,<0.7"
-langchain-core = ">=0.1.48,<0.2.0"
+langchain = ">=0.2.0,<0.3.0"
+langchain-core = ">=0.2.0,<0.3.0"
 langsmith = ">=0.1.0,<0.2.0"
 numpy = ">=1,<2"
 PyYAML = ">=5.3"
@@ -1637,17 +1706,17 @@ tenacity = ">=8.1.0,<9.0.0"
 
 [package.extras]
 cli = ["typer (>=0.9.0,<0.10.0)"]
-extended-testing = ["aiosqlite (>=0.19.0,<0.20.0)", "aleph-alpha-client (>=2.15.0,<3.0.0)", "anthropic (>=0.3.11,<0.4.0)", "arxiv (>=1.4,<2.0)", "assemblyai (>=0.17.0,<0.18.0)", "atlassian-python-api (>=3.36.0,<4.0.0)", "azure-ai-documentintelligence (>=1.0.0b1,<2.0.0)", "azure-identity (>=1.15.0,<2.0.0)", "azure-search-documents (==11.4.0)", "beautifulsoup4 (>=4,<5)", "bibtexparser (>=1.4.0,<2.0.0)", "cassio (>=0.1.6,<0.2.0)", "chardet (>=5.1.0,<6.0.0)", "cloudpickle (>=2.0.0)", "cohere (>=4,<5)", "databricks-vectorsearch (>=0.21,<0.22)", "datasets (>=2.15.0,<3.0.0)", "dgml-utils (>=0.3.0,<0.4.0)", "elasticsearch (>=8.12.0,<9.0.0)", "esprima (>=4.0.1,<5.0.0)", "faiss-cpu (>=1,<2)", "feedparser (>=6.0.10,<7.0.0)", "fireworks-ai (>=0.9.0,<0.10.0)", "friendli-client (>=1.2.4,<2.0.0)", "geopandas (>=0.13.1,<0.14.0)", "gitpython (>=3.1.32,<4.0.0)", "google-cloud-documentai (>=2.20.1,<3.0.0)", "gql (>=3.4.1,<4.0.0)", "gradientai (>=1.4.0,<2.0.0)", "hdbcli (>=2.19.21,<3.0.0)", "hologres-vector (>=0.0.6,<0.0.7)", "html2text (>=2020.1.16,<2021.0.0)", "httpx (>=0.24.1,<0.25.0)", "httpx-sse (>=0.4.0,<0.5.0)", "javelin-sdk (>=0.1.8,<0.2.0)", "jinja2 (>=3,<4)", "jq (>=1.4.1,<2.0.0)", "jsonschema (>1)", "lxml (>=4.9.3,<6.0)", "markdownify (>=0.11.6,<0.12.0)", "motor (>=3.3.1,<4.0.0)", "msal (>=1.25.0,<2.0.0)", "mwparserfromhell (>=0.6.4,<0.7.0)", "mwxml (>=0.3.3,<0.4.0)", "newspaper3k (>=0.2.8,<0.3.0)", "numexpr (>=2.8.6,<3.0.0)", "nvidia-riva-client (>=2.14.0,<3.0.0)", "oci (>=2.119.1,<3.0.0)", "openai (<2)", "openapi-pydantic (>=0.3.2,<0.4.0)", "oracle-ads (>=2.9.1,<3.0.0)", "pandas (>=2.0.1,<3.0.0)", "pdfminer-six (>=20221105,<20221106)", "pgvector (>=0.1.6,<0.2.0)", "praw (>=7.7.1,<8.0.0)", "premai (>=0.3.25,<0.4.0)", "psychicapi (>=0.8.0,<0.9.0)", "py-trello (>=0.19.0,<0.20.0)", "pyjwt (>=2.8.0,<3.0.0)", "pymupdf (>=1.22.3,<2.0.0)", "pypdf (>=3.4.0,<4.0.0)", "pypdfium2 (>=4.10.0,<5.0.0)", "pyspark (>=3.4.0,<4.0.0)", "rank-bm25 (>=0.2.2,<0.3.0)", "rapidfuzz (>=3.1.1,<4.0.0)", "rapidocr-onnxruntime (>=1.3.2,<2.0.0)", "rdflib (==7.0.0)", "requests-toolbelt (>=1.0.0,<2.0.0)", "rspace_client (>=2.5.0,<3.0.0)", "scikit-learn (>=1.2.2,<2.0.0)", "sqlite-vss (>=0.1.2,<0.2.0)", "streamlit (>=1.18.0,<2.0.0)", "sympy (>=1.12,<2.0)", "telethon (>=1.28.5,<2.0.0)", "tidb-vector (>=0.0.3,<1.0.0)", "timescale-vector (>=0.0.1,<0.0.2)", "tqdm (>=4.48.0)", "tree-sitter (>=0.20.2,<0.21.0)", "tree-sitter-languages (>=1.8.0,<2.0.0)", "upstash-redis (>=0.15.0,<0.16.0)", "vdms (>=0.0.20,<0.0.21)", "xata (>=1.0.0a7,<2.0.0)", "xmltodict (>=0.13.0,<0.14.0)"]
+extended-testing = ["aiosqlite (>=0.19.0,<0.20.0)", "aleph-alpha-client (>=2.15.0,<3.0.0)", "anthropic (>=0.3.11,<0.4.0)", "arxiv (>=1.4,<2.0)", "assemblyai (>=0.17.0,<0.18.0)", "atlassian-python-api (>=3.36.0,<4.0.0)", "azure-ai-documentintelligence (>=1.0.0b1,<2.0.0)", "azure-identity (>=1.15.0,<2.0.0)", "azure-search-documents (==11.4.0)", "beautifulsoup4 (>=4,<5)", "bibtexparser (>=1.4.0,<2.0.0)", "cassio (>=0.1.6,<0.2.0)", "chardet (>=5.1.0,<6.0.0)", "cloudpathlib (>=0.18,<0.19)", "cloudpickle (>=2.0.0)", "cohere (>=4,<5)", "databricks-vectorsearch (>=0.21,<0.22)", "datasets (>=2.15.0,<3.0.0)", "dgml-utils (>=0.3.0,<0.4.0)", "elasticsearch (>=8.12.0,<9.0.0)", "esprima (>=4.0.1,<5.0.0)", "faiss-cpu (>=1,<2)", "feedparser (>=6.0.10,<7.0.0)", "fireworks-ai (>=0.9.0,<0.10.0)", "friendli-client (>=1.2.4,<2.0.0)", "geopandas (>=0.13.1,<0.14.0)", "gitpython (>=3.1.32,<4.0.0)", "google-cloud-documentai (>=2.20.1,<3.0.0)", "gql (>=3.4.1,<4.0.0)", "gradientai (>=1.4.0,<2.0.0)", "hdbcli (>=2.19.21,<3.0.0)", "hologres-vector (>=0.0.6,<0.0.7)", "html2text (>=2020.1.16,<2021.0.0)", "httpx (>=0.24.1,<0.25.0)", "httpx-sse (>=0.4.0,<0.5.0)", "javelin-sdk (>=0.1.8,<0.2.0)", "jinja2 (>=3,<4)", "jq (>=1.4.1,<2.0.0)", "jsonschema (>1)", "lxml (>=4.9.3,<6.0)", "markdownify (>=0.11.6,<0.12.0)", "motor (>=3.3.1,<4.0.0)", "msal (>=1.25.0,<2.0.0)", "mwparserfromhell (>=0.6.4,<0.7.0)", "mwxml (>=0.3.3,<0.4.0)", "newspaper3k (>=0.2.8,<0.3.0)", "numexpr (>=2.8.6,<3.0.0)", "nvidia-riva-client (>=2.14.0,<3.0.0)", "oci (>=2.119.1,<3.0.0)", "openai (<2)", "openapi-pydantic (>=0.3.2,<0.4.0)", "oracle-ads (>=2.9.1,<3.0.0)", "oracledb (>=2.2.0,<3.0.0)", "pandas (>=2.0.1,<3.0.0)", "pdfminer-six (>=20221105,<20221106)", "pgvector (>=0.1.6,<0.2.0)", "praw (>=7.7.1,<8.0.0)", "premai (>=0.3.25,<0.4.0)", "psychicapi (>=0.8.0,<0.9.0)", "py-trello (>=0.19.0,<0.20.0)", "pyjwt (>=2.8.0,<3.0.0)", "pymupdf (>=1.22.3,<2.0.0)", "pypdf (>=3.4.0,<4.0.0)", "pypdfium2 (>=4.10.0,<5.0.0)", "pyspark (>=3.4.0,<4.0.0)", "rank-bm25 (>=0.2.2,<0.3.0)", "rapidfuzz (>=3.1.1,<4.0.0)", "rapidocr-onnxruntime (>=1.3.2,<2.0.0)", "rdflib (==7.0.0)", "requests-toolbelt (>=1.0.0,<2.0.0)", "rspace_client (>=2.5.0,<3.0.0)", "scikit-learn (>=1.2.2,<2.0.0)", "sqlite-vss (>=0.1.2,<0.2.0)", "streamlit (>=1.18.0,<2.0.0)", "sympy (>=1.12,<2.0)", "telethon (>=1.28.5,<2.0.0)", "tidb-vector (>=0.0.3,<1.0.0)", "timescale-vector (>=0.0.1,<0.0.2)", "tqdm (>=4.48.0)", "tree-sitter (>=0.20.2,<0.21.0)", "tree-sitter-languages (>=1.8.0,<2.0.0)", "upstash-redis (>=0.15.0,<0.16.0)", "vdms (>=0.0.20,<0.0.21)", "xata (>=1.0.0a7,<2.0.0)", "xmltodict (>=0.13.0,<0.14.0)"]
 
 [[package]]
 name = "langchain-core"
-version = "0.1.49"
+version = "0.2.1"
 description = "Building applications with LLMs through composability"
 optional = false
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langchain_core-0.1.49-py3-none-any.whl", hash = "sha256:4250bfa1861f4c1df3c911b40a974be4df291e1e9057a673fff65895320fdc7d"},
-    {file = "langchain_core-0.1.49.tar.gz", hash = "sha256:04f1e9f25656b98f35d5de9336ea2d1becb576184929a11036c71127caf0dca8"},
+    {file = "langchain_core-0.2.1-py3-none-any.whl", hash = "sha256:3521e1e573988c47399fca9739270c5d34f8ecec147253ad829eb9ff288f76d5"},
+    {file = "langchain_core-0.2.1.tar.gz", hash = "sha256:49383126168d934559a543ce812c485048d9e6ac9b6798fbf3d4a72b6bba5b0c"},
 ]
 
 [package.dependencies]
@@ -1663,36 +1732,36 @@ extended-testing = ["jinja2 (>=3,<4)"]
 
 [[package]]
 name = "langchain-openai"
-version = "0.1.6"
+version = "0.1.7"
 description = "An integration package connecting OpenAI and LangChain"
 optional = false
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langchain_openai-0.1.6-py3-none-any.whl", hash = "sha256:7f62ecb12d3cdd0d96679abea00e4e3ceb1f829f6d1f127a5f7b97c1315d157f"},
-    {file = "langchain_openai-0.1.6.tar.gz", hash = "sha256:7d2e838e57ef231cb7689fd58ac5fa8a6e9e504174f8c5698c837739786e2030"},
+    {file = "langchain_openai-0.1.7-py3-none-any.whl", hash = "sha256:39c3cb22bb739900ae8294d4d9939a6138c0ca7ad11198e57038eb14c08d04ec"},
+    {file = "langchain_openai-0.1.7.tar.gz", hash = "sha256:fd7e1c33ba8e2cab4b2154f3a2fd4a0d9cc6518b41cf49bb87255f9f732a4896"},
 ]
 
 [package.dependencies]
-langchain-core = ">=0.1.46,<0.2.0"
+langchain-core = ">=0.1.46,<0.3"
 openai = ">=1.24.0,<2.0.0"
-tiktoken = ">=0.5.2,<1"
+tiktoken = ">=0.7,<1"
 
 [[package]]
 name = "langchain-text-splitters"
-version = "0.0.1"
+version = "0.2.0"
 description = "LangChain text splitting utilities"
 optional = false
-python-versions = ">=3.8.1,<4.0"
+python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langchain_text_splitters-0.0.1-py3-none-any.whl", hash = "sha256:f5b802f873f5ff6a8b9259ff34d53ed989666ef4e1582e6d1adb3b5520e3839a"},
-    {file = "langchain_text_splitters-0.0.1.tar.gz", hash = "sha256:ac459fa98799f5117ad5425a9330b21961321e30bc19a2a2f9f761ddadd62aa1"},
+    {file = "langchain_text_splitters-0.2.0-py3-none-any.whl", hash = "sha256:7b4c6a45f8471630a882b321e138329b6897102a5bc62f4c12be1c0b05bb9199"},
+    {file = "langchain_text_splitters-0.2.0.tar.gz", hash = "sha256:b32ab4f7397f7d42c1fa3283fefc2547ba356bd63a68ee9092865e5ad83c82f9"},
 ]
 
 [package.dependencies]
-langchain-core = ">=0.1.28,<0.2.0"
+langchain-core = ">=0.2.0,<0.3.0"
 
 [package.extras]
-extended-testing = ["lxml (>=5.1.0,<6.0.0)"]
+extended-testing = ["beautifulsoup4 (>=4.12.3,<5.0.0)", "lxml (>=4.9.3,<6.0)"]
 
 [[package]]
 name = "langsmith"
@@ -4933,4 +5002,4 @@ test = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "8eb7aea382c69eed248f86ef6a3ee85676fc7a31f930a216b6200310bed3ad8c"
+content-hash = "6db9c9a9b3e443012c0e99c38f18777d177a0d1ca5c91ee770c28ec84b1811c6"

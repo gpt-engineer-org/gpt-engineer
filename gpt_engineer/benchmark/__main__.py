@@ -21,20 +21,23 @@ __name__ : str
 """
 import importlib
 import os.path
+import sys
 
 from typing import Annotated, Optional
 
 import typer
 
-from langchain.cache import SQLiteCache
 from langchain.globals import set_llm_cache
+from langchain_community.cache import SQLiteCache
 
 from gpt_engineer.applications.cli.main import load_env_if_needed
 from gpt_engineer.benchmark.bench_config import BenchConfig
 from gpt_engineer.benchmark.benchmarks.load import get_benchmark
 from gpt_engineer.benchmark.run import export_yaml_results, print_results, run
 
-app = typer.Typer()  # creates a CLI app
+app = typer.Typer(
+    context_settings={"help_option_names": ["-h", "--help"]}
+)  # creates a CLI app
 
 
 def get_agent(path):
@@ -52,6 +55,7 @@ def get_agent(path):
         An instance of the imported default configuration agent.
     """
     # Dynamically import the python module at path
+    sys.path.append(os.path.dirname(path))
     agent_module = importlib.import_module(path.replace("/", ".").replace(".py", ""))
     return agent_module.default_config_agent()
 
@@ -79,8 +83,16 @@ def main(
         typer.Option(help="print results for each task", show_default=False),
     ] = None,
     verbose: Annotated[
-        bool, typer.Option(help="print results for each task", show_default=False)
+        Optional[bool],
+        typer.Option(help="print results for each task", show_default=False),
     ] = False,
+    use_cache: Annotated[
+        Optional[bool],
+        typer.Option(
+            help="Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.",
+            show_default=False,
+        ),
+    ] = True,
 ):
     """
     The main function that runs the specified benchmarks with the given agent and outputs the results to the console.
@@ -93,13 +105,16 @@ def main(
         Configuration file for choosing which benchmark problems to run. See default config for more details.
     yaml_output: Optional[str], default=None
         Pass a path to a yaml file to have results written to file.
-    verbose : bool, default=False
+    verbose : Optional[bool], default=False
         A flag to indicate whether to print results for each task.
+    use_cache : Optional[bool], default=True
+        Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.
     Returns
     -------
     None
     """
-    set_llm_cache(SQLiteCache(database_path=".langchain.db"))
+    if use_cache:
+        set_llm_cache(SQLiteCache(database_path=".langchain.db"))
     load_env_if_needed()
     config = BenchConfig.from_toml(bench_config)
     print("using config file: " + bench_config)
