@@ -28,7 +28,7 @@ For **development**:
 
 We actively support Python 3.10 - 3.12. The last version to support Python 3.8 - 3.9 was [0.2.6](https://pypi.org/project/gpt-engineer/0.2.6/).
 
-### Setup API Key
+### Setup API key
 
 Choose **one** of:
 - Export env variable (you can add this to .bashrc so that you don't have to do it each time you start the terminal)
@@ -52,11 +52,18 @@ Check the [Windows README](./WINDOWS_README.md) for Windows usage.
 - Run `gpte <project_dir>` with a relative path to your folder
   - For example: `gpte projects/my-new-project` from the gpt-engineer directory root with your new folder in `projects/`
 
-### Improve Existing Code
+### Improve existing code
 - Locate a folder with code which you want to improve anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions for how you want to improve the code
 - Run `gpte <project_dir> -i` with a relative path to your folder
   - For example: `gpte projects/my-old-project -i` from the gpt-engineer directory root with your folder in `projects/`
+
+### Benchmark custom agents
+- gpt-engineer installs the binary 'bench', which gives you a simple interface for benchmarking your own agent implementations against popular public datasets.
+- The easiest way to get started with benchmarking is by checking out the [template](https://github.com/gpt-engineer-org/gpte-bench-template) repo, which contains detailed instructions and an agent template.
+- Currently supported benchmark:
+  - [APPS](https://github.com/hendrycks/apps)
+  - [MBPP](https://github.com/google-research/google-research/tree/master/mbpp)
 
 By running gpt-engineer you agree to our [terms](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
