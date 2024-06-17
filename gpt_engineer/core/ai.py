@@ -346,7 +346,9 @@ class AI:
         if self.azure_endpoint:
             return AzureChatOpenAI(
                 azure_endpoint=self.azure_endpoint,
-                openai_api_version=os.getenv("OPENAI_API_VERSION", "2023-05-15"),
+                openai_api_version=os.getenv(
+                    "OPENAI_API_VERSION", "2024-05-01-preview"
+                ),
                 deployment_name=self.model_name,
                 openai_api_type="azure",
                 streaming=self.streaming,
