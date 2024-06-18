@@ -246,7 +246,7 @@ def get_system_info():
         "os_version": platform.version(),
         "architecture": platform.machine(),
         "python_version": sys.version,
-        "packages": format_installed_packages(get_installed_packages())
+        "packages": format_installed_packages(get_installed_packages()),
     }
     return system_info
 
