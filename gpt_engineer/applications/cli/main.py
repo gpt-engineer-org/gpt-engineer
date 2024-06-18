@@ -267,6 +267,7 @@ def get_installed_packages():
 def format_installed_packages(packages):
     return "\n".join([f"{name}: {version}" for name, version in packages.items()])
 
+
 @app.command(
     help="""
         GPT-engineer lets you:
