@@ -246,7 +246,7 @@ def get_system_info():
         "os_version": platform.version(),
         "architecture": platform.machine(),
         "python_version": sys.version,
-        "packages": get_installed_packages(),
+        "packages": format_installed_packages(get_installed_packages())
     }
     return system_info
 
@@ -263,6 +263,9 @@ def get_installed_packages():
     except Exception as e:
         return str(e)
 
+
+def format_installed_packages(packages):
+    return "\n".join([f"{name}: {version}" for name, version in packages.items()])
 
 @app.command(
     help="""
