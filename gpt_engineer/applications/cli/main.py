@@ -57,6 +57,7 @@ from gpt_engineer.core.default.steps import (
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.git import stage_uncommitted_to_git
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.project_config import Config
 from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
 
@@ -409,6 +410,11 @@ def main(
 
     path = Path(project_path)
     print("Running gpt-engineer in", path.absolute(), "\n")
+
+    # read the configuration file from the root directory
+    config = Config("config.toml")
+
+    # todo: apply configuration here
 
     prompt = load_prompt(
         DiskMemory(path),

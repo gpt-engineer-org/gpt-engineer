@@ -8,7 +8,7 @@ from pathlib import Path
 
 import tomlkit
 
-default_config_filename = "gpt-engineer.toml"
+default_config_filename = "config.toml"
 
 example_config = """
 [run]
@@ -38,22 +38,22 @@ class _PathsConfig:
 
 
 @dataclass
-class _RunConfig:
-    build: str | None = None
-    test: str | None = None
-    lint: str | None = None
-    format: str | None = None
+class _ApiConfig:
+    OPENAI_API_KEY: str | None = None
+    ANTHROPIC_API_KEY: str | None = None
 
 
 @dataclass
-class _OpenApiConfig:
-    url: str
+class _ModelConfig:
+    model_name: str | None = None
+    temperature: float | None = None
+    azure_endpoint: str | None = None
 
 
 @dataclass
-class _GptEngineerAppConfig:
-    project_id: str
-    openapi: list[_OpenApiConfig] | None = None
+class _ImproveConfig:
+    is_linting: bool | None = None
+    is_file_selection: bool | None = None
 
 
 def filter_none(d: dict) -> dict:
@@ -74,8 +74,9 @@ class Config:
     """Configuration for the GPT Engineer CLI and gptengineer.app via `gpt-engineer.toml`."""
 
     paths: _PathsConfig = field(default_factory=_PathsConfig)
-    run: _RunConfig = field(default_factory=_RunConfig)
-    gptengineer_app: _GptEngineerAppConfig | None = None
+    api_config: _ApiConfig = field(default_factory=_ApiConfig)
+    model_config: _ModelConfig = field(default_factory=_ModelConfig)
+    improve_config: _ImproveConfig = field(default_factory=_ImproveConfig)
 
     @classmethod
     def from_toml(cls, config_file: Path | str):
@@ -86,27 +87,17 @@ class Config:
 
     @classmethod
     def from_dict(cls, config_dict: dict):
-        run = _RunConfig(**config_dict.get("run", {}))
         paths = _PathsConfig(**config_dict.get("paths", {}))
+        api_config = _ApiConfig(**config_dict.get("api_config", {}))
+        model_config = _ModelConfig(**config_dict.get("model_config", {}))
+        improve_config = _ImproveConfig(**config_dict.get("improve_config", {}))
 
-        # load optional gptengineer-app section
-        gptengineer_app_dict = config_dict.get("gptengineer-app", {})
-        gptengineer_app = None
-        if gptengineer_app_dict:
-            assert (
-                "project_id" in gptengineer_app_dict
-            ), "project_id is required in gptengineer-app section"
-            gptengineer_app = _GptEngineerAppConfig(
-                # required if gptengineer-app section is present
-                project_id=gptengineer_app_dict["project_id"],
-                openapi=[
-                    _OpenApiConfig(**openapi)
-                    for openapi in gptengineer_app_dict.get("openapi", [])
-                ]
-                or None,
-            )
-
-        return cls(paths=paths, run=run, gptengineer_app=gptengineer_app)
+        return cls(
+            paths=paths,
+            api_config=api_config,
+            model_config=model_config,
+            improve_config=improve_config,
+        )
 
     def to_dict(self) -> dict:
         d = asdict(self)
