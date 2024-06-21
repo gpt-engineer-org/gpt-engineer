@@ -65,7 +65,7 @@ Check the [Windows README](./WINDOWS_README.md) for Windows usage.
   - [APPS](https://github.com/hendrycks/apps)
   - [MBPP](https://github.com/google-research/google-research/tree/master/mbpp)
 
-By running gpt-engineer you agree to our [terms](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/TERMS_OF_USE.md).
+By running gpt-engineer, you agree to our [terms](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
 
 ## Relation to gptengineer.app (GPT Engineer)
@@ -77,21 +77,21 @@ The gptengineer.app team is actively supporting the open source community.
 ## Features
 
 ### Pre Prompts
-You can specify the "identity" of the AI agent by overriding the `preprompts` folder, with your own version of the `preprompts`, using the `--use-custom-preprompts` argument.
+You can specify the "identity" of the AI agent by overriding the `preprompts` folder with your own version of the `preprompts`. You can do so via the `--use-custom-preprompts` argument.
 
 Editing the `preprompts` is how you make the agent remember things between projects.
 
 ### Vision
 
-By default, gpt-engineer expects text input via a `prompt` file. It can also accept imagine inputs for vision-capable models. This can be useful for adding UX or architecture diagrams as additional context for GPT Engineer. You can do this by specifying an image directory with the—-image_directory flag and setting a vision-capable model in the second cli argument.
+By default, gpt-engineer expects text input via a `prompt` file. It can also accept image inputs for vision-capable models. This can be useful for adding UX or architecture diagrams as additional context for GPT Engineer. You can do this by specifying an image directory with the `—-image_directory` flag and setting a vision-capable model in the second CLI argument.
 
 E.g. `gpte projects/example-vision gpt-4-vision-preview --prompt_file prompt/text --image_directory prompt/images -i`
 
 ### Open source, local and alternative models
 
-By default, gpt-engineer supports OpenAI Models via the OpenAI API or Azure Open AI API, and Anthropic models.
+By default, gpt-engineer supports OpenAI Models via the OpenAI API or Azure OpenAI API, as well as Anthropic models.
 
-With a little extra set up you can also run with open source models, like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
+With a little extra setup, you can also run with open source models like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
 
 ## Mission
 
@@ -101,7 +101,7 @@ If you are interested in contributing to this, we are interested in having you.
 
 If you want to see our broader ambitions, check out the [roadmap](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/ROADMAP.md), and join
 [discord](https://discord.gg/8tcDQ89Ej2)
-to get input on how you can [contribute](.github/CONTRIBUTING.md) to it.
+to learn how you can [contribute](.github/CONTRIBUTING.md) to it.
 
 gpt-engineer is [governed](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/GOVERNANCE.md) by a board of long-term contributors. If you contribute routinely and have an interest in shaping the future of gpt-engineer, you will be considered for the board.
 
