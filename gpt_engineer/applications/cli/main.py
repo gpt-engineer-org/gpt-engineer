@@ -251,7 +251,7 @@ def prompt_yesno() -> bool:
 def main(
     project_path: str = typer.Argument(".", help="path"),
     model: str = typer.Option(
-        os.environ.get("MODEL_NAME", "gpt-4o"), "--model", "-m", help="model id string"
+        os.environ.get("MODEL_NAME", "gpt-4"), "--model", "-m", help="model id string"
     ),
     temperature: float = typer.Option(
         0.1,
@@ -412,8 +412,8 @@ def main(
     print("Running gpt-engineer in", path.absolute(), "\n")
 
     # read the configuration file from the root directory
-    config = Config("config.toml")
-
+    config = Config()
+    config.from_toml(Path(os.getcwd()) / "config.toml").to_dict()
     # todo: apply configuration here
 
     prompt = load_prompt(

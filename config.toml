@@ -17,7 +17,7 @@ temperature = 0.1
 azure_endpoint = ""
 
 # improve mode Configuration
-[imporve]
+[improve]
 # Enable or disable linting (true/false)
 is_linting = true
 # Enable or disable file selection. "true" will open your default editor to select the file. (true/false)

@@ -87,10 +87,23 @@ class Config:
 
     @classmethod
     def from_dict(cls, config_dict: dict):
-        paths = _PathsConfig(**config_dict.get("paths", {}))
-        api_config = _ApiConfig(**config_dict.get("api_config", {}))
-        model_config = _ModelConfig(**config_dict.get("model_config", {}))
-        improve_config = _ImproveConfig(**config_dict.get("improve_config", {}))
+        paths = _PathsConfig(**config_dict.get("paths", {"base": None, "src": None}))
+        api_config = _ApiConfig(
+            **config_dict.get(
+                "api", {"OPENAI_API_KEY": None, "ANTHROPIC_API_KEY": None}
+            )
+        )
+        model_config = _ModelConfig(
+            **config_dict.get(
+                "model",
+                {"model_name": None, "temperature": None, "azure_endpoint": None},
+            )
+        )
+        improve_config = _ImproveConfig(
+            **config_dict.get(
+                "improve", {"is_linting": None, "is_file_selection": None}
+            )
+        )
 
         return cls(
             paths=paths,
@@ -101,7 +114,9 @@ class Config:
 
     def to_dict(self) -> dict:
         d = asdict(self)
-        d["gptengineer-app"] = d.pop("gptengineer_app", None)
+        d["api"] = d.pop("api_config", None)
+        d["model"] = d.pop("model_config", None)
+        d["improve"] = d.pop("improve_config", None)
 
         # Drop None values and empty dictionaries
         # Needed because tomlkit.dumps() doesn't handle None values,
