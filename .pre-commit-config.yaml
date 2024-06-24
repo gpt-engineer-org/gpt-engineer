@@ -25,3 +25,10 @@ repos:
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: trailing-whitespace
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 'v1.9.0'
+    hooks:
+      - id: mypy
+        args: [--strict, --ignore-missing-imports, --allow-untyped-calls, --allow-untyped-decorators, --allow-untyped-defs, --no-implicit-optional, --no-implicit-reexport]
+        additional_dependencies: []
