@@ -8,52 +8,44 @@ from pathlib import Path
 
 import tomlkit
 
-default_config_filename = "gpt-engineer.toml"
+default_config_filename = "config.toml"
 
 example_config = """
-[run]
-build = "npm run build"
-test = "npm run test"
-lint = "quick-lint-js"
+# API Configuration
+[API]
+OPENAI_API_KEY = "..."
+ANTHROPIC_API_KEY = "..."
 
-[paths]
-base = "./frontend"  # base directory to operate in (for monorepos)
-src = "./src"        # source directory (under the base directory) from which context will be retrieved
+# Model configurations
+[model]
+model_name = "gpt-4o"
+temperature = 0.1
+azure_endpoint = ""
 
-[gptengineer-app]  # this namespace is used for gptengineer.app, may be used for internal experiments
-project_id = "..."
-
-# we support multiple OpenAPI schemas, used as context for the LLM
-openapi = [
-    { url = "https://api.gptengineer.app/openapi.json" },
-    { url = "https://some-color-translating-api/openapi.json" },
-]
+# improve mode Configuration
+[improve]
+is_linting = false
+is_file_selection = true
 """
 
 
 @dataclass
-class _PathsConfig:
-    base: str | None = None
-    src: str | None = None
+class _ApiConfig:
+    OPENAI_API_KEY: str | None = None
+    ANTHROPIC_API_KEY: str | None = None
 
 
 @dataclass
-class _RunConfig:
-    build: str | None = None
-    test: str | None = None
-    lint: str | None = None
-    format: str | None = None
+class _ModelConfig:
+    model_name: str | None = None
+    temperature: float | None = None
+    azure_endpoint: str | None = None
 
 
 @dataclass
-class _OpenApiConfig:
-    url: str
-
-
-@dataclass
-class _GptEngineerAppConfig:
-    project_id: str
-    openapi: list[_OpenApiConfig] | None = None
+class _ImproveConfig:
+    is_linting: bool | None = None
+    is_file_selection: bool | None = None
 
 
 def filter_none(d: dict) -> dict:
@@ -71,11 +63,11 @@ def filter_none(d: dict) -> dict:
 
 @dataclass
 class Config:
-    """Configuration for the GPT Engineer CLI and gptengineer.app via `gpt-engineer.toml`."""
+    """Configuration for the GPT Engineer project"""
 
-    paths: _PathsConfig = field(default_factory=_PathsConfig)
-    run: _RunConfig = field(default_factory=_RunConfig)
-    gptengineer_app: _GptEngineerAppConfig | None = None
+    api_config: _ApiConfig = field(default_factory=_ApiConfig)
+    model_config: _ModelConfig = field(default_factory=_ModelConfig)
+    improve_config: _ImproveConfig = field(default_factory=_ImproveConfig)
 
     @classmethod
     def from_toml(cls, config_file: Path | str):
@@ -86,31 +78,34 @@ class Config:
 
     @classmethod
     def from_dict(cls, config_dict: dict):
-        run = _RunConfig(**config_dict.get("run", {}))
-        paths = _PathsConfig(**config_dict.get("paths", {}))
-
-        # load optional gptengineer-app section
-        gptengineer_app_dict = config_dict.get("gptengineer-app", {})
-        gptengineer_app = None
-        if gptengineer_app_dict:
-            assert (
-                "project_id" in gptengineer_app_dict
-            ), "project_id is required in gptengineer-app section"
-            gptengineer_app = _GptEngineerAppConfig(
-                # required if gptengineer-app section is present
-                project_id=gptengineer_app_dict["project_id"],
-                openapi=[
-                    _OpenApiConfig(**openapi)
-                    for openapi in gptengineer_app_dict.get("openapi", [])
-                ]
-                or None,
+        api_config = _ApiConfig(
+            **config_dict.get(
+                "API", {"OPENAI_API_KEY": None, "ANTHROPIC_API_KEY": None}
             )
+        )
+        model_config = _ModelConfig(
+            **config_dict.get(
+                "model",
+                {"model_name": None, "temperature": None, "azure_endpoint": None},
+            )
+        )
+        improve_config = _ImproveConfig(
+            **config_dict.get(
+                "improve", {"is_linting": None, "is_file_selection": None}
+            )
+        )
 
-        return cls(paths=paths, run=run, gptengineer_app=gptengineer_app)
+        return cls(
+            api_config=api_config,
+            model_config=model_config,
+            improve_config=improve_config,
+        )
 
     def to_dict(self) -> dict:
         d = asdict(self)
-        d["gptengineer-app"] = d.pop("gptengineer_app", None)
+        d["API"] = d.pop("api_config", None)
+        d["model"] = d.pop("model_config", None)
+        d["improve"] = d.pop("improve_config", None)
 
         # Drop None values and empty dictionaries
         # Needed because tomlkit.dumps() doesn't handle None values,

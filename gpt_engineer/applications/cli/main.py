@@ -57,6 +57,7 @@ from gpt_engineer.core.default.steps import (
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.git import stage_uncommitted_to_git
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
+from gpt_engineer.core.project_config import Config
 from gpt_engineer.core.prompt import Prompt
 from gpt_engineer.tools.custom_steps import clarified_gen, lite_gen, self_heal
 
@@ -250,7 +251,7 @@ def prompt_yesno() -> bool:
 def main(
     project_path: str = typer.Argument(".", help="path"),
     model: str = typer.Option(
-        os.environ.get("MODEL_NAME", "gpt-4o"), "--model", "-m", help="model id string"
+        os.environ.get("MODEL_NAME", "gpt-4"), "--model", "-m", help="model id string"
     ),
     temperature: float = typer.Option(
         0.1,
@@ -410,6 +411,19 @@ def main(
     path = Path(project_path)
     print("Running gpt-engineer in", path.absolute(), "\n")
 
+    # ask if the user wants to change the configuration
+    print(
+        "The configuration file(config.toml) is located in the root directory. You can edit it with your preferred "
+        "text editor."
+    )
+    # todo: interface to edit the configuration
+
+    # read the configuration file from the root directory
+    config = Config()
+    config_dict = config.from_toml(Path(os.getcwd()) / "config.toml").to_dict()
+
+    # todo: apply configuration here
+
     prompt = load_prompt(
         DiskMemory(path),
         improve_mode,
@@ -457,10 +471,10 @@ def main(
     files = FileStore(project_path)
     if not no_execution:
         if improve_mode:
-            files_dict_before, is_linting = FileSelector(project_path).ask_for_files()
+            files_dict_before = FileSelector(project_path).ask_for_files()
 
             # lint the code
-            if is_linting:
+            if config_dict["improve"]["is_linting"]:
                 files_dict_before = files.linting(files_dict_before)
 
             files_dict = handle_improve_mode(prompt, agent, memory, files_dict_before)
