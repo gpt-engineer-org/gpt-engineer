@@ -4,10 +4,8 @@ import pytest
 
 from gpt_engineer.core.project_config import (
     Config,
-    _GptEngineerAppConfig,
-    _OpenApiConfig,
     example_config,
-    filter_none,
+    filter_none, _ImproveConfig,
 )
 
 
@@ -19,22 +17,12 @@ def test_config_load():
     # load the config from the file
     config = Config.from_toml(f.name)
 
-    assert config.paths.base == "./frontend"
-    assert config.paths.src == "./src"
-    assert config.run.build == "npm run build"
-    assert config.run.test == "npm run test"
-    assert config.run.lint == "quick-lint-js"
-    assert config.gptengineer_app
-    assert config.gptengineer_app.project_id == "..."
-    assert config.gptengineer_app.openapi
-    assert (
-        config.gptengineer_app.openapi[0].url
-        == "https://api.gptengineer.app/openapi.json"
-    )
-    assert (
-        config.gptengineer_app.openapi[1].url
-        == "https://some-color-translating-api/openapi.json"
-    )
+    assert config.api_config.OPENAI_API_KEY == "..."
+    assert config.api_config.ANTHROPIC_API_KEY == "..."
+    assert config.model_config.model_name == "gpt-4o"
+    assert config.model_config.temperature == 0.1
+    assert config.improve_config.is_linting is False
+    assert config.improve_config.is_file_selection is True
     assert config.to_dict()
     assert config.to_toml(f.name, save=False)
 
@@ -44,7 +32,6 @@ def test_config_load():
 
 def test_config_defaults():
     config = Config()
-    assert config.paths.base is None
     with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
         config.to_toml(f.name)
 
@@ -57,48 +44,28 @@ def test_config_defaults():
 
 
 def test_config_from_dict():
-    d = {"gptengineer-app": {"project_id": "..."}}  # minimal example
+    d = {"improve": {"is_linting": "..."}}  # minimal example
     config = Config.from_dict(d)
-    assert config.gptengineer_app
-    assert config.gptengineer_app.project_id == "..."
+    assert config.improve_config
+    assert config.improve_config.is_linting == "..."
     config_dict = config.to_dict()
 
     # check that the config dict matches the input dict exactly (no keys/defaults added)
     assert config_dict == d
 
 
-def test_config_from_dict_with_openapi():
-    # A good test because it has 3 levels of nesting
-    d = {
-        "gptengineer-app": {
-            "project_id": "...",
-            "openapi": [
-                {"url": "https://api.gptengineer.app/openapi.json"},
-            ],
-        }
-    }
-    config = Config.from_dict(d)
-    assert config.gptengineer_app
-    assert config.gptengineer_app.project_id == "..."
-    assert config.gptengineer_app.openapi
-    assert (
-        config.gptengineer_app.openapi[0].url
-        == "https://api.gptengineer.app/openapi.json"
-    )
-
-
 def test_config_load_partial():
     # Loads a partial config, and checks that the rest is not set (i.e. None)
     example_config = """
-[gptengineer-app]
-project_id = "..."
+[improve]
+is_linting = "..."
 """.strip()
     with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
         f.write(example_config)
 
     config = Config.from_toml(f.name)
-    assert config.gptengineer_app
-    assert config.gptengineer_app.project_id == "..."
+    assert config.improve_config
+    assert config.improve_config.is_linting == "..."
     assert config.to_dict()
     toml_str = config.to_toml(f.name, save=False)
     assert toml_str == example_config
@@ -109,15 +76,15 @@ project_id = "..."
 
 def test_config_update():
     example_config = """
-[gptengineer-app]
-project_id = "..."
+[improve]
+is_linting = "..."
 """.strip()
     with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
         f.write(example_config)
     config = Config.from_toml(f.name)
-    config.gptengineer_app = _GptEngineerAppConfig(
-        project_id="...",
-        openapi=[_OpenApiConfig(url="https://api.gptengineer.app/openapi.json")],
+    config.improve_config = _ImproveConfig(
+        is_linting=False,
+        is_file_selection=True
     )
     config.to_toml(f.name)
     assert Config.from_toml(f.name) == config
