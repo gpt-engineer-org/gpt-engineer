@@ -411,9 +411,18 @@ def main(
     path = Path(project_path)
     print("Running gpt-engineer in", path.absolute(), "\n")
 
+    # ask if the user wants to change the configuration
+    print("The configuration file(config.toml) is located in the root directory. You can edit it with your preferred "
+          "text editor.")
+    # todo: interface to edit the configuration
+
     # read the configuration file from the root directory
     config = Config()
-    config.from_toml(Path(os.getcwd()) / "config.toml").to_dict()
+    config_dict = config.from_toml(Path(os.getcwd()) / "config.toml").to_dict()
+
+
+
+
     # todo: apply configuration here
 
     prompt = load_prompt(
@@ -463,10 +472,10 @@ def main(
     files = FileStore(project_path)
     if not no_execution:
         if improve_mode:
-            files_dict_before, is_linting = FileSelector(project_path).ask_for_files()
+            files_dict_before = FileSelector(project_path).ask_for_files()
 
             # lint the code
-            if is_linting:
+            if config_dict["improve"]["is_linting"]:
                 files_dict_before = files.linting(files_dict_before)
 
             files_dict = handle_improve_mode(prompt, agent, memory, files_dict_before)

@@ -2,11 +2,12 @@
 # Unified configuration file for the gpt-engineer project
 
 # API Configuration
-[api]
+[API]
 # API key for OpenAPI
 # OPENAI_API_KEY=Your personal OpenAI API key from https://platform.openai.com/account/api-keys
 OPENAI_API_KEY = "your_api_key_here"
 ANTHROPIC_API_KEY = "your_anthropic_api_key_here"
+
 # Model configurations
 [model]
 model_name = "gpt-4o"
@@ -18,8 +19,9 @@ azure_endpoint = ""
 
 # improve mode Configuration
 [improve]
+# Linting with BLACK (Python) enhances code suggestions from LLMs.
 # Enable or disable linting (true/false)
-is_linting = true
+is_linting = false
 # Enable or disable file selection. "true" will open your default editor to select the file. (true/false)
 is_file_selection = true
 
