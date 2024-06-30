@@ -58,6 +58,7 @@ class FileSelector:
         "Including irrelevant files will degrade performance, "
         "cost additional tokens and potentially overflow token limit.\n\n"
     )
+
     def __init__(self, project_path: Union[str, Path]):
         """
         Initializes the FileSelector with a given project path.
@@ -160,7 +161,6 @@ class FileSelector:
             # Load existing files from the .toml configuration
             all_files = self.get_current_files(root_path)
             s = toml.dumps({"files": {x: "selected" for x in all_files}})
-
 
             with open(toml_file, "r") as file:
                 selected_files = toml.load(file)

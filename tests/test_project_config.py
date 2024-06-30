@@ -4,8 +4,9 @@ import pytest
 
 from gpt_engineer.core.project_config import (
     Config,
+    _ImproveConfig,
     example_config,
-    filter_none, _ImproveConfig,
+    filter_none,
 )
 
 
@@ -82,10 +83,7 @@ is_linting = "..."
     with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
         f.write(example_config)
     config = Config.from_toml(f.name)
-    config.improve_config = _ImproveConfig(
-        is_linting=False,
-        is_file_selection=True
-    )
+    config.improve_config = _ImproveConfig(is_linting=False, is_file_selection=True)
     config.to_toml(f.name)
     assert Config.from_toml(f.name) == config
 

@@ -412,16 +412,15 @@ def main(
     print("Running gpt-engineer in", path.absolute(), "\n")
 
     # ask if the user wants to change the configuration
-    print("The configuration file(config.toml) is located in the root directory. You can edit it with your preferred "
-          "text editor.")
+    print(
+        "The configuration file(config.toml) is located in the root directory. You can edit it with your preferred "
+        "text editor."
+    )
     # todo: interface to edit the configuration
 
     # read the configuration file from the root directory
     config = Config()
     config_dict = config.from_toml(Path(os.getcwd()) / "config.toml").to_dict()
-
-
-
 
     # todo: apply configuration here
 

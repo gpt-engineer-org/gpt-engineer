@@ -28,6 +28,7 @@ is_linting = false
 is_file_selection = true
 """
 
+
 @dataclass
 class _ApiConfig:
     OPENAI_API_KEY: str | None = None
