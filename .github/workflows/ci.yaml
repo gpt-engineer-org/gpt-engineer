@@ -15,20 +15,23 @@ concurrency:
 
 jobs:
   test:
-    permissions: {}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12']
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-        cache: 'pip' #Note that pip is for the tox level. Poetry is still used for installing the specific environments (tox.ini)
+        cache: 'pip'  #Note that pip is for the tox level. Poetry is still used for installing the specific environments (tox.ini)
+
+    - name: Check Python Version
+      run: python --version
 
     - name: Install dependencies
       run: |
