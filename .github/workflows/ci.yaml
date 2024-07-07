@@ -10,34 +10,40 @@ on:
     branches: [ main ]
 
 concurrency:
-  group: ${{github.workflow}} - ${{github.ref}}
+  group: ${{ github.workflow }} - ${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   test:
-    permissions: {}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12']
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python-version }}
-        cache: 'pip' #Note that pip is for the tox level. Poetry is still used for installing the specific environments (tox.ini)
+        python-version: ${{ matrix.python-version == '3.12' && '3.12.3' || matrix.python-version }} # Using 3.12.3 to resolve Pydantic ForwardRef issue
+        cache: 'pip'  # Note that pip is for the tox level. Poetry is still used for installing the specific environments (tox.ini)
 
-    - name: Install tox
-      run: pip install tox==4.15.0
+    - name: Check Python Version
+      run: python --version
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox==4.15.0 poetry
 
     - name: Run tox
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       run: tox
 
-    - name: Report coverage
-      run: |
-        bash <(curl -s https://codecov.io/bash)
+    # Temporarily disabling codecov until we resolve codecov rate limiting issue
+    # - name: Report coverage
+    #   run: |
+    #     bash <(curl -s https://codecov.io/bash)
