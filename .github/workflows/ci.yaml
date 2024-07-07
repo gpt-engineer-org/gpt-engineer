@@ -10,7 +10,7 @@ on:
     branches: [ main ]
 
 concurrency:
-  group: ${{github.workflow}} - ${{github.ref}}
+  group: ${{ github.workflow }} - ${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -30,8 +30,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
         cache: 'pip' #Note that pip is for the tox level. Poetry is still used for installing the specific environments (tox.ini)
 
-    - name: Install tox
-      run: pip install tox==4.15.0
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox==4.15.0 poetry
 
     - name: Run tox
       env:
