@@ -112,6 +112,7 @@ class AI:
             ("vision-preview" in model_name)
             or ("gpt-4-turbo" in model_name and "preview" not in model_name)
             or ("claude" in model_name)
+            or ("gemini" in model_name)
         )
         self.llm = self._create_chat_model()
         self.token_usage_log = TokenUsageLog(model_name)
