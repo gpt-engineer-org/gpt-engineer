@@ -369,8 +369,8 @@ class AI:
                 model=self.model_name,
                 temperature=self.temperature,
                 streaming=self.streaming,
-                google_api_key=os.getenv('GOOGLE_API_KEY'),
-                callbacks=[StreamingStdOutCallbackHandler()]
+                google_api_key=os.getenv("GOOGLE_API_KEY"),
+                callbacks=[StreamingStdOutCallbackHandler()],
             )
         elif self.vision:
             return ChatOpenAI(
