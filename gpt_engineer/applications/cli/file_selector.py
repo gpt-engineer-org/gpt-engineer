@@ -413,6 +413,7 @@ class FileSelector:
             all_files = filter_by_gitignore(project_path, all_files)
 
         return all_files
+        return sorted(all_files, key=lambda x: Path(x).as_posix())
 
 
 class DisplayablePath(object):
