@@ -148,8 +148,6 @@ class FileSelector:
         if init:
             tree_dict = {x: "selected" for x in self.get_current_files(root_path)}
 
-        # Initialize .toml file with file tree if in initial state or if skipping file selection
-        if init:
             s = toml.dumps({"files": tree_dict})
 
             # add comments on all lines that match = "selected"
@@ -164,9 +162,6 @@ class FileSelector:
                 f.write(self.COMMENT)
                 f.write(self.LINTING_STRING)
                 f.write(s)
-                return self.get_files_from_toml(
-                    input_path, toml_file
-                )  # Return the list of selected files without user edits if skipping file selection
 
         else:
             # Load existing files from the .toml configuration
@@ -418,7 +413,6 @@ class FileSelector:
         if is_git_repo(project_path) and "projects" not in project_path.parts:
             all_files = filter_by_gitignore(project_path, all_files)
 
-        return all_files
         return sorted(all_files, key=lambda x: Path(x).as_posix())
 
 
