@@ -359,7 +359,8 @@ def main(
     ),
     skip_file_selection: bool = typer.Option(
         False,
-        "--skip-file-selection", "-s",
+        "--skip-file-selection",
+        "-s",
         help="Skip interactive file selection in improve mode and use the generated TOML file directly.",
     ),
     no_execution: bool = typer.Option(
@@ -410,6 +411,8 @@ def main(
         Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.
     verbose : bool
         Flag indicating whether to enable verbose logging.
+    skip_file_selection: bool
+        Skip interactive file selection in improve mode and use the generated TOML file directly
     no_execution: bool
         Run setup but to not call LLM or write any code. For testing purposes.
     sysinfo: bool
@@ -499,9 +502,6 @@ def main(
         ai=ai,
         code_gen_fn=code_gen_fn,
         improve_fn=improve_fn,
-        skip_file_selection=skip_file_selection,
-        skip_file_selection=skip_file_selection,
-        skip_file_selection=skip_file_selection,
         process_code_fn=execution_fn,
         preprompts_holder=preprompts_holder,
     )
@@ -509,7 +509,7 @@ def main(
     files = FileStore(project_path)
     if not no_execution:
         if improve_mode:
-            files_dict_before, is_linting = FileSelector(project_path).ask_for_files()
+            files_dict_before, is_linting = FileSelector(project_path).ask_for_files(skip_file_selection=skip_file_selection)
 
             # lint the code
             if is_linting:

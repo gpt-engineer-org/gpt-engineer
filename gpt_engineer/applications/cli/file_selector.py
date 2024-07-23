@@ -76,7 +76,7 @@ class FileSelector:
         self.metadata_db = DiskMemory(metadata_path(self.project_path))
         self.toml_path = self.metadata_db.path / self.FILE_LIST_NAME
 
-    def ask_for_files(self) -> tuple[FilesDict, bool]:
+    def ask_for_files(self, skip_file_selection=False) -> tuple[FilesDict, bool]:
         """
         Prompts the user to select files for context improvement.
 
@@ -89,8 +89,9 @@ class FileSelector:
             A dictionary with file paths as keys and file contents as values.
         """
 
-        if os.getenv("GPTE_TEST_MODE"):
+        if os.getenv("GPTE_TEST_MODE") or skip_file_selection:
             # In test mode, retrieve files from a predefined TOML configuration
+            # also get from toml if skip_file_selector is active
             assert self.FILE_LIST_NAME in self.metadata_db
             selected_files = self.get_files_from_toml(self.project_path, self.toml_path)
         else:
@@ -148,7 +149,7 @@ class FileSelector:
             tree_dict = {x: "selected" for x in self.get_current_files(root_path)}
 
         # Initialize .toml file with file tree if in initial state or if skipping file selection
-        if init or self.skip_file_selection:
+        if init:
             s = toml.dumps({"files": tree_dict})
 
             # add comments on all lines that match = "selected"
@@ -163,7 +164,9 @@ class FileSelector:
                 f.write(self.COMMENT)
                 f.write(self.LINTING_STRING)
                 f.write(s)
-                return self.get_files_from_toml(input_path, toml_file)  # Return the list of selected files without user edits if skipping file selection
+                return self.get_files_from_toml(
+                    input_path, toml_file
+                )  # Return the list of selected files without user edits if skipping file selection
 
         else:
             # Load existing files from the .toml configuration
