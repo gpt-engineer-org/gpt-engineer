@@ -357,6 +357,11 @@ def main(
         "--use_cache",
         help="Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.",
     ),
+    skip_file_selection: bool = typer.Option(
+        False,
+        "--skip-file-selection", "-s",
+        help="Skip interactive file selection in improve mode and use the generated TOML file directly.",
+    ),
     no_execution: bool = typer.Option(
         False,
         "--no_execution",
@@ -494,6 +499,9 @@ def main(
         ai=ai,
         code_gen_fn=code_gen_fn,
         improve_fn=improve_fn,
+        skip_file_selection=skip_file_selection,
+        skip_file_selection=skip_file_selection,
+        skip_file_selection=skip_file_selection,
         process_code_fn=execution_fn,
         preprompts_holder=preprompts_holder,
     )
