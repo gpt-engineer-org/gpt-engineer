@@ -30,3 +30,7 @@ If your project includes a debug_log_file.txt, kindly upload it from your_projec
 ## System Information
 
 Please copy and paste the output of the `gpte --sysinfo` command as part of your bug report.
+
+## Installation Method
+
+Please specify whether you installed GPT-Engineer using `pip install` or by building the repository.
