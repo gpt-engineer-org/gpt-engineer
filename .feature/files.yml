@@ -1,0 +1,253 @@
+# Uncomment any files you would like to use for this feature
+# Note that (./) is a special key which represents files at the root of the parent directory
+
+.feature:
+  #- files.yml
+.github:
+  ISSUE_TEMPLATE:
+    #- bug-report.md
+    #- documentation-clarification.md
+    #- feature-request.md
+  PULL_REQUEST_TEMPLATE:
+    #- PULL_REQUEST_TEMPLATE.md
+  workflows:
+    #- automation.yml
+    #- ci.yaml
+    #- pre-commit.yaml
+    #- release.yaml
+  (./):
+  #- CODEOWNERS
+  #- CODE_OF_CONDUCT.md
+  #- CONTRIBUTING.md
+  #- FUNDING.yml
+docker:
+  #- Dockerfile
+  #- README.md
+  #- entrypoint.sh
+docs:
+  examples:
+    open_llms:
+      #- README.md
+      #- langchain_interface.py
+      #- openai_api_interface.py
+  (./):
+  #- Makefile
+  #- api_reference.rst
+  #- code_conduct_link.rst
+  #- conf.py
+  #- contributing_link.rst
+  #- create_api_rst.py
+  #- disclaimer_link.rst
+  #- docs_building.md
+  #- index.rst
+  #- installation.rst
+  #- introduction.md
+  #- make.bat
+  #- open_models.md
+  #- quickstart.rst
+  #- roadmap_link.rst
+  #- terms_link.rst
+  #- tracing_debugging.md
+  #- windows_readme_link.rst
+gpt_engineer:
+  applications:
+    cli:
+      #- __init__.py
+      #- cli_agent.py
+      #- collect.py
+      #- file_selector.py
+      #- learning.py
+      #- main.py
+    feature_cli:
+      agents:
+        - __init__.py
+        - agent_steps.py
+        - chat_agent.py
+        - feature_agent.py
+      prompts:
+        - __init__.py
+        - fuzzy_file_parser
+      (./):
+      - __init__.py
+      - domain.py
+      - feature.py
+      - file_selection.py
+      - files.py
+      - generation_tools.py
+      - main.py
+      - repository.py
+    (./):
+    #- __init__.py
+  benchmark:
+    benchmarks:
+      apps:
+        #- load.py
+        #- problem.py
+        #- problems.py
+      gptme:
+        #- load.py
+      mbpp:
+        #- load.py
+        #- problem.py
+        #- problems.py
+      (./):
+      #- load.py
+    (./):
+    #- __init__.py
+    #- __main__.py
+    #- bench_config.py
+    #- default_bench_config.toml
+    #- run.py
+    #- types.py
+  core:
+    default:
+      #- __init__.py
+      #- constants.py
+      #- disk_execution_env.py
+      #- disk_memory.py
+      #- file_store.py
+      #- paths.py
+      #- simple_agent.py
+      #- steps.py
+    (./):
+    #- __init__.py
+    #- ai.py
+    #- base_agent.py
+    #- base_execution_env.py
+    #- base_memory.py
+    #- chat_to_files.py
+    #- diff.py
+    #- files_dict.py
+    #- git.py
+    #- linting.py
+    #- preprompts_holder.py
+    #- project_config.py
+    #- prompt.py
+    #- token_usage.py
+    #- version_manager.py
+  preprompts:
+    #- clarify
+    #- entrypoint
+    #- file_format
+    #- file_format_diff
+    #- file_format_fix
+    #- generate
+    #- improve
+    #- philosophy
+    #- roadmap
+  tools:
+    #- __init__.py
+    #- custom_steps.py
+    #- supported_languages.py
+  (./):
+  #- __init__.py
+projects:
+  example:
+    #- prompt
+  example-improve:
+    #- README.md
+    #- controller.py
+    #- main.py
+    #- model.py
+    #- prompt
+    #- requirements.txt
+    #- run.sh
+    #- view.py
+  example-vision:
+    images:
+      #- ux_diagram.png
+    (./):
+    #- navigation.html
+    #- prompt
+scripts:
+  #- clean_benchmarks.py
+  #- legacy_benchmark.py
+  #- print_chat.py
+  #- test_api.py
+tests:
+  applications:
+    cli:
+      #- __init__.py
+      #- test_cli_agent.py
+      #- test_collect.py
+      #- test_collection_consent.py
+      #- test_learning.py
+      #- test_main.py
+    feature_cli:
+      #- __init__.py
+      #- test_file_selection.py
+    (./):
+    #- __init__.py
+  benchmark:
+    #- test_BenchConfig.py
+  core:
+    default:
+      #- __init__.py
+      #- test_disk_execution_env.py
+      #- test_disk_file_repository.py
+      #- test_simple_agent.py
+      #- test_steps.py
+    improve_function_test_cases:
+      #- apps_benchmark_6_chat
+      #- apps_benchmark_6_code
+      #- apps_benchmark_6_v2_chat
+      #- apps_benchmark_6_v2_code
+      #- controller_chat
+      #- controller_code
+      #- corrected_diff_from_missing_lines
+      #- create_two_new_files_chat
+      #- create_two_new_files_code
+      #- simple_calculator_chat
+      #- simple_calculator_code
+      #- task_master_chat
+      #- task_master_code
+      #- temperature_converter_chat
+      #- temperature_converter_code
+      #- theo_case_chat
+      #- theo_case_code
+      #- vgvishesh_example_2_chat
+      #- vgvishesh_example_2_code
+      #- vgvishesh_example_chat
+      #- vgvishesh_example_code
+      #- wheaties_example_chat
+      #- wheaties_example_code
+    (./):
+    #- __init__.py
+    #- test_ai.py
+    #- test_chat_to_files.py
+    #- test_git.py
+    #- test_salvage_correct_hunks.py
+    #- test_token_usage.py
+  test_data:
+    #- mona_lisa.jpg
+  tools:
+    #- example_snake_files.py
+  (./):
+  #- __init__.py
+  #- ai_cache.json
+  #- mock_ai.py
+  #- test_install.py
+  #- test_project_config.py
+(./):
+#- .dockerignore
+#- .env.template
+#- .gitignore
+#- .pre-commit-config.yaml
+#- .readthedocs.yaml
+#- Acknowledgements.md
+#- DISCLAIMER.md
+#- GOVERNANCE.md
+#- LICENSE
+#- MANIFEST.in
+#- Makefile
+#- README.md
+#- ROADMAP.md
+#- TERMS_OF_USE.md
+#- WINDOWS_README.md
+#- citation.cff
+#- docker-compose.yml
+#- poetry.lock
+#- pyproject.toml
+#- quicktest.py
+#- sweep.yaml
+#- tox.ini

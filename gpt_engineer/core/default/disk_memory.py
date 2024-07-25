@@ -171,6 +171,9 @@ class DiskMemory(BaseMemory):
 
         full_path.write_text(val, encoding="utf-8")
 
+    def set(self, key: Union[str, Path], val: str) -> None:
+        return self.__setitem__(key, val)
+
     def __delitem__(self, key: Union[str, Path]) -> None:
         """
         Delete a file or directory from the database corresponding to the given key.

@@ -19,6 +19,7 @@ file handling and persistence.
 
 import fnmatch
 import os
+import platform
 import subprocess
 
 from pathlib import Path
@@ -218,32 +219,23 @@ class FileSelector:
             The path to the file to be opened in the text editor.
         """
 
-        editors = [
-            "gedit",
-            "notepad",
-            "nvim",
-            "write",
-            "nano",
-            "vim",
-            "emacs",
-        ]  # Putting the beginner-friendly text editor forward
         chosen_editor = os.environ.get("EDITOR")
 
         # Try the preferred editor first, then fallback to common editors
         if chosen_editor:
             try:
-                subprocess.run([chosen_editor, file_path])
+                subprocess.run([chosen_editor, str(file_path)], check=True)
                 return
             except Exception:
                 pass
 
-        for editor in editors:
-            try:
-                subprocess.run([editor, file_path])
-                return
-            except Exception:
-                continue
-        print("No suitable text editor found. Please edit the file manually.")
+        # Platform-specific methods to open the file
+        if platform.system() == "Windows":
+            os.startfile(file_path)
+        elif platform.system() == "Darwin":
+            subprocess.run(["open", file_path])
+        else:  # Linux and other Unix-like systems
+            subprocess.run(["xdg-open", file_path])
 
     def is_utf8(self, file_path: Union[str, Path]) -> bool:
         """

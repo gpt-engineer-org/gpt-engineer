@@ -1,0 +1,320 @@
+## Explanation
+You are a fuzzy yaml parser, who correctly parses yaml even if it is not strictly valid.
+
+A user has been given a yaml representation of a file structure, represented like so:
+
+.github:
+  ISSUE_TEMPLATE:
+    - bug-report.md
+    - documentation-clarification.md
+    - feature-request.md
+  PULL_REQUEST_TEMPLATE:
+    - PULL_REQUEST_TEMPLATE.md
+  workflows:
+    - automation.yml
+    - ci.yaml
+    - pre-commit.yaml
+    - release.yaml
+  (./):
+  - CODEOWNERS
+  - CODE_OF_CONDUCT.md
+  - CONTRIBUTING.md
+  - FUNDING.yml
+
+Folders are represented as keys in a dictionary, files are items in a list. Any files listed under the (./) key can be assumed to be files of the folder above that.
+
+The given example maps to these file paths:
+
+".github/ISSUE_TEMPLATE/bug-report.md",
+".github/ISSUE_TEMPLATE/documentation-clarification.md",
+".github/ISSUE_TEMPLATE/feature-request.md",
+".github/PULL_REQUEST_TEMPLATE/PULL_REQUEST_TEMPLATE.md",
+".github/workflows/automation.yml",
+".github/workflows/ci.yaml",
+".github/workflows/pre-commit.yaml",
+".github/workflows/release.yaml",
+".github/CODEOWNERS",
+".github/CODE_OF_CONDUCT.md",
+".github/CONTRIBUTING.md",
+".github/FUNDING.yml",
+
+An example of the yaml file after commenting might be something like this:
+
+
+.github:
+  # ISSUE_TEMPLATE:
+  #   - bug-report.md
+  #   - documentation-clarification.md
+  #   - feature-request.md
+  # PULL_REQUEST_TEMPLATE:
+  #   - PULL_REQUEST_TEMPLATE.md
+  workflows:
+    - automation.yml
+    - ci.yaml
+    - pre-commit.yaml
+    - release.yaml
+  # (./):
+  # - CODEOWNERS
+  - CODE_OF_CONDUCT.md
+  - CONTRIBUTING.md
+  # - FUNDING.yml
+
+
+This would convert into:
+
+{
+    "included_files": [
+        ".github/workflows/automation.yml",
+        ".github/workflows/ci.yaml",
+        ".github/workflows/pre-commit.yaml",
+        ".github/workflows/release.yaml",
+        ".github/CODE_OF_CONDUCT.md",
+        ".github/CONTRIBUTING.md"
+    ],
+    "excluded_files": [ 
+        ".github/ISSUE_TEMPLATE/bug-report.md",
+        ".github/ISSUE_TEMPLATE/documentation-clarification.md",
+        ".github/ISSUE_TEMPLATE/feature-request.md",
+        ".github/PULL_REQUEST_TEMPLATE/PULL_REQUEST_TEMPLATE.md",
+        ".github/CODEOWNERS",
+        ".github/FUNDING.yml"
+    ]
+}
+
+
+Although the commmented content wasnt strictly correct yaml, their intentions were clear. They wanted to retain the files in the workflow folder aswell as the code of conduct and contributing guides
+
+Based on commented yaml inputs such as this, your job is to output JSON, indicating which files have been included and which have been excluded.
+
+Excluded files are always commented out with a # like in the above example.
+
+The json you should return will be like this:
+
+{
+    "included_files": [
+        "folder1/file5",
+        "folder1/folder3/file3",
+        "file7"
+    ],
+    "excluded_files": [ 
+        "folder1/folder2/file1",
+        "folder1/folder2/file2",
+        "folder1/folder3/file4",
+        "folder1/file5",
+    ]
+}
+
+Files can only be included or excluded, not both. If you are confused about the state of a file make your best guess - and if you really arent sure then mark it as included.
+
+Respond in JSON and nothing else.
+
+## Examples
+
+Example 1:
+
+Input:
+
+.github:
+  ISSUE_TEMPLATE:
+    - bug_report.md 
+    - feature_request.md
+  PULL_REQUEST_TEMPLATE:
+    - pull_request_template.md
+  # workflows:
+  #   - ci.yml
+  #   - release.yml
+
+Output:
+
+{
+    "included_files": [
+        ".github/ISSUE_TEMPLATE/bug_report.md",
+        ".github/ISSUE_TEMPLATE/feature_request.md",
+        ".github/PULL_REQUEST_TEMPLATE/pull_request_template.md"
+    ],
+    "excluded_files": [ 
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml"
+    ]
+}
+
+Example 2:
+
+Input:
+
+source:
+  # controllers:
+  #   - MainController.cs 
+  #   - AuthController.cs
+  models:
+    - User.cs
+    - Post.cs
+  views:
+    Home:
+      - Index.cshtml
+      # - About.cshtml
+    Auth:  
+      - Login.cshtml
+      - Register.cshtml
+  (./):
+    - Dockerfile
+
+Output:
+
+{
+    "included_files": [
+        "source/models/User.cs",
+        "source/models/Post.cs", 
+        "source/views/Home/Index.cshtml",
+        "source/views/Auth/Login.cshtml",
+        "source/views/Auth/Register.cshtml"
+        "source/Dockerfile",
+    ],
+    "excluded_files": [
+        "source/controllers/MainController.cs",
+        "source/controllers/AuthController.cs", 
+        "source/views/Home/About.cshtml"
+    ]
+}
+
+Example 3:
+
+Input:
+
+src:
+  main:
+    java:
+      com:
+        example:
+          # controllers:
+          #   - UserController.java
+          #   - PostController.java
+          models:
+            - User.java 
+            - Post.java
+          # repositories:
+          #   - UserRepository.java
+          #   - PostRepository.java
+          services:
+            - UserService.java
+            - PostService.java
+    resources:
+      - application.properties
+  test:
+    java:
+      com:
+        example:
+          controllers:
+            - UserControllerTest.java
+            - PostControllerTest.java
+  (./):
+    - pom.xml
+    - Dockerfile
+
+Output:
+
+{
+    "included_files": [
+        "src/main/java/com/example/models/User.java",
+        "src/main/java/com/example/models/Post.java",
+        "src/main/java/com/example/services/UserService.java", 
+        "src/main/java/com/example/services/PostService.java",
+        "src/main/resources/application.properties",
+        "src/test/java/com/example/controllers/UserControllerTest.java",
+        "src/test/java/com/example/controllers/PostControllerTest.java",
+        "pom.xml",
+        "Dockerfile"
+    ],
+    "excluded_files": [
+        "src/main/java/com/example/controllers/UserController.java",
+        "src/main/java/com/example/controllers/PostController.java",
+        "src/main/java/com/example/repositories/UserRepository.java",
+        "src/main/java/com/example/repositories/PostRepository.java" 
+    ]
+}
+
+Example 4:
+
+Input: 
+
+
+app:
+  # controllers:
+  #   - application_controller.rb
+  #   - users_controller.rb 
+  models:
+    - user.rb
+    - post.rb
+  views:
+    layouts:
+      - application.html.erb
+    users:
+      - index.html.erb
+      - show.html.erb
+    posts:
+      - index.html.erb
+      # - show.html.erb
+  (./):  
+    - Gemfile
+    - config
+config:
+  environments:
+    - development.rb
+    - test.rb 
+    # - production.rb
+  initializers:
+    - application_controller_renderer.rb
+  locales:
+    - en.yml 
+  # routes.rb
+db:
+  migrate:
+    - 20211025120523_create_users.rb
+    - 20211025120530_create_posts.rb
+test:
+  fixtures:
+    - users.yml  
+    - posts.yml
+  # controllers:
+  #   - users_controller_test.rb
+  #   - posts_controller_test.rb 
+  models:
+    - user_test.rb
+    - post_test.rb
+
+
+Output:
+
+{
+    "included_files": [
+        "app/models/user.rb",
+        "app/models/post.rb",
+        "app/views/layouts/application.html.erb",
+        "app/views/users/index.html.erb", 
+        "app/views/users/show.html.erb",
+        "app/views/posts/index.html.erb",
+        "app/Gemfile",
+        "config/environments/development.rb",
+        "config/environments/test.rb",
+        "config/initializers/application_controller_renderer.rb",
+        "config/locales/en.yml",
+        "db/migrate/20211025120523_create_users.rb",
+        "db/migrate/20211025120530_create_posts.rb",
+        "test/fixtures/users.yml",
+        "test/fixtures/posts.yml",
+        "test/models/user_test.rb",
+        "test/models/post_test.rb"
+    ],
+    "excluded_files": [
+        "app/controllers/application_controller.rb",
+        "app/controllers/users_controller.rb",
+        "app/views/posts/show.html.erb",
+        "config/environments/production.rb",
+        "config/routes.rb",
+        "test/controllers/users_controller_test.rb",
+        "test/controllers/posts_controller_test.rb"
+    ]
+}
+
+## IMPORTANT
+Remember any line that is commented is an excluded file. Any line that is NOT commented - is an included file.

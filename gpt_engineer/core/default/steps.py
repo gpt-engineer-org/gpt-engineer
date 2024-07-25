@@ -37,7 +37,7 @@ import sys
 import traceback
 
 from pathlib import Path
-from typing import List, MutableMapping, Union
+from typing import List, MutableMapping, Optional, Union
 
 from langchain.schema import HumanMessage, SystemMessage
 from termcolor import colored
@@ -274,6 +274,7 @@ def improve_fn(
     files_dict: FilesDict,
     memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
+    additional_context: Optional[str] = None,
 ) -> FilesDict:
     """
     Improves the code based on user input and returns the updated files.
@@ -290,6 +291,8 @@ def improve_fn(
         The memory interface where the code and related data are stored.
     preprompts_holder : PrepromptsHolder
         The holder for preprompt messages that guide the AI model.
+    additional_context :str
+        Optional additional context to provide to the AI as part of the request
 
     Returns
     -------
@@ -301,7 +304,9 @@ def improve_fn(
         SystemMessage(content=setup_sys_prompt_existing_code(preprompts)),
     ]
 
-    # Add files as input
+    if additional_context:
+        messages.append(HumanMessage(content=additional_context))
+
     messages.append(HumanMessage(content=f"{files_dict.to_chat()}"))
     messages.append(HumanMessage(content=prompt.to_langchain_content()))
     memory.log(
@@ -370,13 +375,13 @@ class Tee(object):
             file.flush()
 
 
-def handle_improve_mode(prompt, agent, memory, files_dict):
+def handle_improve_mode(improve_lambda, memory):
     captured_output = io.StringIO()
     old_stdout = sys.stdout
     sys.stdout = Tee(sys.stdout, captured_output)
 
     try:
-        files_dict = agent.improve(files_dict, prompt)
+        files_dict = improve_lambda()
     except Exception as e:
         print(
             f"Error while improving the project: {e}\nCould you please upload the debug_log_file.txt in {memory.path}/logs folder to github?\nFULL STACK TRACE:\n"
@@ -388,7 +393,6 @@ def handle_improve_mode(prompt, agent, memory, files_dict):
 
         # Get the captured output
         captured_string = captured_output.getvalue()
-        print(captured_string)
         memory.log(DEBUG_LOG_FILE, "\nCONSOLE OUTPUT:\n" + captured_string)
 
     return files_dict

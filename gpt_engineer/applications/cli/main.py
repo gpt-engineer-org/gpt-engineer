@@ -501,8 +501,6 @@ def main(
     files = FileStore(project_path)
     if not no_execution:
         if improve_mode:
-            files_dict_before, is_linting = FileSelector(project_path).ask_for_files()
-
             # lint the code
             if is_linting:
                 files_dict_before = files.linting(files_dict_before)

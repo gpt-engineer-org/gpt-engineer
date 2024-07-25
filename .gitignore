@@ -93,6 +93,11 @@ webapp/.next/
 gpt_engineer/benchmark/benchmarks/apps/dataset
 gpt_engineer/benchmark/benchmarks/mbpp/dataset
 
+prompt
+
+.feature 
+.task 
+
 gpt_engineer/benchmark/minimal_bench_config.toml
 
 test.json
