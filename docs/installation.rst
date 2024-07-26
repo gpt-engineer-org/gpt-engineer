@@ -19,6 +19,10 @@ This is the preferred method to install ``gpt-engineer``, as it will always inst
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
 
+.. note::
+
+    When reporting bugs, please specify your installation method (using `pip install` or by building the repository) in the "Installation Method" section of the bug report template.
+
 .. _pip: https://pip.pypa.io
 .. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
 
