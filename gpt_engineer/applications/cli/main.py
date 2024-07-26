@@ -271,7 +271,7 @@ def get_gpt_engineer_version():
             ["git", "describe", "--tags"],
             capture_output=True,
             text=True,
-            cwd=Path(__file__).resolve().parent
+            cwd=Path(__file__).resolve().parent,
         ).stdout.strip()
         return f"repo version: {version}"
     except Exception as e:
