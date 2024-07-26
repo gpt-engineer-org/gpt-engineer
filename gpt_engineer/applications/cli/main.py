@@ -262,9 +262,20 @@ def get_gpt_engineer_version():
         ).stdout
         for line in version.splitlines():
             if line.startswith("Version:"):
-                return line.split(" ")[1]
+                return f"pip version: {line.split(' ')[1]}"
     except Exception as e:
         return str(e)
+
+    try:
+        version = subprocess.run(
+            ["git", "describe", "--tags"],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).resolve().parent
+        ).stdout.strip()
+        return f"repo version: {version}"
+    except Exception as e:
+        return f"repo version: unknown ({e})"
 
 
 def get_installed_packages():
