@@ -242,6 +242,7 @@ def prompt_yesno() -> bool:
 
 def get_system_info():
     system_info = {
+        "gpt_engineer_version": get_gpt_engineer_version(),
         "os": platform.system(),
         "os_version": platform.version(),
         "architecture": platform.machine(),
@@ -249,6 +250,19 @@ def get_system_info():
         "packages": format_installed_packages(get_installed_packages()),
     }
     return system_info
+
+def get_gpt_engineer_version():
+    try:
+        version = subprocess.run(
+            [sys.executable, "-m", "pip", "show", "gpt-engineer"],
+            capture_output=True,
+            text=True,
+        ).stdout
+        for line in version.splitlines():
+            if line.startswith("Version:"):
+                return line.split(" ")[1]
+    except Exception as e:
+        return str(e)
 
 
 def get_installed_packages():
