@@ -252,6 +252,7 @@ def get_system_info():
     }
     return system_info
 
+
 def get_gpt_engineer_version():
     try:
         version = subprocess.run(
