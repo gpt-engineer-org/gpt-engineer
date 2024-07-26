@@ -248,6 +248,7 @@ def get_system_info():
         "architecture": platform.machine(),
         "python_version": sys.version,
         "packages": format_installed_packages(get_installed_packages()),
+        "env_variables": get_env_variables(),
     }
     return system_info
 
@@ -280,6 +281,16 @@ def get_installed_packages():
 
 def format_installed_packages(packages):
     return "\n".join([f"{name}: {version}" for name, version in packages.items()])
+
+
+def get_env_variables():
+    env_vars = {}
+    for key, value in os.environ.items():
+        if "KEY" in key or "SECRET" in key or "PASSWORD" in key:
+            env_vars[key] = "*****"
+        else:
+            env_vars[key] = value
+    return env_vars
 
 
 @app.command(
