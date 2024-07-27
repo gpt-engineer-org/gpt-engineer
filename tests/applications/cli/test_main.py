@@ -92,6 +92,21 @@ class TestMain:
         )
         args()
 
+    #  Runs gpt-engineer with improve mode and improves an existing project in the specified path, with skip_file_selection
+    def test_improve_existing_project_skip_file_selection(self, tmp_path, monkeypatch):
+        p = tmp_path / "projects/example"
+        p.mkdir(parents=True)
+        (p / "prompt").write_text(prompt_text)
+        args = DefaultArgumentsMain(
+            str(p),
+            improve_mode=True,
+            llm_via_clipboard=True,
+            no_execution=True,
+            skip_file_selection=True,
+        )
+        args()
+        assert args.skip_file_selection, "Skip_file_selection not set"
+
         # def improve_generator():
         #     yield "y"
         #     while True:

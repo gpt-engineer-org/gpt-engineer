@@ -47,7 +47,8 @@ SUPPORTED_LANGUAGES = [
         "tree_sitter_name": "cpp",
     },
     {"name": "C", "extensions": [".c", ".h"], "tree_sitter_name": "c"},
-    {"name": "Markdown", "extensions": [".md"], "tree_sitter_name": "md"}
+    {"name": "Markdown", "extensions": [".md"], "tree_sitter_name": "md"},
+    {"name": "Arduino C", "extensions": [".ino"], "tree_sitter_name": "ino"}
     # ---- the following are not supported by the current code chunker implementation ----
     # {
     #     "name": "Swift",
