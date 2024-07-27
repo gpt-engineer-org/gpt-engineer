@@ -107,6 +107,21 @@ class TestMain:
         args()
         assert args.skip_file_selection, "Skip_file_selection not set"
 
+    #  Runs gpt-engineer with improve mode and improves an existing project in the specified path, with skip_file_selection
+    def test_improve_existing_project_diff_timeout(self, tmp_path, monkeypatch):
+        p = tmp_path / "projects/example"
+        p.mkdir(parents=True)
+        (p / "prompt").write_text(prompt_text)
+        args = DefaultArgumentsMain(
+            str(p),
+            improve_mode=True,
+            llm_via_clipboard=True,
+            no_execution=True,
+            diff_timeout=99,
+        )
+        args()
+        assert args.diff_timeout == 99, "Diff timeout not set"
+
         # def improve_generator():
         #     yield "y"
         #     while True:

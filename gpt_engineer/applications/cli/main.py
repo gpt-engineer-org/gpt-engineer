@@ -373,6 +373,11 @@ def main(
         "--sysinfo",
         help="Output system information for debugging",
     ),
+    diff_timeout: int = typer.Option(
+        3,
+        "--diff_timeout",
+        help="Diff regexp timeout. Default: 3. Increase if regexp search timeouts.",
+    ),
 ):
     """
     The main entry point for the CLI tool that generates or improves a project.
@@ -517,7 +522,9 @@ def main(
             if is_linting:
                 files_dict_before = files.linting(files_dict_before)
 
-            files_dict = handle_improve_mode(prompt, agent, memory, files_dict_before)
+            files_dict = handle_improve_mode(
+                prompt, agent, memory, files_dict_before, diff_timeout=diff_timeout
+            )
             if not files_dict or files_dict_before == files_dict:
                 print(
                     f"No changes applied. Could you please upload the debug_log_file.txt in {memory.path}/logs folder in a github issue?"

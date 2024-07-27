@@ -120,7 +120,7 @@ def apply_diffs(diffs: Dict[str, Diff], files: FilesDict) -> FilesDict:
     return files
 
 
-def parse_diffs(diff_string: str) -> dict:
+def parse_diffs(diff_string: str, diff_timeout=3) -> dict:
     """
     Parses a diff string in the unified git diff format.
 
@@ -138,7 +138,7 @@ def parse_diffs(diff_string: str) -> dict:
 
     diffs = {}
     try:
-        for block in diff_block_pattern.finditer(diff_string, timeout=10):
+        for block in diff_block_pattern.finditer(diff_string, timeout=diff_timeout):
             diff_block = block.group()
 
             # Parse individual diff blocks and update the diffs dictionary
