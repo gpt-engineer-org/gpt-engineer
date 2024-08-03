@@ -31,6 +31,7 @@ import os
 import sys
 
 from pathlib import Path
+from typing import Optional
 
 import openai
 import typer
@@ -250,85 +251,77 @@ def prompt_yesno() -> bool:
 )
 def main(
     project_path: str = typer.Argument(".", help="path"),
-    model: str = typer.Option(
-        os.environ.get("MODEL_NAME", "gpt-4"), "--model", "-m", help="model id string"
-    ),
-    temperature: float = typer.Option(
-        0.1,
+    model: Optional[str] = typer.Option(None, "--model", "-m", help="model id string"),
+    temperature: Optional[float] = typer.Option(
+        None,
         "--temperature",
         "-t",
         help="Controls randomness: lower values for more focused, deterministic outputs",
     ),
-    improve_mode: bool = typer.Option(
-        False,
+    improve_mode: Optional[bool] = typer.Option(
+        None,
         "--improve",
         "-i",
         help="Improve an existing project by modifying the files.",
     ),
-    lite_mode: bool = typer.Option(
-        False,
+    lite_mode: Optional[bool] = typer.Option(
+        None,
         "--lite",
         "-l",
         help="Lite mode: run a generation using only the main prompt.",
     ),
-    clarify_mode: bool = typer.Option(
-        False,
+    clarify_mode: Optional[bool] = typer.Option(
+        None,
         "--clarify",
         "-c",
         help="Clarify mode - discuss specification with AI before implementation.",
     ),
-    self_heal_mode: bool = typer.Option(
-        False,
+    self_heal_mode: Optional[bool] = typer.Option(
+        None,
         "--self-heal",
         "-sh",
         help="Self-heal mode - fix the code by itself when it fails.",
     ),
-    azure_endpoint: str = typer.Option(
-        "",
+    azure_endpoint: Optional[str] = typer.Option(
+        None,
         "--azure",
         "-a",
-        help="""Endpoint for your Azure OpenAI Service (https://xx.openai.azure.com).
-            In that case, the given model is the deployment name chosen in the Azure AI Studio.""",
+        help="Endpoint for your Azure OpenAI Service (https://xx.openai.azure.com). In that case, the given model is the deployment name chosen in the Azure AI Studio.",
     ),
-    use_custom_preprompts: bool = typer.Option(
-        False,
+    use_custom_preprompts: Optional[bool] = typer.Option(
+        None,
         "--use-custom-preprompts",
-        help="""Use your project's custom preprompts instead of the default ones.
-          Copies all original preprompts to the project's workspace if they don't exist there.""",
+        help="Use your project's custom preprompts instead of the default ones. Copies all original preprompts to the project's workspace if they don't exist there.",
     ),
-    llm_via_clipboard: bool = typer.Option(
-        False,
+    llm_via_clipboard: Optional[bool] = typer.Option(
+        None,
         "--llm-via-clipboard",
         help="Use the clipboard to communicate with the AI.",
     ),
-    verbose: bool = typer.Option(
-        False, "--verbose", "-v", help="Enable verbose logging for debugging."
+    verbose: Optional[bool] = typer.Option(
+        None, "--verbose", "-v", help="Enable verbose logging for debugging."
     ),
-    debug: bool = typer.Option(
-        False, "--debug", "-d", help="Enable debug mode for debugging."
+    debug: Optional[bool] = typer.Option(
+        None, "--debug", "-d", help="Enable debug mode for debugging."
     ),
-    prompt_file: str = typer.Option(
-        "prompt",
-        "--prompt_file",
-        help="Relative path to a text file containing a prompt.",
+    prompt_file: Optional[str] = typer.Option(
+        None, "--prompt_file", help="Relative path to a text file containing a prompt."
     ),
-    entrypoint_prompt_file: str = typer.Option(
-        "",
+    entrypoint_prompt_file: Optional[str] = typer.Option(
+        None,
         "--entrypoint_prompt",
         help="Relative path to a text file containing a file that specifies requirements for you entrypoint.",
     ),
-    image_directory: str = typer.Option(
-        "",
-        "--image_directory",
-        help="Relative path to a folder containing images.",
+    image_directory: Optional[str] = typer.Option(
+        None, "--image_directory", help="Relative path to a folder containing images."
     ),
-    use_cache: bool = typer.Option(
-        False,
+    use_cache: Optional[bool] = typer.Option(
+        None,
         "--use_cache",
         help="Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.",
     ),
-    no_execution: bool = typer.Option(
-        False,
+    no_execution: Optional[bool] = typer.Option(
+        None,
         "--no_execution",
         help="Run setup but to not call LLM or write any code. For testing purposes.",
     ),
@@ -378,6 +371,57 @@ def main(
     None
     """
 
+    # ask if the user wants to change the configuration
+    print(
+        "The configuration file(config.toml) is located in the root directory. You can edit it with your preferred "
+        "text editor."
+    )
+    # todo: interface to edit the configuration
+
+    # read the configuration file from the root directory
+    config = Config()
+    config_dict = config.from_toml(Path(os.getcwd()) / "config.toml").to_dict()
+
+    # todo: apply configuration here
+
+    # Override with CLI options if provided
+    model = model or config_dict["model"]["model_name"]
+    temperature = (
+        temperature if temperature is not None else config_dict["model"]["temperature"]
+    )
+    improve_mode = (
+        improve_mode
+        if improve_mode is not None
+        else config.get("improve", {}).get("is_file_selection", False)
+    )
+    lite_mode = (
+        lite_mode
+        if lite_mode is not None
+        else config.get("improve", {}).get("is_linting", False)
+    )
+    clarify_mode = clarify_mode or False  # not provided in the config, default to False
+    self_heal_mode = (
+        self_heal_mode or False
+    )  # not provided in the config, default to False
+    azure_endpoint = azure_endpoint or config.get("model", {}).get("azure_endpoint", "")
+    use_custom_preprompts = (
+        use_custom_preprompts or False
+    )  # not provided in the config, default to False
+    llm_via_clipboard = (
+        llm_via_clipboard or False
+    )  # not provided in the config, default to False
+    verbose = verbose or False  # not provided in the config, default to False
+    debug = debug or False  # not provided in the config, default to False
+    prompt_file = (
+        prompt_file or "prompt"
+    )  # not provided in the config, default to 'prompt'
+    entrypoint_prompt_file = (
+        entrypoint_prompt_file or ""
+    )  # not provided in the config, default to ''
+    image_directory = image_directory or ""  # not provided in the config, default to ''
+    use_cache = use_cache or False  # not provided in the config, default to False
+    no_execution = no_execution or False  # not provided in the config, default to False
+
     if debug:
         import pdb
 
@@ -410,19 +454,6 @@ def main(
 
     path = Path(project_path)
     print("Running gpt-engineer in", path.absolute(), "\n")
-
-    # ask if the user wants to change the configuration
-    print(
-        "The configuration file(config.toml) is located in the root directory. You can edit it with your preferred "
-        "text editor."
-    )
-    # todo: interface to edit the configuration
-
-    # read the configuration file from the root directory
-    config = Config()
-    config_dict = config.from_toml(Path(os.getcwd()) / "config.toml").to_dict()
-
-    # todo: apply configuration here
 
     prompt = load_prompt(
         DiskMemory(path),
