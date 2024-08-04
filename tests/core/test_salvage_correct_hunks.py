@@ -89,6 +89,14 @@ def test_theo_case():
     print(updated_files["run.py"])
 
 
+def test_zbf_yml_missing():
+    files = FilesDict({"application.yml": get_file_content("zbf_yml_missing_code")})
+    updated_files, _ = salvage_correct_hunks(
+        message_builder("zbf_yml_missing_chat"), files, memory
+    )
+    print(updated_files["application.yml"])
+
+
 def test_clean_up_folder(clean_up_folder):
     # The folder should be deleted after the test is run
     assert True
