@@ -90,11 +90,14 @@ def test_theo_case():
 
 
 def test_zbf_yml_missing():
-    files = FilesDict({"application.yml": get_file_content("zbf_yml_missing_code")})
+    files = FilesDict(
+        {"src/main/resources/application.yml": get_file_content("zbf_yml_missing_code")}
+    )
     updated_files, _ = salvage_correct_hunks(
         message_builder("zbf_yml_missing_chat"), files, memory
     )
-    print(updated_files["application.yml"])
+    print(updated_files["src/main/resources/application.yml"])
+    print(updated_files["src/main/resources/application-local.yml"])
 
 
 def test_clean_up_folder(clean_up_folder):
