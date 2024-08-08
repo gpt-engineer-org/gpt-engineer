@@ -142,7 +142,14 @@ def parse_diffs(diff_string: str) -> dict:
             diff_block = block.group()
 
             # Parse individual diff blocks and update the diffs dictionary
-            diffs.update(parse_diff_block(diff_block))
+            diff = parse_diff_block(diff_block)
+            for filename, diff_obj in diff.items():
+                if filename not in diffs:
+                    diffs[filename] = diff_obj
+                else:
+                    print(
+                        f"\nMultiple diffs found for {filename}. Only the first one is kept."
+                    )
     except TimeoutError:
         print("gpt-engineer timed out while parsing git diff")
 
