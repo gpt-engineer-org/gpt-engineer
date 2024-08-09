@@ -147,6 +147,32 @@ End.
 Conclusion: ***
 """
 
+single_diff = """
+```
+--- a/file1.txt
++++ a/file1.txt
+@@ -1,3 +1,3 @@
+-old line
++new line
+```
+"""
+multi_diff = """
+```
+--- a/file1.txt
++++ a/file1.txt
+@@ -1,3 +1,3 @@
+-old line
++new line
+```
+```
+--- a/file1.txt
++++ a/file1.txt
+@@ -2,3 +2,3 @@
+-another old line
++another new line
+```
+"""
+
 
 # Single function tests
 def test_basic_similarity():
@@ -287,6 +313,36 @@ def parse_chats_with_regex(
     diffs = parse_diffs(diff_content)
 
     return diff_content, code_content, diffs
+
+
+def capture_print_output(func):
+    import io
+    import sys
+
+    captured_output = io.StringIO()
+    sys.stdout = captured_output
+    func()
+    sys.stdout = sys.__stdout__
+    return captured_output
+
+
+def test_single_diff():
+    diffs = parse_diffs(single_diff)
+    correct_diff = "\n".join(single_diff.strip().split("\n")[1:-1])
+    assert diffs["a/file1.txt"].diff_to_string() == correct_diff
+
+
+def test_multi_diff_discard():
+    captured_output = capture_print_output(lambda: parse_diffs(multi_diff))
+    diffs = parse_diffs(multi_diff)
+    correct_diff = "\n".join(multi_diff.strip().split("\n")[1:8]).replace(
+        "```\n```", ""
+    )
+    assert (
+        "Multiple diffs found for a/file1.txt. Only the first one is kept."
+        in captured_output.getvalue()
+    )
+    assert diffs["a/file1.txt"].diff_to_string().strip() == correct_diff.strip()
 
 
 # test parse diff

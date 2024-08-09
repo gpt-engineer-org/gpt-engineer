@@ -274,6 +274,7 @@ def improve_fn(
     files_dict: FilesDict,
     memory: BaseMemory,
     preprompts_holder: PrepromptsHolder,
+    diff_timeout=3,
 ) -> FilesDict:
     """
     Improves the code based on user input and returns the updated files.
@@ -308,14 +309,16 @@ def improve_fn(
         DEBUG_LOG_FILE,
         "UPLOADED FILES:\n" + files_dict.to_log() + "\nPROMPT:\n" + prompt.text,
     )
-    return _improve_loop(ai, files_dict, memory, messages)
+    return _improve_loop(ai, files_dict, memory, messages, diff_timeout=diff_timeout)
 
 
 def _improve_loop(
-    ai: AI, files_dict: FilesDict, memory: BaseMemory, messages: List
+    ai: AI, files_dict: FilesDict, memory: BaseMemory, messages: List, diff_timeout=3
 ) -> FilesDict:
     messages = ai.next(messages, step_name=curr_fn())
-    files_dict, errors = salvage_correct_hunks(messages, files_dict, memory)
+    files_dict, errors = salvage_correct_hunks(
+        messages, files_dict, memory, diff_timeout=diff_timeout
+    )
 
     retries = 0
     while errors and retries < MAX_EDIT_REFINEMENT_STEPS:
@@ -327,21 +330,21 @@ def _improve_loop(
             )
         )
         messages = ai.next(messages, step_name=curr_fn())
-        files_dict, errors = salvage_correct_hunks(messages, files_dict, memory)
+        files_dict, errors = salvage_correct_hunks(
+            messages, files_dict, memory, diff_timeout
+        )
         retries += 1
 
     return files_dict
 
 
 def salvage_correct_hunks(
-    messages: List,
-    files_dict: FilesDict,
-    memory: BaseMemory,
+    messages: List, files_dict: FilesDict, memory: BaseMemory, diff_timeout=3
 ) -> tuple[FilesDict, List[str]]:
     error_messages = []
     ai_response = messages[-1].content.strip()
 
-    diffs = parse_diffs(ai_response)
+    diffs = parse_diffs(ai_response, diff_timeout=diff_timeout)
     # validate and correct diffs
 
     for _, diff in diffs.items():
@@ -370,13 +373,13 @@ class Tee(object):
             file.flush()
 
 
-def handle_improve_mode(prompt, agent, memory, files_dict):
+def handle_improve_mode(prompt, agent, memory, files_dict, diff_timeout=3):
     captured_output = io.StringIO()
     old_stdout = sys.stdout
     sys.stdout = Tee(sys.stdout, captured_output)
 
     try:
-        files_dict = agent.improve(files_dict, prompt)
+        files_dict = agent.improve(files_dict, prompt, diff_timeout=diff_timeout)
     except Exception as e:
         print(
             f"Error while improving the project: {e}\nCould you please upload the debug_log_file.txt in {memory.path}/logs folder to github?\nFULL STACK TRACE:\n"
