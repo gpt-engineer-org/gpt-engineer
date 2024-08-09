@@ -384,43 +384,49 @@ def main(
 
     # todo: apply configuration here
 
-    # Override with CLI options if provided
+    # Loading the configuration from the config_dict
+
     model = model or config_dict["model"]["model_name"]
     temperature = (
         temperature if temperature is not None else config_dict["model"]["temperature"]
     )
+    azure_endpoint = azure_endpoint or config_dict["model"]["azure_endpoint"]
+
+    # Improve mode configuration
     improve_mode = (
         improve_mode
         if improve_mode is not None
-        else config.get("improve", {}).get("is_file_selection", False)
+        else config_dict["improve"]["is_file_selection"]
     )
     lite_mode = (
-        lite_mode
-        if lite_mode is not None
-        else config.get("improve", {}).get("is_linting", False)
+        lite_mode if lite_mode is not None else config_dict["improve"]["is_linting"]
     )
-    clarify_mode = clarify_mode or False  # not provided in the config, default to False
+
+    # Self-healing mechanism configuration
     self_heal_mode = (
-        self_heal_mode or False
-    )  # not provided in the config, default to False
-    azure_endpoint = azure_endpoint or config.get("model", {}).get("azure_endpoint", "")
-    use_custom_preprompts = (
-        use_custom_preprompts or False
-    )  # not provided in the config, default to False
-    llm_via_clipboard = (
-        llm_via_clipboard or False
-    )  # not provided in the config, default to False
-    verbose = verbose or False  # not provided in the config, default to False
-    debug = debug or False  # not provided in the config, default to False
-    prompt_file = (
-        prompt_file or "prompt"
-    )  # not provided in the config, default to 'prompt'
-    entrypoint_prompt_file = (
-        entrypoint_prompt_file or ""
-    )  # not provided in the config, default to ''
-    image_directory = image_directory or ""  # not provided in the config, default to ''
-    use_cache = use_cache or False  # not provided in the config, default to False
-    no_execution = no_execution or False  # not provided in the config, default to False
+        self_heal_mode
+        if self_heal_mode is not None
+        else config_dict["self_healing"]["retry_attempts"]
+    )
+
+    # Git filter configuration
+    config_dict["git_filter"]["file_extensions"]  # Assuming this is needed somewhere
+
+    # API keys
+    config_dict["API"]["OPENAI_API_KEY"]
+    config_dict["API"]["ANTHROPIC_API_KEY"]
+
+    # Default values for optional parameters
+    clarify_mode = clarify_mode or False
+    use_custom_preprompts = use_custom_preprompts or False
+    llm_via_clipboard = llm_via_clipboard or False
+    verbose = verbose or False
+    debug = debug or False
+    prompt_file = prompt_file or "prompt"
+    entrypoint_prompt_file = entrypoint_prompt_file or ""
+    image_directory = image_directory or ""
+    use_cache = use_cache or False
+    no_execution = no_execution or False
 
     if debug:
         import pdb

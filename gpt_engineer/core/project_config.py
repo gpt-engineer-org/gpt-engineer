@@ -1,10 +1,6 @@
-"""
-Functions for reading and writing the `gpt-engineer.toml` configuration file.
-
-The `gpt-engineer.toml` file is a TOML file that contains project-specific configuration used by the GPT Engineer CLI and gptengineer.app.
-"""
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any, Dict
 
 import tomlkit
 
@@ -26,48 +22,29 @@ azure_endpoint = ""
 [improve]
 is_linting = false
 is_file_selection = true
+
+# Git Filter Configuration
+[git_filter]
+file_extensions = ["py", "toml", "md"]
+
+# Self-Healing Mechanism Configuration
+[self_healing]
+retry_attempts = 1
 """
-
-
-@dataclass
-class _ApiConfig:
-    OPENAI_API_KEY: str | None = None
-    ANTHROPIC_API_KEY: str | None = None
-
-
-@dataclass
-class _ModelConfig:
-    model_name: str | None = None
-    temperature: float | None = None
-    azure_endpoint: str | None = None
-
-
-@dataclass
-class _ImproveConfig:
-    is_linting: bool | None = None
-    is_file_selection: bool | None = None
-
-
-def filter_none(d: dict) -> dict:
-    # Drop None values and empty dictionaries from a dictionary
-    return {
-        k: v
-        for k, v in (
-            (k, filter_none(v) if isinstance(v, dict) else v)
-            for k, v in d.items()
-            if v is not None
-        )
-        if not (isinstance(v, dict) and not v)  # Check for non-empty after filtering
-    }
 
 
 @dataclass
 class Config:
     """Configuration for the GPT Engineer project"""
 
-    api_config: _ApiConfig = field(default_factory=_ApiConfig)
-    model_config: _ModelConfig = field(default_factory=_ModelConfig)
-    improve_config: _ImproveConfig = field(default_factory=_ImproveConfig)
+    api_config: Dict[str, Any] = field(default_factory=dict)
+    model_config: Dict[str, Any] = field(default_factory=dict)
+    improve_config: Dict[str, Any] = field(default_factory=dict)
+    git_filter_config: Dict[str, Any] = field(default_factory=dict)
+    self_healing_config: Dict[str, Any] = field(default_factory=dict)
+    other_sections: Dict[str, Any] = field(
+        default_factory=dict
+    )  # To handle any other sections dynamically
 
     @classmethod
     def from_toml(cls, config_file: Path | str):
@@ -78,38 +55,36 @@ class Config:
 
     @classmethod
     def from_dict(cls, config_dict: dict):
-        api_config = _ApiConfig(
-            **config_dict.get(
-                "API", {"OPENAI_API_KEY": None, "ANTHROPIC_API_KEY": None}
-            )
-        )
-        model_config = _ModelConfig(
-            **config_dict.get(
-                "model",
-                {"model_name": None, "temperature": None, "azure_endpoint": None},
-            )
-        )
-        improve_config = _ImproveConfig(
-            **config_dict.get(
-                "improve", {"is_linting": None, "is_file_selection": None}
-            )
-        )
+        api_config = config_dict.get("API", {})
+        model_config = config_dict.get("model", {})
+        improve_config = config_dict.get("improve", {})
+        git_filter_config = config_dict.get("git_filter", {})
+        self_healing_config = config_dict.get("self_healing", {})
+
+        # Extract other sections not explicitly handled
+        handled_keys = {"API", "model", "improve", "git_filter", "self_healing"}
+        other_sections = {k: v for k, v in config_dict.items() if k not in handled_keys}
 
         return cls(
             api_config=api_config,
             model_config=model_config,
             improve_config=improve_config,
+            git_filter_config=git_filter_config,
+            self_healing_config=self_healing_config,
+            other_sections=other_sections,
         )
 
     def to_dict(self) -> dict:
-        d = asdict(self)
-        d["API"] = d.pop("api_config", None)
-        d["model"] = d.pop("model_config", None)
-        d["improve"] = d.pop("improve_config", None)
+        d = {
+            "API": self.api_config,
+            "model": self.model_config,
+            "improve": self.improve_config,
+            "git_filter": self.git_filter_config,
+            "self_healing": self.self_healing_config,
+        }
+        d.update(self.other_sections)  # Add other dynamic sections
 
         # Drop None values and empty dictionaries
-        # Needed because tomlkit.dumps() doesn't handle None values,
-        # and we don't want to write empty sections.
         d = filter_none(d)
 
         return d
@@ -124,15 +99,15 @@ class Config:
         default_config = Config().to_dict()
         for k, v in self.to_dict().items():
             # only write values that are already explicitly set, or that differ from defaults
-            if k in config or v != default_config[k]:
+            if k in config or v != default_config.get(k):
                 if isinstance(v, dict):
                     config[k] = {
                         k2: v2
                         for k2, v2 in v.items()
                         if (
-                            k2 in config[k]
+                            k2 in config.get(k, {})
                             or default_config.get(k) is None
-                            or v2 != default_config[k].get(k2)
+                            or v2 != default_config.get(k, {}).get(k2)
                         )
                     }
                 else:
@@ -151,3 +126,16 @@ def read_config(config_file: Path) -> tomlkit.TOMLDocument:
     assert config_file.exists(), f"Config file {config_file} does not exist"
     with open(config_file, "r") as f:
         return tomlkit.load(f)
+
+
+def filter_none(d: dict) -> dict:
+    """Drop None values and empty dictionaries from a dictionary"""
+    return {
+        k: v
+        for k, v in (
+            (k, filter_none(v) if isinstance(v, dict) else v)
+            for k, v in d.items()
+            if v is not None
+        )
+        if not (isinstance(v, dict) and not v)  # Check for non-empty after filtering
+    }
