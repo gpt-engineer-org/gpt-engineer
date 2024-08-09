@@ -76,7 +76,7 @@ class FileSelector:
         self.metadata_db = DiskMemory(metadata_path(self.project_path))
         self.toml_path = self.metadata_db.path / self.FILE_LIST_NAME
 
-    def ask_for_files(self) -> tuple[FilesDict, bool]:
+    def ask_for_files(self, skip_file_selection=False) -> tuple[FilesDict, bool]:
         """
         Prompts the user to select files for context improvement.
 
@@ -89,8 +89,9 @@ class FileSelector:
             A dictionary with file paths as keys and file contents as values.
         """
 
-        if os.getenv("GPTE_TEST_MODE"):
+        if os.getenv("GPTE_TEST_MODE") or skip_file_selection:
             # In test mode, retrieve files from a predefined TOML configuration
+            # also get from toml if skip_file_selector is active
             assert self.FILE_LIST_NAME in self.metadata_db
             selected_files = self.get_files_from_toml(self.project_path, self.toml_path)
         else:
@@ -412,7 +413,7 @@ class FileSelector:
         if is_git_repo(project_path) and "projects" not in project_path.parts:
             all_files = filter_by_gitignore(project_path, all_files)
 
-        return all_files
+        return sorted(all_files, key=lambda x: Path(x).as_posix())
 
 
 class DisplayablePath(object):

@@ -44,6 +44,7 @@ def self_heal(
     prompt: Prompt = None,
     preprompts_holder: PrepromptsHolder = None,
     memory: BaseMemory = None,
+    diff_timeout=3,
 ) -> FilesDict:
     """
     Attempts to execute the code from the entrypoint and if it fails, sends the error output back to the AI with instructions to fix.
@@ -111,7 +112,7 @@ def self_heal(
                 f"A program with this specification was requested:\n{prompt}\n, but running it produced the following output:\n{stdout_full}\n and the following errors:\n{stderr_full}. Please change it so that it fulfills the requirements."
             )
             files_dict = improve_fn(
-                ai, new_prompt, files_dict, memory, preprompts_holder
+                ai, new_prompt, files_dict, memory, preprompts_holder, diff_timeout
             )
         else:
             break

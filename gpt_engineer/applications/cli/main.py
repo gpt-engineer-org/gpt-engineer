@@ -357,6 +357,12 @@ def main(
         "--use_cache",
         help="Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.",
     ),
+    skip_file_selection: bool = typer.Option(
+        False,
+        "--skip-file-selection",
+        "-s",
+        help="Skip interactive file selection in improve mode and use the generated TOML file directly.",
+    ),
     no_execution: bool = typer.Option(
         False,
         "--no_execution",
@@ -366,6 +372,11 @@ def main(
         False,
         "--sysinfo",
         help="Output system information for debugging",
+    ),
+    diff_timeout: int = typer.Option(
+        3,
+        "--diff_timeout",
+        help="Diff regexp timeout. Default: 3. Increase if regexp search timeouts.",
     ),
 ):
     """
@@ -405,6 +416,8 @@ def main(
         Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.
     verbose : bool
         Flag indicating whether to enable verbose logging.
+    skip_file_selection: bool
+        Skip interactive file selection in improve mode and use the generated TOML file directly
     no_execution: bool
         Run setup but to not call LLM or write any code. For testing purposes.
     sysinfo: bool
@@ -501,13 +514,17 @@ def main(
     files = FileStore(project_path)
     if not no_execution:
         if improve_mode:
-            files_dict_before, is_linting = FileSelector(project_path).ask_for_files()
+            files_dict_before, is_linting = FileSelector(project_path).ask_for_files(
+                skip_file_selection=skip_file_selection
+            )
 
             # lint the code
             if is_linting:
                 files_dict_before = files.linting(files_dict_before)
 
-            files_dict = handle_improve_mode(prompt, agent, memory, files_dict_before)
+            files_dict = handle_improve_mode(
+                prompt, agent, memory, files_dict_before, diff_timeout=diff_timeout
+            )
             if not files_dict or files_dict_before == files_dict:
                 print(
                     f"No changes applied. Could you please upload the debug_log_file.txt in {memory.path}/logs folder in a github issue?"

@@ -109,6 +109,7 @@ class CliAgent(BaseAgent):
         improve_fn: ImproveType = improve_fn,
         process_code_fn: CodeProcessor = execute_entrypoint,
         preprompts_holder: PrepromptsHolder = None,
+        diff_timeout=3,
     ):
         """
         Creates a new instance of CliAgent with default configurations for memory, execution environment,
@@ -186,6 +187,7 @@ class CliAgent(BaseAgent):
         files_dict: FilesDict,
         prompt: Prompt,
         execution_command: Optional[str] = None,
+        diff_timeout=3,
     ) -> FilesDict:
         """
         Improves an existing piece of code using the AI and step bundle based on the provided prompt.
@@ -206,7 +208,12 @@ class CliAgent(BaseAgent):
         """
 
         files_dict = self.improve_fn(
-            self.ai, prompt, files_dict, self.memory, self.preprompts_holder
+            self.ai,
+            prompt,
+            files_dict,
+            self.memory,
+            self.preprompts_holder,
+            diff_timeout=diff_timeout,
         )
         # entrypoint = gen_entrypoint(
         #     self.ai, prompt, files_dict, self.memory, self.preprompts_holder
