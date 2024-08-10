@@ -2,12 +2,7 @@ import tempfile
 
 import pytest
 
-from gpt_engineer.core.project_config import (
-    Config,
-    _ImproveConfig,
-    example_config,
-    filter_none,
-)
+from gpt_engineer.core.project_config import Config, example_config, filter_none
 
 
 def test_config_load():
@@ -76,15 +71,18 @@ is_linting = "..."
 
 
 def test_config_update():
-    example_config = """
+    initial_config = """
 [improve]
 is_linting = "..."
 """.strip()
     with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
-        f.write(example_config)
+        f.write(initial_config)
+
     config = Config.from_toml(f.name)
-    config.improve_config = _ImproveConfig(is_linting=False, is_file_selection=True)
+    config.improve_config = {"is_linting": False, "is_file_selection": True}
     config.to_toml(f.name)
+
+    # Check that updated values are written and read correctly
     assert Config.from_toml(f.name) == config
 
 
