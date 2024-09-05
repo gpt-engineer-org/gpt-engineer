@@ -106,13 +106,8 @@ to learn how you can [contribute](.github/CONTRIBUTING.md) to it.
 gpt-engineer is [governed](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/GOVERNANCE.md) by a board of long-term contributors. If you contribute routinely and have an interest in shaping the future of gpt-engineer, you will be considered for the board.
 
 ## Significant contributors
-<img data-component="Avatar" alt="" size="40" src="https://avatars.githubusercontent.com/u/143704446?s=60&amp;v=4" data-testid="github-avatar" height="40" width="40" class="Avatar__StyledAvatar-sc-2lv0r8-0 dwHCGq">
+<ul style="list-style-type: none; padding: 0; display: flex; flex-wrap: wrap;"> <li style="margin-right: 10px; margin-bottom: 10px;"> <a href="https://github.com/ATheorell"> <img src="https://avatars.githubusercontent.com/u/143704446?s=64&v=4" alt="@ATheorell" width="32" height="32" style="border-radius: 50%;"> @ATheorell </a> </li> <li style="margin-right: 10px; margin-bottom: 10px;"> <a href="https://github.com/AntonOsika"> <img src="https://avatars.githubusercontent.com/u/4467025?s=64&v=4" alt="@AntonOsika" width="32" height="32" style="border-radius: 50%;"> @AntonOsika </a> </li> <li style="margin-right: 10px; margin-bottom: 10px;"> <a href="https://github.com/similato87"> <img src="https://avatars.githubusercontent.com/u/71301573?s=64&v=4" alt="@similato87" width="32" height="32" style="border-radius: 50%;"> @similato87 </a> </li> <li style="margin-right: 10px; margin-bottom: 10px;"> <a href="https://github.com/TheoMcCabe"> <img src="https://avatars.githubusercontent.com/u/9841960?s=64&v=4" alt="@TheoMcCabe" width="32" height="32" style="border-radius: 50%;"> @TheoMcCabe </a> </li> <li style="margin-right: 10px; margin-bottom: 10px;"> <a href="https://github.com/captivus"> <img src="https://avatars.githubusercontent.com/u/366332?s=64&v=4" alt="@captivus" width="32" height="32" style="border-radius: 50%;"> @captivus </a> </li> </ul>
 
-<img data-component="Avatar" alt="" size="40" src="https://avatars.githubusercontent.com/u/366332?s=60&amp;v=4" data-testid="github-avatar" height="40" width="40" class="Avatar__StyledAvatar-sc-2lv0r8-0 dwHCGq">
-
-<img data-component="Avatar" alt="" size="40" src="https://avatars.githubusercontent.com/u/71301573?s=60&amp;v=4" data-testid="github-avatar" height="40" width="40" class="Avatar__StyledAvatar-sc-2lv0r8-0 dwHCGq">
-
-<img data-component="Avatar" alt="" size="40" src="https://avatars.githubusercontent.com/u/366332?s=60&amp;v=4" data-testid="github-avatar" height="40" width="40" class="Avatar__StyledAvatar-sc-2lv0r8-0 dwHCGq">
 
 ## Example
 
