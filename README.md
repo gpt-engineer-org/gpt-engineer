@@ -105,6 +105,15 @@ to learn how you can [contribute](.github/CONTRIBUTING.md) to it.
 
 gpt-engineer is [governed](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/GOVERNANCE.md) by a board of long-term contributors. If you contribute routinely and have an interest in shaping the future of gpt-engineer, you will be considered for the board.
 
+## Significant contributors
+<img data-component="Avatar" alt="" size="40" src="https://avatars.githubusercontent.com/u/143704446?s=60&amp;v=4" data-testid="github-avatar" height="40" width="40" class="Avatar__StyledAvatar-sc-2lv0r8-0 dwHCGq">
+
+<img data-component="Avatar" alt="" size="40" src="https://avatars.githubusercontent.com/u/366332?s=60&amp;v=4" data-testid="github-avatar" height="40" width="40" class="Avatar__StyledAvatar-sc-2lv0r8-0 dwHCGq">
+
+<img data-component="Avatar" alt="" size="40" src="https://avatars.githubusercontent.com/u/71301573?s=60&amp;v=4" data-testid="github-avatar" height="40" width="40" class="Avatar__StyledAvatar-sc-2lv0r8-0 dwHCGq">
+
+<img data-component="Avatar" alt="" size="40" src="https://avatars.githubusercontent.com/u/366332?s=60&amp;v=4" data-testid="github-avatar" height="40" width="40" class="Avatar__StyledAvatar-sc-2lv0r8-0 dwHCGq">
+
 ## Example
 
 
