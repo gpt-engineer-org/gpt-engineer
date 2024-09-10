@@ -37,6 +37,7 @@ from langchain.schema import (
 )
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
+from langchain_community.chat_models import ChatPerplexity
 
 from gpt_engineer.core.token_usage import TokenUsageLog
 
@@ -361,6 +362,13 @@ class AI:
                 callbacks=[StreamingStdOutCallbackHandler()],
                 streaming=self.streaming,
                 max_tokens_to_sample=4096,
+            )
+        elif os.getenv("PPLX_API_KEY") is not None:
+            return ChatPerplexity(
+                model=self.model_name,
+                temperature=self.temperature,
+                callbacks=[StreamingStdOutCallbackHandler()],
+                streaming=self.streaming,
             )
         elif self.vision:
             return ChatOpenAI(
