@@ -32,6 +32,18 @@ from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.files_dict import FilesDict
 
+import fcntl
+import os
+
+# Taken from https://gist.github.com/sebclaeys/1232088
+def non_block_read(output):
+    fd = output.fileno()
+    fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+    fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+    try:
+        return output.readline()
+    except:
+        return ""
 
 class DiskExecutionEnv(BaseExecutionEnv):
     """
@@ -88,8 +100,8 @@ class DiskExecutionEnv(BaseExecutionEnv):
             while p.poll() is None:
                 assert p.stdout is not None
                 assert p.stderr is not None
-                stdout = p.stdout.readline()
-                stderr = p.stderr.readline()
+                stdout = non_block_read(p.stdout)
+                stderr = non_block_read(p.stderr)
                 if stdout:
                     print(stdout, end="")
                     stdout_full += stdout
