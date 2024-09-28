@@ -22,6 +22,8 @@ Imports
 - FilesDict: For handling collections of files.
 """
 
+import fcntl
+import os
 import subprocess
 import time
 
@@ -31,9 +33,6 @@ from typing import Optional, Tuple, Union
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.files_dict import FilesDict
-
-import fcntl
-import os
 
 
 # Taken from https://gist.github.com/sebclaeys/1232088
