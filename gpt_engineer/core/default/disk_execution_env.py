@@ -35,6 +35,7 @@ from gpt_engineer.core.files_dict import FilesDict
 import fcntl
 import os
 
+
 # Taken from https://gist.github.com/sebclaeys/1232088
 def non_block_read(output):
     fd = output.fileno()
@@ -44,6 +45,7 @@ def non_block_read(output):
         return output.readline()
     except:
         return ""
+
 
 class DiskExecutionEnv(BaseExecutionEnv):
     """
