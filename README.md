@@ -7,6 +7,13 @@
 ![GitHub Release](https://img.shields.io/github/v/release/gpt-engineer-org/gpt-engineer)
 [![Twitter Follow](https://img.shields.io/twitter/follow/antonosika?style=social)](https://twitter.com/antonosika)
 
+The OG code genereation experimentation platform!
+
+If you are looking for the evolution that is an opinionated, managed service – check out gptengineer.app.
+
+If you are looking for a well maintained hackable CLI for – check out aider.
+
+
 gpt-engineer lets you:
 - Specify software in natural language
 - Sit back and watch as an AI writes and executes the code
