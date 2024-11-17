@@ -94,7 +94,7 @@ You can specify the "identity" of the AI agent by overriding the `preprompts` fo
 
 Editing the `preprompts` is how you make the agent remember things between projects.
 
-### Vision
+### Visual input
 
 By default, gpt-engineer expects text input via a `prompt` file. It can also accept image inputs for vision-capable models. This can be useful for adding UX or architecture diagrams as additional context for GPT Engineer. You can do this by specifying an image directory with the `—-image_directory` flag and setting a vision-capable model in the second CLI argument.
 
@@ -118,8 +118,6 @@ to learn how you can [contribute](.github/CONTRIBUTING.md) to it.
 
 gpt-engineer is [governed](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/GOVERNANCE.md) by a board of long-term contributors. If you contribute routinely and have an interest in shaping the future of gpt-engineer, you will be considered for the board.
 
-## Significant contributors
-<ul style="list-style-type: none; padding: 0; display: flex; flex-wrap: wrap;"> <li style="margin-right: 10px; margin-bottom: 10px;"> <a href="https://github.com/ATheorell"> <img src="https://avatars.githubusercontent.com/u/143704446?s=64&v=4" alt="@ATheorell" width="32" height="32" style="border-radius: 50%;"> @ATheorell </a> </li> <li style="margin-right: 10px; margin-bottom: 10px;"> <a href="https://github.com/similato87"> <img src="https://avatars.githubusercontent.com/u/71301573?s=64&v=4" alt="@similato87" width="32" height="32" style="border-radius: 50%;"> @similato87 </a> </li> <li style="margin-right: 10px; margin-bottom: 10px;"> <a href="https://github.com/TheoMcCabe"> <img src="https://avatars.githubusercontent.com/u/9841960?s=64&v=4" alt="@TheoMcCabe" width="32" height="32" style="border-radius: 50%;"> @TheoMcCabe </a> </li> <li style="margin-right: 10px; margin-bottom: 10px;"> <a href="https://github.com/captivus"> <img src="https://avatars.githubusercontent.com/u/366332?s=64&v=4" alt="@captivus" width="32" height="32" style="border-radius: 50%;"> @captivus </a> </li> </ul>
 
 
 ## Example
