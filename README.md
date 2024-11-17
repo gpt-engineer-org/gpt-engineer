@@ -65,6 +65,12 @@ Check the [Windows README](./WINDOWS_README.md) for Windows usage.
   - [APPS](https://github.com/hendrycks/apps)
   - [MBPP](https://github.com/google-research/google-research/tree/master/mbpp)
 
+The community has started work with different benchmarking initiatives, as described in [this Loom](https://www.loom.com/share/206805143fbb4302b5455a5329eaab17?sid=f689608f-8e49-44f7-b55f-4c81e9dc93e6) video.
+
+### Research
+Some of our community members have worked on different research briefs that could be taken further. See [this document](https://docs.google.com/document/d/1qmOj2DvdPc6syIAm8iISZFpfik26BYw7ZziD5c-9G0E/edit?usp=sharing) if you are interested.
+
+## Terms
 By running gpt-engineer, you agree to our [terms](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
 
