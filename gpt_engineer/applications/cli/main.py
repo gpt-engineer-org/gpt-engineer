@@ -242,13 +242,40 @@ def prompt_yesno() -> bool:
 
 def get_system_info():
     system_info = {
+        "gpt_engineer_version": get_gpt_engineer_version(),
         "os": platform.system(),
         "os_version": platform.version(),
         "architecture": platform.machine(),
         "python_version": sys.version,
         "packages": format_installed_packages(get_installed_packages()),
+        "env_variables": format_env_variables(get_env_variables()),
     }
     return system_info
+
+
+def get_gpt_engineer_version():
+    try:
+        version = subprocess.run(
+            [sys.executable, "-m", "pip", "show", "gpt-engineer"],
+            capture_output=True,
+            text=True,
+        ).stdout
+        for line in version.splitlines():
+            if line.startswith("Version:"):
+                return f"pip version: {line.split(' ')[1]}"
+    except Exception as e:
+        return str(e)
+
+    try:
+        version = subprocess.run(
+            ["git", "describe", "--tags"],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).resolve().parent,
+        ).stdout.strip()
+        return f"repo version: {version}"
+    except Exception as e:
+        return f"repo version: unknown ({e})"
 
 
 def get_installed_packages():
@@ -266,6 +293,26 @@ def get_installed_packages():
 
 def format_installed_packages(packages):
     return "\n".join([f"{name}: {version}" for name, version in packages.items()])
+
+
+def get_env_variables():
+    env_vars = {}
+    for key, value in os.environ.items():
+        if "KEY" in key or "SECRET" in key or "PASSWORD" in key:
+            env_vars[key] = "*****"
+        else:
+            env_vars[key] = value
+    return env_vars
+
+
+def format_env_variables(env_vars):
+    formatted_vars = []
+    for key, value in env_vars.items():
+        if "KEY" in key or "SECRET" in key or "PASSWORD" in key:
+            formatted_vars.append(f"{key}: *****")
+        else:
+            formatted_vars.append(f"{key}: {value}")
+    return "\n".join(formatted_vars)
 
 
 @app.command(
