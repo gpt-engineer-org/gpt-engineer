@@ -1,0 +1,36 @@
+# config.toml
+# Unified configuration file for the gpt-engineer project
+
+# API Configuration
+[API]
+# API key for OpenAPI
+# OPENAI_API_KEY=Your personal OpenAI API key from https://platform.openai.com/account/api-keys
+OPENAI_API_KEY = "your_api_key_here"
+ANTHROPIC_API_KEY = "your_anthropic_api_key_here"
+
+# Model configurations
+[model]
+model_name = "gpt-4o"
+# Controls randomness: lower values for more focused, deterministic outputs
+temperature = 0.1
+# Endpoint for your Azure OpenAI Service (https://xx.openai.azure.com).
+# In that case, the given model is the deployment name chosen in the Azure AI Studio.
+azure_endpoint = ""
+
+# improve mode Configuration
+[improve]
+# Linting with BLACK (Python) enhances code suggestions from LLMs.
+# Enable or disable linting (true/false)
+is_linting = false
+# Enable or disable file selection. "true" will open your default editor to select the file. (true/false)
+is_file_selection = true
+
+# Git Filter Configuration
+[git_filter]
+# File extension settings for the git filter
+file_extensions = ["py", "toml", "md"]
+
+# Self-Healing Mechanism Configuration
+[self_healing]
+# Number of retry attempts for self-healing mechanisms (0-2)
+retry_attempts = 1

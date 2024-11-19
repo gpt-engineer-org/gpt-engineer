@@ -53,15 +53,11 @@ class FileSelector:
     IGNORE_FOLDERS = {"site-packages", "node_modules", "venv", "__pycache__"}
     FILE_LIST_NAME = "file_selection.toml"
     COMMENT = (
-        "# Remove '#' to select a file or turn off linting.\n\n"
-        "# Linting with BLACK (Python) enhances code suggestions from LLMs. "
-        "To disable linting, uncomment the relevant option in the linting settings.\n\n"
+        "# Remove '#' to select a file\n\n"
         "# gpt-engineer can only read selected files. "
         "Including irrelevant files will degrade performance, "
         "cost additional tokens and potentially overflow token limit.\n\n"
     )
-    LINTING_STRING = '[linting]\n# "linting" = "off"\n\n'
-    is_linting = True
 
     def __init__(self, project_path: Union[str, Path]):
         """
@@ -118,7 +114,7 @@ class FileSelector:
             except UnicodeDecodeError:
                 print(f"Warning: File not UTF-8 encoded {file_path}, skipping")
 
-        return FilesDict(content_dict), self.is_linting
+        return FilesDict(content_dict)
 
     def editor_file_selector(
         self, input_path: Union[str, Path], init: bool = True
@@ -160,24 +156,12 @@ class FileSelector:
             # Write to the toml file
             with open(toml_file, "w") as f:
                 f.write(self.COMMENT)
-                f.write(self.LINTING_STRING)
                 f.write(s)
 
         else:
             # Load existing files from the .toml configuration
             all_files = self.get_current_files(root_path)
             s = toml.dumps({"files": {x: "selected" for x in all_files}})
-
-            # get linting status from the toml file
-            with open(toml_file, "r") as file:
-                linting_status = toml.load(file)
-            if (
-                "linting" in linting_status
-                and linting_status["linting"].get("linting", "").lower() == "off"
-            ):
-                self.is_linting = False
-                self.LINTING_STRING = '[linting]\n"linting" = "off"\n\n'
-                print("\nLinting is disabled")
 
             with open(toml_file, "r") as file:
                 selected_files = toml.load(file)
@@ -196,7 +180,6 @@ class FileSelector:
             # Write the merged list back to the .toml for user review and modification
             with open(toml_file, "w") as file:
                 file.write(self.COMMENT)  # Ensure to write the comment
-                file.write(self.LINTING_STRING)
                 file.write(s)
 
         print(
@@ -293,16 +276,6 @@ class FileSelector:
         """
         selected_files = []
         edited_tree = toml.load(toml_file)  # Load the edited .toml file
-
-        # check if users have disabled linting or not
-        if (
-            "linting" in edited_tree
-            and edited_tree["linting"].get("linting", "").lower() == "off"
-        ):
-            self.is_linting = False
-            print("\nLinting is disabled")
-        else:
-            self.is_linting = True
 
         # Iterate through the files in the .toml and append selected files to the list
         for file, _ in edited_tree["files"].items():
