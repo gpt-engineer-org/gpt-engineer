@@ -89,6 +89,20 @@ def load_env_if_needed():
     if os.getenv("ANTHROPIC_API_KEY") is None:
         load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
 
+    if os.getenv("GOOGLE_API_KEY") is None:
+        load_dotenv()
+    if os.getenv("GOOGLE_API_KEY") is None:
+        load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
+
+
+def model_env():
+    if os.getenv("MODEL_NAME") is None:
+        load_dotenv()
+    if os.getenv("MODEL_NAME") is None:
+        load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
+
+    return os.getenv("MODEL_NAME", default="gpt-4o")
+
 
 def concatenate_paths(base_path, sub_path):
     # Compute the relative path from base_path to sub_path
@@ -281,7 +295,10 @@ def format_installed_packages(packages):
 def main(
     project_path: str = typer.Argument(".", help="path"),
     model: str = typer.Option(
-        os.environ.get("MODEL_NAME", "gpt-4o"), "--model", "-m", help="model id string"
+        os.environ.get("MODEL_NAME", model_env()),
+        "--model",
+        "-m",
+        help="model id string",
     ),
     temperature: float = typer.Option(
         0.1,

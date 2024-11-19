@@ -36,6 +36,7 @@ from langchain.schema import (
     messages_to_dict,
 )
 from langchain_anthropic import ChatAnthropic
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 
 from gpt_engineer.core.token_usage import TokenUsageLog
@@ -111,6 +112,7 @@ class AI:
             ("vision-preview" in model_name)
             or ("gpt-4-turbo" in model_name and "preview" not in model_name)
             or ("claude" in model_name)
+            or ("gemini" in model_name)
         )
         self.llm = self._create_chat_model()
         self.token_usage_log = TokenUsageLog(model_name)
@@ -361,6 +363,14 @@ class AI:
                 callbacks=[StreamingStdOutCallbackHandler()],
                 streaming=self.streaming,
                 max_tokens_to_sample=4096,
+            )
+        elif "gemini" in self.model_name:
+            return ChatGoogleGenerativeAI(
+                model=self.model_name,
+                temperature=self.temperature,
+                streaming=self.streaming,
+                google_api_key=os.getenv("GOOGLE_API_KEY"),
+                callbacks=[StreamingStdOutCallbackHandler()],
             )
         elif self.vision:
             return ChatOpenAI(
