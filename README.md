@@ -53,6 +53,8 @@ Check the [Windows README](./WINDOWS_README.md) for Windows usage.
 - Do everything in your browser:
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/gpt-engineer-org/gpt-engineer/codespaces)
 
+[![Open in Codeanywhere](https://codeanywhere.com/img/open-in-codeanywhere-btn.svg)](https://app.codeanywhere.com/#https://github.com/gpt-engineer-org/gpt-engineer)
+
 ### Create new code (default usage)
 - Create an empty folder for your project anywhere on your computer
 - Create a file called `prompt` (no extension) inside your new folder and fill it with instructions
