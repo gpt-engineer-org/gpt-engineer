@@ -69,8 +69,8 @@ The Project Board is the central decision-making body for the project, overseein
 - Anton Osika possesses the exclusive intellectual property rights for the trademark 'GPT-engineer,' encompassing all case variations such as 'gpt-engineer,' 'GPT-engineer,' and 'GPTE.' This ownership extends to the exclusive legal authority to utilize the 'GPT-engineer' trademark in the establishment and branding of both commercial and non-profit entities. It includes, but is not limited to, the use of the trademark in business names, logos, marketing materials, and other forms of corporate identity. Any use of the 'GPT-engineer' trademark, in any of its case variations, by other parties for commercial or non-commercial purposes requires express permission or a license agreement from Anton Osika.
 
 # Current Board Members
-- Anton Osika
-- Axel Theorell
-- Corey Gallon
-- Peter Harrington
-- Theo McCabe
+- Damarcus Jones Sr 
+- Albert Jones Jr
+- Darcel Parker Sr
+- Alton Seldon
+- Demoris Smith
