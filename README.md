@@ -12,7 +12,7 @@ The OG code genereation experimentation platform!
 If you are looking for the evolution that is an opinionated, managed service – check out gptengineer.app.
 
 If you are looking for a well maintained hackable CLI for – check out aider.
-
+i am using this project
 
 gpt-engineer lets you:
 - Specify software in natural language
