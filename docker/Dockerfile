@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   tcl \
   curl \
   git \
+  vim \
+  nano \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
