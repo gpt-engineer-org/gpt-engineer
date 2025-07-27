@@ -1,43 +1,49 @@
 """
-This module provides functionality to clean up benchmark directories by removing
-all files and folders except for 'prompt' and 'main_prompt'.
+This script cleans each subdirectory in the 'benchmark' folder,
+removing all files and folders except those named 'prompt' or 'main_prompt'.
 """
-
-# list all folders in benchmark folder
-# for each folder, run the benchmark
 
 import os
 import shutil
-
 from pathlib import Path
+import typer
 
-from typer import run
+app = typer.Typer()
 
-
-def main():
+@app.command()
+def clean(confirm: bool = typer.Option(False, help="Confirm cleanup without asking")):
     """
-    Main function that iterates through all directories in the 'benchmark' folder
-    and cleans them by removing all files and directories except for 'prompt' and
-    'main_prompt'.
+    Clean all benchmark folders by removing all contents
+    except 'prompt' and 'main_prompt' files/folders.
     """
+    benchmarks_dir = Path("benchmark")
 
-    benchmarks = Path("benchmark")
+    if not benchmarks_dir.exists():
+        typer.echo("❌ 'benchmark' directory does not exist.")
+        raise typer.Exit()
 
-    for benchmark in benchmarks.iterdir():
+    for benchmark in benchmarks_dir.iterdir():
         if benchmark.is_dir():
-            print(f"Cleaning {benchmark}")
-            for path in benchmark.iterdir():
-                if path.name in ["prompt", "main_prompt"]:
+            typer.echo(f"\n🧹 Cleaning '{benchmark}'")
+
+            for item in benchmark.iterdir():
+                if item.name in ["prompt", "main_prompt"]:
                     continue
 
-                # Get filename of Path object
-                if path.is_dir():
-                    # delete the entire directory
-                    shutil.rmtree(path)
-                else:
-                    # delete the file
-                    os.remove(path)
+                try:
+                    if not confirm:
+                        if not typer.confirm(f"Delete '{item}'?"):
+                            continue
 
+                    if item.is_dir():
+                        shutil.rmtree(item)
+                        typer.echo(f"✅ Deleted folder: {item}")
+                    else:
+                        item.unlink()
+                        typer.echo(f"✅ Deleted file: {item}")
+
+                except Exception as e:
+                    typer.echo(f"⚠️ Error deleting {item}: {e}")
 
 if __name__ == "__main__":
-    run(main)
+    app()
