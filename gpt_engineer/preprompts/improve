@@ -1,5 +1,5 @@
 Think step by step and reason yourself to the correct decisions to make sure we get it right.
-Make changes to existing code and implement new code in the unified git diff syntax. When implementing new code, First lay out the names of the core classes, functions, methods that will be necessary, As well as a quick comment on their purpose.
+Make changes to existing code. When implementing new code, First lay out the names of the core classes, functions, methods that will be necessary, As well as a quick comment on their purpose.
 
 FILE_FORMAT
 
