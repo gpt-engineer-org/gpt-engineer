@@ -25,9 +25,11 @@ execute_entrypoint : function
 setup_sys_prompt_existing_code : function
     Sets up the system prompt for improving existing code.
 
-
 improve : function
     Improves the code based on user input and returns the updated files.
+
+_apply_morph_edit : function
+    Send code editing instructions to Morph API and return the merged code.
 """
 
 import inspect
@@ -35,6 +37,10 @@ import io
 import re
 import sys
 import traceback
+import json
+import os
+from openai import OpenAI
+
 
 from pathlib import Path
 from typing import List, MutableMapping, Union
@@ -95,7 +101,7 @@ def setup_sys_prompt(preprompts: MutableMapping[Union[str, Path], str]) -> str:
 
 
 def setup_sys_prompt_existing_code(
-    preprompts: MutableMapping[Union[str, Path], str]
+    preprompts: MutableMapping[Union[str, Path], str],
 ) -> str:
     """
     Sets up the system prompt for improving existing code.
@@ -268,6 +274,46 @@ def execute_entrypoint(
     return files_dict
 
 
+def apply_morph_edit(instructions: str, initial_code: str, code_edit: str) -> str:
+    """
+    Send code editing instructions to Morph API and return the merged code.
+
+    Args:
+        instructions (str): The instructions for the edit.
+        initial_code (str): The original code to modify.
+        code_edit (str): The proposed code changes.
+
+    Returns:
+        str: The merged/edited code returned by Morph, or the original code if an error occurs.
+    """
+    api_key = os.getenv("MORPH_API_KEY")
+    if not api_key:
+        print("Error: MORPH_API_KEY not set.")
+        return initial_code
+
+    client = OpenAI(api_key=api_key, base_url="https://api.morphllm.com/v1")
+
+    try:
+        response = client.chat.completions.create(
+            model="morph-v3-large",
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"<instruction>{instructions}</instruction>\n<code>{initial_code}</code>\n<update>{code_edit}</update>",
+                }
+            ],
+        )
+        merged_code = response.choices[0].message.content
+        if not merged_code:
+            print("Warning: Morph returned empty content. Using original code.")
+            return initial_code
+        return merged_code
+
+    except Exception as e:
+        print(f"Unexpected error applying Morph edit: {e}")
+        return initial_code
+
+
 def improve_fn(
     ai: AI,
     prompt: Prompt,
@@ -316,48 +362,30 @@ def _improve_loop(
     ai: AI, files_dict: FilesDict, memory: BaseMemory, messages: List, diff_timeout=3
 ) -> FilesDict:
     messages = ai.next(messages, step_name=curr_fn())
-    files_dict, errors = salvage_correct_hunks(
-        messages, files_dict, memory, diff_timeout=diff_timeout
-    )
-
-    retries = 0
-    while errors and retries < MAX_EDIT_REFINEMENT_STEPS:
-        messages.append(
-            HumanMessage(
-                content="Some previously produced diffs were not on the requested format, or the code part was not found in the code. Details:\n"
-                + "\n".join(errors)
-                + "\n Only rewrite the problematic diffs, making sure that the failing ones are now on the correct format and can be found in the code. Make sure to not repeat past mistakes. \n"
-            )
-        )
-        messages = ai.next(messages, step_name=curr_fn())
-        files_dict, errors = salvage_correct_hunks(
-            messages, files_dict, memory, diff_timeout
-        )
-        retries += 1
-
-    return files_dict
-
-
-def salvage_correct_hunks(
-    messages: List, files_dict: FilesDict, memory: BaseMemory, diff_timeout=3
-) -> tuple[FilesDict, List[str]]:
-    error_messages = []
+    # Log AI raw response
     ai_response = messages[-1].content.strip()
 
-    diffs = parse_diffs(ai_response, diff_timeout=diff_timeout)
-    # validate and correct diffs
+    try:
+        data = json.loads(ai_response)
+    except json.JSONDecodeError as e:
+        # Log the error and the response for debugging
+        print(f"Failed to parse AI response as JSON: {e}")
+        print("AI response:", ai_response)
+        return files_dict  # Return the original files_dict unchanged
 
-    for _, diff in diffs.items():
-        # if diff is a new file, validation and correction is unnecessary
-        if not diff.is_new_file():
-            problems = diff.validate_and_correct(
-                file_to_lines_dict(files_dict[diff.filename_pre])
+    for file in data:
+        if file["target_file"] not in files_dict:
+            files_dict[file["target_file"]] = file["code_edit"]
+        else:
+            # Use Morph to apply the edit
+            merged_code = apply_morph_edit(
+                instructions=file["instructions"],
+                initial_code=files_dict[file["target_file"]],
+                code_edit=file["code_edit"],
             )
-            error_messages.extend(problems)
-    files_dict = apply_diffs(diffs, files_dict)
-    memory.log(IMPROVE_LOG_FILE, "\n\n".join(x.pretty_repr() for x in messages))
-    memory.log(DIFF_LOG_FILE, "\n\n".join(error_messages))
-    return files_dict, error_messages
+            files_dict[file["target_file"]] = merged_code
+
+    return files_dict
 
 
 class Tee(object):
