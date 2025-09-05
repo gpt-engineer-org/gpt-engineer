@@ -284,24 +284,34 @@ def apply_morph_edit(instructions: str, initial_code: str, code_edit: str) -> st
         code_edit (str): The proposed code changes.
 
     Returns:
-        str: The merged/edited code returned by Morph.
+        str: The merged/edited code returned by Morph, or the original code if an error occurs.
     """
-    client = OpenAI(
-        api_key=os.getenv("MORPH_API_KEY"), base_url="https://api.morphllm.com/v1"
-    )
+    api_key = os.getenv("MORPH_API_KEY")
+    if not api_key:
+        print("Error: MORPH_API_KEY not set.")
+        return initial_code
 
-    response = client.chat.completions.create(
-        model="morph-v3-large",
-        messages=[
-            {
-                "role": "user",
-                "content": f"<instruction>{instructions}</instruction>\n<code>{initial_code}</code>\n<update>{code_edit}</update>",
-            }
-        ],
-    )
+    client = OpenAI(api_key=api_key, base_url="https://api.morphllm.com/v1")
 
-    merged_code = response.choices[0].message.content
-    return merged_code
+    try:
+        response = client.chat.completions.create(
+            model="morph-v3-large",
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"<instruction>{instructions}</instruction>\n<code>{initial_code}</code>\n<update>{code_edit}</update>",
+                }
+            ],
+        )
+        merged_code = response.choices[0].message.content
+        if not merged_code:
+            print("Warning: Morph returned empty content. Using original code.")
+            return initial_code
+        return merged_code
+
+    except Exception as e:
+        print(f"Unexpected error applying Morph edit: {e}")
+        return initial_code
 
 
 def improve_fn(
@@ -354,7 +364,14 @@ def _improve_loop(
     messages = ai.next(messages, step_name=curr_fn())
     # Log AI raw response
     ai_response = messages[-1].content.strip()
-    data = json.loads(ai_response)
+
+    try:
+        data = json.loads(ai_response)
+    except json.JSONDecodeError as e:
+        # Log the error and the response for debugging
+        print(f"Failed to parse AI response as JSON: {e}")
+        print("AI response:", ai_response)
+        return files_dict  # Return the original files_dict unchanged
 
     for file in data:
         if file["target_file"] not in files_dict:
