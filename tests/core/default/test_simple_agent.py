@@ -1,6 +1,7 @@
 import tempfile
 
 import pytest
+import json
 
 from langchain.schema import AIMessage
 
@@ -47,11 +48,16 @@ def test_improve():
             "run.sh": "python3 main.py\n",
         }
     )
+    mock_response_data = [
+        {
+            "target_file": "main.py",
+            "instructions": "Reverse the string written to the file",
+            "code_edit": "with open(filename, 'w') as file:\n    file.write('!dlroW olleH')",
+        }
+    ]
     mock_ai = MockAI(
         [
-            AIMessage(
-                "```diff\n--- main.py\n+++ main.py\n@@ -7,3 +7,3 @@\n     with open(filename, 'w') as file:\n-        file.write('Hello World!')\n+        file.write('!dlroW olleH')\n```"
-            )
+            AIMessage(content=json.dumps(mock_response_data))
         ]
     )
     lean_agent = SimpleAgent.with_default_config(temp_dir, mock_ai)

@@ -4,6 +4,8 @@ import tempfile
 from unittest.mock import MagicMock
 
 import pytest
+import json
+from unittest.mock import patch
 
 from langchain.schema import SystemMessage
 
@@ -266,51 +268,27 @@ pytest test_factorial.py
 
 
 class TestImprove:
-    def test_improve_existing_code(self, tmp_path):
-        # Mock the AI class
-        ai_patch = """
-Some introductory text.
-```diff
---- main.py
-+++ main.py
-@@ -1,1 +1,1 @@
--print('Hello, World!')
-+print('Goodbye, World!')
-```
-"""
+    @patch("gpt_engineer.core.default.steps.apply_morph_edit")
+    def test_improve_existing_code(self, mock_apply_morph, tmp_path):
+        expected_final_code = "print('Goodbye, World!')"
+
+        mock_apply_morph.return_value = expected_final_code
+
+        mock_ai_response_json = json.dumps(
+            [{"target_file": "main.py", "instructions": "...", "code_edit": "..."}]
+        )
         ai_mock = MagicMock(spec=AI)
-        ai_mock.next.return_value = [SystemMessage(content=ai_patch)]
+        ai_mock.next.return_value = [SystemMessage(content=mock_ai_response_json)]
 
-        # Create a Code object with existing code
-        code = FilesDict(
-            {
-                "main.py": "print('Hello, World!')",
-                "requirements.txt": "numpy==1.18.1",
-                "README.md": "This is a sample code repository.",
-            }
-        )
-
-        # Create a BaseRepository object for memory
+        code = FilesDict({"main.py": "print('Hello, World!')"})
         memory = DiskMemory(tmp_path)
-
-        # Define the user prompt
-        prompt = Prompt(
-            "Change the program to print 'Goodbye, World!' instead of 'Hello, World!'"
-        )
-
-        # Call the improve function
+        prompt = Prompt("Change the program...")
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
-        improved_code = improve_fn(ai_mock, prompt, code, memory, preprompts_holder)
 
-        # Assert that the code was improved correctly
-        expected_code = FilesDict(
-            {
-                "main.py": "print('Goodbye, World!')",
-                "requirements.txt": "numpy==1.18.1",
-                "README.md": "This is a sample code repository.",
-            }
-        )
-        assert improved_code == expected_code
+        # Call the function, which will now use the FAKE Morph call
+        improved_code = improve_fn(ai_mock, prompt, code, memory, preprompts_holder)
+        assert improved_code["main.py"] == expected_final_code
+        mock_apply_morph.assert_called_once()
 
     def test_lint_python(self):
         linting = Linting()

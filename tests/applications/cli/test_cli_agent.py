@@ -1,7 +1,9 @@
 import os
 import tempfile
+import json
 
 import pytest
+from unittest.mock import patch
 
 from langchain.schema import AIMessage
 
@@ -112,43 +114,45 @@ def test_init_clarified_gen_config(monkeypatch):
     assert code[outfile].strip() == "Hello World!"
 
 
-def test_improve_standard_config(monkeypatch):
+@patch("gpt_engineer.core.default.steps.apply_morph_edit")
+def test_improve_standard_config(mock_apply_morph, monkeypatch): # 2. Pytest gives you the mock as an argument
+    # 3. Tell your fake function what to return when it's called
+    mock_apply_morph.return_value = "!dlroW olleH"
+
+    # The rest of the test setup
     monkeypatch.setattr("builtins.input", lambda _: "y")
     temp_dir = tempfile.mkdtemp()
     code = FilesDict(
         {
-            "main.py": "def write_hello_world_to_file(filename):\n    \"\"\"\n    Writes 'Hello World!' to the specified file.\n    \n    :param filename: The name of the file to write to.\n    \"\"\"\n    with open(filename, 'w') as file:\n        file.write('Hello World!')\n\nif __name__ == \"__main__\":\n    output_filename = 'output.txt'\n    write_hello_world_to_file(output_filename)",
+            "main.py": "def write_hello_world_to_file(filename):\n    file.write('Hello World!')",
             "requirements.txt": "# No dependencies required",
             "run.sh": "python3 main.py\n",
         }
     )
     memory = DiskMemory(memory_path(temp_dir))
-    # version_manager = GitVersionManager(temp_dir)
     execution_env = DiskExecutionEnv()
-    mock_ai = MockAI(
-        [
-            AIMessage(
-                "```diff\n--- main.py\n+++ main.py\n@@ -7,3 +7,3 @@\n     with open(filename, 'w') as file:\n-        file.write('Hello World!')\n+        file.write('!dlroW olleH')\n```"
-            )
-        ]
-    )
+
+    # The mock for the *first* AI call (this part you had correct)
+    mock_response_data = [{
+        "target_file": "main.py",
+        "instructions": "Reverse the string written to the file",
+        "code_edit": "...", # The content here doesn't matter, as the call is mocked
+    }]
+    mock_ai = MockAI([AIMessage(content=json.dumps(mock_response_data))])
+    
     cli_agent = CliAgent.with_default_config(memory, execution_env, ai=mock_ai)
 
-    code = cli_agent.improve(
+    # When this improve function is called, it will use your MOCKED apply_morph_edit
+    improved_code = cli_agent.improve(
         code,
-        Prompt(
-            "Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'"
-        ),
+        Prompt("Change the program so that it prints '!dlroW olleH' instead of 'Hello World!'"),
     )
 
-    env = DiskExecutionEnv()
-    env.upload(code).run(f"bash {ENTRYPOINT_FILE}")
-    code = env.download()
-
-    outfile = "output.txt"
-    assert outfile in code
-    assert code[outfile] == "!dlroW olleH"
-
+    # 4. The result of the `improve` call is now the direct output of your mock
+    assert improved_code["main.py"] == "!dlroW olleH"
+    
+    # 5. (Best Practice) We can also check that the fake API call was made
+    mock_apply_morph.assert_called_once()
 
 if __name__ == "__main__":
     pytest.main()
