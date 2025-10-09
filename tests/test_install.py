@@ -2,12 +2,11 @@
 Tests for successful installation of the package.
 """
 
+import os
 import shutil
 import subprocess
 import sys
 import venv
-import os
-import subprocess
 
 from pathlib import Path
 
