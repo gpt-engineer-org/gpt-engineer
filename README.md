@@ -46,6 +46,8 @@ Choose **one** of:
 - Custom model:
     - See [docs](https://gpt-engineer.readthedocs.io/en/latest/open_models.html), supports local model, azure, etc.
 
+Limiting context window: see `docs/context_window.md` for strategies to control token usage and avoid truncation.
+
 Check the [Windows README](./WINDOWS_README.md) for Windows usage.
 
 **Other ways to run:**
