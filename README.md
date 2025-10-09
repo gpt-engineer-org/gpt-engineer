@@ -127,3 +127,21 @@ gpt-engineer is [governed](https://github.com/gpt-engineer-org/gpt-engineer/blob
 
 
 https://github.com/gpt-engineer-org/gpt-engineer/assets/4467025/40d0a9a8-82d0-4432-9376-136df0d57c99
+
+
+
+### 6. Update README.md
+
+Add a troubleshooting section to **`README.md`**:
+
+```markdown
+## Troubleshooting
+
+### Installation Error: `canonicalize_version() got an unexpected keyword argument 'strip_trailing_zero'`
+
+If you encounter this error during installation, it's due to compatibility issues with setuptools and pyperclip.
+
+**Quick fix:**
+```bash
+pip install "setuptools<66.0" "pyperclip==1.8.2"
+pip install gpt-engineer
