@@ -48,6 +48,12 @@ def venv_setup_teardown():
     finally:
         # Clean up by removing the virtual environment after tests.
         shutil.rmtree(VENV_DIR)
+    try:
+        subprocess.run(["gpte", "--version"], check=True)
+        print("gpte is installed")
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("gpte is NOT installed")
+
 
 
 def test_installation():
