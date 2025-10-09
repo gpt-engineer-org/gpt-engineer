@@ -44,9 +44,9 @@ jobs:
           poetry config virtualenvs.create true
           poetry config virtualenvs.in-project true
 
-      # Only lock and install once, right after configuration
       - name: Update lock file
         run: poetry lock
+
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
 
