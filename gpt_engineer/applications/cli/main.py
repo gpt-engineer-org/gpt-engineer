@@ -268,7 +268,7 @@ def get_system_info():
     }
     # Formatting logic is now moved here
     formatted_info = "\n".join(
-        [f"{key.replace('_', ' ').title()}: {value}" for key, value in system_info.items()]
+        [f"{key.replace(' ', '_').title()}: {value}" for key, value in system_info.items()]
     )
     return formatted_info
 
