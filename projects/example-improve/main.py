@@ -1,18 +1,19 @@
-import sys
-import platform
 import os
+import platform
 import subprocess
-import json
+import sys
+
 from importlib.metadata import distributions
-from rich.console import Console
-from rich.table import Table
 
 from controller import Controller
 from model import Game
+from rich.console import Console
+from rich.table import Table
 from view import View
 
 # Sensitive environment variables to mask
 SENSITIVE_KEYS = ["OPENAI_API_KEY", "API_KEY", "SECRET", "TOKEN"]
+
 
 def get_command_version(command):
     """Run a command and return its version, or 'Not found'."""
@@ -24,6 +25,7 @@ def get_command_version(command):
     except Exception:
         return "Not found"
 
+
 def get_env_variables():
     """Return filtered environment variables with sensitive ones masked."""
     filtered = {}
@@ -34,6 +36,7 @@ def get_env_variables():
             filtered[key] = value
     return filtered
 
+
 def get_installed_packages():
     """Return a dict of installed Python packages and versions."""
     packages = {}
@@ -43,6 +46,7 @@ def get_installed_packages():
         if name:
             packages[name] = version
     return packages
+
 
 def sysinfo():
     info = {
@@ -67,7 +71,16 @@ def sysinfo():
     table.add_column("Value", style="green")
 
     # Top-level info
-    for key in ["gpt_engineer_version", "os", "os_version", "architecture", "python_version", "pip_version", "git_version", "node_version"]:
+    for key in [
+        "gpt_engineer_version",
+        "os",
+        "os_version",
+        "architecture",
+        "python_version",
+        "pip_version",
+        "git_version",
+        "node_version",
+    ]:
         table.add_row(key, str(info[key]))
 
     console.print(table)
@@ -84,6 +97,7 @@ def sysinfo():
             console.print(f"... ({len(info['installed_packages'])-30} more packages)")
             break
         console.print(f"{pkg}: {ver}")
+
 
 def main():
     # Check if --sysinfo argument is provided
