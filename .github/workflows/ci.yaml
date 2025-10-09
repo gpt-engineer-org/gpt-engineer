@@ -43,7 +43,12 @@ jobs:
         run: |
           poetry config virtualenvs.create true
           poetry config virtualenvs.in-project true
-          poetry install --no-interaction --no-root
+
+      # Only lock and install once, right after configuration
+      - name: Update lock file
+        run: poetry lock
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
 
       - name: Run tests with Poetry (pytest)
         env:
@@ -51,19 +56,13 @@ jobs:
         run: |
           poetry run pytest -q --maxfail=1 --disable-warnings -v
 
-      - name: Update lock file
-        run: poetry lock
-      - name: Install dependencies
-        run: poetry install
-
-
       - name: Run tests via Tox (multi-environment)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           tox -vv
 
-      # Optional: Enable later when Codecov is stable
+      # Optional, enable later for codecov
       # - name: Upload coverage
       #   uses: codecov/codecov-action@v5
       #   with:
