@@ -1,5 +1,5 @@
 # Stage 1: Builder stage
-FROM python:3.12-slim AS builder
+FROM python:3.13-slim AS builder
 
 # Install necessary OS packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir -e .
 RUN pip install --no-cache-dir openai>=1.0.0 backoff
 
 # Stage 2: Final stage
-FROM python:3.12-slim
+FROM python:3.13-slim
 
 WORKDIR /app
 
