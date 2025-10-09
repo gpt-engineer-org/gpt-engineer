@@ -272,6 +272,31 @@ def prompt_yesno() -> bool:
 #     )
 #     return formatted_info
 
+# def get_system_info():
+#     """
+#     Retrieves and formats system information.
+
+#     Returns
+#     -------
+#     str
+#         A formatted string containing system details like OS, Python version, etc.
+#     """
+#     system_info = {
+#         "os": platform.system(),
+#         "os_version": platform.version(),
+#         "architecture": platform.machine(),
+#         "python_version": sys.version,
+#     }
+#     # The corrected line: replaces underscores with spaces
+#     formatted_info = "\n".join(
+#         [
+#             f"{key.replace('_', ' ').title()}: {value}"
+#             for key, value in system_info.items()
+#         ]
+#     )
+#     return formatted_info
+
+
 def get_system_info():
     """
     Retrieves and formats system information.
