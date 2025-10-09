@@ -51,6 +51,12 @@ jobs:
         run: |
           poetry run pytest -q --maxfail=1 --disable-warnings -v
 
+      - name: Update lock file
+        run: poetry lock
+      - name: Install dependencies
+        run: poetry install
+
+
       - name: Run tests via Tox (multi-environment)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
