@@ -240,15 +240,86 @@ def prompt_yesno() -> bool:
         print("Please respond with 'y' or 'n'")
 
 
+# def get_system_info():
+#     system_info = {
+#         "os": platform.system(),
+#         "os_version": platform.version(),
+#         "architecture": platform.machine(),
+#         "python_version": sys.version,
+#         "packages": format_installed_packages(get_installed_packages()),
+#     }
+#     return system_info
+
+
+# def get_system_info():
+#     """
+#     Retrieves and formats system information.
+
+#     Returns
+#     -------
+#     str
+#         A formatted string containing system details like OS, Python version, etc.
+#     """
+#     system_info = {
+#         "os": platform.system(),
+#         "os_version": platform.version(),
+#         "architecture": platform.machine(),
+#         "python_version": sys.version,
+#     }
+#     # Formatting logic is now moved here
+#     formatted_info = "\n".join(
+#         [f"{key.replace(' ', '_').title()}: {value}" for key, value in system_info.items()]
+#     )
+#     return formatted_info
+
+# def get_system_info():
+#     """
+#     Retrieves and formats system information.
+
+#     Returns
+#     -------
+#     str
+#         A formatted string containing system details like OS, Python version, etc.
+#     """
+#     system_info = {
+#         "os": platform.system(),
+#         "os_version": platform.version(),
+#         "architecture": platform.machine(),
+#         "python_version": sys.version,
+#     }
+#     # The corrected line: replaces underscores with spaces
+#     formatted_info = "\n".join(
+#         [
+#             f"{key.replace('_', ' ').title()}: {value}"
+#             for key, value in system_info.items()
+#         ]
+#     )
+#     return formatted_info
+
+
 def get_system_info():
+    """
+    Retrieves and formats system information.
+
+    Returns
+    -------
+    str
+        A formatted string containing system details like OS, Python version, etc.
+    """
     system_info = {
         "os": platform.system(),
         "os_version": platform.version(),
         "architecture": platform.machine(),
         "python_version": sys.version,
-        "packages": format_installed_packages(get_installed_packages()),
     }
-    return system_info
+    # The corrected line: replaces underscores with spaces
+    formatted_info = "\n".join(
+        [
+            f"{key.replace('_', ' ').title()}: {value}"
+            for key, value in system_info.items()
+        ]
+    )
+    return formatted_info
 
 
 def get_installed_packages():
@@ -434,9 +505,7 @@ def main(
         sys.excepthook = lambda *_: pdb.pm()
 
     if sysinfo:
-        sys_info = get_system_info()
-        for key, value in sys_info.items():
-            print(f"{key}: {value}")
+        print(get_system_info())
         raise typer.Exit()
 
     # Validate arguments
