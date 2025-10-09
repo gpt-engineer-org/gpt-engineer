@@ -50,6 +50,10 @@ jobs:
 
     - name: Run tests
       run: poetry run pytest -q
+    - name: Install test tools
+      run: pip install poetry tox
+    - name: Run tests via tox
+      run: tox -vv
 
     # Temporarily disabling codecov until we resolve codecov rate limiting issue
     # - name: Report coverage
