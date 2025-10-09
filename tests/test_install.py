@@ -7,6 +7,7 @@ import subprocess
 import sys
 import venv
 import os
+import subprocess
 
 from pathlib import Path
 
@@ -94,18 +95,15 @@ def test_installed_main_execution(tmp_path, monkeypatch):
     p = tmp_path / "projects/example"
     p.mkdir(parents=True)
     (p / "prompt").write_text("make a program that prints the outcome of 4+4")
-    
-    # Pass environment variables including OPENAI_API_KEY explicitly
     env = os.environ.copy()
-    assert 'OPENAI_API_KEY' in env, "OPENAI_API_KEY environment variable is not set"
-    
+    assert 'OPEN_API_KEY' in env, "OPEN_API_KEY environment variable is not set"
     proc = subprocess.Popen(
         ["gpte", str(p)],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         text=True,
         cwd=tmp_path,
-        env=env  # Pass the environment to the subprocess
+        env=env
     )
 
     inputs = "Y\nn"
