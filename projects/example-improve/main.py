@@ -50,7 +50,7 @@ def get_installed_packages():
 
 def sysinfo():
     info = {
-        "gpt_engineer_version": "0.1.0",  # Change if your package version differs
+        "gpt_engineer_version": "0.3.1",  # Change if your package version differs
         "os": platform.system(),
         "os_version": platform.version(),
         "architecture": platform.machine(),
