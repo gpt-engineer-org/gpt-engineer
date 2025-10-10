@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: ;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --ring: 240 5% 64.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: ;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+    --ring: 240 3.7% 15.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.keyboard-visible {
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.leaflet-popup-content p {
+  margin: 0 !important;
+}
+
+/* leaflet made me do it.. */
+.bring-to-front {
+  z-index: 99999 !important;
+}
+
+.bring-to-front-modal {
+  z-index: 99999999 !important;
+}
+
+.rate-limit-modal {
+  z-index: 999999999999 !important;
+}
+
+/* tradingview mobile */
+.my-5.tradingview-widget-container {
+  height: 150px !important;
+}
+
+/* Markdown styles */
+/* Markdown styles */
+.markdown-container {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  font-size: 16px;
+}
+
+.markdown-container h1,
+.markdown-container h2,
+.markdown-container h3,
+.markdown-container h4,
+.markdown-container h5,
+.markdown-container h6 {
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.3em;
+}
+
+.markdown-container h1 {
+  font-size: 1.5em;
+}
+
+.markdown-container h2 {
+  font-size: 1.4em;
+}
+
+.markdown-container h3 {
+  font-size: 1.3em;
+}
+
+.markdown-container h4 {
+  font-size: 1.2em;
+}
+
+.markdown-container h5 {
+  font-size: 1.1em;
+}
+
+.markdown-container h6 {
+  font-size: 1em;
+}
+
+.markdown-container p {
+  margin-bottom: 1em;
+}
+
+.markdown-container strong {
+  font-weight: bold;
+}
+
+.markdown-container em {
+  font-style: italic;
+}
+
+.markdown-container a {
+  color: #000;
+  text-decoration: underline;
+}
+
+.markdown-container code {
+  font-family: monospace;
+  font-size: 0.9em;
+  padding: 0.2em 0.4em;
+  background-color: #f6f8fa;
+  border-radius: 3px;
+}
+
+.markdown-container pre {
+  font-family: monospace;
+  font-size: 0.9em;
+  padding: 1em;
+  overflow: auto;
+  background-color: #f6f8fa;
+  border-radius: 3px;
+}
+
+.markdown-container pre code {
+  padding: 0;
+  background-color: transparent;
+}
+
+.markdown-container ul,
+.markdown-container ol {
+  margin-bottom: 1em;
+  padding-left: 2em;
+}
+
+.markdown-container ul li,
+.markdown-container ol li {
+  margin-bottom: 0.5em;
+}
+
+.markdown-container ul li {
+  list-style-type: disc;
+}
+
+.markdown-container ol li {
+  list-style-type: decimal;
+}
+
+.markdown-container blockquote {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 4px solid #ddd;
+  color: #666;
+}
+
+.markdown-container hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 1.5em 0;
+}
+
+.fixed.inset-0.z-50.bg-black\/80.data-\[state\=open\]\:animate-in.data-\[state\=closed\]\:animate-out.data-\[state\=closed\]\:fade-out-0.data-\[state\=open\]\:fade-in-0 {
+  z-index: 99999;
+}
+
+.clip-yt-img {
+  margin-top: -24px;
+  clip-path: inset(30px 0 30px 0);
+}
