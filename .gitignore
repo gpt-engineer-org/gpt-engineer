@@ -96,3 +96,20 @@ gpt_engineer/benchmark/benchmarks/mbpp/dataset
 gpt_engineer/benchmark/minimal_bench_config.toml
 
 test.json
+[tool.poetry.dependencies]
+python = "^3.10"
+rudder-sdk-python = ">=2.0.2"
+black = "23.3.0"
+datasets = ">=2.17.1,<3.0.0"
+openai = ">=1.0,<2.0"
+pillow = ">=10.2.0,<11.0.0"
+toml = ">=0.10.2"
+regex = ">=2023.12.25,<2024.0.0"
+langchain-openai = ">=0.1.22"
+dataclasses-json = "0.5.7"
+typer = ">=0.3.2"
+langchain-community = ">=0.2.0,<0.3.0"
+tiktoken = ">=0.0.4"
+python-dotenv = ">=0.21.0"
+pyperclip = ">=1.8.2,<1.9.0"
+setuptools = ">=45.0,<66.0"
