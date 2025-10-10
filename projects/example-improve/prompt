@@ -1,1 +1,0 @@
-If up is pressed, the snake should turn down and after one step to the right. If down is pressed it should go up. Also, make the snake go left when right is pressed and right when left is pressed.

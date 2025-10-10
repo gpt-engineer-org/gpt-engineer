@@ -1,16 +1,14 @@
+version: "3"
 services:
-  gpt-engineer:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    stdin_open: true
-    tty: true
-    # Set the API key from the .env file
-    env_file:
-      - .env
-    ##  OR set the API key directly
-    # environment:
-      # - OPENAI_API_KEY=YOUR_API_KEY
-    image: gpt-engineer
-    volumes:
-      - ./projects/example:/project
+  llm-answer-engine:
+    build: .
+    environment:
+      - OPENAI_API_KEY=your_openai_api_key
+      - GROQ_API_KEY=your_groq_api_key
+      - BRAVE_SEARCH_API_KEY=your_brave_search_api_key
+      - SERPER_API=your_serper_api_key
+# uncomment the following to change the default config (ollama, etc)
+#    volumes:
+#      - $PWD/app/config.tsx:/home/node/app/app/config.tsx:ro
+    ports:
+      - 3000:3000
