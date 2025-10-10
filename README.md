@@ -12,80 +12,125 @@ The OG code genereation experimentation platform!
 If you are looking for the evolution that is an opinionated, managed service – check out gptengineer.app.
 
 If you are looking for a well maintained hackable CLI for – check out aider.
+ # gpt-engineer
+
+GitHub Repo stars · Discord Follow · License · GitHub Issues or Pull Requests · GitHub Release · Twitter Follow
+
+The OG code generation experimentation platform!
+
+If you are looking for the evolution that is an opinionated, managed service – check out gptengineer.app.
+
+If you are looking for a well maintained hackable CLI – check out aider.
 
 
 gpt-engineer lets you:
+
 - Specify software in natural language
 - Sit back and watch as an AI writes and executes the code
 - Ask the AI to implement improvements
+
 
 ## Getting Started
 
 ### Install gpt-engineer
 
-For **stable** release:
+For stable release:
 
-- `python -m pip install gpt-engineer`
+```bash
+python -m pip install gpt-engineer
+```
 
-For **development**:
-- `git clone https://github.com/gpt-engineer-org/gpt-engineer.git`
-- `cd gpt-engineer`
-- `poetry install`
-- `poetry shell` to activate the virtual environment
+For development:
 
-We actively support Python 3.10 - 3.12. The last version to support Python 3.8 - 3.9 was [0.2.6](https://pypi.org/project/gpt-engineer/0.2.6/).
+```bash
+git clone https://github.com/gpt-engineer-org/gpt-engineer.git
+cd gpt-engineer
+poetry install
+poetry shell  # activate the virtual environment
+```
+
+We actively support Python 3.10 - 3.12. The last version to support Python 3.8 - 3.9 was 0.2.6.
 
 ### Setup API key
 
-Choose **one** of:
-- Export env variable (you can add this to .bashrc so that you don't have to do it each time you start the terminal)
-    - `export OPENAI_API_KEY=[your api key]`
-- .env file:
-    - Create a copy of `.env.template` named `.env`
-    - Add your OPENAI_API_KEY in .env
-- Custom model:
-    - See [docs](https://gpt-engineer.readthedocs.io/en/latest/open_models.html), supports local model, azure, etc.
+Choose one of:
 
-Limiting context window: see `docs/context_window.md` for strategies to control token usage and avoid truncation.
+- Export an environment variable (add it to your shell profile so you don't need to set it every time):
 
-Check the [Windows README](./WINDOWS_README.md) for Windows usage.
+```bash
+export OPENAI_API_KEY=[your api key]
+```
 
-**Other ways to run:**
-- Use Docker ([instructions](docker/README.md))
-- Do everything in your browser:
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/gpt-engineer-org/gpt-engineer/codespaces)
+- Use a `.env` file:
+  - Create a copy of `.env.template` named `.env`
+  - Add your `OPENAI_API_KEY` in `.env`
+
+- Custom model: See the docs for instructions (supports local models, Azure, etc.).
+
+Check the `WINDOWS_README.md` file for Windows-specific instructions.
+
+Other ways to run:
+
+- Use Docker (see `docker/README.md`)
+- Open in GitHub Codespaces
+
+
+## Usage
 
 ### Create new code (default usage)
-- Create an empty folder for your project anywhere on your computer
-- Create a file called `prompt` (no extension) inside your new folder and fill it with instructions
-- Run `gpte <project_dir>` with a relative path to your folder
-  - For example: `gpte projects/my-new-project` from the gpt-engineer directory root with your new folder in `projects/`
+
+1. Create an empty folder for your project.
+2. Inside that folder create a file named `prompt` (no extension) and fill it with your instructions.
+3. From the gpt-engineer repo root run:
+
+```bash
+gpte <project_dir>
+# example: gpte projects/my-new-project
+```
+
 
 ### Improve existing code
-- Locate a folder with code which you want to improve anywhere on your computer
-- Create a file called `prompt` (no extension) inside your new folder and fill it with instructions for how you want to improve the code
-- Run `gpte <project_dir> -i` with a relative path to your folder
-  - For example: `gpte projects/my-old-project -i` from the gpt-engineer directory root with your folder in `projects/`
 
-### Benchmark custom agents
-- gpt-engineer installs the binary 'bench', which gives you a simple interface for benchmarking your own agent implementations against popular public datasets.
-- The easiest way to get started with benchmarking is by checking out the [template](https://github.com/gpt-engineer-org/gpte-bench-template) repo, which contains detailed instructions and an agent template.
-- Currently supported benchmark:
-  - [APPS](https://github.com/hendrycks/apps)
-  - [MBPP](https://github.com/google-research/google-research/tree/master/mbpp)
+1. Locate the folder containing the code you want to improve.
+2. Create a `prompt` file inside it with instructions for the improvement.
+3. Run:
 
-The community has started work with different benchmarking initiatives, as described in [this Loom](https://www.loom.com/share/206805143fbb4302b5455a5329eaab17?sid=f689608f-8e49-44f7-b55f-4c81e9dc93e6) video.
+```bash
+gpte <project_dir> -i
+# example: gpte projects/my-old-project -i
+```
+
+
+### Benchmarking
+
+The `gpt-engineer` package installs a `bench` binary for benchmarking agent implementations. See the `gpte-bench-template` repo for a starter template.
+
+Supported datasets include APPS and MBPP.
+
 
 ### Research
-Some of our community members have worked on different research briefs that could be taken further. See [this document](https://docs.google.com/document/d/1qmOj2DvdPc6syIAm8iISZFpfik26BYw7ZziD5c-9G0E/edit?usp=sharing) if you are interested.
 
-## Terms
-By running gpt-engineer, you agree to our [terms](https://github.com/gpt-engineer-org/gpt-engineer/blob/main/TERMS_OF_USE.md).
+See the `docs` and community resources for research notes and briefs.
 
 
-## Relation to gptengineer.app (GPT Engineer)
-[gptengineer.app](https://gptengineer.app/) is a commercial project for the automatic generation of web apps.
-It features a UI for non-technical users connected to a git-controlled codebase.
+## Notes
+
+- Limiting context window: see `docs/context_window.md` for strategies to control token usage and avoid truncation.
+- By running gpt-engineer you agree to the terms in `TERMS_OF_USE.md`.
+
+
+## Links & Community
+
+- Roadmap: `ROADMAP.md`
+- Governance: `GOVERNANCE.md`
+- Contributing: `.github/CONTRIBUTING.md`
+- Discord: https://discord.gg/8tcDQ89Ej2
+
+
+---
+
+_This README was updated locally._
+
 The gptengineer.app team is actively supporting the open source community.
 
 
