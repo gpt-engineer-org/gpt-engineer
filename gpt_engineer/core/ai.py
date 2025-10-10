@@ -37,6 +37,8 @@ from langchain.schema import (
 )
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
+from langchain_google_genai import ChatGemini  
+
 
 from gpt_engineer.core.token_usage import TokenUsageLog
 
@@ -250,7 +252,7 @@ class AI:
 
         return messages
 
-    @backoff.on_exception(backoff.expo, openai.RateLimitError, max_tries=7, max_time=45)
+    @backoff.on_exception(backoff.expo, openai.error.RateLimitError, max_tries=7, max_time=45)
     def backoff_inference(self, messages):
         """
         Perform inference using the language model while implementing an exponential backoff strategy.
@@ -362,6 +364,14 @@ class AI:
                 streaming=self.streaming,
                 max_tokens_to_sample=4096,
             )
+        elif "gemini" in self.model_name:
+            return ChatGemini(
+                model=self.model_name,
+                temperature=self.temperature,
+                streaming=self.streaming,
+                callbacks=[StreamingStdOutCallbackHandler()],
+                max_output_tokens=4096,
+            )
         elif self.vision:
             return ChatOpenAI(
                 model=self.model_name,
@@ -377,6 +387,7 @@ class AI:
                 streaming=self.streaming,
                 callbacks=[StreamingStdOutCallbackHandler()],
             )
+
 
 
 def serialize_messages(messages: List[Message]) -> str:
