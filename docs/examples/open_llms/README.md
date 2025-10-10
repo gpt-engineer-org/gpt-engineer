@@ -53,4 +53,4 @@ export MODEL_NAME="CodeLlama"
 python examples/open_llms/langchain_interface.py
 ```
 
-That's it 🤓 time to go back [to](/docs/open_models.md#running-the-example) and give `gpte` a try.
+That's it 🤓 time to go back [to](../../open_models.md) and give `gpte` a try.

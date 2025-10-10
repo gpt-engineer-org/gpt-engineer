@@ -5,13 +5,13 @@ Quickstart
 Installation
 ============
 
-To install LangChain run:
+To install gpt-engineer run:
 
 .. code-block:: console
 
     $ python -m pip install gpt-engineer
 
-For more details, see our [Installation guide](/instllation.html).
+For more details, see our `Installation guide <installation.rst>`_.
 
 Setup API Key
 =============
@@ -29,9 +29,9 @@ Choose one of the following:
   - Create a copy of ``.env.template`` named ``.env``
   - Add your ``OPENAI_API_KEY`` in .env
 
-- If you want to use a custom model, visit our docs on `using open models and azure models <./open_models.html>`_.
+- If you want to use a custom model, visit our docs on `using open models and azure models <open_models.md>`_.
 
-- To set API key on windows check the `Windows README <./windows_readme_link.html>`_.
+- To set API key on Windows check the `Windows README <windows_readme_link.rst>`_.
 
 Building with ``gpt-engineer``
 ==============================
@@ -60,7 +60,7 @@ Improve Existing Code
 
     $ gpte projects/my-old-project -i
 
-By running ``gpt-engineer`` you agree to our `terms <./terms_link.html>`_.
+By running ``gpt-engineer`` you agree to our `terms <terms_link.rst>`_.
 
 To **run in the browser** you can simply:
 

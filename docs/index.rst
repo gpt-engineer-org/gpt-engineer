@@ -16,6 +16,7 @@ Welcome to GPT-ENGINEER's Documentation
    windows_readme_link
    open_models.md
    tracing_debugging.md
+   context_window.md
 
 .. toctree::
    :maxdepth: 2

@@ -72,7 +72,7 @@ Feel free to try out larger models on your hardware and see what happens.
 Running the Example
 ==================
 
-To see that your setup works check [test open LLM setup](examples/test_open_llm/README.md).
+To see that your setup works check [test open LLM setup](examples/open_llms/README.md).
 
 If above tests work proceed 😉
 
