@@ -240,13 +240,35 @@ def prompt_yesno() -> bool:
         print("Please respond with 'y' or 'n'")
 
 
+def mask_sensitive_value(value: str) -> str:
+    """Mask sensitive values in environment variables."""
+    if len(value) <= 4:
+        return "****"
+    return value[:4] + "****" + value[-4:]
+
 def get_system_info():
+    # Import here to avoid circular imports
+    from gpt_engineer.core.version_info import get_version_info
+
+    # Get version information
+    version, install_type = get_version_info()
+    
+    # Get relevant environment variables
+    relevant_env_vars = {
+        key: mask_sensitive_value(value) if any(s in key.lower() for s in ['key', 'token', 'secret', 'password', 'credential'])
+        else value
+        for key, value in os.environ.items()
+        if any(prefix in key.upper() for prefix in ['OPENAI_', 'GPT_', 'PYTHON', 'PATH', 'MODEL'])
+    }
+
     system_info = {
-        "os": platform.system(),
-        "os_version": platform.version(),
-        "architecture": platform.machine(),
-        "python_version": sys.version,
-        "packages": format_installed_packages(get_installed_packages()),
+        "GPT Engineer Version": f"{version} ({install_type} installation)",
+        "OS": platform.system(),
+        "OS Version": platform.version(),
+        "Architecture": platform.machine(),
+        "Python Version": sys.version.split()[0],
+        "Environment Variables": relevant_env_vars,
+        "Installed Packages": format_installed_packages(get_installed_packages()),
     }
     return system_info
 
