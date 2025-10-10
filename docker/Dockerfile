@@ -16,7 +16,7 @@ COPY . .
 
 # Install dependencies
 RUN pip install --no-cache-dir -e .
-RUN pip install --no-cache-dir openai>=1.0.0 backoff
+RUN pip install --no-cache-dir openai>=1.0.0 backoff langchain_google_genai
 
 # Stage 2: Final stage
 FROM python:3.13-slim
