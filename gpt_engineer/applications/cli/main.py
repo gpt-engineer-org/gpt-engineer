@@ -90,6 +90,148 @@ def load_env_if_needed():
         load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
 
 
+def validate_api_key_format(key_name: str, key_value: str) -> tuple[bool, str]:
+    """
+    Validate the format of an API key.
+    
+    Parameters
+    ----------
+    key_name : str
+        The name of the API key environment variable.
+    key_value : str
+        The value of the API key to validate.
+    
+    Returns
+    -------
+    tuple[bool, str]
+        A tuple of (is_valid, error_message). If valid, error_message is empty.
+    """
+    if not key_value:
+        return False, f"{key_name} is empty"
+    
+    # Check minimum length (most API keys are at least 20 characters)
+    if len(key_value) < 20:
+        return False, f"{key_name} appears too short (length: {len(key_value)}). Please check your API key."
+    
+    # Check for common mistakes
+    if key_value.startswith("your-"):
+        return False, f"{key_name} appears to be a placeholder. Please use your actual API key."
+    
+    if key_value == "...":
+        return False, f"{key_name} is a placeholder. Please set your actual API key."
+    
+    # Validate specific formats for known providers
+    if key_name == "OPENAI_API_KEY":
+        # OpenAI keys typically start with 'sk-' or 'sk-proj-'
+        if not (key_value.startswith("sk-") or key_value.startswith("Bearer ")):
+            return False, f"{key_name} should start with 'sk-' (found: '{key_value[:10]}...')"
+    
+    elif key_name == "ANTHROPIC_API_KEY":
+        # Anthropic keys typically start with 'sk-ant-'
+        if not key_value.startswith("sk-ant-"):
+            return False, f"{key_name} should start with 'sk-ant-' (found: '{key_value[:10]}...')"
+    
+    return True, ""
+
+
+def validate_api_configuration(
+    model: str,
+    azure_endpoint: str,
+    llm_via_clipboard: bool
+) -> None:
+    """
+    Validate API configuration before execution.
+    
+    This function checks if the required API keys are set and properly formatted
+    based on the selected model and configuration. It provides clear error messages
+    with actionable suggestions if validation fails.
+    
+    Parameters
+    ----------
+    model : str
+        The model name to use (e.g., 'gpt-4', 'claude-3-opus-20240229').
+    azure_endpoint : str
+        The Azure OpenAI endpoint URL (if using Azure).
+    llm_via_clipboard : bool
+        Whether using clipboard mode (skips API key validation).
+    
+    Raises
+    ------
+    typer.Exit
+        If validation fails, exits with code 1 and displays error message.
+    """
+    # Skip validation for clipboard mode
+    if llm_via_clipboard:
+        return
+    
+    # Skip validation for local models
+    if os.getenv("LOCAL_MODEL"):
+        return
+    
+    # Determine which API key is needed based on model and configuration
+    required_key = None
+    key_value = None
+    provider_name = ""
+    setup_instructions = ""
+    
+    if azure_endpoint:
+        # Azure OpenAI
+        required_key = "AZURE_OPENAI_API_KEY"
+        key_value = os.getenv(required_key)
+        provider_name = "Azure OpenAI"
+        setup_instructions = (
+            "1. Get your API key from Azure Portal (https://portal.azure.com)\n"
+            "2. Set it using: export AZURE_OPENAI_API_KEY='your-key'\n"
+            "3. Or add it to a .env file in your project directory"
+        )
+    elif "claude" in model.lower() or "anthropic" in model.lower():
+        # Anthropic
+        required_key = "ANTHROPIC_API_KEY"
+        key_value = os.getenv(required_key)
+        provider_name = "Anthropic"
+        setup_instructions = (
+            "1. Get your API key from https://console.anthropic.com/\n"
+            "2. Set it using: export ANTHROPIC_API_KEY='your-key'\n"
+            "3. Or add it to a .env file in your project directory"
+        )
+    else:
+        # OpenAI (default)
+        required_key = "OPENAI_API_KEY"
+        key_value = os.getenv(required_key)
+        provider_name = "OpenAI"
+        setup_instructions = (
+            "1. Get your API key from https://platform.openai.com/api-keys\n"
+            "2. Set it using: export OPENAI_API_KEY='your-key'\n"
+            "3. Or add it to a .env file in your project directory"
+        )
+    
+    # Check if API key is set
+    if not key_value:
+        error_msg = (
+            f"\n{colored('Error:', 'red')} {required_key} is not set.\n\n"
+            f"To use {provider_name} with model '{model}', you need to configure your API key:\n\n"
+            f"{setup_instructions}\n\n"
+            f"For more information, see: {colored('README.md', 'cyan')}"
+        )
+        print(error_msg)
+        raise typer.Exit(code=1)
+    
+    # Validate API key format
+    is_valid, error_message = validate_api_key_format(required_key, key_value)
+    if not is_valid:
+        error_msg = (
+            f"\n{colored('Error:', 'red')} {error_message}\n\n"
+            f"Please check your {required_key} and ensure it's set correctly.\n\n"
+            f"To update your API key:\n"
+            f"{setup_instructions}\n"
+        )
+        print(error_msg)
+        raise typer.Exit(code=1)
+    
+    # Success - API key is set and appears valid
+    logging.debug(f"API key validation passed for {provider_name}")
+
+
 def concatenate_paths(base_path, sub_path):
     # Compute the relative path from base_path to sub_path
     relative_path = os.path.relpath(sub_path, base_path)
@@ -454,6 +596,9 @@ def main(
         ), "Clarify and lite mode are not active for improve mode"
 
     load_env_if_needed()
+
+    # Validate API configuration before creating AI
+    validate_api_configuration(model, azure_endpoint, llm_via_clipboard)
 
     if llm_via_clipboard:
         ai = ClipboardAI()
