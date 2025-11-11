@@ -30,6 +30,7 @@ import json
 import logging
 import os
 import platform
+import re
 import subprocess
 import sys
 
@@ -240,12 +241,153 @@ def prompt_yesno() -> bool:
         print("Please respond with 'y' or 'n'")
 
 
+def get_gpt_engineer_version():
+    """
+    Get the version of gpt-engineer and determine if it's a released or dev version.
+    
+    Returns
+    -------
+    dict
+        A dictionary containing version information and installation type.
+    """
+    try:
+        # Try to get the version from the installed package
+        import importlib.metadata
+        version = importlib.metadata.version("gpt-engineer")
+        
+        # Check if it's a development installation by looking for .dev, .post, or git hash
+        is_dev = bool(re.search(r'\.(dev|post)|[\+]', version))
+        
+        # Try to determine installation method
+        try:
+            metadata = importlib.metadata.metadata("gpt-engineer")
+            # Check if installed in editable mode or from source
+            installer = metadata.get("Installer", "unknown")
+            
+            # If we can find .git directory in the package path, it's likely from repo
+            import gpt_engineer
+            package_path = Path(gpt_engineer.__file__).parent.parent
+            has_git = (package_path / ".git").exists()
+            
+            if has_git or is_dev:
+                install_type = "development (from GitHub repo)"
+            else:
+                install_type = "released (from pip)"
+                
+        except Exception:
+            install_type = "released (from pip)" if not is_dev else "development"
+            
+        return {
+            "version": version,
+            "install_type": install_type
+        }
+    except Exception as e:
+        return {
+            "version": "unknown",
+            "install_type": "unknown",
+            "error": str(e)
+        }
+
+
+def get_environment_variables():
+    """
+    Get relevant environment variables with sensitive data masked.
+    
+    Returns
+    -------
+    dict
+        A dictionary of environment variables with sensitive values masked.
+    """
+    # List of environment variables relevant to gpt-engineer
+    relevant_vars = [
+        "OPENAI_API_KEY",
+        "ANTHROPIC_API_KEY",
+        "AZURE_OPENAI_API_KEY",
+        "AZURE_OPENAI_ENDPOINT",
+        "MODEL_NAME",
+        "OPENAI_BASE_URL",
+        "OPENAI_API_BASE",
+        "LOCAL_MODEL",
+        "GPT_ENGINEER_*",  # Any GPT_ENGINEER prefixed vars
+    ]
+    
+    env_info = {}
+    
+    for var_pattern in relevant_vars:
+        if "*" in var_pattern:
+            # Handle wildcard patterns
+            prefix = var_pattern.replace("*", "")
+            for key in os.environ:
+                if key.startswith(prefix):
+                    env_info[key] = mask_sensitive_value(key, os.environ[key])
+        else:
+            # Handle exact matches
+            value = os.getenv(var_pattern)
+            if value is not None:
+                env_info[var_pattern] = mask_sensitive_value(var_pattern, value)
+            else:
+                env_info[var_pattern] = "not set"
+    
+    return env_info
+
+
+def mask_sensitive_value(key, value):
+    """
+    Mask sensitive values in environment variables.
+    
+    Parameters
+    ----------
+    key : str
+        The environment variable key.
+    value : str
+        The environment variable value.
+    
+    Returns
+    -------
+    str
+        The masked value showing only presence and length information.
+    """
+    # List of patterns that indicate sensitive data
+    sensitive_patterns = [
+        "KEY",
+        "SECRET",
+        "TOKEN",
+        "PASSWORD",
+        "CREDENTIAL",
+        "AUTH"
+    ]
+    
+    # Check if the key contains any sensitive pattern
+    is_sensitive = any(pattern in key.upper() for pattern in sensitive_patterns)
+    
+    if is_sensitive and value:
+        # Show first 4 and last 4 characters if long enough, otherwise just indicate it's set
+        if len(value) > 12:
+            masked = f"{value[:4]}...{value[-4:]} (length: {len(value)})"
+        else:
+            masked = f"****** (length: {len(value)})"
+        return masked
+    else:
+        # Non-sensitive values can be shown in full
+        return value
+
+
 def get_system_info():
+    """
+    Get comprehensive system information for debugging.
+    
+    Returns
+    -------
+    dict
+        A dictionary containing system, version, and environment information.
+    """
     system_info = {
         "os": platform.system(),
         "os_version": platform.version(),
         "architecture": platform.machine(),
         "python_version": sys.version,
+        "gpt_engineer_version": get_gpt_engineer_version(),
+        "environment_variables": get_environment_variables(),
         "packages": format_installed_packages(get_installed_packages()),
     }
     return system_info
@@ -435,8 +577,17 @@ def main(
 
     if sysinfo:
         sys_info = get_system_info()
+        print("=" * 60)
+        print("System Information")
+        print("=" * 60)
         for key, value in sys_info.items():
-            print(f"{key}: {value}")
+            if isinstance(value, dict):
+                print(f"\n{key}:")
+                for sub_key, sub_value in value.items():
+                    print(f"  {sub_key}: {sub_value}")
+            else:
+                print(f"{key}: {value}")
+        print("=" * 60)
         raise typer.Exit()
 
     # Validate arguments
