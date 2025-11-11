@@ -260,10 +260,6 @@ def get_gpt_engineer_version():
         
         # Try to determine installation method
         try:
-            metadata = importlib.metadata.metadata("gpt-engineer")
-            # Check if installed in editable mode or from source
-            installer = metadata.get("Installer", "unknown")
-            
             # If we can find .git directory in the package path, it's likely from repo
             import gpt_engineer
             package_path = Path(gpt_engineer.__file__).parent.parent

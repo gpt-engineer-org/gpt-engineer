@@ -118,11 +118,9 @@ class TestGetGptEngineerVersion(unittest.TestCase):
     """Test the get_gpt_engineer_version function."""
 
     @patch("importlib.metadata.version")
-    @patch("importlib.metadata.metadata")
-    def test_get_version_released(self, mock_metadata, mock_version):
+    def test_get_version_released(self, mock_version):
         """Test getting version for a released package."""
         mock_version.return_value = "0.3.1"
-        mock_metadata.return_value = {"Installer": "pip"}
 
         with patch("gpt_engineer.applications.cli.main.Path") as mock_path:
             mock_path.return_value.parent.parent.__truediv__.return_value.exists.return_value = (
@@ -135,11 +133,9 @@ class TestGetGptEngineerVersion(unittest.TestCase):
             self.assertIn("released", result["install_type"].lower())
 
     @patch("importlib.metadata.version")
-    @patch("importlib.metadata.metadata")
-    def test_get_version_development(self, mock_metadata, mock_version):
+    def test_get_version_development(self, mock_version):
         """Test getting version for a development package."""
         mock_version.return_value = "0.3.1.dev0"
-        mock_metadata.return_value = {"Installer": "pip"}
 
         with patch("gpt_engineer.applications.cli.main.Path") as mock_path:
             mock_path.return_value.parent.parent.__truediv__.return_value.exists.return_value = (
