@@ -105,7 +105,7 @@ export LOCAL_MODEL=true
 And run `gpt-engineer` with the following command:
 
 ```bash
-gpte <project_dir> $MODEL_NAME --lite --temperature 0.1
+gpte <project_dir> --model $MODEL_NAME --lite --temperature 0.1
 ```
 
 The `--lite` mode is needed for now since open models for some reason behave worse with too many instructions at the moment. Temperature is set to `0.1` to get consistent best possible results.
@@ -133,7 +133,7 @@ export LOCAL_MODEL=true
 ```
 
 ```bash
-gpte <project_dir> $MODEL_NAME --lite --temperature 0.1
+gpte <project_dir> --model $MODEL_NAME --lite --temperature 0.1
 ```
 
 Using Azure models
