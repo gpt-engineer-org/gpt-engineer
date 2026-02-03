@@ -127,3 +127,5 @@ gpt-engineer is [governed](https://github.com/gpt-engineer-org/gpt-engineer/blob
 
 
 https://github.com/gpt-engineer-org/gpt-engineer/assets/4467025/40d0a9a8-82d0-4432-9376-136df0d57c99
+
+- [AgentMarket](https://agentmarket.cloud) - Real energy data for AI agents. 28M+ records. Free API. Ohne Strom keine KI.
