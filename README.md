@@ -45,6 +45,7 @@ Choose **one** of:
     - Add your OPENAI_API_KEY in .env
 - Custom model:
     - See [docs](https://gpt-engineer.readthedocs.io/en/latest/open_models.html), supports local model, azure, etc.
+- For MiniMax models: `export MINIMAX_API_KEY=[your api key]`
 
 Check the [Windows README](./WINDOWS_README.md) for Windows usage.
 
@@ -102,7 +103,24 @@ E.g. `gpte projects/example-vision gpt-4-vision-preview --prompt_file prompt/tex
 
 ### Open source, local and alternative models
 
-By default, gpt-engineer supports OpenAI Models via the OpenAI API or Azure OpenAI API, as well as Anthropic models.
+By default, gpt-engineer supports OpenAI Models via the OpenAI API or Azure OpenAI API, as well as Anthropic models and [MiniMax](https://platform.minimax.io) models.
+
+#### MiniMax Models
+
+To use MiniMax models, set the `MINIMAX_API_KEY` environment variable and pass a MiniMax model name:
+
+```bash
+export MINIMAX_API_KEY=your-minimax-api-key
+gpte my-project -m MiniMax-M2.5
+```
+
+Supported MiniMax models:
+| Model | Description |
+|-------|-------------|
+| `MiniMax-M2.5` | Peak Performance. Ultimate Value. 204K context window. |
+| `MiniMax-M2.5-highspeed` | Same performance, faster and more agile. 204K context window. |
+
+You can also set a custom API base URL via `MINIMAX_API_BASE` (defaults to `https://api.minimax.io/v1`). For users in China, set it to `https://api.minimaxi.com/v1`.
 
 With a little extra setup, you can also run with open source models like WizardCoder. See the [documentation](https://gpt-engineer.readthedocs.io/en/latest/open_models.html) for example instructions.
 

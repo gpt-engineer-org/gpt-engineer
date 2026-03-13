@@ -259,6 +259,17 @@ class TokenUsageLog:
         """
         return "gpt" in self.model_name.lower()
 
+    def is_minimax_model(self) -> bool:
+        """
+        Check if the model is a MiniMax model.
+
+        Returns
+        -------
+        bool
+            True if the model is a MiniMax model, False otherwise.
+        """
+        return "minimax" in self.model_name.lower()
+
     def total_tokens(self) -> int:
         """
         Return the total number of tokens used in the conversation.
