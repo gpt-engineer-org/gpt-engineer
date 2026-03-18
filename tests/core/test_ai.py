@@ -60,7 +60,7 @@ def test_token_logging(monkeypatch):
 def test_minimax_model_creation(monkeypatch):
     monkeypatch.setattr(AI, "_create_chat_model", mock_create_chat_model)
 
-    ai = AI("MiniMax-M2.5")
+    ai = AI("MiniMax-M2.7")
 
     # act
     response_messages = ai.start("system prompt", "user prompt", step_name="step name")
@@ -75,7 +75,7 @@ def test_minimax_temperature_constraint():
     """Test that MiniMax temperature is clamped to avoid zero."""
     ai_instance = AI.__new__(AI)
     ai_instance.temperature = 0.0
-    ai_instance.model_name = "MiniMax-M2.5"
+    ai_instance.model_name = "MiniMax-M2.7"
     ai_instance.azure_endpoint = None
     ai_instance.streaming = True
     ai_instance.vision = False
@@ -93,7 +93,7 @@ def test_minimax_missing_api_key():
     """Test that MiniMax raises error when API key is missing."""
     ai_instance = AI.__new__(AI)
     ai_instance.temperature = 0.1
-    ai_instance.model_name = "MiniMax-M2.5"
+    ai_instance.model_name = "MiniMax-M2.7"
     ai_instance.azure_endpoint = None
     ai_instance.streaming = True
     ai_instance.vision = False

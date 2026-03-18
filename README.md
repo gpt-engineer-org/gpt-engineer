@@ -111,12 +111,14 @@ To use MiniMax models, set the `MINIMAX_API_KEY` environment variable and pass a
 
 ```bash
 export MINIMAX_API_KEY=your-minimax-api-key
-gpte my-project -m MiniMax-M2.5
+gpte my-project -m MiniMax-M2.7
 ```
 
 Supported MiniMax models:
 | Model | Description |
 |-------|-------------|
+| `MiniMax-M2.7` | Latest flagship model with enhanced reasoning and coding. |
+| `MiniMax-M2.7-highspeed` | High-speed version of M2.7 for low-latency scenarios. |
 | `MiniMax-M2.5` | Peak Performance. Ultimate Value. 204K context window. |
 | `MiniMax-M2.5-highspeed` | Same performance, faster and more agile. 204K context window. |
 
