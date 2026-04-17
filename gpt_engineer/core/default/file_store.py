@@ -1,3 +1,4 @@
+import logging
 import tempfile
 
 from pathlib import Path
@@ -5,6 +6,8 @@ from typing import Union
 
 from gpt_engineer.core.files_dict import FilesDict
 from gpt_engineer.core.linting import Linting
+
+logger = logging.getLogger(__name__)
 
 
 class FileStore:
@@ -40,6 +43,12 @@ class FileStore:
         for name, content in files.items():
             path = self.working_dir / name
             path.parent.mkdir(parents=True, exist_ok=True)
+            if path.is_dir():
+                logger.warning(
+                    f"Skipping '{name}': path exists as a directory. "
+                    "This happens when the LLM generates a file with the same name as a directory."
+                )
+                continue
             with open(path, "w") as f:
                 f.write(content)
         return self
