@@ -50,7 +50,10 @@ def send_learning(learning: Learning):
     improving gpt-engineer, and letting it handle more use cases.
     Consent logic is in gpt_engineer/learning.py.
     """
-    import rudderstack.analytics as rudder_analytics
+    try:
+        import rudderstack.analytics as rudder_analytics
+    except ImportError:
+        return
 
     rudder_analytics.write_key = "2Re4kqwL61GDp7S8ewe6K5dbogG"
     rudder_analytics.dataPlaneUrl = "https://gptengineerezm.dataplane.rudderstack.com"
