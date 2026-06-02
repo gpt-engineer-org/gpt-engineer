@@ -111,16 +111,15 @@ To use MiniMax models, set the `MINIMAX_API_KEY` environment variable and pass a
 
 ```bash
 export MINIMAX_API_KEY=your-minimax-api-key
-gpte my-project -m MiniMax-M2.7
+gpte my-project -m MiniMax-M3
 ```
 
 Supported MiniMax models:
 | Model | Description |
 |-------|-------------|
-| `MiniMax-M2.7` | Latest flagship model with enhanced reasoning and coding. |
+| `MiniMax-M3` | Latest flagship model with a 512K context window, up to 128K output, and image input support (default). |
+| `MiniMax-M2.7` | Previous-generation flagship model. |
 | `MiniMax-M2.7-highspeed` | High-speed version of M2.7 for low-latency scenarios. |
-| `MiniMax-M2.5` | Peak Performance. Ultimate Value. 204K context window. |
-| `MiniMax-M2.5-highspeed` | Same performance, faster and more agile. 204K context window. |
 
 You can also set a custom API base URL via `MINIMAX_API_BASE` (defaults to `https://api.minimax.io/v1`). For users in China, set it to `https://api.minimaxi.com/v1`.
 
