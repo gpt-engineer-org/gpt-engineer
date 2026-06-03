@@ -89,6 +89,11 @@ def load_env_if_needed():
     if os.getenv("ANTHROPIC_API_KEY") is None:
         load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
 
+    if os.getenv("MINIMAX_API_KEY") is None:
+        load_dotenv()
+    if os.getenv("MINIMAX_API_KEY") is None:
+        load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
+
 
 def concatenate_paths(base_path, sub_path):
     # Compute the relative path from base_path to sub_path
@@ -551,6 +556,8 @@ def main(
 
     if ai.token_usage_log.is_openai_model():
         print("Total api cost: $ ", ai.token_usage_log.usage_cost())
+    elif ai.token_usage_log.is_minimax_model():
+        print("Total tokens used: ", ai.token_usage_log.total_tokens())
     elif os.getenv("LOCAL_MODEL"):
         print("Total api cost: $ 0.0 since we are using local LLM.")
     else:

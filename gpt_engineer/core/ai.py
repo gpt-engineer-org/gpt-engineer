@@ -362,6 +362,26 @@ class AI:
                 streaming=self.streaming,
                 max_tokens_to_sample=4096,
             )
+        elif "minimax" in self.model_name.lower():
+            # MiniMax requires temperature in (0.0, 1.0], zero is not accepted
+            minimax_temperature = max(self.temperature, 0.01)
+            minimax_api_key = os.getenv("MINIMAX_API_KEY")
+            if not minimax_api_key:
+                raise ValueError(
+                    "MINIMAX_API_KEY environment variable is required for MiniMax models. "
+                    "Get your API key at https://platform.minimax.io"
+                )
+            minimax_base_url = os.getenv(
+                "MINIMAX_API_BASE", "https://api.minimax.io/v1"
+            )
+            return ChatOpenAI(
+                model=self.model_name,
+                temperature=minimax_temperature,
+                streaming=self.streaming,
+                callbacks=[StreamingStdOutCallbackHandler()],
+                openai_api_key=minimax_api_key,
+                openai_api_base=minimax_base_url,
+            )
         elif self.vision:
             return ChatOpenAI(
                 model=self.model_name,
